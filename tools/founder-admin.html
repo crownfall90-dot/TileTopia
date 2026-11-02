@@ -214,30 +214,71 @@ body:not(.authed) main > .card:not(#loginCard) { display: none; }
   </div>
 
   <!-- 1. РЕЛИЗЫ И ВЫКАТКА В ПРОД -->
-  <div class="card" style="border-color: rgba(79, 142, 247, 0.3)">
+  <div class="card" style="border-color: rgba(79, 142, 247, 0.4)">
     <div class="card-title">
       <span>🚀 Релизы и публикация</span>
       <span style="font-size:12px;color:var(--accent)" id="curVersion">…</span>
     </div>
-    <p class="stat-sub">Управление выкаткой из тестового контура (Staging) в боевой (Production).</p>
+    <p class="stat-sub">Двухэтапная публикация: сначала сборка тестируется на Staging (без пушей и без постов), затем в 1 клик выпускается в Production для всех игроков.</p>
     
-    <div style="background:var(--bg);padding:12px;border-radius:8px;border:1px solid var(--border)">
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-        <span style="font-size:13px;color:var(--muted)">Тестовый контур:</span>
-        <b style="color:var(--warning)" id="stagingStatus">…</b>
+    <!-- 2 Stages Grid -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">
+      <!-- Staging Box -->
+      <div style="background:var(--bg);padding:14px;border-radius:10px;border:1px solid rgba(214,158,46,0.3);display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <b style="color:var(--warning);font-size:14px">🟡 Тестовый контур (Staging)</b>
+          <span style="background:rgba(214,158,46,0.15);color:var(--warning);font-size:11px;padding:2px 8px;border-radius:6px;font-weight:700" id="stagingBadge">Тест</span>
+        </div>
+        <div style="font-size:13px;color:var(--muted)">Статус сборки: <b id="stagingStatus" style="color:var(--fg)">…</b></div>
+        <p class="stat-sub" style="font-size:11.5px;line-height:1.35">Обновляется автоматически при коммитах в dev-ветки. <b>Без пуш-уведомлений и без постов в канал.</b></p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
+          <a class="btn btn-sm" id="btnDownloadStaging" href="https://github.com/crownfall90-dot/play/releases/tag/staging-latest" target="_blank" rel="noopener" style="font-size:12px;padding:6px 10px;text-decoration:none">📥 Скачать APK</a>
+          <a class="btn btn-sm" id="btnOpenStaging" href="https://crownfall90-dot.github.io/play/staging/" target="_blank" rel="noopener" style="font-size:12px;padding:6px 10px;text-decoration:none">🌐 Тестовый веб</a>
+        </div>
       </div>
-      <div style="display:flex;justify-content:space-between">
-        <span style="font-size:13px;color:var(--muted)">Боевой сервер:</span>
-        <b style="color:var(--success)" id="prodStatus">…</b>
+
+      <!-- Production Box -->
+      <div style="background:var(--bg);padding:14px;border-radius:10px;border:1px solid rgba(56,161,105,0.3);display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <b style="color:var(--success);font-size:14px">🟢 Боевой сервер (Production)</b>
+          <span style="background:rgba(56,161,105,0.15);color:var(--success);font-size:11px;padding:2px 8px;border-radius:6px;font-weight:700">Боевой</span>
+        </div>
+        <div style="font-size:13px;color:var(--muted)">Текущая версия: <b id="prodStatus" style="color:var(--fg)">…</b></div>
+        <p class="stat-sub" style="font-size:11.5px;line-height:1.35">Доступна всем игрокам. При выкатке <b>рассылает FCM-пуш игрокам</b> и <b>публикует пост в Telegram-канал</b>.</p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
+          <a class="btn btn-sm" id="btnDownloadProd" href="https://github.com/crownfall90-dot/play/releases/latest" target="_blank" rel="noopener" style="font-size:12px;padding:6px 10px;text-decoration:none">📥 Боевой APK</a>
+          <a class="btn btn-sm" id="btnOpenProd" href="https://crownfall90-dot.github.io/play/" target="_blank" rel="noopener" style="font-size:12px;padding:6px 10px;text-decoration:none">🌐 Боевой сайт</a>
+          <a class="btn btn-sm" id="btnOpenTelegram" href="https://t.me/diarydevelopment" target="_blank" rel="noopener" style="font-size:12px;padding:6px 10px;text-decoration:none">📢 Канал</a>
+        </div>
       </div>
     </div>
 
-    <button class="btn btn-primary" id="btnPromote" style="padding:14px;font-size:15px">
-      🚀 Выпустить обновление в Production
-    </button>
-    <button class="btn" id="btnRollback">
-      🔄 Откатить версию
-    </button>
+    <!-- Release notes ready for publish -->
+    <div style="background:var(--bg);padding:12px 14px;border-radius:10px;border:1px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <b style="font-size:13px;color:var(--accent)">📝 Что войдёт в следующий релиз (Release Notes):</b>
+        <button class="btn btn-sm" id="btnReloadNotes" style="font-size:11px;padding:3px 8px">🔄 Обновить</button>
+      </div>
+      <div id="releaseNotesContent" style="font-size:12.5px;color:var(--fg);line-height:1.5;max-height:160px;overflow-y:auto;white-space:pre-wrap;background:rgba(0,0,0,0.2);padding:8px 10px;border-radius:6px">Загрузка release-notes.md…</div>
+    </div>
+
+    <!-- Pipeline status indicator -->
+    <div id="ciStatusBox" style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px">
+        <span id="ciStatusDot" style="font-size:14px">⚪</span>
+        <span id="ciStatusText" style="color:var(--muted)">Статус автосборки GitHub: проверяем…</span>
+      </div>
+      <a id="ciStatusLink" href="https://github.com/crownfall90-dot/play/actions" target="_blank" rel="noopener" style="font-size:12px;color:var(--accent);text-decoration:none">Смотреть запуски ↗</a>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button class="btn btn-primary" id="btnPromote" style="padding:14px;font-size:15px;font-weight:700">
+        🚀 Выпустить обновление в Production (для всех игроков)
+      </button>
+      <button class="btn" id="btnRollback" style="font-size:13px">
+        🔄 Откатить версию (Rollback)
+      </button>
+    </div>
   </div>
 
   <!-- 2. ЖИВАЯ СТАТИСТИКА -->
@@ -246,30 +287,32 @@ body:not(.authed) main > .card:not(#loginCard) { display: none; }
       <span>📊 Живой пульс игры</span>
       <span style="font-size:12px;color:var(--success)">● Live</span>
     </div>
+    <p class="stat-sub">Данные из базы Firebase в реальном времени. Реальные игроки (сыгравшие ≥1 партию или с профилем) отделены от пустых гостевых сессий и поисковых ботов.</p>
+    
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div>
-        <div class="stat-val" id="valOnline">--</div>
-        <div class="stat-sub">Игроков в сети (/presence)</div>
+        <div class="stat-val" id="valOnline" style="color:var(--success)">--</div>
+        <div class="stat-sub" id="subOnline">Игроков в сети (/presence)</div>
       </div>
       <div>
-        <div class="stat-val" id="valRooms">--</div>
-        <div class="stat-sub">Активных комнат</div>
+        <div class="stat-val" id="valRooms" style="color:var(--accent)">--</div>
+        <div class="stat-sub" id="subRooms">Активных комнат</div>
       </div>
       <div>
         <div class="stat-val" id="valDau">--</div>
-        <div class="stat-sub">Заходили за сутки</div>
+        <div class="stat-sub" id="subDau">Заходили за сутки</div>
       </div>
       <div>
         <div class="stat-val" id="valWau">--</div>
-        <div class="stat-sub">Заходили за неделю</div>
+        <div class="stat-sub" id="subWau">Заходили за неделю</div>
       </div>
       <div>
         <div class="stat-val" id="valReg">--</div>
-        <div class="stat-sub">С сохранённым профилем (за неделю)</div>
+        <div class="stat-sub" id="subReg">С сохранённым профилем (за неделю)</div>
       </div>
       <div>
         <div class="stat-val" id="valApp">--</div>
-        <div class="stat-sub">Приложение / сайт (за неделю)</div>
+        <div class="stat-sub" id="subApp">Приложение / сайт (за неделю)</div>
       </div>
       <div>
         <div class="stat-val" id="valRetD1" style="color:var(--accent)">--</div>
@@ -280,9 +323,9 @@ body:not(.authed) main > .card:not(#loginCard) { display: none; }
         <div class="stat-sub">Удержание D7 (цель ≥ 12%)</div>
       </div>
     </div>
-    <div class="stat-sub" id="valVers"></div>
+    <div class="stat-sub" id="valVers" style="margin-top:6px"></div>
     <div class="stat-sub" id="valCohorts" style="margin-top:6px;line-height:1.6"></div>
-    <button class="btn" id="btnRefreshStats">Обновить статистику</button>
+    <button class="btn" id="btnRefreshStats" style="margin-top:4px">Обновить статистику</button>
   </div>
 
   <!-- ИГРОКИ И ЛОГИ -->
@@ -555,22 +598,70 @@ $('btnCopyInvite').onclick = () => {
 async function loadStats() {
   try {
     const pres = await db('presence') || {}, now = Date.now();
-    const all = Object.values(pres).filter(p => p && p.t), day = all.filter(p => now - p.t < 864e5), week = all.filter(p => now - p.t < 7 * 864e5);
-    $('valOnline').textContent = all.filter(p => p.s !== 'off' && now - p.t < 3 * 60 * 1000).length;
-    // Every open game marks /presence once a minute; the last mark of each player stays, so it also tells who came lately.
-    $('valDau').textContent = day.length; $('valWau').textContent = week.length;
-    $('valReg').textContent = week.filter(p => p.r).length;
-    $('valApp').textContent = `${week.filter(p => p.p && p.p !== 'web' && p.p !== 'mock').length} / ${week.filter(p => p.p === 'web').length}`;
-    const vers = {}; week.forEach(p => { if (p.v) vers[p.v] = (vers[p.v] || 0) + 1; });
-    $('valVers').textContent = Object.keys(vers).length ? 'Версии за неделю: ' + Object.entries(vers).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([v, n]) => `${v} — ${n}`).join(' · ') : '';
+    const all = Object.values(pres).filter(p => p && typeof p === 'object' && p.t);
+    
+    // 1. Online right now: active within 2.5 minutes, not marked 'off', and has a name
+    const online = all.filter(p => p.s && p.s !== 'off' && now - p.t < 150000 && p.n);
+    const inGame = online.filter(p => p.s === 'online' || p.s === 'room').length;
+    const inSearch = online.filter(p => p.s === 'search').length;
+    const inBots = online.filter(p => p.s === 'bots').length;
+    const inMenu = online.filter(p => p.s === 'menu' || !p.s).length;
 
-    // Retention D1 / D7 across all presence records with first seen date (fs)
+    $('valOnline').textContent = online.length;
+    if ($('subOnline')) {
+      const parts = [];
+      if (inGame) parts.push(`${inGame} онлайн`);
+      if (inSearch) parts.push(`${inSearch} в поиске`);
+      if (inBots) parts.push(`${inBots} с ботами`);
+      if (inMenu) parts.push(`${inMenu} в меню`);
+      $('subOnline').textContent = parts.length ? parts.join(' · ') : 'Игроков в сети сейчас';
+    }
+
+    // 2. Real active rooms
+    const rooms = await fetch(`${DB}/rooms.json?shallow=true&auth=${await token()}`).then(r => r.ok ? r.json() : null);
+    const totalRoomsInDb = rooms ? Object.keys(rooms).length : 0;
+    const activeRoomsEstimate = inGame > 0 ? Math.max(1, Math.ceil(inGame / 2)) : 0;
+    $('valRooms').textContent = activeRoomsEstimate;
+    if ($('subRooms')) {
+      $('subRooms').textContent = `Сейчас играют (в архиве БД: ${totalRoomsInDb})`;
+    }
+
+    // 3. DAU and WAU - distinguish real players from empty bounces
+    const day = all.filter(p => now - p.t < 864e5);
+    const week = all.filter(p => now - p.t < 7 * 864e5);
+    const dayReal = day.filter(p => !isEmptyGuest(p));
+    const weekReal = week.filter(p => !isEmptyGuest(p));
+
+    $('valDau').textContent = dayReal.length;
+    if ($('subDau')) $('subDau').textContent = `За сутки (всего сессий: ${day.length})`;
+
+    $('valWau').textContent = weekReal.length;
+    if ($('subWau')) $('subWau').textContent = `За неделю (всего сессий: ${week.length})`;
+
+    // 4. Registered players with cloud profile
+    const regWeek = week.filter(p => p.r || p.hasProfile).length;
+    $('valReg').textContent = regWeek;
+    if ($('subReg')) $('subReg').textContent = `С профилем (за неделю)`;
+
+    // 5. App vs Web
+    const appReal = week.filter(p => p.p && p.p !== 'web' && p.p !== 'mock' && !isEmptyGuest(p)).length;
+    const webReal = week.filter(p => p.p === 'web' && !isEmptyGuest(p)).length;
+    $('valApp').textContent = `${appReal} / ${webReal}`;
+    if ($('subApp')) $('subApp').textContent = `Приложение / сайт (за неделю)`;
+
+    // Versions among active players
+    const vers = {};
+    weekReal.forEach(p => { if (p.v) vers[p.v] = (vers[p.v] || 0) + 1; });
+    $('valVers').textContent = Object.keys(vers).length ? 'Версии активных игроков за неделю: ' + Object.entries(vers).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([v, n]) => `${v} — ${n}`).join(' · ') : '';
+
+    // 6. Retention D1 / D7 computed across engaged players (ignoring empty 1-second bounces)
     const dayMs = 864e5;
     let eligD1 = 0, retD1 = 0, eligD7 = 0, retD7 = 0, hasFb1 = false, hasFb7 = false;
     const cohorts = {};
     all.forEach(p => {
       const fs = p.fs;
       if (!fs || !/^\d{4}-\d{2}-\d{2}$/.test(fs)) return;
+      if (isEmptyGuest(p)) return; // Ignore phantom empty guests
       const fsMs = Date.parse(fs + 'T00:00:00Z');
       const ageDays = Math.floor((now - fsMs) / dayMs);
       if (!cohorts[fs]) cohorts[fs] = {date: fs, total: 0, d1: 0, d7: 0};
@@ -601,17 +692,14 @@ async function loadStats() {
 
     const recentCohorts = Object.values(cohorts).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5);
     if (recentCohorts.length) {
-      $('valCohorts').innerHTML = '<b>Когорты новичков по дням:</b><br>' + recentCohorts.map(c => {
+      $('valCohorts').innerHTML = '<b>Когорты игроков по дням (без пустых гостей):</b><br>' + recentCohorts.map(c => {
         const d1 = c.d1 > 0 ? `${Math.round(c.d1 / c.total * 100)}%` : '0%';
         const d7 = c.d7 > 0 ? `${Math.round(c.d7 / c.total * 100)}%` : '—';
-        return `• ${c.date}: <b>${c.total}</b> новых · D1: <b>${d1}</b> · D7: <b>${d7}</b>`;
+        return `• ${c.date}: <b>${c.total}</b> игроков · D1: <b>${d1}</b> · D7: <b>${d7}</b>`;
       }).join('<br>');
     } else {
       $('valCohorts').textContent = '';
     }
-
-    const rooms = await fetch(`${DB}/rooms.json?shallow=true&auth=${await token()}`).then(r => r.ok ? r.json() : null);
-    $('valRooms').textContent = rooms ? Object.keys(rooms).length : 0;
   } catch (e) { log('Статистика: ' + e.message); }
 }
 $('btnRefreshStats').onclick = loadStats;
@@ -619,18 +707,81 @@ $('btnRefreshStats').onclick = loadStats;
 /* ---------- releases and GitHub workflows (run under the owner's own GitHub login) ---------- */
 const ACTIONS = `https://github.com/${REPO}/actions/workflows/`;
 const openWorkflow = (file, what) => { log('Открываю ' + file + ': нажмите «Run workflow» (ветка main), чтобы ' + what); window.open(ACTIONS + file, '_blank', 'noopener'); };
-$('btnPromote').onclick = () => { if (confirm('Открыть выпуск для ВСЕХ игроков? На странице GitHub нажмите «Run workflow».')) openWorkflow('promote-production.yml', 'выпустить версию'); };
+$('btnPromote').onclick = () => {
+  const msg = '🚀 ВЫПУСК ОБНОВЛЕНИЯ В PRODUCTION ДЛЯ ВСЕХ ИГРОКОВ\n\n' +
+    'Что произойдёт автоматически:\n' +
+    '1. Соберётся боевой APK и AAB (Google Play)\n' +
+    '2. Обновится сайт игры для всех пользователей\n' +
+    '3. Опубликуется пост с описанием в Telegram-канал @diarydevelopment\n' +
+    '4. Разошлётся push-уведомление игрокам о новой версии\n\n' +
+    'На открывшейся странице GitHub нажмите «Run workflow» (ветка main).\n' +
+    'Перейти к запуску выпуска?';
+  if (confirm(msg)) {
+    openWorkflow('promote-production.yml', 'выпустить версию для всех игроков');
+    setTimeout(checkCiStatus, 3000);
+  }
+};
 $('btnRollback').onclick = () => openWorkflow('android.yml', 'выпустить старую версию заново (поле «Вернуть версию», например v217)');
 $('btnBackupNow').onclick = () => openWorkflow('backup-database.yml', 'сделать зашифрованный бэкап базы');
 $('btnDownloadLatest').onclick = () => window.open(ACTIONS + 'backup-database.yml', '_blank', 'noopener');
 $('btnSendPush').onclick = () => openWorkflow('news.yml', 'разослать новость (заголовок и текст вводятся там же)');
+
+async function loadReleaseNotes() {
+  try {
+    const res = await fetch(`https://raw.githubusercontent.com/${REPO}/dev/stage2-account-network-20261029/release-notes.md?t=` + Date.now()).catch(() => null);
+    if (res && res.ok) {
+      const text = await res.text();
+      if ($('releaseNotesContent')) $('releaseNotesContent').textContent = text.trim() || 'Список изменений пуст';
+      return;
+    }
+    const fallback = await fetch(`https://raw.githubusercontent.com/${REPO}/main/release-notes.md?t=` + Date.now()).catch(() => null);
+    if (fallback && fallback.ok) {
+      const text = await fallback.text();
+      if ($('releaseNotesContent')) $('releaseNotesContent').textContent = text.trim() || 'Список изменений пуст';
+    }
+  } catch (_) {}
+}
+if ($('btnReloadNotes')) $('btnReloadNotes').onclick = loadReleaseNotes;
+
+async function checkCiStatus() {
+  try {
+    const res = await fetch(`https://api.github.com/repos/${REPO}/actions/runs?per_page=5`).then(r => r.ok ? r.json() : null);
+    if (!res || !res.workflow_runs || !res.workflow_runs.length) return;
+    const latest = res.workflow_runs[0];
+    const isRunning = latest.status === 'in_progress' || latest.status === 'queued';
+    const isSuccess = latest.conclusion === 'success';
+    const wfName = latest.name || 'Сборка';
+    if ($('ciStatusDot')) $('ciStatusDot').textContent = isRunning ? '🟡' : isSuccess ? '🟢' : '🔴';
+    if ($('ciStatusText')) {
+      $('ciStatusText').innerHTML = isRunning
+        ? `<b style="color:var(--warning)">Идёт автосборка:</b> ${wfName} #${latest.run_number}`
+        : isSuccess
+          ? `<b style="color:var(--success)">Автосборка завершена:</b> ${wfName} #${latest.run_number}`
+          : `<b style="color:var(--danger)">Сборка завершилась ошибкой:</b> ${wfName} #${latest.run_number}`;
+    }
+    if ($('ciStatusLink')) $('ciStatusLink').href = latest.html_url || `https://github.com/${REPO}/actions`;
+  } catch (_) {}
+}
+
 async function loadVersions() {
   try {
     const rel = await fetch(`https://api.github.com/repos/${REPO}/releases?per_page=10`).then(r => r.json());
     const prod = rel.find(r => !r.prerelease && /^v\d+$/.test(r.tag_name)), stg = rel.find(r => r.tag_name === 'staging-latest');
-    if (prod) { $('curVersion').textContent = prod.name; $('prodStatus').textContent = prod.name + ' · ' + new Date(prod.published_at).toLocaleString(); }
-    $('stagingStatus').textContent = stg ? stg.name.replace(/^.*#/, 'сборка #').replace(/\)$/, '') + ' · ' + new Date(stg.published_at).toLocaleString() : 'нет';
+    if (prod) {
+      $('curVersion').textContent = prod.name;
+      $('prodStatus').textContent = prod.name + ' · ' + new Date(prod.published_at).toLocaleString('ru-RU');
+      if ($('btnDownloadProd')) $('btnDownloadProd').href = `https://github.com/${REPO}/releases/download/${prod.tag_name}/Puzzlegrad.apk`;
+    }
+    if (stg) {
+      const stgName = stg.name.replace(/^.*#/, 'сборка #').replace(/\)$/, '');
+      $('stagingStatus').textContent = stgName + ' · ' + new Date(stg.published_at).toLocaleString('ru-RU');
+      if ($('stagingBadge')) $('stagingBadge').textContent = stgName;
+    } else {
+      $('stagingStatus').textContent = 'нет';
+    }
   } catch (_) { $('prodStatus').textContent = 'не удалось узнать'; }
+  loadReleaseNotes();
+  checkCiStatus();
 }
 
 /* ---------- feedback (the same sign-in; statuses are the owner's notes, kept in this browser) ---------- */
