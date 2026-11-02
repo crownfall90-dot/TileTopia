@@ -1,0 +1,27 @@
+name: Setup Telegram Mini App in Bot
+
+on:
+  workflow_dispatch:
+    inputs:
+      web_url:
+        description: 'Web App URL'
+        required: false
+        default: 'https://crownfall90-dot.github.io/play/'
+
+permissions:
+  contents: read
+
+jobs:
+  setup:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+      - name: Configure Telegram Bot Mini App
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          test -n "$TELEGRAM_BOT_TOKEN" || { echo "TELEGRAM_BOT_TOKEN is not set"; exit 1; }
+          python3 scripts/telegram-setup-bot.py "${{ inputs.web_url }}"

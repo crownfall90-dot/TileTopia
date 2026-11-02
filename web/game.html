@@ -3,6 +3,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Onest:wght@400;500;600;700&family=Unbounded:wght@500;700;800&display=swap">
+<script src="https://telegram.org/js/telegram-web-app.js"></script>
 <!-- styles: src/ui/styles.css (scripts/wrap-web.sh puts them here) -->
 
 <div class="page">
@@ -1323,6 +1324,12 @@ function stopTimer() {
 // Turn clock for people (bots are quick anyway). When it runs out the card goes to a random fitting spot.
 // "Hurry up" alert: in the last 10 s of a turn, if the player has done nothing for a moment, the screen edges pulse
 // red; in the last 5 s the phone also buzzes lightly every second.
+function haptic(type = 'light') {
+  if (typeof PG !== 'undefined' && PG.app && PG.app.telegram && PG.app.telegram.telegramHaptic(type)) return;
+  try {
+    if (navigator.vibrate) navigator.vibrate(type === 'error' || type === 'warning' ? [50, 40, 50] : 40);
+  } catch (_) {}
+}
 let lastAct = Date.now(), buzzedAt = -1;
 ['pointerdown', 'pointermove', 'wheel', 'keydown'].forEach(ev => document.addEventListener(ev, () => { lastAct = Date.now(); }, {passive: true, capture: true}));
 function idleWarn(left) {
@@ -1330,7 +1337,7 @@ function idleWarn(left) {
   if (left == null) { g.classList.remove('warn', 'hard'); buzzedAt = -1; return; }
   if (!g.classList.contains('warn')) { g.classList.remove('on'); g.style.setProperty('--c', '#ff5a4d'); g.classList.add('warn'); }
   g.classList.toggle('hard', left <= 5);
-  if (left <= 5 && buzzedAt !== left) { buzzedAt = left; try { if (navigator.vibrate) navigator.vibrate(left <= 1 ? [50, 40, 50] : 40); } catch (_) {} }
+  if (left <= 5 && buzzedAt !== left) { buzzedAt = left; haptic(left <= 1 ? 'warning' : 'light'); }
 }
 function startTimer() {
   stopTimer(); lastAct = Date.now();
@@ -1366,7 +1373,7 @@ function turnAlert() {
   if (!wallet.alert) return;
   const g = $('#edgeglow'); g.style.setProperty('--c', players[turn].col);
   g.classList.remove('on'); void g.offsetWidth; g.classList.add('on');
-  try { if (navigator.vibrate) navigator.vibrate(40); } catch (_) {}
+  haptic('light');
 }
 function beginHumanTurn() {
   beep('turn'); turnAlert();
@@ -2211,9 +2218,14 @@ async function ensureGuestName() {
     const take = n => {
       wallet.no = n;
       if (!clean(wallet.name)) {
-        const gen = (typeof PG !== 'undefined' && PG.account && PG.account.auth && PG.account.auth.generateRandomNickname)
+        let preferred = '';
+        if (typeof PG !== 'undefined' && PG.app && PG.app.telegram) {
+          const tgU = PG.app.telegram.getTelegramUser();
+          if (tgU) preferred = tgU.username || tgU.firstName || '';
+        }
+        const gen = preferred || ((typeof PG !== 'undefined' && PG.account && PG.account.auth && PG.account.auth.generateRandomNickname)
           ? PG.account.auth.generateRandomNickname()
-          : 'Зодчий';
+          : 'Зодчий');
         wallet.guest = gen;
       }
       saveWallet(); renderSetup(); if (typeof presenceMark === 'function') presenceMark(true);
@@ -5766,6 +5778,9 @@ function show(name) {
   if (name === 'menu') { renderResume(); saveWallet(); presenceCount(); progressDot(); renderMenuProfile(); }
   if (name === 'progress') { renderProgress(); renderAccount(); }
   track('screen_view', {screen_name: name});
+  if (typeof PG !== 'undefined' && PG.app && PG.app.telegram) {
+    PG.app.telegram.updateTelegramBackButton(name !== 'menu', () => show('menu'));
+  }
   if (name === 'friends') openFriends();
   if (name === 'menu') { friendsDot(); (typeof bootReady === 'undefined' ? Promise.resolve() : bootReady).then(() => { (typeof syncStart === 'undefined' ? Promise.resolve() : syncStart).then(() => { setTimeout(streakCheck, 300); setTimeout(checkNameProposal, 800); }); setTimeout(notifNudge, 1600); }); }
   clearTimeout(presenceSoon); presenceSoon = setTimeout(() => presenceMark(true), 1500);
@@ -5887,10 +5902,17 @@ function routeLink({room, friend}) {
 // The Android shell calls this when the game is opened (or already open) with a link.
 window.onDeepLink = href => { const l = parseLink(href); if (l) bootReady.then(() => setTimeout(() => routeLink(l), 400)); };
 function openLink() {
+  if (typeof PG !== 'undefined' && PG.app && PG.app.telegram) {
+    PG.app.telegram.initTelegramWebApp();
+    const tgRoom = PG.app.telegram.getTelegramStartParam();
+    if (tgRoom && tgRoom.length === 5) {
+      return routeLink({room: tgRoom});
+    }
+  }
   const l = parseLink(location.href); if (!l || !(l.room || l.friend)) return;
   try { history.replaceState(history.state, '', location.pathname); } catch (_) {}
   // In an Android browser: first offer to open the game app, the browser stays an option.
-  if (/Android/i.test(navigator.userAgent) && !standalone()) {
+  if (/Android/i.test(navigator.userAgent) && !standalone() && !(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData)) {
     const qs = l.friend ? 'friend=' + l.friend : 'room=' + l.room, what = l.friend ? 'Приглашение в друзья' : 'Приглашение в комнату';
     const intent = `intent://${location.host}${location.pathname}?${qs}#Intent;scheme=https;package=com.crownfall.mosaic;S.browser_fallback_url=${encodeURIComponent(APK_URL)};end`;
     const box = document.createElement('div'); box.className = 'over'; box.style.position = 'fixed';
@@ -5903,7 +5925,8 @@ function openLink() {
 }
 // On the first visit from a phone (not installed yet) show how to install, once.
 function firstInstallHint() {
-  if (!isWeb || standalone() || !isMobile || wallet.installHinted || document.querySelector('body > .over') || tut || gameVisible) return; // never over a lesson or a game
+  const isTg = typeof PG !== 'undefined' && PG.app && PG.app.telegram && PG.app.telegram.isTelegramWebApp();
+  if (isTg || !isWeb || standalone() || !isMobile || wallet.installHinted || document.querySelector('body > .over') || tut || gameVisible) return; // never over a lesson or a game
   wallet.installHinted = true; saveWallet(); installDialog();
 }
 // After an update (from Google Play or GitHub) show what changed, once per version.
