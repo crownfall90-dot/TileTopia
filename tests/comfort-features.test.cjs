@@ -38,13 +38,14 @@ test('comfort: askProfile dialog includes randomizer dice button #profDice', asy
   assert.ok(html.includes('🎲'), 'Must show dice emoji');
 });
 
-test('comfort: LOCS have stable identifiers and all locations are open', async () => {
+test('comfort: LOCS have stable identifiers and village is open while future locations are upcoming', async () => {
   const {LOCS} = await import('../src/state/catalog.js');
   assert.equal(LOCS.length, 4);
   const ids = LOCS.map(l => l.id);
   assert.deepEqual(ids, ['village', 'city', 'siberia', 'jungle']);
-  for (const loc of LOCS) {
-    assert.equal(loc.open, true, `Location ${loc.id} should be open`);
+  assert.equal(LOCS[0].open, true, 'Village should be open');
+  for (const loc of LOCS.slice(1)) {
+    assert.equal(loc.open, false, `Location ${loc.id} should be marked upcoming (open: false)`);
     assert.ok(loc.name && loc.art, `Location ${loc.id} must have name and art`);
   }
 });

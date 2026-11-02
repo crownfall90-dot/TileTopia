@@ -41,8 +41,8 @@ export function renderFramesGrid({frames, wallet, initial}) {
 export function renderLocationsGrid(locs) {
   return locs.map(l => `<div class="loc${l.open ? '' : ' locked'}">` +
     `<svg viewBox="0 0 160 90" aria-hidden="true">${l.art}</svg>` +
-    `<span class="badge">${l.open ? 'Открыта' : '<svg width="10" height="11" viewBox="0 0 10 11"><rect x="1" y="5" width="8" height="6" rx="1" fill="currentColor"/><path d="M3 5V3.5a2 2 0 014 0V5" stroke="currentColor" fill="none" stroke-width="1.4"/></svg>Скоро'}</span>` +
-    `<div class="li"><b>${l.name}</b><small>${l.open ? l.desc : l.desc + '. Появится в одном из следующих обновлений'}</small></div></div>`
+    `<span class="badge">${l.open ? 'Открыта' : 'Скоро'}</span>` +
+    `<div class="li"><b>${l.name}</b><small>${l.desc}</small></div></div>`
   ).join('');
 }
 

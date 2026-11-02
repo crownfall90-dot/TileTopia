@@ -214,7 +214,7 @@
             <div class="seg" id="setupBotLvl"><button data-blvl="easy">Лёгкие</button><button data-blvl="normal">Обычные</button><button data-blvl="hard">Сложные</button></div>
             <p class="shint" id="setupBotLvlHint">Обычные — взвешенные ходы и захват подходящих объектов.</p>
           </div>
-          <div class="col" id="setupLocBox">
+          <div class="col" id="setupLocBox" hidden>
             <div class="h3">Локация стола</div>
             <div class="seg" id="setupLoc"><button data-loc="village" class="on">🌳 Деревня</button><button data-loc="city">🏙️ Мегаполис</button><button data-loc="siberia">❄️ Сибирь</button><button data-loc="jungle">🌴 Джунгли</button></div>
           </div>
@@ -246,33 +246,107 @@
 
       <section class="screen scroll" id="scr-lobby" hidden>
         <div class="lb">
-          <div class="ltop"><button class="iconbtn" id="lobbyBack" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Комната</b></div>
-          <div class="col" id="lbJoin">
-            <input class="field" id="myName" hidden>
-            <button class="cta wide" id="create">Создать комнату</button>
-            <div class="h3">Войти по коду</div>
-            <div class="joinrow"><input class="field codein" id="codeIn" maxlength="5" placeholder="K7Q2X" autocomplete="off" autocapitalize="characters"><button class="cta" id="join">Войти</button></div>
+          <div class="ltop">
+            <button class="iconbtn" id="lobbyBack" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+            <b id="lobbyTitle">Сетевая игра</b>
           </div>
-          <div class="col" id="lbRoom" hidden>
-            <div class="codecard"><small>Код комнаты</small><div class="code tap" id="codeShow" role="button" tabindex="0" aria-label="Скопировать код комнаты"></div>
+
+          <!-- Lobby Entrance Screen: Create or Join -->
+          <div class="col lb-entrance" id="lbJoin">
+            <input class="field" id="myName" hidden>
+            <div class="lobby-hero">
+              <div class="l-hero-ico">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+              </div>
+              <div class="l-hero-tx">
+                <b>Игра по сети</b>
+                <small>Сразитесь с друзьями онлайн в реальном времени</small>
+              </div>
+            </div>
+
+            <div class="lobby-card create-card">
+              <div class="l-card-head">
+                <div class="l-card-badge">Новая комната</div>
+                <b>Создать комнату</b>
+                <small>Вы станете ведущим партии, сможете настроить правила и позвать друзей</small>
+              </div>
+              <button class="cta wide pri" id="create">
+                <span>Создать комнату</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+
+            <div class="l-divider"><span>или по коду</span></div>
+
+            <div class="lobby-card join-card">
+              <div class="l-card-head">
+                <div class="l-card-badge">Подключение</div>
+                <b>Войти по коду</b>
+                <small>Введите 5-значный код комнаты от друга</small>
+              </div>
+              <div class="joinrow">
+                <input class="field codein" id="codeIn" maxlength="5" placeholder="K7Q2X" autocomplete="off" autocapitalize="characters" spellcheck="false">
+                <button class="cta" id="join">Войти</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Room Screen -->
+          <div class="col lb-room-view" id="lbRoom" hidden>
+            <div class="codecard">
+              <div class="codecard-tag">Комната создана</div>
+              <small>Код комнаты для друзей</small>
+              <div class="code tap" id="codeShow" role="button" tabindex="0" aria-label="Скопировать код комнаты"></div>
               <small class="code-hint">Нажмите на код, чтобы скопировать</small>
-              <button class="chip pri lb-invite" id="lbInvite"><span>👥 Пригласить друзей</span><span class="fonline-badge" id="lbOnlineN" hidden>0</span></button></div>
+              <button class="chip pri lb-invite" id="lbInvite">
+                <span>👥 Пригласить друзей</span>
+                <span class="fonline-badge" id="lbOnlineN" hidden>0</span>
+              </button>
+            </div>
+
             <button class="cupsbadge" id="lbCups"></button>
-            <div class="h3">Ваш цвет</div>
-            <div class="mycolor" id="myColor"></div>
-            <div class="h3" id="lbCount">Игроки</div>
-            <ul class="plist" id="plist"></ul>
-            <button class="chip" id="addBot">+ Добавить бота</button>
+
+            <div class="col-card">
+              <div class="h3-bar">
+                <span class="h3-icon">🎨</span>
+                <span class="h3">Ваш цвет</span>
+              </div>
+              <div class="mycolor" id="myColor"></div>
+            </div>
+
+            <div class="col-card">
+              <div class="h3-bar player-bar">
+                <div class="h3-left">
+                  <span class="h3-icon">👥</span>
+                  <span class="h3" id="lbCount">Игроки</span>
+                </div>
+                <button class="chip addbot-chip" id="addBot">+ Добавить бота</button>
+              </div>
+              <ul class="plist" id="plist"></ul>
+            </div>
+
             <div id="lobbyOnline" hidden>
               <div class="h3" id="lobbyOnlineTitle">Друзья онлайн</div>
               <ul class="flist" id="lobbyOnlineList"></ul>
             </div>
-            <div class="h3">Правила партии</div>
-            <div class="rulesbox" data-rules id="lbRules"></div>
-            <button class="cta wide" id="backToGame" hidden>Вернуться в партию</button>
-            <button class="cta wide" id="lobbyStart">Начать игру</button>
-            <button class="cta wide" id="lobbyReady" hidden>Готов</button>
-            <div class="lbwait" id="lbWait" hidden><div class="pz sm"><div class="pzb"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div><p class="shint">Ожидание старта…</p></div>
+
+            <div class="col-card">
+              <div class="h3-bar">
+                <span class="h3-icon">📜</span>
+                <span class="h3">Правила партии</span>
+              </div>
+              <div class="rulesbox" data-rules id="lbRules"></div>
+            </div>
+
+            <div class="room-actions">
+              <button class="cta wide" id="backToGame" hidden>Вернуться в партию</button>
+              <button class="cta wide pri-start" id="lobbyStart">Начать игру</button>
+              <button class="cta wide alt-ready" id="lobbyReady" hidden>Готов</button>
+              <div class="lbwait" id="lbWait" hidden>
+                <div class="pz sm"><div class="pzb"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+                <p class="shint">Ожидание старта партии…</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -2783,6 +2857,7 @@ let lobbyPendTimer = 0;
 function renderLobby() {
   if (mm) matchRender();
   $('#lbJoin').hidden = !!net; $('#lbRoom').hidden = !net;
+  if ($('#lobbyTitle')) $('#lobbyTitle').textContent = net ? ('Комната ' + net.code) : 'Сетевая игра';
   if (!net) return;
   updateLobbyOnlineBadge();
   $('#codeShow').innerHTML = [...net.code].map(c => `<span>${c}</span>`).join('');
@@ -3222,12 +3297,17 @@ $('#mBots').onclick = () => {
 
 /* Quick phrases online: a fixed set of emoji and short lines (no free text, so nothing to
    moderate). They appear as a bubble under the sender's card for a few seconds. */
-const SAYS = ['👍', '😄', '😮', '😅', '🔥', 'Привет!', 'Хороший ход!', 'Ой!', 'Ну ты даёшь!', 'Удачи!', 'Спасибо за игру!',
-  '👏', '😎', '🤔', '😢', '🎉', '❤️', 'Красиво построено!', 'Вот это поворот!', 'Моя очередь?', 'Ещё партию?'];
+const SAYS = [
+  '👍', '😄', '😮', '😅', '🔥', '👏', '😎', '🤔', '😢', '🎉', '❤️', '🤝', '👑', '⚔️', '🎯', '💪', '🤯', '☕',
+  'Привет!', 'Хороший ход!', 'Ой!', 'Ну ты даёшь!', 'Удачи!', 'Спасибо за игру!',
+  'Красиво построено!', 'Вот это поворот!', 'Моя очередь?', 'Ещё партию?',
+  'Я думал иначе...', 'Всё идёт по плану!', 'Неожиданно!', 'Красивая партия!',
+  'Ура!', 'Почти получилось!', 'Секунду, думаю...', 'Отличная игра!'
+];
 // A message stays on screen SAY_MS; its author cannot send the next one before it is gone (everyone ignores a faster one).
 const SAY_MS = 3200, sayUntil = {};
 let sayAt = 0;
-const isText = x => /[а-я]/i.test(x);
+const isText = x => /[а-яёА-ЯЁ]/i.test(x);
 function renderSayBox() {
   const em = SAYS.filter(x => !isText(x)), tx = SAYS.filter(isText);
   $('#sayBox').innerHTML = `<div class="sy-lock">Подождите: прошлое сообщение ещё на экране</div><div class="sy-h">Эмоции</div><div class="sy-e">${em.map(x => `<button class="e" data-say="${SAYS.indexOf(x)}">${x}</button>`).join('')}</div>` +
@@ -3253,7 +3333,7 @@ $('#sayBox').addEventListener('click', e => {
     const botIdxs = players.map((p, i) => !isMe(p) && !p.human ? i : -1).filter(i => i >= 0);
     if (botIdxs.length && Math.random() < 0.45) {
       const bIdx = botIdxs[Math.floor(Math.random() * botIdxs.length)];
-      const botReplies = [0, 1, 11, 13, 16]; // '👍', '😄', '👏', '🤔', '❤️'
+      const botReplies = [0, 1, 5, 7, 10, 11, 12, 14, 15]; // '👍', '😄', '👏', '🤔', '❤️', '🤝', '👑', '🎯', '💪'
       const reply = botReplies[Math.floor(Math.random() * botReplies.length)];
       setTimeout(() => { if (typeof phase !== 'undefined' && phase !== 'end') showSay(bIdx, reply); }, 1200 + Math.random() * 800);
     }
@@ -3267,7 +3347,7 @@ function showSay(p, i) {
   b.className = 'bubble' + (isText(txt) ? '' : ' e'); b.textContent = txt; b.style.setProperty('--c', players[p].col);
   b.style.left = cx + 'px'; b.style.top = cy + 'px';
   document.body.append(b); setTimeout(() => b.remove(), SAY_MS + 100);
-  if (!isText(txt) && ['🔥', '🎉', '❤️', '👏'].includes(txt) && !RM) for (let k = 0; k < 7; k++) {
+  if (!isText(txt) && ['🔥', '🎉', '❤️', '👏', '👑', '⚔️', '🎯', '💪', '🤯'].includes(txt) && !RM) for (let k = 0; k < 7; k++) {
     const sp = document.createElement('i'); sp.className = 'spark'; sp.textContent = txt;
     sp.style.cssText = `left:${cx - 8}px;top:${cy + 10}px;--dx:${((k - 3) * 16 + (Math.random() - .5) * 14) | 0}px;--dy:${(-30 - Math.random() * 50) | 0}px;--rt:${((Math.random() - .5) * 90) | 0}deg;animation-delay:${k * 70}ms`;
     document.body.append(sp); setTimeout(() => sp.remove(), 1900 + k * 70);
