@@ -49,6 +49,18 @@ test('ui/feedback: renderFeedbackCardHtml renders categories, star rating and he
   assert.ok(html.includes('promo'), 'contains name contest promo');
   assert.ok(html.includes('5/5 — Отличная игра!'), 'renders star label');
   assert.ok(html.includes('Опишите идею...'), 'renders placeholder');
+
+  // Verify opening with 0 stars initially (not auto-selecting 5 stars)
+  const zeroHtml = feedback.renderFeedbackCardHtml({
+    first: false,
+    stars: 0,
+    starLabel: 'Нажмите на звезду, чтобы оценить',
+    cat: 'idea',
+    placeholder: 'Опишите идею...',
+    diagSummary: ''
+  });
+  assert.ok(!zeroHtml.includes('fb-star active'), 'starts without active stars');
+  assert.ok(zeroHtml.includes('Нажмите на звезду, чтобы оценить'), 'displays prompt to rate');
 });
 
 test('ui/owner: devGet and devSet handle native preferences bridge and storage', () => {

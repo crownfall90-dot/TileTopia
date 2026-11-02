@@ -2,6 +2,24 @@
 
 export const RENAME_PRICE = 50;
 
+export const NICKNAME_ADJECTIVES = [
+  'Мудрый', 'Смелый', 'Тихий', 'Быстрый', 'Горный', 'Вольный',
+  'Храбрый', 'Светлый', 'Верный', 'Зоркий', 'Тайный', 'Ловкий'
+];
+
+export const NICKNAME_NOUNS = [
+  'Зодчий', 'Искатель', 'Странник', 'Следопыт', 'Картограф', 'Магистр',
+  'Хранитель', 'Страж', 'Орион', 'Бастион', 'Атлас', 'Компас'
+];
+
+/** Generates an evocative, universal fantasy/adventure nickname (up to 12 chars). */
+export function generateRandomNickname(rngFn = Math.random) {
+  const pick = arr => arr[Math.floor(rngFn() * arr.length)];
+  if (rngFn() < 0.45) return pick(NICKNAME_NOUNS);
+  const combo = `${pick(NICKNAME_ADJECTIVES)} ${pick(NICKNAME_NOUNS)}`;
+  return combo.length <= 12 ? combo : pick(NICKNAME_NOUNS);
+}
+
 /** Sanitize nickname and constrain length to 12 characters. */
 export function sanitizeNickname(v) {
   return String(v || '').replace(/[<>&"'`]/g, '').trim().slice(0, 12);
@@ -30,6 +48,8 @@ export const AUTH_ERR = {
   USER_DISABLED: ['Этот профиль отключён. Напишите в поддержку', 'mail'],
   TOO_MANY_ATTEMPTS_TRY_LATER: ['Слишком много попыток подряд. Подождите несколько минут или смените пароль через «Забыли пароль?»', ''],
   CREDENTIAL_TOO_OLD_LOGIN_AGAIN: ['Для этого нужно войти заново', ''],
+  CREDENTIAL_ALREADY_IN_USE: ['Этот аккаунт Google уже используется. Выполняем вход...', ''],
+  FEDERATED_USER_ID_ALREADY_LINKED: ['Этот аккаунт Google уже привязан к другому профилю. Выполняем вход...', ''],
   SHORT_OR_WRONG: ['Пароль не подходит. Для нового профиля пароль нужен от 6 символов', 'pass'],
 };
 

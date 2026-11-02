@@ -104,11 +104,17 @@ export function formatCupsBadge(cups, isHost) {
   const className = 'cupsbadge' + (cups ? ' on' : '') + (isHost ? ' host' : '');
   const title = cups ? '🏆 Игра на кубки' : '🤝 Без кубков';
   const subtitle = isHost
-    ? (cups ? 'Кубки начисляются' : 'Кубки не меняются')
+    ? (cups ? 'Кубки начисляются · нажмите для смены' : 'Кубки не меняются · нажмите для смены')
     : (cups ? 'Рейтинговая игра' : 'Без рейтинга');
-  const innerHtml = `<b>${title}</b><small>${subtitle}</small>`;
+  const innerHtml = `<div class="cupsbadge-main"><b>${title}</b><small>${subtitle}</small></div><div class="cups-switch" aria-hidden="true"><span class="cups-switch-track"><span class="cups-switch-knob">${cups ? '🏆' : '🤝'}</span></span></div>`;
   return {className, innerHtml};
 }
+
+export const BOT_LVL_LABELS = {
+  easy: 'Лёгкий',
+  normal: 'Обычный',
+  hard: 'Сложный'
+};
 
 export function renderRoomSeatsHtml({
   seats = [],
@@ -134,16 +140,22 @@ export function renderRoomSeatsHtml({
     const colVal = validColFn(x.col) ? x.col : (palette[i % palette.length] ? (palette[i % palette.length].col || palette[i % palette.length]) : '#3fc27a');
     const dataAttrs = (x.uid && !isMe) ? ` data-pl="${safeUid}" data-n="${safeName}" data-c="${validColFn(x.col) ? x.col : ''}"` : '';
 
-    const whoHtml = `<b>${safeName}${isMe ? ' (вы)' : ''}</b>${stTagFn(x.st)}<small>${isBot ? 'Бот' : isRoomHost ? 'Создатель комнаты' : (x.ready ? '✓ Готов к игре' : 'Ждём готовности')}</small>`;
+    const botLvl = x.botlvl || 'normal';
+    const botLvlName = BOT_LVL_LABELS[botLvl] || 'Обычный';
+    const whoHtml = `<b>${safeName}${isMe ? ' (вы)' : ''}</b>${stTagFn(x.st)}<small>${isBot ? `Бот · ${botLvlName.toLowerCase()}` : isRoomHost ? 'Создатель комнаты' : (x.ready ? '✓ Готов к игре' : 'Ждём готовности')}</small>`;
     
     const canAddFriend = (!isMe && !isBot && x.uid && x.uid !== myUid && !isFriendFn(x.uid) && registered);
     const addFriendBtn = canAddFriend ? `<button class="chip addf" data-addf="${safeUid}" data-n="${safeName}" aria-label="В друзья">＋</button>` : '';
 
     let actionOrPill;
     if (isHost && !isMe) {
-      actionOrPill = `<button class="chip" data-kick="${i}">Убрать</button>`;
+      if (isBot) {
+        actionOrPill = `<button class="chip botlvl-chip" data-botlvl="${i}" title="Нажмите, чтобы сменить сложность">🤖 ${botLvlName}</button><button class="chip" data-kick="${i}">Убрать</button>`;
+      } else {
+        actionOrPill = `<button class="chip" data-kick="${i}">Убрать</button>`;
+      }
     } else if (isBot) {
-      actionOrPill = '<span class="pill">Бот</span>';
+      actionOrPill = `<span class="pill botpill">🤖 ${botLvlName}</span>`;
     } else if (isRoomHost) {
       actionOrPill = '<span class="pill host">Создатель</span>';
     } else if (x.ready) {

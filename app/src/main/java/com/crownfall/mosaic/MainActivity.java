@@ -327,7 +327,8 @@ public class MainActivity extends Activity {
         // Google refuses the token when this app's signing certificate (SHA-1) is not registered for the package in
         // the Firebase/Google Cloud project: the account picker opens, then this error comes back (code 28444).
         String m = String.valueOf(e.getMessage());
-        if (m.contains("28444") || m.contains("Developer console")) return "misconfigured";
+        if (m.contains("USER_CANCELED") || m.contains("Canceled") || m.contains("canceled") || m.contains("16: Cannot find")) return "canceled";
+        if (m.contains("28444") || m.contains("28433") || m.contains("10:") || m.contains("DEVELOPER_ERROR") || m.contains("Developer console")) return "misconfigured";
         return "failed";
     }
 
@@ -425,15 +426,38 @@ public class MainActivity extends Activity {
                         @Override public void onResult(GetCredentialResponse res) {
                             try {
                                 Credential cred = res.getCredential();
-                                GoogleIdTokenCredential g = GoogleIdTokenCredential.createFrom(cred.getData());
-                                js("window.onGoogleToken && window.onGoogleToken(" + org.json.JSONObject.quote(g.getIdToken()) + ")");
+                                String idToken = null;
+                                try {
+                                    GoogleIdTokenCredential g = GoogleIdTokenCredential.createFrom(cred.getData());
+                                    idToken = g.getIdToken();
+                                } catch (Throwable t) {
+                                    android.util.Log.w("MosaicGoogle", "GoogleIdTokenCredential.createFrom: " + t.getMessage());
+                                }
+                                if (idToken == null || idToken.isEmpty()) {
+                                    android.os.Bundle b = cred.getData();
+                                    if (b != null) {
+                                        idToken = b.getString("com.google.android.libraries.identity.googleid.BUNDLE_KEY_ID_TOKEN");
+                                        if (idToken == null) idToken = b.getString("id_token");
+                                        if (idToken == null) idToken = b.getString("idToken");
+                                    }
+                                }
+                                if (idToken != null && !idToken.isEmpty()) {
+                                    android.util.Log.i("MosaicGoogle", "Google ID token obtained");
+                                    js("window.onGoogleToken && window.onGoogleToken(" + org.json.JSONObject.quote(idToken) + ")");
+                                } else {
+                                    android.util.Log.e("MosaicGoogle", "Empty Google ID token");
+                                    report(new RuntimeException("Empty Google ID token from credential type: " + (cred != null ? cred.getType() : "null")));
+                                    js("window.onGoogleError && window.onGoogleError('bad_credential')");
+                                }
                             } catch (Exception e) {
+                                android.util.Log.e("MosaicGoogle", "onResult exception: " + e.getMessage(), e);
                                 report(e);
                                 js("window.onGoogleError && window.onGoogleError('bad_credential')");
                             }
                         }
                         @Override public void onError(GetCredentialException e) {
                             String code = googleErrorCode(e);
+                            android.util.Log.w("MosaicGoogle", "onError: code=" + code + " ex=" + e.getClass().getSimpleName() + " msg=" + e.getMessage());
                             if ("failed".equals(code) || "misconfigured".equals(code)) report(e);
                             js("window.onGoogleError && window.onGoogleError(" + org.json.JSONObject.quote(code) + ")");
                         }

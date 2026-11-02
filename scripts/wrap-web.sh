@@ -61,7 +61,7 @@ else:
     print(json.dumps({'apiKey': g['client'][0]['api_key'][0]['current_key'], 'dbUrl': db, 'googleClientId': gid}))
 PY
 )
-notes=$("$PY_BIN" -c 'import json; print(json.dumps(open("release-notes.md", encoding="utf-8").read().strip(), ensure_ascii=False))')
+notes=$(PYTHONIOENCODING=utf-8 "$PY_BIN" -c 'import json; print(json.dumps(open("release-notes.md", encoding="utf-8").read().strip()))')
 
 build_page() {
   dest="$1"

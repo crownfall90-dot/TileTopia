@@ -64,4 +64,4 @@ Set REQUIRE_STAGING_SIGNING=true to prevent fallback to a temporary debug key.
 Use the existing staging build command in TESTING.md in a disposable checkout.
 Do not print the environment or save secrets in shell history.
 
-This is still an offline, debug/test APK, not a production release.
+This is a staging test APK with online capabilities, not a production release.

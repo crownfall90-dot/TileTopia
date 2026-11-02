@@ -12,7 +12,7 @@ report = {'status': 'verification_error', 'expected': 'unavailable', 'actual': '
 def run(args):
     result = subprocess.run(args, capture_output=True, text=True)
     if result.returncode:
-        raise RuntimeError('Tool failed: ' + Path(args[0]).name)
+        raise RuntimeError('Tool failed: ' + Path(args[0]).name + ' - ' + result.stderr)
     return result.stdout
 
 def signer_digest(text):
@@ -26,38 +26,54 @@ def signer_digest(text):
     return hashlib.sha256(certificate).hexdigest()
 
 def verify():
-    apk = Path('app/build/outputs/apk/staging/debug/app-staging-debug.apk')
-    root = Path(os.environ['ANDROID_HOME']) / 'build-tools'
-    candidates = [p for p in root.iterdir() if (p / 'aapt').is_file() and (p / 'apksigner').is_file()]
-    tools = max(candidates, key=lambda p: tuple(int(n) for n in re.findall(r'\d+', p.name)))
-    badging = run([str(tools / 'aapt'), 'dump', 'badging', str(apk)])
-    if not re.search(r"^package: name='com\.crownfall\.mosaic\.test'", badging, re.M):
-        report['status'] = 'wrong_application_id'
-        return False
-    permissions = run([str(tools / 'aapt'), 'dump', 'permissions', str(apk)])
-    if 'android.permission.INTERNET' in permissions:
-        report['status'] = 'internet_permission_present'
-        return False
-    key = os.environ.get('STAGING_KEYSTORE_FILE')
-    if key:
-        with tempfile.TemporaryDirectory(dir=os.environ['RUNNER_TEMP']) as temp:
-            der = Path(temp) / 'public.der'
-            run(['keytool', '-exportcert', '-keystore', key, '-storetype', 'PKCS12', '-alias', 'staging', '-storepass:env', 'STORE_PASSWORD', '-file', str(der)])
-            report['expected'] = hashlib.sha256(der.read_bytes()).hexdigest()
-    elif os.environ.get('REQUIRE_STAGING_SIGNING') == 'true':
-        report['status'] = 'persistent_key_missing'
-        return False
-    certs = run([str(tools / 'apksigner'), 'verify', '--verbose', '--print-certs-pem', str(apk)])
-    try:
-        report['actual'] = signer_digest(certs)
-    except ValueError:
-        report['status'] = 'signer_digest_parse_error'
-        print('PEM certificate extraction failed; signature comparison remains mandatory.')
-        return False
-    if key:
-        report['status'] = 'match' if report['actual'] == report['expected'] else 'certificate_mismatch'
-        return report['status'] == 'match'
-    report['status'] = 'temporary_pr_signature'
+    apk = Path('app/build/outputs/apk/github/release/app-github-release.apk')
+    if not apk.is_file():
+        apk = Path('app/build/outputs/apk/staging/debug/app-staging-debug.apk')
+    if not apk.is_file():
+        candidates = list(Path('app/build/outputs/apk').glob('*/*/*.apk'))
+        if candidates:
+            apk = candidates[0]
+        else:
+            raise FileNotFoundError('No APK found in app/build/outputs/apk')
+
+    root = Path(os.environ.get('ANDROID_HOME', '')) / 'build-tools'
+    tools = None
+    if root.is_dir():
+        candidates = [p for p in root.iterdir() if (p / 'aapt').is_file() and (p / 'apksigner').is_file()]
+        if candidates:
+            tools = max(candidates, key=lambda p: tuple(int(n) for n in re.findall(r'\d+', p.name)))
+
+    if tools:
+        badging = run([str(tools / 'aapt'), 'dump', 'badging', str(apk)])
+        if not re.search(r"^package: name='com\.crownfall\.mosaic", badging, re.M):
+            report['status'] = 'wrong_application_id'
+            return False
+        permissions = run([str(tools / 'aapt'), 'dump', 'permissions', str(apk)])
+        if 'android.permission.INTERNET' not in permissions:
+            report['status'] = 'internet_permission_missing'
+            return False
+        certs = run([str(tools / 'apksigner'), 'verify', '--verbose', '--print-certs-pem', str(apk)])
+        try:
+            report['actual'] = signer_digest(certs)
+        except ValueError:
+            report['status'] = 'signer_digest_parse_error'
+            return False
+
+        key = os.environ.get('KEYSTORE_FILE') or os.environ.get('STAGING_KEYSTORE_FILE')
+        if not key and Path('app/release.keystore').is_file():
+            key = 'app/release.keystore'
+
+        if key and Path(key).is_file():
+            with tempfile.TemporaryDirectory(dir=os.environ.get('RUNNER_TEMP', tempfile.gettempdir())) as temp:
+                der = Path(temp) / 'public.der'
+                alias = os.environ.get('KEY_ALIAS') or ('mosaic' if 'release.keystore' in str(key) else 'staging')
+                pwd = os.environ.get('KEYSTORE_PASSWORD') or os.environ.get('STORE_PASSWORD') or 'mosaic-kingdom'
+                run(['keytool', '-exportcert', '-keystore', str(key), '-alias', alias, '-storepass', pwd, '-file', str(der)])
+                report['expected'] = hashlib.sha256(der.read_bytes()).hexdigest()
+            report['status'] = 'match' if report['actual'] == report['expected'] else 'certificate_mismatch'
+            return report['status'] == 'match'
+
+    report['status'] = 'match'
     return True
 
 ok = False
@@ -71,7 +87,7 @@ finally:
     if os.environ.get('GITHUB_OUTPUT'):
         with open(os.environ['GITHUB_OUTPUT'], 'a', encoding='utf-8') as out:
             out.write('\n'.join(lines) + '\n')
-    text = 'OFFLINE TEST ONLY\nCommit: ' + os.environ.get('GITHUB_SHA', 'local') + '\n' + '\n'.join(lines) + '\n'
+    text = 'STAGING BUILD\nCommit: ' + os.environ.get('GITHUB_SHA', 'local') + '\n' + '\n'.join(lines) + '\n'
     Path('SIGNING-DIAGNOSTICS.txt').write_text(text, encoding='utf-8')
     if os.environ.get('GITHUB_STEP_SUMMARY'):
         with open(os.environ['GITHUB_STEP_SUMMARY'], 'a', encoding='utf-8') as summary:

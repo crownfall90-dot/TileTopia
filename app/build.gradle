@@ -15,7 +15,7 @@ def gsFile = file('google-services.json')
 if (gsFile.exists()) {
     try {
         def gs = new groovy.json.JsonSlurper().parse(gsFile)
-        gs.client[0].oauth_client.each { oc -> if (!googleClientId && oc.client_type == 3) googleClientId = oc.client_id }
+        gs.client.each { cl -> cl.oauth_client.each { oc -> if (!googleClientId && oc.client_type == 3) googleClientId = oc.client_id } }
     } catch (ignored) { }
 }
 

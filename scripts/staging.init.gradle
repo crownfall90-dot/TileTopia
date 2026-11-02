@@ -4,6 +4,7 @@ gradle.beforeProject { p ->
             dimension 'store'
             applicationIdSuffix '.test'
             versionNameSuffix '-test.2'
+            buildConfigField 'String', 'UPDATE_REPO', '"crownfall90-dot/play"'
             buildConfigField 'String', 'PUSH_TOPIC', '"updates-staging"'
         }
         p.extensions.getByName('androidComponents').finalizeDsl { androidDsl ->

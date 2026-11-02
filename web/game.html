@@ -32,7 +32,7 @@
       <section class="screen" id="scr-menu" hidden>
         <div class="mtop">
           <button class="mprof" id="mprof" data-go="progress" aria-label="Профиль, уровень и золото"></button>
-          <div class="mtools"><button class="mtool" data-go="rules" aria-label="Как играть"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 014.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17.2h.01"/></svg></button><button class="mtool" id="menuSettings" aria-label="Настройки"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg></button></div>
+          <div class="mtools"><button class="mtool" data-go="history" aria-label="История партий" title="История партий"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg></button><button class="mtool" data-go="rules" aria-label="Как играть"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 014.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17.2h.01"/></svg></button><button class="mtool" id="menuSettings" aria-label="Настройки"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg></button></div>
         </div>
         <div class="hero"><div class="mini" id="mini"></div></div>
         <div class="mbody">
@@ -121,8 +121,15 @@
           <div class="sgroup prof" id="acct"></div>
           <button class="tutcard itemsentry" id="itemsBtn"><span>🎒</span><span><b>Мои предметы</b><small id="itemsSub">Статусы, рамки, фигурки, локации</small></span><i class="tgo">›</i></button>
           <div class="pstats" id="stats"></div>
-          <div class="seg ptabs" id="ptabs"><button data-pt="rewards" aria-pressed="true">Награды</button><button data-pt="cols" aria-pressed="false">Коллекции</button><button data-pt="top" aria-pressed="false">Рейтинг</button><button data-pt="hist" aria-pressed="false">История</button></div>
+          <div class="seg ptabs" id="ptabs"><button data-pt="rewards" aria-pressed="true">Награды</button><button data-pt="cols" aria-pressed="false">Коллекции</button><button data-pt="top" aria-pressed="false">Рейтинг</button></div>
           <div class="col" id="ptab"></div>
+        </div>
+      </section>
+
+      <section class="screen scroll" id="scr-history" hidden>
+        <div class="lb">
+          <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>История партий</b></div>
+          <div class="col" id="historyList"></div>
         </div>
       </section>
 
@@ -202,6 +209,15 @@
           <div class="h3">Сколько игроков</div>
           <div class="seg" id="seg"><button>2</button><button>3</button><button>4</button><button>5</button></div>
           <p class="shint" id="segHint" hidden></p>
+          <div class="col" id="setupBotLvlBox" hidden>
+            <div class="h3">Сложность ботов</div>
+            <div class="seg" id="setupBotLvl"><button data-blvl="easy">Лёгкие</button><button data-blvl="normal">Обычные</button><button data-blvl="hard">Сложные</button></div>
+            <p class="shint" id="setupBotLvlHint">Обычные — взвешенные ходы и захват подходящих объектов.</p>
+          </div>
+          <div class="col" id="setupLocBox" hidden>
+            <div class="h3">Локация стола</div>
+            <div class="seg" id="setupLoc"><button data-loc="village" class="on">🌳 Деревня</button><button data-loc="city">🏙️ Мегаполис</button><button data-loc="siberia">❄️ Сибирь</button><button data-loc="jungle">🌴 Джунгли</button></div>
+          </div>
           <div class="col" id="seatsBox"><div class="h3">Игроки</div>
             <ul class="plist" id="slist"></ul></div>
           <div class="col" id="meBox" hidden><div class="h3">Ваше имя</div>
@@ -230,32 +246,107 @@
 
       <section class="screen scroll" id="scr-lobby" hidden>
         <div class="lb">
-          <div class="ltop"><button class="iconbtn" id="lobbyBack" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Комната</b></div>
-          <div class="col" id="lbJoin">
-            <input class="field" id="myName" hidden>
-            <button class="cta wide" id="create">Создать комнату</button>
-            <div class="h3">Войти по коду</div>
-            <div class="joinrow"><input class="field codein" id="codeIn" maxlength="5" placeholder="K7Q2X" autocomplete="off" autocapitalize="characters"><button class="cta" id="join">Войти</button></div>
+          <div class="ltop">
+            <button class="iconbtn" id="lobbyBack" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+            <b id="lobbyTitle">Сетевая игра</b>
           </div>
-          <div class="col" id="lbRoom" hidden>
-            <div class="codecard"><small>Код комнаты</small><div class="code tap" id="codeShow" role="button" tabindex="0" aria-label="Скопировать код комнаты"></div>
-              <div class="row2"><button class="chip pri" id="lbInvite">👥 Пригласить</button><button class="chip" id="copyLink">🔗 Поделиться</button></div></div>
+
+          <!-- Lobby Entrance Screen: Create or Join -->
+          <div class="col lb-entrance" id="lbJoin">
+            <input class="field" id="myName" hidden>
+            <div class="lobby-hero">
+              <div class="l-hero-ico">
+                <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M17 21v-2a4 4 0 00-4-4H5a4 4 0 00-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 00-3-3.87"/><path d="M16 3.13a4 4 0 010 7.75"/></svg>
+              </div>
+              <div class="l-hero-tx">
+                <b>Игра по сети</b>
+                <small>Сразитесь с друзьями онлайн в реальном времени</small>
+              </div>
+            </div>
+
+            <div class="lobby-card create-card">
+              <div class="l-card-head">
+                <div class="l-card-badge">Новая комната</div>
+                <b>Создать комнату</b>
+                <small>Вы станете ведущим партии, сможете настроить правила и позвать друзей</small>
+              </div>
+              <button class="cta wide pri" id="create">
+                <span>Создать комнату</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+
+            <div class="l-divider"><span>или по коду</span></div>
+
+            <div class="lobby-card join-card">
+              <div class="l-card-head">
+                <div class="l-card-badge">Подключение</div>
+                <b>Войти по коду</b>
+                <small>Введите 5-значный код комнаты от друга</small>
+              </div>
+              <div class="joinrow">
+                <input class="field codein" id="codeIn" maxlength="5" placeholder="K7Q2X" autocomplete="off" autocapitalize="characters" spellcheck="false">
+                <button class="cta" id="join">Войти</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Room Screen -->
+          <div class="col lb-room-view" id="lbRoom" hidden>
+            <div class="codecard">
+              <div class="codecard-tag">Комната создана</div>
+              <small>Код комнаты для друзей</small>
+              <div class="code tap" id="codeShow" role="button" tabindex="0" aria-label="Скопировать код комнаты"></div>
+              <small class="code-hint">Нажмите на код, чтобы скопировать</small>
+              <button class="chip pri lb-invite" id="lbInvite">
+                <span>👥 Пригласить друзей</span>
+                <span class="fonline-badge" id="lbOnlineN" hidden>0</span>
+              </button>
+            </div>
+
             <button class="cupsbadge" id="lbCups"></button>
-            <div class="h3">Ваш цвет</div>
-            <div class="mycolor" id="myColor"></div>
-            <div class="h3" id="lbCount">Игроки</div>
-            <ul class="plist" id="plist"></ul>
-            <button class="chip" id="addBot">+ Добавить бота</button>
+
+            <div class="col-card">
+              <div class="h3-bar">
+                <span class="h3-icon">🎨</span>
+                <span class="h3">Ваш цвет</span>
+              </div>
+              <div class="mycolor" id="myColor"></div>
+            </div>
+
+            <div class="col-card">
+              <div class="h3-bar player-bar">
+                <div class="h3-left">
+                  <span class="h3-icon">👥</span>
+                  <span class="h3" id="lbCount">Игроки</span>
+                </div>
+                <button class="chip addbot-chip" id="addBot">+ Добавить бота</button>
+              </div>
+              <ul class="plist" id="plist"></ul>
+            </div>
+
             <div id="lobbyOnline" hidden>
               <div class="h3" id="lobbyOnlineTitle">Друзья онлайн</div>
               <ul class="flist" id="lobbyOnlineList"></ul>
             </div>
-            <div class="h3">Правила партии</div>
-            <div class="rulesbox" data-rules id="lbRules"></div>
-            <button class="cta wide" id="backToGame" hidden>Вернуться в партию</button>
-            <button class="cta wide" id="lobbyStart">Начать игру</button>
-            <button class="cta wide" id="lobbyReady" hidden>Готов</button>
-            <div class="lbwait" id="lbWait" hidden><div class="pz sm"><div class="pzb"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div><p class="shint">Ожидание старта…</p></div>
+
+            <div class="col-card">
+              <div class="h3-bar">
+                <span class="h3-icon">📜</span>
+                <span class="h3">Правила партии</span>
+              </div>
+              <div class="rulesbox" data-rules id="lbRules"></div>
+            </div>
+
+            <div class="room-actions">
+              <button class="cta wide" id="backToGame" hidden>Вернуться в партию</button>
+              <button class="cta wide pri-start" id="lobbyStart">Начать игру</button>
+              <button class="cta wide alt-ready" id="lobbyReady" hidden>Готов</button>
+              <div class="lbwait" id="lbWait" hidden>
+                <div class="pz sm"><div class="pzb"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+                <p class="shint">Ожидание старта партии…</p>
+              </div>
+            </div>
           </div>
         </div>
       </section>
@@ -1065,7 +1156,7 @@ async function afterPlace(t, p, forced) {
       // Bot: always use placed tile only, even in anyMode.
       // Bots never reinforce their own object (only free ones), so their play stays as it was.
       const botOpts = (anyMode ? claimable(t, p).map(g => ({t, g})) : opts).filter(o => o.done || !o.g || B.component(tiles, meeples, o.t, o.g).meeples.length === 0);
-      choice = PG.engine.bots.figurePick(tiles, meeples, botOpts, players[p].meeples, Math.random, botLevel(), players[p] && players[p].persona);
+      choice = PG.engine.bots.figurePick(tiles, meeples, botOpts, players[p].meeples, Math.random, playerBotLevel(p), players[p] && players[p].persona);
     }
   }
   if (my !== token) return;
@@ -1267,7 +1358,8 @@ function handOver() { $('#over').hidden = true; beginHumanTurn(); }
 // themselves); from the fourth game the chosen level applies and one note says so.
 const softStart = () => (PG.game && PG.game.turns) ? PG.game.turns.isSoftStart(wallet.botlvl, PROG.st.games) : (wallet.botlvl === 'normal' && PROG.st.games < 3);
 const botLevel = () => (PG.game && PG.game.turns) ? PG.game.turns.resolveBotLevel(wallet.botlvl, PROG.st.games, PG.engine.bots.BOT_LEVELS) : (softStart() ? 'easy' : PG.engine.bots.BOT_LEVELS.includes(wallet.botlvl) ? wallet.botlvl : 'normal');
-const botPick = (type, p) => PG.engine.bots.levelPick(tiles, meeples, type, p, players.length, Math.random, botLevel(), players[p] && players[p].persona);
+const playerBotLevel = p => (players[p] && players[p].botlvl) || botLevel();
+const botPick = (type, p) => PG.engine.bots.levelPick(tiles, meeples, type, p, players.length, Math.random, playerBotLevel(p), players[p] && players[p].persona);
 const helperPick = (type, p) => PG.engine.bots.helperPick(tiles, meeples, type, p, players.length, Math.random);
 async function aiTurn() {
   const p = turn, my = token, tt = turnTok;
@@ -1322,8 +1414,9 @@ async function endGame(reason) {
   const rows = order.slice(0, 5).map((p, k) => `<li class="${p.i === meIdx ? 'me' : ''}" style="--c:${p.col};--d:${k * 90}ms"><span class="n">${k + 1}</span><i></i><b>${p.name}</b><span class="v">${p.score}</span></li>`).join('');
   const myCol = (players[meIdx] && players[meIdx].col) || wallet.color || '#f2b84b';
   const confetti = won ? `<div class="confetti">${Array.from({length: 22}, (_, k) => `<span style="left:${(k * 4.6 + (k % 3) * 3) % 100}%;--dl:${(k % 7) * 120}ms;--cc:${[myCol, '#f2b84b', '#ffffff', myCol, '#ffd75e'][k % 5]}"></span>`).join('')}</div>` : '';
-  // After the first win a guest is offered to keep the progress (a profile with sign-in), once.
-  const saveCard = won && FB && !fbAuth && PROG.st.wins === 1 && !wallet.saveAsked ? `<button class="ghostbtn savecard" id="saveProg"><b>☁️ Сохранить прогресс</b><small>Войдите, чтобы золото и уровень не пропали при смене телефона</small></button>` : '';
+  // Offer guests to secure their progress with an account
+  const needsSave = FB && !fbAuth && !registered();
+  const saveCard = needsSave && (PROG.st.games >= 1) && !wallet.saveDismissed ? `<button class="ghostbtn savecard" id="saveProg"><b>🏰 Сохранить прогресс</b><small>Войдите через Google в 1 клик, чтобы не потерять фигурки, ${wallet.gold} 💰 золота и кубки</small></button>` : '';
   over.innerHTML = `<div class="ocard fin">${confetti}<div class="medal">${medal}</div><h3>${title}</h3><p>${sub}</p><ol class="standings">${rows}</ol>${rewardChips(gold)}${xpLine()}${saveCard}<button class="cta wide" id="again2">${net ? 'Реванш' : 'Ещё партию'}</button><button class="ghostbtn" data-go="results">Подробные итоги</button></div>`;
   over.hidden = false;
   historySave(reason, true);
@@ -1377,7 +1470,7 @@ function newGame() {
   if (wallet.boosts.meeple > 0 && seats.some(x => !x.human) && seats.filter(x => x.human).length === 1) {
     bonus = seats.findIndex(x => x.human); wallet.boosts.meeple--; saveWallet();
   }
-  startGame({seats, rules: {...setup.rules, rv: 2}, deck: makeDeck(setup.rules), seed: (Math.random() * 1e9) | 0, bonus});
+  startGame({seats, rules: {...setup.rules, rv: 2}, deck: makeDeck(setup.rules), seed: (Math.random() * 1e9) | 0, bonus, loc: wallet.loc || 'village'});
   if (bonus >= 0) toastAny('Подарок: +1 фигурка в этой партии');
 }
 // Everything random about a game is in cfg, so every phone in an online room builds the same game.
@@ -1391,7 +1484,10 @@ function startGame(cfg, replay = []) {
   }
   if (!replay.length && !cfg.tut && !cfg.noIntro) track('game_start', {mode: cfg.online ? (net && net.quick ? 'online' : 'friends') : cfg.seats.filter(s => s.human).length > 1 ? 'local' : 'bots', players: cfg.seats.length, rules: (cfg.rules && cfg.rules.mode) || 'classic'});
   tut = null; tutShow();
-  $('#sayBtn').hidden = !cfg.online; $('#sayBox').hidden = true;
+  const locId = (cfg && cfg.loc) || wallet.loc || 'village';
+  const gameScr = $('#scr-game');
+  if (gameScr) gameScr.dataset.loc = locId;
+  $('#sayBtn').hidden = false; $('#sayBox').hidden = true;
   queue = replay.map(m => ({...m, old: true})); applied = 0; clearTimeout(catchT); catchUp = replay.length > 0; lastPlaced = null; markOwn();
   gameLog = {cfg, moves: replay.slice()};
   if (meepleResolve) { meepleResolve = null; mrow.hidden = true; prow.hidden = false; }
@@ -1400,7 +1496,7 @@ function startGame(cfg, replay = []) {
   world.innerHTML = '<div class="ground"></div>';
   ghost = null; slotEls = []; meeples = []; doneFeats = []; turn = 0; phase = 'idle';
   const rules = gameRules = cfg.rules;
-  players = cfg.seats.map((s, i) => { const name = clean(s.name) || 'Игрок ' + (i + 1); return {name, init: name[0].toUpperCase(), col: validCol(s.col) ? s.col : PL0[i].col, human: s.human, ghost: !!s.ghost, st: PG.state.status.shownStatus(s.st), owner: s.owner, uid: s.uid || null, fig: FIGS[s.fig] ? s.fig : 'classic', score: 0, stats: {c: 0, r: 0, f: 0, t: 0, m: 0}, meeples: rules.meeples, missed: 0}; });
+  players = cfg.seats.map((s, i) => { const name = clean(s.name) || 'Игрок ' + (i + 1); return {name, init: name[0].toUpperCase(), col: validCol(s.col) ? s.col : PL0[i].col, human: s.human, ghost: !!s.ghost, st: PG.state.status.shownStatus(s.st), owner: s.owner, uid: s.uid || null, fig: FIGS[s.fig] ? s.fig : 'classic', botlvl: s.botlvl || (s.human ? null : (wallet.botlvl || 'normal')), score: 0, stats: {c: 0, r: 0, f: 0, t: 0, m: 0}, meeples: rules.meeples, missed: 0}; });
   if (cfg.bonus >= 0 && players[cfg.bonus]) players[cfg.bonus].meeples++;
   paintFigures();
   if (!net) saveGame();
@@ -2084,7 +2180,16 @@ async function ensureGuestName() {
   try {
     const tok = await fbToken(), me = fbAuth && fbAuth.uid;
     const mine = await fetch(`${FB.dbUrl}/playerNo/${me}.json?auth=${tok}`).then(r => r.ok ? r.json() : null).catch(() => null);
-    const take = n => { wallet.no = n; if (!clean(wallet.name)) wallet.guest = 'nickname' + n; saveWallet(); renderSetup(); if (typeof presenceMark === 'function') presenceMark(true); };
+    const take = n => {
+      wallet.no = n;
+      if (!clean(wallet.name)) {
+        const gen = (typeof PG !== 'undefined' && PG.account && PG.account.auth && PG.account.auth.generateRandomNickname)
+          ? PG.account.auth.generateRandomNickname()
+          : 'Зодчий';
+        wallet.guest = gen;
+      }
+      saveWallet(); renderSetup(); if (typeof presenceMark === 'function') presenceMark(true);
+    };
     if (mine) return take(mine);
     const url = `${FB.dbUrl}/guestN.json?auth=${tok}`;
     for (let i = 0; i < 5 && !wallet.no; i++) {
@@ -2127,6 +2232,24 @@ function renderSetup() {
   document.querySelectorAll('#seg button').forEach(b => b.setAttribute('aria-pressed', +b.textContent === n));
   $('#seatsBox').hidden = on; $('#meBox').hidden = !on;
   $('#segHint').hidden = !on; $('#segHint').textContent = m.seg || '';
+  const isBotGame = setupMode === 'bots';
+  const blBox = $('#setupBotLvlBox');
+  if (blBox) {
+    blBox.hidden = !isBotGame;
+    if (isBotGame) {
+      const curLvl = wallet.botlvl || 'normal';
+      document.querySelectorAll('#setupBotLvl button').forEach(b => b.setAttribute('aria-pressed', b.dataset.blvl === curLvl));
+      const HINTS = {
+        easy: 'Лёгкие — простые ходы для спокойной игры или разминки.',
+        normal: 'Обычные — взвешенные ходы и захват подходящих объектов.',
+        hard: 'Сложные — сильный расчёт очков и агрессивная борьба за города.'
+      };
+      const blHint = $('#setupBotLvlHint');
+      if (blHint) blHint.textContent = HINTS[curLvl] || HINTS.normal;
+    }
+  }
+  const curLoc = wallet.loc || 'village';
+  document.querySelectorAll('#setupLoc button').forEach(b => b.setAttribute('aria-pressed', b.dataset.loc === curLoc));
   if (on) {
     if (typeof PG !== 'undefined' && PG.ui && PG.ui.setup && PG.ui.setup.renderSetupMeHtml) {
       const me = PG.ui.setup.renderSetupMeHtml(profileName(), wallet.color, PALETTE);
@@ -2145,6 +2268,20 @@ function renderSetup() {
   $('#start').disabled = false; $('#start').textContent = m.go;
 }
 $('#seg').onclick = e => { const b = e.target.closest('button'); if (!b) return; if (onlineMode()) setup.onN = +b.textContent; else setup.n = +b.textContent; saveSetup(); renderSetup(); };
+if ($('#setupBotLvl')) $('#setupBotLvl').onclick = e => {
+  const b = e.target.closest('button'); if (!b || !b.dataset.blvl) return;
+  wallet.botlvl = b.dataset.blvl; saveWallet();
+  if (setup && setup.seats) {
+    setup.seats.filter(s => !s.human).forEach(s => s.botlvl = wallet.botlvl);
+    saveSetup();
+  }
+  renderSetup();
+};
+if ($('#setupLoc')) $('#setupLoc').onclick = e => {
+  const b = e.target.closest('button'); if (!b || !b.dataset.loc) return;
+  wallet.loc = b.dataset.loc; saveWallet();
+  renderSetup();
+};
 $('#slist').addEventListener('input', e => { const i = +e.target.id.slice(2); setup.seats[i].name = e.target.value; saveSetup(); });
 $('#slist').addEventListener('click', e => {
   const cb = e.target.closest('[data-col]'); if (cb) { colorEdit = colorEdit === +cb.dataset.col ? -1 : +cb.dataset.col; return renderSetup(); }
@@ -2237,32 +2374,63 @@ async function shareText(txt, done) {
   if (navigator.share) { try { await navigator.share({title: 'Puzzlegrad', text: full}); return; } catch (e) { if (e && e.name === 'AbortError') return; } }
   copyText(full, done);
 }
-$('#copyLink').onclick = () => track('share', {content_type: 'room'}) || shareText(`Заходи играть в Puzzlegrad: ${SITE_URL}?room=${net.code}\nИли в игре «С друзьями» и код комнаты:\n${net.code}`, 'Приглашение скопировано — отправьте его друзьям');
+function shareRoomLink() {
+  if (net && net.code) {
+    track('share', {content_type: 'room'});
+    shareText(`Заходи играть в Puzzlegrad: ${SITE_URL}?room=${net.code}\nИли в игре «С друзьями» и код комнаты:\n${net.code}`, 'Приглашение скопировано — отправьте его друзьям');
+  } else {
+    track('share', {content_type: 'quick'});
+    shareText(`Заходи играть в Puzzlegrad: ${SITE_URL}`, 'Ссылка скопирована');
+  }
+}
+if ($('#copyLink')) $('#copyLink').onclick = shareRoomLink;
 $('#codeShow').onclick = () => net && net.code && copyText(net.code, `Код ${net.code} скопирован`);
 $('#lbCups').onclick = () => { if (!net || !net.host || net.gameId) return; setup.rules.cups = !setup.rules.cups; saveSetup(); if (net.lobby) publishLobby(net.lobby.seats); renderLobby(); renderRules(); };
-// Inviting friends, one sheet for the room and for the online search: friends online now with "Call" (they get a card
-// with one-tap join), and the share sheet for anyone else.
-function inviteSheet(fresh) {
-  const old = document.getElementById('invBox'); if (old) old.remove();
-  // online search: only friends who are online right now, nothing to send; a friends' room also offers the link
+
+function updateLobbyOnlineBadge() {
+  const badge = $('#lbOnlineN');
+  if (!badge) return;
+  const ok = FB && registered();
+  const seats = net && net.lobby ? net.lobby.seats : [];
+  const inRoom = new Set(seats.map(x => x.uid).filter(Boolean));
+  const on = ok ? friends.filter(f => f.on && !inRoom.has(f.uid)).length : 0;
+  if (on > 0) {
+    badge.textContent = on;
+    badge.hidden = false;
+  } else {
+    badge.hidden = true;
+  }
+}
+
+function renderInviteSheetRows(box) {
+  const wrap = box.querySelector('#ivListWrap');
+  if (!wrap) return;
   const online = !!(mm || (net && net.quick)), room = net && net.code;
-  const box = document.createElement('div'); box.className = 'over'; box.id = 'invBox'; box.style.position = 'fixed';
   const ok = FB && registered(), seats = net && net.lobby ? net.lobby.seats : [], inRoom = new Set(seats.map(x => x.uid).filter(Boolean));
   const on = ok ? friends.filter(f => f.on && !inRoom.has(f.uid)) : [];
   const state = f => invited.code === room && invited.joined.has(f.uid) ? ['✓ С вами', ' joined'] : invited.code === room && invited.uids.has(f.uid) ? ['Ждём ответа', ' sent'] : ['Позвать', ''];
-  const rows = on.map(f => { const [t, c] = state(f); return `<li class="ivrow${c}"><span class="av" style="--c:${f.c || '#3fc27a'}">${(f.n || '?')[0]}</span><span class="ivwho"><b>${f.n}</b><small><i></i>${STATE_TEXT[f.p && f.p.s] || 'в сети'}</small></span><button class="chip go" data-linv="${f.uid}"${c ? ' disabled' : ''}>${t}</button></li>`; }).join('');
-  const empty = !ok ? 'Звать друзей могут сохранённые профили' : online ? 'Сейчас никого из друзей нет в сети. Как только кто-то зайдёт — он появится здесь' : 'Сейчас никого из друзей нет в сети — отправьте им ссылку';
-  box.innerHTML = `<div class="ocard invsheet"><div class="ivhead"><span>👥</span><h3>${online ? 'Позвать друзей в онлайн-игру' : 'Пригласить друзей'}</h3><small>${online ? 'Друг получит приглашение и сядет за ваш стол' : 'Друг получит приглашение в комнату'}</small></div>
-    ${rows ? `<ul class="ivlist">${rows}</ul>` : `<p class="ivempty">${empty}</p>`}
-    ${online ? '' : '<button class="cta wide" id="invShare">🔗 Отправить ссылку</button>'}<button class="ghostbtn" id="invNo">Готово</button></div>`;
+  const rows = on.map(f => { const [t, c] = state(f); return `<li class="ivrow${c}"><span class="av" style="--c:${f.c || '#3fc27a'}">${(clean(f.n) || '?')[0]}</span><span class="ivwho"><b>${clean(f.n)}</b><small><i></i>${STATE_TEXT[f.p && f.p.s] || 'в сети'}</small></span><button class="chip go" data-linv="${f.uid}"${c ? ' disabled' : ''}>${t}</button></li>`; }).join('');
+  const empty = !ok ? 'Звать друзей могут сохранённые профили' : online ? 'Сейчас никого из друзей нет в сети. Как только кто-то зайдёт — он появится здесь' : 'Сейчас никого из друзей нет в сети — поделитесь ссылкой на комнату';
+  wrap.innerHTML = rows ? `<ul class="ivlist">${rows}</ul>` : `<p class="ivempty">${empty}</p>`;
+}
+
+// Inviting friends: shows online friends with "Call" and the share button
+function inviteSheet(fresh) {
+  const old = document.getElementById('invBox'); if (old) old.remove();
+  const online = !!(mm || (net && net.quick));
+  const box = document.createElement('div'); box.className = 'over'; box.id = 'invBox'; box.style.position = 'fixed';
+  const ok = FB && registered();
+  box.innerHTML = `<div class="ocard invsheet"><div class="ivhead"><span>👥</span><h3>Пригласить друзей</h3><small>${online ? 'Друг получит приглашение и сядет за ваш стол' : 'Друг получит приглашение в комнату'}</small></div>
+    <div id="ivListWrap"></div>
+    <button class="cta wide" id="invShare">🔗 Поделиться ссылкой</button><button class="ghostbtn" id="invNo">Готово</button></div>`;
   document.body.append(box);
+  renderInviteSheetRows(box);
   box.onclick = e => {
     if (e.target === box || e.target.id === 'invNo') return box.remove();
     const b = e.target.closest('[data-linv]'); if (b) setTimeout(() => { b.textContent = 'Ждём ответа'; b.disabled = true; b.closest('.ivrow').classList.add('sent'); }, 30);
   };
-  const sh = box.querySelector('#invShare'); if (sh) sh.onclick = () => $('#copyLink').click();
-  // drawn at once from what is known, then once more with fresh online marks
-  if (ok && fresh !== true) loadFriends().then(() => { if (box.isConnected) { box.remove(); inviteSheet(true); } }).catch(() => {});
+  const sh = box.querySelector('#invShare'); if (sh) sh.onclick = () => shareRoomLink();
+  if (ok && fresh !== true) loadFriends().then(() => { if (box.isConnected) renderInviteSheetRows(box); updateLobbyOnlineBadge(); }).catch(() => {});
 }
 $('#lbInvite').onclick = () => inviteSheet();
 $('#mInvite').onclick = () => inviteSheet();
@@ -2526,7 +2694,7 @@ function onNet(d) {
     // flag: then what this phone remembered about the game is used.
     const was = lastOnline();
     net.quick = typeof m.quick === 'boolean' ? m.quick : !!(was && was.code === net.code && was.q);
-    startGame({seats: m.seats.map((x, i) => ({name: clean(x.name) || 'Игрок ' + (i + 1), human: !!x.owner, ghost: !!x.ghost, st: PG.state.status.shownStatus(x.st), owner: x.owner, uid: typeof x.uid === 'string' ? String(x.uid).replace(/[^\w-]/g, '').slice(0, 64) : null, fig: FIGS[x.fig] ? x.fig : 'classic', col: validCol(x.col) ? x.col : PL0[i % PL0.length].col})), rules: m.rules, deck: m.deck, seed: m.seed, online: d.id, noIntro: !live});
+    startGame({seats: m.seats.map((x, i) => ({name: clean(x.name) || 'Игрок ' + (i + 1), human: !!x.owner, ghost: !!x.ghost, st: PG.state.status.shownStatus(x.st), owner: x.owner, uid: typeof x.uid === 'string' ? String(x.uid).replace(/[^\w-]/g, '').slice(0, 64) : null, fig: FIGS[x.fig] ? x.fig : 'classic', botlvl: x.botlvl || 'normal', col: validCol(x.col) ? x.col : PL0[i % PL0.length].col})), rules: m.rules, deck: m.deck, seed: m.seed, online: d.id, noIntro: !live});
     if (!m.seats.some(x => x.owner === myId)) toast('Партия уже идёт — вы смотрите');
     else { try { localStorage.setItem('lastGame', JSON.stringify({code: net.code, at: Date.now(), q: net.quick ? 1 : 0})); } catch (_) {} updAnnounce(); } // to come back after a restart
     return show('game');
@@ -2689,7 +2857,9 @@ let lobbyPendTimer = 0;
 function renderLobby() {
   if (mm) matchRender();
   $('#lbJoin').hidden = !!net; $('#lbRoom').hidden = !net;
+  if ($('#lobbyTitle')) $('#lobbyTitle').textContent = net ? ('Комната ' + net.code) : 'Сетевая игра';
   if (!net) return;
+  updateLobbyOnlineBadge();
   $('#codeShow').innerHTML = [...net.code].map(c => `<span>${c}</span>`).join('');
   // "for cups" is seen by everyone in the room; the creator switches it here with one tap
   const cups = !!(net.lobby && net.lobby.rules ? net.lobby.rules.cups : setup.rules.cups), cb = $('#lbCups');
@@ -2699,7 +2869,9 @@ function renderLobby() {
     cb.innerHTML = badge.innerHtml;
   } else {
     cb.className = 'cupsbadge' + (cups ? ' on' : '') + (net.host ? ' host' : '');
-    cb.innerHTML = `<b>${cups ? '🏆 Игра на кубки' : '🤝 Без кубков'}</b><small>${net.host ? (cups ? 'Кубки начисляются' : 'Кубки не меняются') : (cups ? 'Рейтинговая игра' : 'Без рейтинга')}</small>`;
+    const title = cups ? '🏆 Игра на кубки' : '🤝 Без кубков';
+    const subtitle = net.host ? (cups ? 'Кубки начисляются · нажмите для смены' : 'Кубки не меняются · нажмите для смены') : (cups ? 'Рейтинговая игра' : 'Без рейтинга');
+    cb.innerHTML = `<div class="cupsbadge-main"><b>${title}</b><small>${subtitle}</small></div><div class="cups-switch" aria-hidden="true"><span class="cups-switch-track"><span class="cups-switch-knob">${cups ? '🏆' : '🤝'}</span></span></div>`;
   }
   cb.disabled = !net.host || !!net.gameId;
   renderMyColor();
@@ -2835,10 +3007,27 @@ $('#join').onclick = () => {
   serverReachable().then(ok => ok ? connect(code, false) : noServer(() => $('#join').click()));
 };
 $('#lobbyBack').onclick = () => { if (net && phase === 'end' || net && !net.gameId) leaveRoom(); show('menu'); renderLobby(); };
-$('#addBot').onclick = () => { const seats = net.lobby.seats.slice(); seats.push({owner: null, name: BOT_NAMES.find(n => !seats.some(x => x.name === n)) || 'Бот', fig: randomFig(), col: PALETTE[(Math.random() * PALETTE.length) | 0].col, ready: true}); publishLobby(seats); };
+$('#addBot').onclick = () => { const seats = net.lobby.seats.slice(); seats.push({owner: null, name: BOT_NAMES.find(n => !seats.some(x => x.name === n)) || 'Бот', fig: randomFig(), col: PALETTE[(Math.random() * PALETTE.length) | 0].col, botlvl: wallet.botlvl || 'normal', ready: true}); publishLobby(seats); };
 $('#lobbyReady').onclick = () => { if (!net || net.host) return; const mySeat = net.lobby && net.lobby.seats ? net.lobby.seats.find(x => x.owner === myId) : null; const next = !(mySeat && mySeat.ready); netSend({t: 'ready', id: myId, ready: next}); };
 $('#plist').addEventListener('click', e => { const a = e.target.closest('[data-addf]'); if (a) { a.remove(); addFriend(a.dataset.addf, a.dataset.n); } });
 $('#plist').addEventListener('click', e => { const b = e.target.closest('[data-kick]'); if (!b) return; const seats = net.lobby.seats.slice(); seats.splice(+b.dataset.kick, 1); publishLobby(seats); });
+$('#plist').addEventListener('click', e => {
+  const bl = e.target.closest('[data-botlvl]');
+  if (bl && net && net.host && net.lobby && net.lobby.seats) {
+    const idx = +bl.dataset.botlvl;
+    const s = net.lobby.seats[idx];
+    if (s && !s.owner) {
+      const LEVELS = ['easy', 'normal', 'hard'];
+      const curIdx = LEVELS.indexOf(s.botlvl || 'normal');
+      const nextLvl = LEVELS[(curIdx + 1) % LEVELS.length];
+      s.botlvl = nextLvl;
+      publishLobby(net.lobby.seats);
+      renderLobby();
+      const LVL_NAMES = {easy: 'Лёгкий', normal: 'Обычный', hard: 'Сложный'};
+      toastAny(`Сложность бота: ${LVL_NAMES[nextLvl]}`);
+    }
+  }
+});
 $('#backToGame').onclick = () => show('game');
 $('#lobbyStart').onclick = () => {
   const seats = net.lobby ? net.lobby.seats : [], pend = pendingInvites(seats).filter(p => !p.late && !p.declined);
@@ -2852,7 +3041,7 @@ function startOnline(seats) {
   const rules = {...(net && net.quick ? ratedRules(mm ? mm.mode : setup.rules.mode) : setup.rules)};
   // Rules v2 only when every guest announced it (an old client would count points differently).
   rules.rv = seats.every(x => !x.owner || x.owner === myId || (net.peerV2 && net.peerV2.get(x.owner))) ? 2 : 1;
-  netSend({t: 'start', sec: FB ? 1 : 0, seats: assignColors(seats).map(x => ({name: x.name, owner: x.owner || null, uid: x.uid || null, fig: x.fig || 'classic', col: x.col, ghost: x.ghost ? 1 : 0, st: PG.state.status.shownStatus(x.st)})), rules, deck: makeDeck(rules), seed: (Math.random() * 1e9) | 0, quick: !!(net && net.quick)});
+  netSend({t: 'start', sec: FB ? 1 : 0, seats: assignColors(seats).map(x => ({name: x.name, owner: x.owner || null, uid: x.uid || null, fig: x.fig || 'classic', col: x.col, ghost: x.ghost ? 1 : 0, st: PG.state.status.shownStatus(x.st), botlvl: x.botlvl || 'normal'})), rules, deck: makeDeck(rules), seed: (Math.random() * 1e9) | 0, quick: !!(net && net.quick)});
 }
 function rematchClick() {
   if (!net) { newGame(); show('game'); return; }
@@ -3108,12 +3297,17 @@ $('#mBots').onclick = () => {
 
 /* Quick phrases online: a fixed set of emoji and short lines (no free text, so nothing to
    moderate). They appear as a bubble under the sender's card for a few seconds. */
-const SAYS = ['👍', '😄', '😮', '😅', '🔥', 'Привет!', 'Хороший ход!', 'Ой!', 'Ну ты даёшь!', 'Удачи!', 'Спасибо за игру!',
-  '👏', '😎', '🤔', '😢', '🎉', '❤️', 'Красиво построено!', 'Вот это поворот!', 'Моя очередь?', 'Ещё партию?'];
+const SAYS = [
+  '👍', '😄', '😮', '😅', '🔥', '👏', '😎', '🤔', '😢', '🎉', '❤️', '🤝', '👑', '⚔️', '🎯', '💪', '🤯', '☕',
+  'Привет!', 'Хороший ход!', 'Ой!', 'Ну ты даёшь!', 'Удачи!', 'Спасибо за игру!',
+  'Красиво построено!', 'Вот это поворот!', 'Моя очередь?', 'Ещё партию?',
+  'Я думал иначе...', 'Всё идёт по плану!', 'Неожиданно!', 'Красивая партия!',
+  'Ура!', 'Почти получилось!', 'Секунду, думаю...', 'Отличная игра!'
+];
 // A message stays on screen SAY_MS; its author cannot send the next one before it is gone (everyone ignores a faster one).
 const SAY_MS = 3200, sayUntil = {};
 let sayAt = 0;
-const isText = x => /[а-я]/i.test(x);
+const isText = x => /[а-яёА-ЯЁ]/i.test(x);
 function renderSayBox() {
   const em = SAYS.filter(x => !isText(x)), tx = SAYS.filter(isText);
   $('#sayBox').innerHTML = `<div class="sy-lock">Подождите: прошлое сообщение ещё на экране</div><div class="sy-h">Эмоции</div><div class="sy-e">${em.map(x => `<button class="e" data-say="${SAYS.indexOf(x)}">${x}</button>`).join('')}</div>` +
@@ -3128,11 +3322,22 @@ function sayLockUi() {
 $('#sayBtn').onclick = e => { e.stopPropagation(); const box = $('#sayBox'); box.hidden = !box.hidden; if (!box.hidden) box.classList.toggle('lock', sayLocked()); };
 document.addEventListener('pointerdown', e => { if (!e.target.closest('#sayBox,#sayBtn')) $('#sayBox').hidden = true; });
 $('#sayBox').addEventListener('click', e => {
-  const b = e.target.closest('[data-say]'); if (!b || !net || sayLocked()) return;
+  const b = e.target.closest('[data-say]'); if (!b || sayLocked()) return;
   const me = players.findIndex(isMe); if (me < 0) return;
   $('#sayBox').hidden = true;
   sayAt = Date.now() + SAY_MS; sayLockUi(); setTimeout(() => { $('#sayBox').classList.remove('lock'); $('#sayBtn').classList.remove('cool'); }, SAY_MS);
-  netSend({t: 'say', g: net.gameId, p: me, i: +b.dataset.say});
+  if (net) {
+    netSend({t: 'say', g: net.gameId, p: me, i: +b.dataset.say});
+  } else {
+    showSay(me, +b.dataset.say);
+    const botIdxs = players.map((p, i) => !isMe(p) && !p.human ? i : -1).filter(i => i >= 0);
+    if (botIdxs.length && Math.random() < 0.45) {
+      const bIdx = botIdxs[Math.floor(Math.random() * botIdxs.length)];
+      const botReplies = [0, 1, 5, 7, 10, 11, 12, 14, 15]; // '👍', '😄', '👏', '🤔', '❤️', '🤝', '👑', '🎯', '💪'
+      const reply = botReplies[Math.floor(Math.random() * botReplies.length)];
+      setTimeout(() => { if (typeof phase !== 'undefined' && phase !== 'end') showSay(bIdx, reply); }, 1200 + Math.random() * 800);
+    }
+  }
 });
 function showSay(p, i) {
   const txt = SAYS[i], card = playersEl.children[p]; if (!txt || !card) return;
@@ -3142,7 +3347,7 @@ function showSay(p, i) {
   b.className = 'bubble' + (isText(txt) ? '' : ' e'); b.textContent = txt; b.style.setProperty('--c', players[p].col);
   b.style.left = cx + 'px'; b.style.top = cy + 'px';
   document.body.append(b); setTimeout(() => b.remove(), SAY_MS + 100);
-  if (!isText(txt) && ['🔥', '🎉', '❤️', '👏'].includes(txt) && !RM) for (let k = 0; k < 7; k++) {
+  if (!isText(txt) && ['🔥', '🎉', '❤️', '👏', '👑', '⚔️', '🎯', '💪', '🤯'].includes(txt) && !RM) for (let k = 0; k < 7; k++) {
     const sp = document.createElement('i'); sp.className = 'spark'; sp.textContent = txt;
     sp.style.cssText = `left:${cx - 8}px;top:${cy + 10}px;--dx:${((k - 3) * 16 + (Math.random() - .5) * 14) | 0}px;--dy:${(-30 - Math.random() * 50) | 0}px;--rt:${((Math.random() - .5) * 90) | 0}deg;animation-delay:${k * 70}ms`;
     document.body.append(sp); setTimeout(() => sp.remove(), 1900 + k * 70);
@@ -3433,6 +3638,8 @@ function editProfile() {
   box.onclick = e => { if (e.target === box) done(); };
 }
 function renderHistory(el) {
+  el = el || $('#historyList') || $('#ptab');
+  if (!el) return;
   const rows = (() => { const a = jsonRead(GAME_HISTORY_KEY, []); return Array.isArray(a) ? a.filter(x => x && Array.isArray(x.players)) : []; })();
   if (typeof PG !== 'undefined' && PG.ui && PG.ui.progress && PG.ui.progress.renderHistoryHtml) {
     el.innerHTML = PG.ui.progress.renderHistoryHtml(rows, isFriend);
@@ -3658,9 +3865,19 @@ function askProfile() {
     ? PG.game.tutorial.renderAskProfileDialogHtml(wallet.color)
     : `<div class="ocard prof"><div class="pav" id="pav" style="--c:${wallet.color}">?</div><h3>Создайте профиль</h3><p>Придумайте никнейм и выберите цвет — их увидят соперники и рейтинг</p><input class="field" id="profName" maxlength="12" placeholder="Никнейм" autocomplete="off"><button class="cta wide" id="profOk" disabled>Готово</button><button class="ghostbtn" id="profLogin">У меня уже есть профиль — войти</button></div>`;
   document.body.append(box);
-  const inp = box.querySelector('#profName'), ok = box.querySelector('#profOk'), av = box.querySelector('#pav');
+  const inp = box.querySelector('#profName'), ok = box.querySelector('#profOk'), av = box.querySelector('#pav'), dice = box.querySelector('#profDice');
   colorPick(inp, av);
   inp.oninput = () => { const n = clean(inp.value); ok.disabled = n.length < 2 || n === 'Вы'; av.textContent = (n[0] || '?').toUpperCase(); };
+  if (dice) {
+    dice.onclick = () => {
+      const gen = (typeof PG !== 'undefined' && PG.account && PG.account.auth && PG.account.auth.generateRandomNickname)
+        ? PG.account.auth.generateRandomNickname()
+        : 'Зодчий';
+      inp.value = gen;
+      inp.dispatchEvent(new Event('input'));
+      beep('coin');
+    };
+  }
   ok.onclick = () => { if (!setProfileName(inp.value)) return; box.remove(); toastAny(`Привет, ${profileName()}!`); renderSetup(); if (FB) setTimeout(() => accountDialog('link'), 600); if (typeof checkNameProposal === 'function') setTimeout(checkNameProposal, 1200); };
   box.querySelector('#profLogin').onclick = () => { box.remove(); accountDialog('login'); };
   setTimeout(() => inp.focus(), 200);
@@ -3972,27 +4189,73 @@ $('#stBuy').onclick = () => {
   });
 };
 let itab = 'st';
+let previewFrameKey = null;
+
+function renderPlayerShowcaseHtml() {
+  const S = ST();
+  const worn = wallet.statusKey || '';
+  const pName = profileName();
+  const initial = (pName[0] || '?').toUpperCase();
+  const effFrameKey = previewFrameKey !== null ? previewFrameKey : (wallet.frame || 'none');
+  const frameObj = FRAMES[effFrameKey] || FRAMES.none;
+  const isPreviewing = previewFrameKey !== null && previewFrameKey !== (wallet.frame || 'none');
+  const ownFr = Object.keys(FRAMES).filter(k => k === 'none' || (wallet.frames || []).includes(k) || (!FRAMES[k].price && !FRAMES[k].earn));
+  const canEquip = isPreviewing && ownFr.includes(effFrameKey);
+  const statusTxt = worn && S.statusText(worn);
+  const statusBadgeHtml = statusTxt ? stBadge(statusTxt) : '<span class="pst-none">без статуса</span>';
+  const curFig = wallet.fig || 'classic';
+  const figObj = FIGS[curFig] || FIGS.classic;
+
+  return `<div class="player-showcase-card" id="playerShowcase">
+    <div class="psc-top">
+      <span>👁️ Так вас видят в игре</span>
+      ${canEquip ? `<button class="chip go psc-apply" data-applyframe="${effFrameKey}">Надеть эту рамку</button>` : isPreviewing ? `<button class="chip x psc-apply" data-resetframe="1">Сбросить примерку</button>` : ''}
+    </div>
+    <div class="psc-body">
+      <div class="psc-av-wrap">
+        <span class="av${frameObj.ring ? ' fr' : ''}" style="--c:${wallet.color};${frameObj.ring ? `--fr:${frameObj.ring}` : ''}">${initial}</span>
+      </div>
+      <div class="psc-info">
+        <div class="psc-name-line">
+          <b class="psc-name">${clean(pName)}</b>
+          <span class="psc-status">${statusBadgeHtml}</span>
+        </div>
+        <div class="psc-meta">
+          <small class="psc-flabel">${frameObj.name}${isPreviewing ? ' · <b style="color:var(--brass)">примерка</b>' : ''}</small>
+        </div>
+      </div>
+      <div class="psc-fig-wrap">
+        <img src="${figPreview(curFig)}" class="psc-fig" alt="${figObj.name}">
+        <small>${figObj.name}</small>
+      </div>
+    </div>
+  </div>`;
+}
+
 function renderItems() {
   const box = $('#itemsBody'); if (!box) return;
   document.querySelectorAll('#itabs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.it === itab));
   const S = ST(), own = S.ownedStatuses(wallet), worn = wallet.statusKey || '';
+  const showcase = renderPlayerShowcaseHtml();
   if (typeof PG !== 'undefined' && PG.ui && PG.ui.shop && PG.ui.shop.renderItemsStatusesHtml) {
+    let tabContent = '';
     if (itab === 'st') {
-      box.innerHTML = PG.ui.shop.renderItemsStatusesHtml({shopStatuses: S.SHOP_STATUSES, exclusiveStatuses: S.EXCLUSIVE_STATUSES, ownedStatuses: own, wornKey: worn, statusTextFn: k => S.statusText(k), stBadgeFn: stBadge});
+      tabContent = PG.ui.shop.renderItemsStatusesHtml({shopStatuses: S.SHOP_STATUSES, exclusiveStatuses: S.EXCLUSIVE_STATUSES, ownedStatuses: own, wornKey: worn, statusTextFn: k => S.statusText(k), stBadgeFn: stBadge});
     } else if (itab === 'fr') {
-      box.innerHTML = PG.ui.shop.renderItemsFramesHtml({frames: FRAMES, ownedFrames: wallet.frames || [], wornFrame: wallet.frame, color: wallet.color, profileInitial: profileName()[0]});
+      tabContent = PG.ui.shop.renderItemsFramesHtml({frames: FRAMES, ownedFrames: wallet.frames || [], wornFrame: wallet.frame, previewFrame: previewFrameKey, color: wallet.color, profileInitial: profileName()[0]});
     } else if (itab === 'fg') {
-      box.innerHTML = PG.ui.shop.renderItemsFigsHtml({figs: FIGS, ownedFigs: wallet.owned, selectedFig: wallet.fig, figPreviewFn: figPreview});
+      tabContent = PG.ui.shop.renderItemsFigsHtml({figs: FIGS, ownedFigs: wallet.owned, selectedFig: wallet.fig, figPreviewFn: figPreview});
     } else {
-      box.innerHTML = PG.ui.shop.renderItemsLocsHtml(LOCS);
+      tabContent = PG.ui.shop.renderItemsLocsHtml(LOCS);
     }
+    box.innerHTML = showcase + tabContent;
     return;
   }
   if (itab === 'st') {
     const counted = S.SHOP_STATUSES.length + S.EXCLUSIVE_STATUSES.filter(x => !x.soon).length, have = own.filter(k => !k.startsWith('cu:')).length;
     const mine = own.map(k => ({k, t: S.statusText(k), ex: k.startsWith('ex:'), cu: k.startsWith('cu:')}));
     const lockedEx = S.EXCLUSIVE_STATUSES.filter(x => !own.includes('ex:' + x.id));
-    box.innerHTML = `<div class="icount">Собрано <b>${have}</b> из ${counted}${own.length > have ? ` · своих: ${own.length - have}` : ''}</div>`
+    box.innerHTML = showcase + `<div class="icount">Собрано <b>${have}</b> из ${counted}${own.length > have ? ` · своих: ${own.length - have}` : ''}</div>`
       + `<div class="itnow">Сейчас: ${worn && S.statusText(worn) ? stBadge(S.statusText(worn)) + '<button class="chip x" data-unwear>Снять</button>' : '<small>статус не надет</small>'}</div>`
       + (mine.length ? `<div class="h3 sec">Мои статусы</div><div class="stgrid">${mine.map(m => `<button class="stb${worn === m.k ? ' sel' : ''}${m.ex ? ' ex' : ''}" data-iwear="${m.k}">${stBadge(m.t, m.ex ? ' ex' : '')}<small>${worn === m.k ? 'Надет' : m.ex ? 'Эксклюзив · надеть' : m.cu ? 'Свой · надеть' : 'Надеть'}</small></button>`).join('')}</div>` : '<p class="shint">Пока нет статусов. Купите в магазине или получите за достижения.</p>')
       + (lockedEx.length ? `<div class="h3 sec">Эксклюзивные</div><div class="exlist">${lockedEx.map(x => `<div class="exrow${x.soon ? ' soon' : ''}"><span class="exic">${x.ic}</span><span><b>${x.text}</b><small>${x.how}</small></span><i>🔒</i></div>`).join('')}</div>` : '')
@@ -4001,25 +4264,51 @@ function renderItems() {
     const ownFr = Object.keys(FRAMES).filter(k => k === 'none' || (wallet.frames || []).includes(k) || (!FRAMES[k].price && !FRAMES[k].earn));
     const total = Object.keys(FRAMES).length - 1, have = ownFr.filter(k => k !== 'none').length;
     const lock = Object.entries(FRAMES).filter(([k, f]) => !ownFr.includes(k));
-    box.innerHTML = `<div class="icount">Собрано <b>${have}</b> из ${total}</div><div class="frgrid">${ownFr.map(k => { const f = FRAMES[k], sel = (wallet.frame || 'none') === k; return `<button class="frb${sel ? ' sel' : ''}" data-ifr="${k}"><span class="av${f.ring ? ' fr' : ''}" style="--c:${wallet.color};${f.ring ? `--fr:${f.ring}` : ''}">${(profileName()[0] || '?').toUpperCase()}</span><span>${f.name}</span><small>${sel ? 'Надета' : 'Надеть'}</small></button>`; }).join('')}</div>`
-      + (lock.length ? `<div class="h3 sec">Ещё не открыты</div><div class="frgrid">${lock.map(([k, f]) => `<div class="frb lockd"><span class="av fr" style="--c:#2a3254;--fr:${f.ring}">?</span><span>${f.name}</span><small>${f.earn ? '🔒 ' + f.earn : `<i class="coin"></i>${f.price}`}</small></div>`).join('')}</div>` : '')
+    const effFr = previewFrameKey || wallet.frame || 'none';
+    box.innerHTML = showcase + `<div class="icount">Собрано <b>${have}</b> из ${total}</div><div class="frgrid">${ownFr.map(k => { const f = FRAMES[k], sel = effFr === k; return `<button class="frb${sel ? ' sel' : ''}" data-ifr="${k}"><span class="av${f.ring ? ' fr' : ''}" style="--c:${wallet.color};${f.ring ? `--fr:${f.ring}` : ''}">${(profileName()[0] || '?').toUpperCase()}</span><span>${f.name}</span><small>${sel ? 'Надета' : 'Надеть'}</small></button>`; }).join('')}</div>`
+      + (lock.length ? `<div class="h3 sec">Ещё не открыты (нажмите для примерки)</div><div class="frgrid">${lock.map(([k, f]) => `<button class="frb lockd${previewFrameKey === k ? ' sel' : ''}" data-pfr="${k}" title="Нажмите для примерки"><span class="av fr" style="--c:#2a3254;--fr:${f.ring}">?</span><span>${f.name}</span><small>${previewFrameKey === k ? 'Примерка' : (f.earn ? '🔒 ' + f.earn : `<i class="coin"></i>${f.price}`)}</small></button>`).join('')}</div>` : '')
       + '<button class="ghostbtn wide" data-ishop>В магазин</button>';
   } else if (itab === 'fg') {
     const ownF = Object.keys(FIGS).filter(k => wallet.owned.includes(k)), lock = Object.keys(FIGS).filter(k => !wallet.owned.includes(k));
-    box.innerHTML = `<div class="icount">Собрано <b>${ownF.length}</b> из ${Object.keys(FIGS).length}</div><div class="figgrid">${ownF.map(k => `<button class="fig${wallet.fig === k ? ' sel' : ''}" data-ifig="${k}"><img src="${figPreview(k)}" alt=""><b>${FIGS[k].name}</b><small>${wallet.fig === k ? 'Выбрана' : 'Выбрать'}</small></button>`).join('')}</div>`
+    box.innerHTML = showcase + `<div class="icount">Собрано <b>${ownF.length}</b> из ${Object.keys(FIGS).length}</div><div class="figgrid">${ownF.map(k => `<button class="fig${wallet.fig === k ? ' sel' : ''}" data-ifig="${k}"><img src="${figPreview(k)}" alt=""><b>${FIGS[k].name}</b><small>${wallet.fig === k ? 'Выбрана' : 'Выбрать'}</small></button>`).join('')}</div>`
       + (lock.length ? `<div class="h3 sec">Ещё не куплены</div><div class="figgrid">${lock.map(k => `<div class="fig poor lockd"><img src="${figPreview(k)}" alt="" style="filter:grayscale(1) brightness(.6)"><b>${FIGS[k].name}</b><small><i class="coin"></i>${FIGS[k].price}</small></div>`).join('')}</div>` : '')
       + '<button class="ghostbtn wide" data-ishop>В магазин</button>';
   } else {
-    box.innerHTML = `<div class="icount">Открыто <b>${LOCS.filter(l => l.open).length}</b> из ${LOCS.length}</div><div class="locgrid">${LOCS.map(l => `<div class="loc${l.open ? '' : ' locked'}"><svg viewBox="0 0 160 90" aria-hidden="true">${l.art}</svg><b>${l.name}</b><small>${l.open ? 'Открыта' : 'Скоро'}</small></div>`).join('')}</div>`;
+    box.innerHTML = showcase + `<div class="icount">Открыто <b>${LOCS.filter(l => l.open).length}</b> из ${LOCS.length}</div><div class="locgrid">${LOCS.map(l => `<div class="loccard${l.open ? ' active' : ' locked'}"><div class="locart"><svg viewBox="0 0 160 90" aria-hidden="true">${l.art}</svg><span class="locbadge ${l.open ? 'open' : 'soon'}">${l.open ? '✓ Активна' : 'Скоро'}</span></div><div class="locinfo"><b>${l.name}</b><small>${l.desc || ''}</small></div></div>`).join('')}</div>`;
   }
 }
-$('#itabs').addEventListener('click', e => { const b = e.target.closest('[data-it]'); if (!b) return; itab = b.dataset.it; renderItems(); });
+$('#itabs').addEventListener('click', e => { const b = e.target.closest('[data-it]'); if (!b) return; itab = b.dataset.it; previewFrameKey = null; renderItems(); });
 $('#itemsBody').addEventListener('click', e => {
   const t = e.target;
   if (t.closest('[data-ishop]')) return show('shop');
+  if (t.closest('[data-applyframe]')) {
+    const k = t.closest('[data-applyframe]').dataset.applyframe;
+    wallet.frame = k; previewFrameKey = null; saveWallet(); renderItems(); renderMenuProfile(); toastAny('Рамка надета'); return;
+  }
+  if (t.closest('[data-resetframe]')) {
+    previewFrameKey = null; renderItems(); return;
+  }
   if (t.closest('[data-unwear]')) { ST().wearStatus(wallet, null); return afterStatusChange(); }
   const w = t.closest('[data-iwear]'); if (w) { ST().wearStatus(wallet, wallet.statusKey === w.dataset.iwear ? null : w.dataset.iwear); return afterStatusChange(); }
-  const f = t.closest('[data-ifr]'); if (f) { wallet.frame = f.dataset.ifr; saveWallet(); renderItems(); renderMenuProfile(); return; }
+  const pf = t.closest('[data-pfr]');
+  if (pf) {
+    previewFrameKey = pf.dataset.pfr;
+    renderItems();
+    const frName = (FRAMES[previewFrameKey] && FRAMES[previewFrameKey].name) || 'Рамка';
+    toastAny(`Примерка: «${frName}»`);
+    return;
+  }
+  const f = t.closest('[data-ifr]');
+  if (f) {
+    wallet.frame = f.dataset.ifr;
+    previewFrameKey = null;
+    saveWallet();
+    renderItems();
+    renderMenuProfile();
+    const frName = (FRAMES[wallet.frame] && FRAMES[wallet.frame].name) || 'Рамка';
+    toastAny(`Рамка «${frName}» надета`);
+    return;
+  }
   const g = t.closest('[data-ifig]'); if (g) { wallet.fig = g.dataset.ifig; saveWallet(); renderItems(); return; }
 });
 $('#itemsBtn').onclick = () => { show('items'); renderItems(); };
@@ -4041,6 +4330,7 @@ function renderLobbyFriends() {
   const inRoom = new Set(seats.map(x => x.uid).filter(Boolean));
   fillOnline($('#lobbyOnline'), $('#lobbyOnlineTitle'), $('#lobbyOnlineList'), ok && net && !net.quick && !(net.gameId && phase !== 'end') && seats.length < roomMax(), inRoom, net && net.code);
   fillOnline($('#mOnline'), $('#mOnlineTitle'), $('#mOnlineList'), ok && !!mm && !(net && net.gameId) && seats.length < mm.want, inRoom, net && net.quick ? net.code : null);
+  updateLobbyOnlineBadge();
 }
 function renderFriends() {
   const box = $('#flist'); if (!box || $('#scr-friends').hidden) return;
@@ -4411,6 +4701,7 @@ function openFeedback() {
     other: 'Ваш отзыв, впечатление или вопрос к разработчику…'
   };
   const STAR_LABELS = {
+    0: 'Нажмите на звезду, чтобы оценить',
     1: '1/5 — Много багов / не понравилось',
     2: '2/5 — Есть проблемы и баги',
     3: '3/5 — Нормально, но есть над чем работать',
@@ -4429,8 +4720,8 @@ function openFeedback() {
     ? PG.ui.feedback.renderFeedbackCardHtml({
         first,
         namePromo,
-        stars: 5,
-        starLabel: STAR_LABELS[5],
+        stars: 0,
+        starLabel: STAR_LABELS[0],
         cat: 'idea',
         placeholder: PLACEHOLDERS.idea,
         diagSummary: `${diag.os} · ${diag.screen} · Сеть: ${diag.net}`
@@ -4440,7 +4731,7 @@ function openFeedback() {
   document.body.append(box);
 
   let cat = 'idea';
-  let stars = 5;
+  let stars = 0;
 
   const starBtns = box.querySelectorAll('.fb-star');
   const starLbl = box.querySelector('#fbStarLabel');
@@ -4781,6 +5072,8 @@ const AUTH_ERR = {
   USER_DISABLED: ['Этот профиль отключён. Напишите в поддержку', 'mail'],
   TOO_MANY_ATTEMPTS_TRY_LATER: ['Слишком много попыток подряд. Подождите несколько минут или смените пароль через «Забыли пароль?»', ''],
   CREDENTIAL_TOO_OLD_LOGIN_AGAIN: ['Для этого нужно войти заново', ''],
+  CREDENTIAL_ALREADY_IN_USE: ['Этот аккаунт Google уже используется. Выполняем вход...', ''],
+  FEDERATED_USER_ID_ALREADY_LINKED: ['Этот аккаунт Google уже привязан к другому профилю. Выполняем вход...', ''],
   SHORT_OR_WRONG: ['Пароль не подходит. Для нового профиля пароль нужен от 6 символов', 'pass'],
 };
 // Server-side setup problems (sign-in method off, e-mail change blocked…) are not the player's
@@ -4867,7 +5160,7 @@ async function finishGoogle(idToken, link, onFail) {
       try { await fbToken(); j = await googleIdp(idToken, fbAuth.idToken); joined = true; }
       catch (e) {
         // Already the key of another profile: sign in to that one (a saved profile asking to link is told so instead).
-        if (!gErr(e, /FEDERATED_USER_ID_ALREADY_LINKED/) || (link && wasRegistered)) throw e;
+        if (!gErr(e, /FEDERATED_USER_ID_ALREADY_LINKED|CREDENTIAL_ALREADY_IN_USE/) || (link && wasRegistered)) throw e;
       }
     }
     if (!j) j = await googleIdp(idToken, null);
@@ -4897,7 +5190,7 @@ async function finishGoogle(idToken, link, onFail) {
       accountDialog('login', jwtEmail(idToken));
     } else {
       const [t] = authErr(e, link); toastAny(t);
-      if (link && gErr(e, /FEDERATED_USER_ID_ALREADY_LINKED/)) setTimeout(() => accountDialog('login'), 400);
+      if (link && gErr(e, /FEDERATED_USER_ID_ALREADY_LINKED|CREDENTIAL_ALREADY_IN_USE/)) setTimeout(() => accountDialog('login'), 400);
     }
     if (onFail) onFail(e);
   } finally { googleBusy = false; }
@@ -4931,28 +5224,35 @@ function finishSignup() {
 }
 // One entry point: the native sheet on the phone, Google's own button in the browser.
 function startGoogle(link, onFail, btn) {
+  if (btn && btn.innerHTML && !btn._origHtml) {
+    btn._origHtml = btn.innerHTML;
+    btn.innerHTML = '<span class="gicon">⏳</span> Входим...';
+  }
+  const resetBtn = () => { if (btn && btn._origHtml) { btn.innerHTML = btn._origHtml; btn._origHtml = null; } };
   if (googleAvailable()) {
     startGoogle.reqId = (startGoogle.reqId || 0) + 1;
     const reqId = startGoogle.reqId;
     window.onGoogleToken = t => {
       track('google_token', {stale: reqId !== startGoogle.reqId ? 1 : 0}); // shows in Analytics whether the phone got a token at all
-      if (reqId !== startGoogle.reqId) return;
+      if (reqId !== startGoogle.reqId) { resetBtn(); return; }
       window.onGoogleToken = null;
       window.onGoogleError = null;
-      finishGoogle(t, link, onFail);
+      finishGoogle(t, link, err => { resetBtn(); if (typeof onFail === 'function') onFail(err); });
     };
     window.onGoogleError = c => {
       track('google_error', {code: String(c)});
-      if (reqId !== startGoogle.reqId) return;
+      if (reqId !== startGoogle.reqId) { resetBtn(); return; }
       window.onGoogleToken = null;
       window.onGoogleError = null;
+      resetBtn();
       try {
-        if (c !== 'canceled') toastAny(c === 'not_configured' ? 'Google-вход не настроен в этой сборке' : c === 'misconfigured' ? 'Вход через Google пока не подключён для этой версии игры. Войдите по почте — профиль тот же' : c === 'no_credentials' ? 'Google не предоставил учётные данные. Проверьте аккаунт Google на устройстве и попробуйте снова' : 'Не получилось открыть вход Google. Попробуйте снова');
+        if (c !== 'canceled') toastAny(c === 'not_configured' ? 'Google-вход не настроен в этой сборке' : c === 'misconfigured' ? 'Вход через Google пока не подключён для этой версии игры. Войдите по почте — профиль тот же' : c === 'no_credentials' ? 'Google не предоставил учётные данные. Проверьте аккаунт Google на устройстве и попробуйте снова' : c === 'bad_credential' ? 'Не удалось прочитать ответ Google. Попробуйте снова' : 'Не получилось открыть вход Google. Попробуйте снова');
       } finally { if (typeof onFail === 'function') onFail(c); }
     };
     try { AndroidApp.googleSignIn(); } catch (_) { window.onGoogleError('failed'); }
     return;
   }
+  resetBtn();
   if (googleWebOk() && btn) return googleWebButton(btn, link, onFail);
   toastAny('Вход через Google доступен в приложении');
   if (onFail) onFail('unavailable');
@@ -5243,10 +5543,20 @@ function accountDialog(mode, prefill) {
 function renameDialog() {
   if (wallet.gold < RENAME_PRICE) return toastAny(`Смена имени стоит ${RENAME_PRICE} золота — не хватает ${RENAME_PRICE - wallet.gold}`);
   const box = document.createElement('div'); box.className = 'over'; box.style.position = 'fixed';
-  box.innerHTML = `<div class="ocard acc"><h3>Смена имени</h3><p>Стоимость: <b><i class="coin" style="display:inline-block;vertical-align:-3px"></i> ${RENAME_PRICE}</b> · останется ${wallet.gold - RENAME_PRICE}</p><input class="field" id="newName" maxlength="12" placeholder="${profileName()}"><button class="cta wide" id="rnGo" disabled>Сменить имя</button><button class="ghostbtn" id="rnNo">Отмена</button></div>`;
+  box.innerHTML = `<div class="ocard acc"><h3>Смена имени</h3><p>Стоимость: <b><i class="coin" style="display:inline-block;vertical-align:-3px"></i> ${RENAME_PRICE}</b> · останется ${wallet.gold - RENAME_PRICE}</p><div style="display:flex;gap:8px;align-items:center;margin-bottom:12px"><input class="field" id="newName" maxlength="12" placeholder="${profileName()}" style="flex:1"><button type="button" class="iconbtn" id="rnDice" title="Случайное имя" style="width:44px;height:44px;border-radius:10px;background:var(--surface-hover);font-size:20px;border:1px solid var(--line);cursor:pointer;flex:0 0 auto">🎲</button></div><button class="cta wide" id="rnGo" disabled>Сменить имя</button><button class="ghostbtn" id="rnNo">Отмена</button></div>`;
   document.body.append(box);
-  const inp = box.querySelector('#newName'), go = box.querySelector('#rnGo');
+  const inp = box.querySelector('#newName'), go = box.querySelector('#rnGo'), dice = box.querySelector('#rnDice');
   inp.oninput = () => { const n = clean(inp.value); go.disabled = n.length < 2 || n === profileName(); };
+  if (dice) {
+    dice.onclick = () => {
+      const gen = (typeof PG !== 'undefined' && PG.account && PG.account.auth && PG.account.auth.generateRandomNickname)
+        ? PG.account.auth.generateRandomNickname()
+        : 'Зодчий';
+      inp.value = gen;
+      inp.dispatchEvent(new Event('input'));
+      beep('coin');
+    };
+  }
   box.querySelector('#rnNo').onclick = () => box.remove();
   go.onclick = () => { if (wallet.gold < RENAME_PRICE) return; wallet.gold -= RENAME_PRICE; setProfileName(inp.value); beep('coin'); box.remove(); toastAny(`Теперь вы — ${profileName()}`); renderAccount(); syncRating(true); };
   setTimeout(() => inp.focus(), 200);
@@ -5285,6 +5595,7 @@ function show(name) {
   if (mm && name !== 'match') stopMatch(name === 'game');
   if (name === 'results') renderResults(phase === 'end');
   if (name === 'items') renderItems();
+  if (name === 'history') renderHistory($('#historyList'));
   if (gameVisible) { applyCam(); if (pendingStart) startTurn(); else pumpRemote(); }
   if (name === 'lobby') { renderLobby(); if (FB && registered()) loadFriends().then(renderLobbyFriends).catch(() => {}); }
   if (name === 'shop') renderShop();

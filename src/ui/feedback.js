@@ -22,6 +22,7 @@ export const FEEDBACK_PLACEHOLDERS = {
 };
 
 export const FEEDBACK_STAR_LABELS = {
+  0: 'Нажмите на звезду, чтобы оценить',
   1: '1/5 — Много багов / не понравилось',
   2: '2/5 — Есть проблемы и баги',
   3: '3/5 — Нормально, но есть над чем работать',
@@ -36,7 +37,7 @@ export function formatFeedbackPayload({cat, msg, stars, ver, attachDiag, diag}) 
   const body = {
     k: cat || 'idea',
     m: String(msg || '').slice(0, 1500),
-    stars: typeof stars === 'number' ? stars : 5,
+    stars: typeof stars === 'number' && stars > 0 ? stars : 0,
     v: ver || 'web',
     t: {'.sv': 'timestamp'}
   };
@@ -57,9 +58,10 @@ export function formatFeedbackPayload({cat, msg, stars, ver, attachDiag, diag}) 
 /**
  * Generates the HTML content for the feedback dialog card
  */
-export function renderFeedbackCardHtml({first, namePromo, stars, starLabel, cat, placeholder, diagSummary}) {
+export function renderFeedbackCardHtml({first, namePromo, stars = 0, starLabel, cat, placeholder, diagSummary}) {
+  const currentStars = typeof stars === 'number' ? stars : 0;
   const starsHtml = [1, 2, 3, 4, 5].map(v =>
-    `<button type="button" class="fb-star${v <= stars ? ' active' : ''}" data-val="${v}" aria-label="${v} ${v === 1 ? 'звезда' : v < 5 ? 'звезды' : 'звёзд'}">⭐</button>`
+    `<button type="button" class="fb-star${currentStars > 0 && v <= currentStars ? ' active' : ''}" data-val="${v}" aria-label="${v} ${v === 1 ? 'звезда' : v < 5 ? 'звезды' : 'звёзд'}">⭐</button>`
   ).join('');
 
   // Plain colour tiles (a jigsaw outline with tabs crowded four labels into a narrow dialog and looked broken).

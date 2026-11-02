@@ -1,5 +1,6 @@
-name: Account regression and offline build
+name: Account regression and staging build
 on:
+  workflow_dispatch:
   push:
     branches: [dev/stage2-account-network-20261029]
     paths: ['app/src/main/java/**', 'tests/**', '.github/workflows/account-verify.yml', 'web/game.html']
@@ -24,12 +25,11 @@ jobs:
           set +e
           node --test tests/*.test.cjs > /tmp/tests.log 2>&1
           echo "$?" > /tmp/tests.exit
-          rm -f app/google-services.json
           sh scripts/wrap-web.sh > /tmp/build.log 2>&1
           rc=$?
           if [ "$rc" -eq 0 ]; then
             chmod +x gradlew
-            ./gradlew -I scripts/staging.init.gradle assembleStagingDebug -PversionCode=1 --no-daemon >> /tmp/build.log 2>&1
+            ./gradlew assembleGithubRelease -PversionCode=1 --no-daemon >> /tmp/build.log 2>&1
             rc=$?
           fi
           echo "$rc" > /tmp/build.exit
@@ -41,7 +41,7 @@ jobs:
           python3 - <<'PY'
           from pathlib import Path
           import os,re
-          out=['# Account verification','Source: '+os.environ['SOURCE_SHA'],'Tests exit code: '+Path('/tmp/tests.exit').read_text().strip(),'Offline assembleStagingDebug exit code: '+Path('/tmp/build.exit').read_text().strip(),'No APK publication, FCM send, production Firebase access, main change or signing-key rotation.']
+          out=['# Account verification','Source: '+os.environ['SOURCE_SHA'],'Tests exit code: '+Path('/tmp/tests.exit').read_text().strip(),'Staging assembleGithubRelease exit code: '+Path('/tmp/build.exit').read_text().strip(),'No APK publication, FCM send, production Firebase access, main change or signing-key rotation.']
           for name in ['tests','build']:
               log=Path('/tmp/'+name+'.log').read_text(errors='replace')
               if name=='build':
@@ -57,7 +57,7 @@ jobs:
           git diff --cached --check
           git config user.name 'Puzzlegrad development automation'
           git config user.email 'puzzlegrad-automation@users.noreply.github.com'
-          git commit -m 'docs: record actual account regression and offline build results'
+          git commit -m 'docs: record actual account regression and staging build results'
           # somebody may have pushed while the tests ran: rebase the one report commit onto the new tip and try again
           for i in 1 2 3 4; do
             git push origin HEAD:dev/stage2-account-network-20261029 && break

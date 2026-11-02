@@ -156,7 +156,15 @@ body:not(.authed) main > .card:not(#loginCard) { display: none; }
 }
 
 .pl-wide{grid-column:1/-1}
-.pl-tools{display:flex;gap:8px;flex-wrap:wrap}.pl-tools .field{flex:1;min-width:160px}
+.pl-stats-grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:10px;margin-bottom:12px}
+.pl-stat-card{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:12px 14px;display:flex;flex-direction:column;gap:4px}
+.pl-stat-val{font-size:24px;font-weight:800;color:var(--fg)}
+.pl-stat-sub{font-size:12px;color:var(--muted)}
+.pl-tools{display:flex;gap:8px;flex-wrap:wrap;align-items:center}.pl-tools .field{flex:1;min-width:160px}
+.pl-filter-btn{font-size:12px;padding:8px 12px;border-radius:8px;background:var(--surface);border:1px solid var(--border);color:var(--fg);cursor:pointer}
+.pl-filter-btn.active{background:rgba(99,102,241,.18);border-color:var(--accent);color:var(--accent);font-weight:600}
+.btn-purge{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.3);color:#fca5a5}
+.btn-purge:hover{background:rgba(239,68,68,.25);border-color:#ef4444;color:#fff}
 .pl-list{display:flex;flex-direction:column;gap:6px;max-height:420px;overflow:auto}
 .pl-row{display:flex;align-items:center;gap:10px;padding:9px 10px;border-radius:10px;background:var(--bg);border:1px solid var(--border);cursor:pointer;text-align:left;color:var(--fg);font:inherit;width:100%}
 .pl-row:hover,.pl-row.on{border-color:var(--accent)}
@@ -164,7 +172,16 @@ body:not(.authed) main > .card:not(#loginCard) { display: none; }
 .pl-who{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.pl-who b{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.pl-who small{color:var(--muted);font-size:12px}
 .pl-badge{font-size:11px;padding:2px 7px;border-radius:7px;background:var(--surface-hover);color:var(--muted);white-space:nowrap}.pl-badge.ok{color:var(--success)}.pl-badge.on{color:#fff;background:var(--success)}
 .pl-info{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px}.pl-info div{background:var(--bg);border:1px solid var(--border);border-radius:10px;padding:9px 11px}.pl-info small{display:block;color:var(--muted);font-size:11px;margin-bottom:2px}.pl-info b{font-size:14px;word-break:break-word}
-.pl-log{display:flex;flex-direction:column;gap:4px;max-height:360px;overflow:auto;font:12.5px/1.4 'JetBrains Mono',monospace}.pl-log div{display:flex;gap:10px;padding:5px 8px;border-radius:6px;background:var(--bg)}.pl-log time{color:var(--muted);white-space:nowrap}.pl-log b{min-width:110px;color:var(--accent)}.pl-log span{word-break:break-word;color:var(--fg)}.pl-log .err b{color:#ff6b6b}
+.pl-log{display:flex;flex-direction:column;gap:6px;max-height:400px;overflow:auto}
+.pl-log-item{display:flex;flex-direction:column;gap:5px;padding:8px 10px;border-radius:8px;background:var(--bg);border:1px solid var(--border)}
+.pl-log-item.err{border-color:rgba(239,68,68,.4);background:rgba(239,68,68,.05)}
+.pl-log-item .log-head{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.pl-log-item .log-ic{font-size:16px}
+.pl-log-item .log-title{font-size:13px;font-weight:700;color:var(--fg)}
+.pl-log-item .log-tag{font-size:10.5px;color:var(--muted);background:var(--surface-hover);padding:1px 6px;border-radius:4px;font-family:monospace}
+.pl-log-item .log-time{font-size:11px;color:var(--muted);margin-left:auto;white-space:nowrap}
+.pl-log-item .log-desc{font-size:12px;color:var(--fg);padding-left:24px;line-height:1.4;word-break:break-word}
+.pl-log-item .log-desc b{color:var(--accent)}
 </style>
 </head>
 <body>
@@ -197,30 +214,71 @@ body:not(.authed) main > .card:not(#loginCard) { display: none; }
   </div>
 
   <!-- 1. РЕЛИЗЫ И ВЫКАТКА В ПРОД -->
-  <div class="card" style="border-color: rgba(79, 142, 247, 0.3)">
+  <div class="card" style="border-color: rgba(79, 142, 247, 0.4)">
     <div class="card-title">
       <span>🚀 Релизы и публикация</span>
       <span style="font-size:12px;color:var(--accent)" id="curVersion">…</span>
     </div>
-    <p class="stat-sub">Управление выкаткой из тестового контура (Staging) в боевой (Production).</p>
+    <p class="stat-sub">Двухэтапная публикация: сначала сборка тестируется на Staging (без пушей и без постов), затем в 1 клик выпускается в Production для всех игроков.</p>
     
-    <div style="background:var(--bg);padding:12px;border-radius:8px;border:1px solid var(--border)">
-      <div style="display:flex;justify-content:space-between;margin-bottom:6px">
-        <span style="font-size:13px;color:var(--muted)">Тестовый контур:</span>
-        <b style="color:var(--warning)" id="stagingStatus">…</b>
+    <!-- 2 Stages Grid -->
+    <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(280px,1fr));gap:12px">
+      <!-- Staging Box -->
+      <div style="background:var(--bg);padding:14px;border-radius:10px;border:1px solid rgba(214,158,46,0.3);display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <b style="color:var(--warning);font-size:14px">🟡 Тестовый контур (Staging)</b>
+          <span style="background:rgba(214,158,46,0.15);color:var(--warning);font-size:11px;padding:2px 8px;border-radius:6px;font-weight:700" id="stagingBadge">Тест</span>
+        </div>
+        <div style="font-size:13px;color:var(--muted)">Статус сборки: <b id="stagingStatus" style="color:var(--fg)">…</b></div>
+        <p class="stat-sub" style="font-size:11.5px;line-height:1.35">Обновляется автоматически при коммитах в dev-ветки. <b>Без пуш-уведомлений и без постов в канал.</b></p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
+          <a class="btn btn-sm" id="btnDownloadStaging" href="https://github.com/crownfall90-dot/play/releases/tag/staging-latest" target="_blank" rel="noopener" style="font-size:12px;padding:6px 10px;text-decoration:none">📥 Скачать APK</a>
+          <a class="btn btn-sm" id="btnOpenStaging" href="https://crownfall90-dot.github.io/play/staging/" target="_blank" rel="noopener" style="font-size:12px;padding:6px 10px;text-decoration:none">🌐 Тестовый веб</a>
+        </div>
       </div>
-      <div style="display:flex;justify-content:space-between">
-        <span style="font-size:13px;color:var(--muted)">Боевой сервер:</span>
-        <b style="color:var(--success)" id="prodStatus">…</b>
+
+      <!-- Production Box -->
+      <div style="background:var(--bg);padding:14px;border-radius:10px;border:1px solid rgba(56,161,105,0.3);display:flex;flex-direction:column;gap:8px">
+        <div style="display:flex;justify-content:space-between;align-items:center">
+          <b style="color:var(--success);font-size:14px">🟢 Боевой сервер (Production)</b>
+          <span style="background:rgba(56,161,105,0.15);color:var(--success);font-size:11px;padding:2px 8px;border-radius:6px;font-weight:700">Боевой</span>
+        </div>
+        <div style="font-size:13px;color:var(--muted)">Текущая версия: <b id="prodStatus" style="color:var(--fg)">…</b></div>
+        <p class="stat-sub" style="font-size:11.5px;line-height:1.35">Доступна всем игрокам. При выкатке <b>рассылает FCM-пуш игрокам</b> и <b>публикует пост в Telegram-канал</b>.</p>
+        <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
+          <a class="btn btn-sm" id="btnDownloadProd" href="https://github.com/crownfall90-dot/play/releases/latest" target="_blank" rel="noopener" style="font-size:12px;padding:6px 10px;text-decoration:none">📥 Боевой APK</a>
+          <a class="btn btn-sm" id="btnOpenProd" href="https://crownfall90-dot.github.io/play/" target="_blank" rel="noopener" style="font-size:12px;padding:6px 10px;text-decoration:none">🌐 Боевой сайт</a>
+          <a class="btn btn-sm" id="btnOpenTelegram" href="https://t.me/diarydevelopment" target="_blank" rel="noopener" style="font-size:12px;padding:6px 10px;text-decoration:none">📢 Канал</a>
+        </div>
       </div>
     </div>
 
-    <button class="btn btn-primary" id="btnPromote" style="padding:14px;font-size:15px">
-      🚀 Выпустить обновление в Production
-    </button>
-    <button class="btn" id="btnRollback">
-      🔄 Откатить версию
-    </button>
+    <!-- Release notes ready for publish -->
+    <div style="background:var(--bg);padding:12px 14px;border-radius:10px;border:1px solid var(--border)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <b style="font-size:13px;color:var(--accent)">📝 Что войдёт в следующий релиз (Release Notes):</b>
+        <button class="btn btn-sm" id="btnReloadNotes" style="font-size:11px;padding:3px 8px">🔄 Обновить</button>
+      </div>
+      <div id="releaseNotesContent" style="font-size:12.5px;color:var(--fg);line-height:1.5;max-height:160px;overflow-y:auto;white-space:pre-wrap;background:rgba(0,0,0,0.2);padding:8px 10px;border-radius:6px">Загрузка release-notes.md…</div>
+    </div>
+
+    <!-- Pipeline status indicator -->
+    <div id="ciStatusBox" style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid var(--border)">
+      <div style="display:flex;align-items:center;gap:8px;font-size:13px">
+        <span id="ciStatusDot" style="font-size:14px">⚪</span>
+        <span id="ciStatusText" style="color:var(--muted)">Статус автосборки GitHub: проверяем…</span>
+      </div>
+      <a id="ciStatusLink" href="https://github.com/crownfall90-dot/play/actions" target="_blank" rel="noopener" style="font-size:12px;color:var(--accent);text-decoration:none">Смотреть запуски ↗</a>
+    </div>
+
+    <div style="display:flex;flex-direction:column;gap:8px">
+      <button class="btn btn-primary" id="btnPromote" style="padding:14px;font-size:15px;font-weight:700">
+        🚀 Выпустить обновление в Production (для всех игроков)
+      </button>
+      <button class="btn" id="btnRollback" style="font-size:13px">
+        🔄 Откатить версию (Rollback)
+      </button>
+    </div>
   </div>
 
   <!-- 2. ЖИВАЯ СТАТИСТИКА -->
@@ -229,30 +287,32 @@ body:not(.authed) main > .card:not(#loginCard) { display: none; }
       <span>📊 Живой пульс игры</span>
       <span style="font-size:12px;color:var(--success)">● Live</span>
     </div>
+    <p class="stat-sub">Данные из базы Firebase в реальном времени. Реальные игроки (сыгравшие ≥1 партию или с профилем) отделены от пустых гостевых сессий и поисковых ботов.</p>
+    
     <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
       <div>
-        <div class="stat-val" id="valOnline">--</div>
-        <div class="stat-sub">Игроков в сети (/presence)</div>
+        <div class="stat-val" id="valOnline" style="color:var(--success)">--</div>
+        <div class="stat-sub" id="subOnline">Игроков в сети (/presence)</div>
       </div>
       <div>
-        <div class="stat-val" id="valRooms">--</div>
-        <div class="stat-sub">Активных комнат</div>
+        <div class="stat-val" id="valRooms" style="color:var(--accent)">--</div>
+        <div class="stat-sub" id="subRooms">Активных комнат</div>
       </div>
       <div>
         <div class="stat-val" id="valDau">--</div>
-        <div class="stat-sub">Заходили за сутки</div>
+        <div class="stat-sub" id="subDau">Заходили за сутки</div>
       </div>
       <div>
         <div class="stat-val" id="valWau">--</div>
-        <div class="stat-sub">Заходили за неделю</div>
+        <div class="stat-sub" id="subWau">Заходили за неделю</div>
       </div>
       <div>
         <div class="stat-val" id="valReg">--</div>
-        <div class="stat-sub">С сохранённым профилем (за неделю)</div>
+        <div class="stat-sub" id="subReg">С сохранённым профилем (за неделю)</div>
       </div>
       <div>
         <div class="stat-val" id="valApp">--</div>
-        <div class="stat-sub">Приложение / сайт (за неделю)</div>
+        <div class="stat-sub" id="subApp">Приложение / сайт (за неделю)</div>
       </div>
       <div>
         <div class="stat-val" id="valRetD1" style="color:var(--accent)">--</div>
@@ -263,15 +323,41 @@ body:not(.authed) main > .card:not(#loginCard) { display: none; }
         <div class="stat-sub">Удержание D7 (цель ≥ 12%)</div>
       </div>
     </div>
-    <div class="stat-sub" id="valVers"></div>
+    <div class="stat-sub" id="valVers" style="margin-top:6px"></div>
     <div class="stat-sub" id="valCohorts" style="margin-top:6px;line-height:1.6"></div>
-    <button class="btn" id="btnRefreshStats">Обновить статистику</button>
+    <button class="btn" id="btnRefreshStats" style="margin-top:4px">Обновить статистику</button>
   </div>
 
   <!-- ИГРОКИ И ЛОГИ -->
   <div class="card pl-wide">
     <div class="card-title"><span>👥 Игроки и логи</span><span class="stat-sub" id="plCount"></span></div>
-    <div class="pl-tools"><input class="field" id="plSearch" placeholder="Поиск по имени или id…"><button class="btn" id="btnPlReload">Обновить</button><button class="btn" id="btnErrors">⚠️ Последние ошибки</button></div>
+    
+    <div class="pl-stats-grid">
+      <div class="pl-stat-card">
+        <div class="pl-stat-val" id="statActivePlayers">--</div>
+        <div class="pl-stat-sub">Игроков (≥ 1 игры)</div>
+      </div>
+      <div class="pl-stat-card">
+        <div class="pl-stat-val" id="statOnlineGames" style="color:var(--accent)">--</div>
+        <div class="pl-stat-sub">🌐 Сыграно онлайн</div>
+      </div>
+      <div class="pl-stat-card">
+        <div class="pl-stat-val" id="statFriendGames" style="color:var(--purple)">--</div>
+        <div class="pl-stat-sub">🤝 С друзьями</div>
+      </div>
+      <div class="pl-stat-card">
+        <div class="pl-stat-val" id="statBotGames" style="color:var(--success)">--</div>
+        <div class="pl-stat-sub">🤖 С ботами</div>
+      </div>
+    </div>
+
+    <div class="pl-tools">
+      <input class="field" id="plSearch" placeholder="Поиск по имени или id…">
+      <button class="btn" id="btnPlReload">Обновить</button>
+      <button class="btn pl-filter-btn active" id="btnFilterEmpty">Скрывать пустых гостей</button>
+      <button class="btn btn-purge" id="btnPurgeEmpty" title="Удалить пустые аккаунты nickname<№> без сыгранных партий и без профиля">🧹 Очистить пустых гостей</button>
+      <button class="btn" id="btnErrors">⚠️ Последние ошибки</button>
+    </div>
     <div class="pl-list" id="plList"><div class="stat-sub">Загрузка…</div></div>
     <div id="plDetail" hidden></div>
   </div>
@@ -512,22 +598,70 @@ $('btnCopyInvite').onclick = () => {
 async function loadStats() {
   try {
     const pres = await db('presence') || {}, now = Date.now();
-    const all = Object.values(pres).filter(p => p && p.t), day = all.filter(p => now - p.t < 864e5), week = all.filter(p => now - p.t < 7 * 864e5);
-    $('valOnline').textContent = all.filter(p => p.s !== 'off' && now - p.t < 3 * 60 * 1000).length;
-    // Every open game marks /presence once a minute; the last mark of each player stays, so it also tells who came lately.
-    $('valDau').textContent = day.length; $('valWau').textContent = week.length;
-    $('valReg').textContent = week.filter(p => p.r).length;
-    $('valApp').textContent = `${week.filter(p => p.p && p.p !== 'web' && p.p !== 'mock').length} / ${week.filter(p => p.p === 'web').length}`;
-    const vers = {}; week.forEach(p => { if (p.v) vers[p.v] = (vers[p.v] || 0) + 1; });
-    $('valVers').textContent = Object.keys(vers).length ? 'Версии за неделю: ' + Object.entries(vers).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([v, n]) => `${v} — ${n}`).join(' · ') : '';
+    const all = Object.values(pres).filter(p => p && typeof p === 'object' && p.t);
+    
+    // 1. Online right now: active within 2.5 minutes, not marked 'off', and has a name
+    const online = all.filter(p => p.s && p.s !== 'off' && now - p.t < 150000 && p.n);
+    const inGame = online.filter(p => p.s === 'online' || p.s === 'room').length;
+    const inSearch = online.filter(p => p.s === 'search').length;
+    const inBots = online.filter(p => p.s === 'bots').length;
+    const inMenu = online.filter(p => p.s === 'menu' || !p.s).length;
 
-    // Retention D1 / D7 across all presence records with first seen date (fs)
+    $('valOnline').textContent = online.length;
+    if ($('subOnline')) {
+      const parts = [];
+      if (inGame) parts.push(`${inGame} онлайн`);
+      if (inSearch) parts.push(`${inSearch} в поиске`);
+      if (inBots) parts.push(`${inBots} с ботами`);
+      if (inMenu) parts.push(`${inMenu} в меню`);
+      $('subOnline').textContent = parts.length ? parts.join(' · ') : 'Игроков в сети сейчас';
+    }
+
+    // 2. Real active rooms
+    const rooms = await fetch(`${DB}/rooms.json?shallow=true&auth=${await token()}`).then(r => r.ok ? r.json() : null);
+    const totalRoomsInDb = rooms ? Object.keys(rooms).length : 0;
+    const activeRoomsEstimate = inGame > 0 ? Math.max(1, Math.ceil(inGame / 2)) : 0;
+    $('valRooms').textContent = activeRoomsEstimate;
+    if ($('subRooms')) {
+      $('subRooms').textContent = `Сейчас играют (в архиве БД: ${totalRoomsInDb})`;
+    }
+
+    // 3. DAU and WAU - distinguish real players from empty bounces
+    const day = all.filter(p => now - p.t < 864e5);
+    const week = all.filter(p => now - p.t < 7 * 864e5);
+    const dayReal = day.filter(p => !isEmptyGuest(p));
+    const weekReal = week.filter(p => !isEmptyGuest(p));
+
+    $('valDau').textContent = dayReal.length;
+    if ($('subDau')) $('subDau').textContent = `За сутки (всего сессий: ${day.length})`;
+
+    $('valWau').textContent = weekReal.length;
+    if ($('subWau')) $('subWau').textContent = `За неделю (всего сессий: ${week.length})`;
+
+    // 4. Registered players with cloud profile
+    const regWeek = week.filter(p => p.r || p.hasProfile).length;
+    $('valReg').textContent = regWeek;
+    if ($('subReg')) $('subReg').textContent = `С профилем (за неделю)`;
+
+    // 5. App vs Web
+    const appReal = week.filter(p => p.p && p.p !== 'web' && p.p !== 'mock' && !isEmptyGuest(p)).length;
+    const webReal = week.filter(p => p.p === 'web' && !isEmptyGuest(p)).length;
+    $('valApp').textContent = `${appReal} / ${webReal}`;
+    if ($('subApp')) $('subApp').textContent = `Приложение / сайт (за неделю)`;
+
+    // Versions among active players
+    const vers = {};
+    weekReal.forEach(p => { if (p.v) vers[p.v] = (vers[p.v] || 0) + 1; });
+    $('valVers').textContent = Object.keys(vers).length ? 'Версии активных игроков за неделю: ' + Object.entries(vers).sort((a, b) => b[1] - a[1]).slice(0, 5).map(([v, n]) => `${v} — ${n}`).join(' · ') : '';
+
+    // 6. Retention D1 / D7 computed across engaged players (ignoring empty 1-second bounces)
     const dayMs = 864e5;
     let eligD1 = 0, retD1 = 0, eligD7 = 0, retD7 = 0, hasFb1 = false, hasFb7 = false;
     const cohorts = {};
     all.forEach(p => {
       const fs = p.fs;
       if (!fs || !/^\d{4}-\d{2}-\d{2}$/.test(fs)) return;
+      if (isEmptyGuest(p)) return; // Ignore phantom empty guests
       const fsMs = Date.parse(fs + 'T00:00:00Z');
       const ageDays = Math.floor((now - fsMs) / dayMs);
       if (!cohorts[fs]) cohorts[fs] = {date: fs, total: 0, d1: 0, d7: 0};
@@ -558,17 +692,14 @@ async function loadStats() {
 
     const recentCohorts = Object.values(cohorts).sort((a, b) => b.date.localeCompare(a.date)).slice(0, 5);
     if (recentCohorts.length) {
-      $('valCohorts').innerHTML = '<b>Когорты новичков по дням:</b><br>' + recentCohorts.map(c => {
+      $('valCohorts').innerHTML = '<b>Когорты игроков по дням (без пустых гостей):</b><br>' + recentCohorts.map(c => {
         const d1 = c.d1 > 0 ? `${Math.round(c.d1 / c.total * 100)}%` : '0%';
         const d7 = c.d7 > 0 ? `${Math.round(c.d7 / c.total * 100)}%` : '—';
-        return `• ${c.date}: <b>${c.total}</b> новых · D1: <b>${d1}</b> · D7: <b>${d7}</b>`;
+        return `• ${c.date}: <b>${c.total}</b> игроков · D1: <b>${d1}</b> · D7: <b>${d7}</b>`;
       }).join('<br>');
     } else {
       $('valCohorts').textContent = '';
     }
-
-    const rooms = await fetch(`${DB}/rooms.json?shallow=true&auth=${await token()}`).then(r => r.ok ? r.json() : null);
-    $('valRooms').textContent = rooms ? Object.keys(rooms).length : 0;
   } catch (e) { log('Статистика: ' + e.message); }
 }
 $('btnRefreshStats').onclick = loadStats;
@@ -576,18 +707,81 @@ $('btnRefreshStats').onclick = loadStats;
 /* ---------- releases and GitHub workflows (run under the owner's own GitHub login) ---------- */
 const ACTIONS = `https://github.com/${REPO}/actions/workflows/`;
 const openWorkflow = (file, what) => { log('Открываю ' + file + ': нажмите «Run workflow» (ветка main), чтобы ' + what); window.open(ACTIONS + file, '_blank', 'noopener'); };
-$('btnPromote').onclick = () => { if (confirm('Открыть выпуск для ВСЕХ игроков? На странице GitHub нажмите «Run workflow».')) openWorkflow('promote-production.yml', 'выпустить версию'); };
+$('btnPromote').onclick = () => {
+  const msg = '🚀 ВЫПУСК ОБНОВЛЕНИЯ В PRODUCTION ДЛЯ ВСЕХ ИГРОКОВ\n\n' +
+    'Что произойдёт автоматически:\n' +
+    '1. Соберётся боевой APK и AAB (Google Play)\n' +
+    '2. Обновится сайт игры для всех пользователей\n' +
+    '3. Опубликуется пост с описанием в Telegram-канал @diarydevelopment\n' +
+    '4. Разошлётся push-уведомление игрокам о новой версии\n\n' +
+    'На открывшейся странице GitHub нажмите «Run workflow» (ветка main).\n' +
+    'Перейти к запуску выпуска?';
+  if (confirm(msg)) {
+    openWorkflow('promote-production.yml', 'выпустить версию для всех игроков');
+    setTimeout(checkCiStatus, 3000);
+  }
+};
 $('btnRollback').onclick = () => openWorkflow('android.yml', 'выпустить старую версию заново (поле «Вернуть версию», например v217)');
 $('btnBackupNow').onclick = () => openWorkflow('backup-database.yml', 'сделать зашифрованный бэкап базы');
 $('btnDownloadLatest').onclick = () => window.open(ACTIONS + 'backup-database.yml', '_blank', 'noopener');
 $('btnSendPush').onclick = () => openWorkflow('news.yml', 'разослать новость (заголовок и текст вводятся там же)');
+
+async function loadReleaseNotes() {
+  try {
+    const res = await fetch(`https://raw.githubusercontent.com/${REPO}/dev/stage2-account-network-20261029/release-notes.md?t=` + Date.now()).catch(() => null);
+    if (res && res.ok) {
+      const text = await res.text();
+      if ($('releaseNotesContent')) $('releaseNotesContent').textContent = text.trim() || 'Список изменений пуст';
+      return;
+    }
+    const fallback = await fetch(`https://raw.githubusercontent.com/${REPO}/main/release-notes.md?t=` + Date.now()).catch(() => null);
+    if (fallback && fallback.ok) {
+      const text = await fallback.text();
+      if ($('releaseNotesContent')) $('releaseNotesContent').textContent = text.trim() || 'Список изменений пуст';
+    }
+  } catch (_) {}
+}
+if ($('btnReloadNotes')) $('btnReloadNotes').onclick = loadReleaseNotes;
+
+async function checkCiStatus() {
+  try {
+    const res = await fetch(`https://api.github.com/repos/${REPO}/actions/runs?per_page=5`).then(r => r.ok ? r.json() : null);
+    if (!res || !res.workflow_runs || !res.workflow_runs.length) return;
+    const latest = res.workflow_runs[0];
+    const isRunning = latest.status === 'in_progress' || latest.status === 'queued';
+    const isSuccess = latest.conclusion === 'success';
+    const wfName = latest.name || 'Сборка';
+    if ($('ciStatusDot')) $('ciStatusDot').textContent = isRunning ? '🟡' : isSuccess ? '🟢' : '🔴';
+    if ($('ciStatusText')) {
+      $('ciStatusText').innerHTML = isRunning
+        ? `<b style="color:var(--warning)">Идёт автосборка:</b> ${wfName} #${latest.run_number}`
+        : isSuccess
+          ? `<b style="color:var(--success)">Автосборка завершена:</b> ${wfName} #${latest.run_number}`
+          : `<b style="color:var(--danger)">Сборка завершилась ошибкой:</b> ${wfName} #${latest.run_number}`;
+    }
+    if ($('ciStatusLink')) $('ciStatusLink').href = latest.html_url || `https://github.com/${REPO}/actions`;
+  } catch (_) {}
+}
+
 async function loadVersions() {
   try {
     const rel = await fetch(`https://api.github.com/repos/${REPO}/releases?per_page=10`).then(r => r.json());
     const prod = rel.find(r => !r.prerelease && /^v\d+$/.test(r.tag_name)), stg = rel.find(r => r.tag_name === 'staging-latest');
-    if (prod) { $('curVersion').textContent = prod.name; $('prodStatus').textContent = prod.name + ' · ' + new Date(prod.published_at).toLocaleString(); }
-    $('stagingStatus').textContent = stg ? stg.name.replace(/^.*#/, 'сборка #').replace(/\)$/, '') + ' · ' + new Date(stg.published_at).toLocaleString() : 'нет';
+    if (prod) {
+      $('curVersion').textContent = prod.name;
+      $('prodStatus').textContent = prod.name + ' · ' + new Date(prod.published_at).toLocaleString('ru-RU');
+      if ($('btnDownloadProd')) $('btnDownloadProd').href = `https://github.com/${REPO}/releases/download/${prod.tag_name}/Puzzlegrad.apk`;
+    }
+    if (stg) {
+      const stgName = stg.name.replace(/^.*#/, 'сборка #').replace(/\)$/, '');
+      $('stagingStatus').textContent = stgName + ' · ' + new Date(stg.published_at).toLocaleString('ru-RU');
+      if ($('stagingBadge')) $('stagingBadge').textContent = stgName;
+    } else {
+      $('stagingStatus').textContent = 'нет';
+    }
   } catch (_) { $('prodStatus').textContent = 'не удалось узнать'; }
+  loadReleaseNotes();
+  checkCiStatus();
 }
 
 /* ---------- feedback (the same sign-in; statuses are the owner's notes, kept in this browser) ---------- */
@@ -673,30 +867,270 @@ $('btnNameSuggReload').onclick = loadNameSuggestions;
    The list comes from /presence (every player leaves a mark when the game is open, the last one stays: name, platform,
    version, device, when). A player's card adds /leaders, the synced /profiles/{uid} (level, gold, stats) and the
    event log /logs/{uid} the game writes; errors are filtered by the player's id. No e-mails are stored anywhere. */
-let plItems = [], plSel = '';
+let plItems = [], plRawList = [], plSel = '', hideEmptyGuests = true;
 const ago = t => { if (!t) return '—'; const m = Math.round((Date.now() - t) / 60000); return m < 2 ? 'сейчас' : m < 60 ? m + ' мин назад' : m < 1440 ? Math.round(m / 60) + ' ч назад' : Math.round(m / 1440) + ' дн назад'; };
 const PLAT = {app: 'Android (приложение)', github: 'Android (APK)', play: 'Google Play', web: 'Сайт', mock: 'Макет'};
+
+function isGuestNickname(name) {
+  if (!name) return true;
+  const s = String(name).trim().toLowerCase();
+  return /^nickname\d+$/i.test(s);
+}
+
+function isEmptyGuest(p) {
+  // If registered or has a saved profile, they are NOT an empty guest
+  if (p.r || p.hasProfile) return false;
+  // If player chose a real custom nickname (not nickname<digits>), keep them
+  if (!isGuestNickname(p.n)) return false;
+  // If player has played at least 1 game, they are ACTIVE - KEEP THEM!
+  if ((p.games || 0) > 0) return false;
+  if ((p.rating || 0) > 0 || (p.owins || 0) > 0) return false;
+  if ((p.onlineGames || 0) > 0 || (p.friendGames || 0) > 0 || (p.botGames || 0) > 0) return false;
+  // If currently active / playing online right now
+  if (p.isOnline && (p.s === 'online' || p.s === 'bots' || p.s === 'search')) return false;
+  // If returned D1/D7
+  if (p.d1 || p.d7) return false;
+  return true;
+}
+
 async function loadPlayers() {
   try {
-    const all = await db('presence?orderBy="t"&limitToLast=500') || {};
-    plItems = Object.entries(all).filter(([, v]) => v && typeof v === 'object').map(([uid, v]) => ({uid, ...v})).sort((a, b) => (b.t || 0) - (a.t || 0));
+    const [all, leads, profs] = await Promise.all([
+      db('presence?orderBy="t"&limitToLast=500').catch(() => ({})),
+      db('leaders').catch(() => ({})),
+      db('profiles').catch(() => ({}))
+    ]);
+    const now = Date.now();
+    plRawList = Object.entries(all || {}).filter(([, v]) => v && typeof v === 'object').map(([uid, v]) => {
+      const lead = leads && leads[uid] ? leads[uid] : null;
+      const prof = profs && profs[uid] ? profs[uid] : null;
+      let w = {};
+      try { if (prof && prof.w) w = JSON.parse(prof.w); } catch (_) {}
+      const st = (w.prog && w.prog.st) || {};
+      const byMode = st.byMode || {};
+
+      const onlineGames = (byMode.online && byMode.online.games) || (lead && (lead.g || lead.w)) || st.ogames || 0;
+      const friendGames = (byMode.friends && byMode.friends.games) || 0;
+      const botGames = (byMode.bots && byMode.bots.games) || (st.games ? Math.max(0, st.games - onlineGames - friendGames) : 0);
+      const totalGames = st.games || (onlineGames + friendGames + botGames) || (lead && (lead.g || lead.w)) || 0;
+      const rating = lead ? (+lead.r || 0) : 0;
+      const owins = (lead && +lead.w) || st.owins || 0;
+      const isOnline = v.s && v.s !== 'off' && now - (v.t || 0) < 3 * 60 * 1000;
+      const hasProfile = !!(v.r || prof);
+
+      return {
+        uid,
+        ...v,
+        lead,
+        prof,
+        hasProfile,
+        games: totalGames,
+        onlineGames,
+        friendGames,
+        botGames,
+        rating,
+        owins,
+        isOnline
+      };
+    }).sort((a, b) => (b.t || 0) - (a.t || 0));
+
+    // Aggregate statistics across players
+    const seenUids = new Set();
+    let actPlayers = 0, onG = 0, frG = 0, botG = 0;
+    plRawList.forEach(p => {
+      seenUids.add(p.uid);
+      if (p.games >= 1) actPlayers++;
+      onG += p.onlineGames;
+      frG += p.friendGames;
+      botG += p.botGames;
+    });
+
+    if (profs && typeof profs === 'object') {
+      Object.entries(profs).forEach(([uid, prof]) => {
+        if (seenUids.has(uid) || !prof || !prof.w) return;
+        try {
+          const w = JSON.parse(prof.w);
+          const st = (w.prog && w.prog.st) || {};
+          const bm = st.byMode || {};
+          const og = (bm.online && bm.online.games) || st.ogames || 0;
+          const fg = (bm.friends && bm.friends.games) || 0;
+          const bg = (bm.bots && bm.bots.games) || (st.games ? Math.max(0, st.games - og - fg) : 0);
+          const g = st.games || (og + fg + bg) || 0;
+          if (g >= 1) actPlayers++;
+          onG += og; frG += fg; botG += bg;
+        } catch (_) {}
+      });
+    }
+
+    if ($('statActivePlayers')) $('statActivePlayers').textContent = actPlayers;
+    if ($('statOnlineGames')) $('statOnlineGames').textContent = onG;
+    if ($('statFriendGames')) $('statFriendGames').textContent = frG;
+    if ($('statBotGames')) $('statBotGames').textContent = botG;
+
+    const emptyCount = plRawList.filter(isEmptyGuest).length;
+    if ($('btnPurgeEmpty')) {
+      $('btnPurgeEmpty').textContent = `🧹 Очистить пустых (${emptyCount})`;
+      $('btnPurgeEmpty').disabled = emptyCount === 0;
+    }
+
     renderPlayers();
   } catch (e) { $('plList').innerHTML = '<div class="stat-sub">' + esc(e.message) + '</div>'; }
 }
+
 function renderPlayers() {
   const q = $('plSearch').value.trim().toLowerCase(), now = Date.now();
-  const list = plItems.filter(p => !q || String(p.n || '').toLowerCase().includes(q) || p.uid.toLowerCase().includes(q));
-  $('plCount').textContent = `${list.length} из ${plItems.length}`;
+  const emptyCount = plRawList.filter(isEmptyGuest).length;
+  if ($('btnFilterEmpty')) {
+    $('btnFilterEmpty').classList.toggle('active', hideEmptyGuests);
+    $('btnFilterEmpty').textContent = hideEmptyGuests ? `Скрывать пустых (${emptyCount})` : 'Показаны все гости';
+  }
+
+  let list = plRawList;
+  if (hideEmptyGuests && !q) {
+    list = list.filter(p => !isEmptyGuest(p));
+  }
+  if (q) {
+    list = list.filter(p => String(p.n || '').toLowerCase().includes(q) || p.uid.toLowerCase().includes(q));
+  }
+  plItems = list;
+
+  const totalStr = `${list.length} из ${plRawList.length}`;
+  $('plCount').textContent = totalStr;
+
   $('plList').innerHTML = list.length ? list.map(p => {
     const on = p.s && p.s !== 'off' && now - (p.t || 0) < 3 * 60 * 1000;
-    return `<button class="pl-row${p.uid === plSel ? ' on' : ''}" data-uid="${esc(p.uid)}"><span class="pl-av">${esc((p.n || '?')[0].toUpperCase())}</span><span class="pl-who"><b>${esc(p.n || 'без имени')}</b><small>${esc(PLAT[p.p] || p.p || '—')} · v${esc(p.v || '?')} · ${ago(p.t)}</small></span>${p.r ? '<span class="pl-badge ok">профиль</span>' : '<span class="pl-badge">гость</span>'}${on ? '<span class="pl-badge on">в сети</span>' : ''}</button>`;
+    const isActGuest = !p.hasProfile && (p.games > 0 || p.rating > 0);
+    const badgeHtml = p.hasProfile
+      ? '<span class="pl-badge ok">профиль</span>'
+      : isActGuest
+        ? `<span class="pl-badge ok">гость (${p.games} ${p.games === 1 ? 'игра' : (p.games < 5 ? 'игры' : 'игр')})</span>`
+        : '<span class="pl-badge">гость</span>';
+    const gamesInfo = p.games > 0 ? `🎲 ${p.games} партий · ` : '';
+    return `<button class="pl-row${p.uid === plSel ? ' on' : ''}" data-uid="${esc(p.uid)}"><span class="pl-av">${esc((p.n || '?')[0].toUpperCase())}</span><span class="pl-who"><b>${esc(p.n || 'без имени')}</b><small>${gamesInfo}${esc(PLAT[p.p] || p.p || '—')} · v${esc(p.v || '?')} · ${ago(p.t)}</small></span>${badgeHtml}${on ? '<span class="pl-badge on">в сети</span>' : ''}</button>`;
   }).join('') : '<div class="stat-sub">Никого не найдено</div>';
 }
+
+async function purgeEmptyGuests() {
+  const emptyList = plRawList.filter(isEmptyGuest);
+  if (!emptyList.length) return log('Пустых гостей nickname<№> не найдено');
+  if (!confirm(`Удалить из базы ${emptyList.length} пустых гостей (nickname<№> без сыгранных партий и без профиля)?`)) return;
+  log(`Удаление ${emptyList.length} пустых гостей…`);
+  let deleted = 0;
+  for (const p of emptyList) {
+    try {
+      await Promise.all([
+        db('presence/' + p.uid, 'DELETE'),
+        db('logs/' + p.uid, 'DELETE').catch(() => null)
+      ]);
+      deleted++;
+    } catch (_) {}
+  }
+  log(`Успешно удалено пустых гостей: ${deleted}`);
+  await loadPlayers();
+}
+
+const LOG_TITLES = {
+  open: {icon: '📱', title: 'Запуск игры'},
+  first_open: {icon: '🌟', title: 'Первый запуск игры'},
+  game_start: {icon: '🎮', title: 'Начало партии'},
+  game_end: {icon: '🏁', title: 'Конец партии'},
+  first_game_done: {icon: '🥇', title: 'Первая игра завершена'},
+  second_game_done: {icon: '🥈', title: 'Вторая игра завершена'},
+  third_game_done: {icon: '🥉', title: 'Третья игра завершена'},
+  return_d1: {icon: '🔄', title: 'Возврат на 1-й день (D1)'},
+  return_d3: {icon: '🔄', title: 'Возврат на 3-й день (D3)'},
+  return_d7: {icon: '🔄', title: 'Возврат на 7-й день (D7)'},
+  save_prompt_tap: {icon: '💾', title: 'Нажал «Сохранить профиль»'},
+  login: {icon: '🔑', title: 'Вход в аккаунт'},
+  sign_up: {icon: '📝', title: 'Регистрация аккаунта'},
+  logout: {icon: '🚪', title: 'Выход из аккаунта'},
+  net_down: {icon: '📶', title: 'Потеря интернет-связи'},
+  net_back: {icon: '📶', title: 'Связь восстановлена'},
+  perf_lag: {icon: '⚡', title: 'Зафиксирован лаг FPS'},
+  spend_virtual_currency: {icon: '💰', title: 'Покупка в магазине'},
+  tutorial_begin: {icon: '🎓', title: 'Начало обучения'},
+  tutorial_complete: {icon: '🎓', title: 'Обучение пройдено'},
+  friend_invite: {icon: '👥', title: 'Приглашение друга'},
+  name_suggested: {icon: '💡', title: 'Предложил название'},
+  feedback_sent: {icon: '💬', title: 'Отправлен отзыв'},
+  reinstall_offer: {icon: '🔄', title: 'Предложение обновиться'},
+  reinstall_download: {icon: '⬇️', title: 'Скачивание обновления'},
+  reinstall_remove: {icon: '🗑️', title: 'Удаление старой версии'},
+  wallet_sig_mismatch: {icon: '🛡️', title: 'Несовпадение подписи кошелька'},
+  maintenance: {icon: '🛠️', title: 'Экран техработ'},
+  google_error: {icon: '⚠️', title: 'Ошибка Google Auth'},
+  google_redirect: {icon: '🔄', title: 'Перенаправление Google'},
+  error: {icon: '⚠️', title: 'Ошибка в приложении'}
+};
+
+function formatLogDetail(kind, rawDetail) {
+  if (!rawDetail) return '';
+  let obj = null;
+  if (typeof rawDetail === 'object') obj = rawDetail;
+  else if (typeof rawDetail === 'string' && rawDetail.trim().startsWith('{')) {
+    try { obj = JSON.parse(rawDetail); } catch (_) {}
+  }
+
+  const MODE_NAMES = {online: '🌐 Онлайн', bots: '🤖 С ботами', friends: '🤝 С друзьями', local: '📱 Локально'};
+
+  if (kind === 'game_start' && obj) {
+    const m = MODE_NAMES[obj.mode] || obj.mode || 'Обычная';
+    const lvl = obj.lvl ? ` · сложность: <b>${esc(obj.lvl)}</b>` : '';
+    const seats = obj.seats ? ` · игроков: <b>${esc(obj.seats)}</b>` : '';
+    return `Режим: <b>${m}</b>${lvl}${seats}`;
+  }
+
+  if (kind === 'game_end' && obj) {
+    const m = MODE_NAMES[obj.mode] || obj.mode || '';
+    let res = '';
+    if (obj.place === 1) res = '🏆 <b>1-е место (Победа!)</b>';
+    else if (obj.place > 1) res = `<b>${obj.place}-е место</b>`;
+    else if (obj.draw) res = '🤝 <b>Ничья</b>';
+    const sc = obj.score != null ? ` · Счёт: <b>${esc(obj.score)}</b>` : '';
+    const g = obj.gold ? ` · Награда: <b>+${esc(obj.gold)} 💰</b>` : '';
+    return [m ? `Режим: <b>${m}</b>` : '', res, sc, g].filter(Boolean).join(' · ');
+  }
+
+  if ((kind === 'first_open' || kind === 'open') && obj) {
+    const v = obj.v ? `Версия: <b>v${esc(obj.v)}</b>` : '';
+    const p = obj.p ? `Платформа: <b>${esc(PLAT[obj.p] || obj.p)}</b>` : '';
+    return [v, p].filter(Boolean).join(' · ') || esc(rawDetail);
+  }
+
+  if (kind === 'perf_lag' && obj) {
+    const ms = obj.ms ? `Задержка: <b>${esc(obj.ms)} мс</b>` : '';
+    const fps = obj.fps ? `FPS: <b>${esc(obj.fps)}</b>` : '';
+    return [ms, fps].filter(Boolean).join(' · ') || esc(rawDetail);
+  }
+
+  if (kind === 'spend_virtual_currency' && obj) {
+    const item = obj.item || obj.id ? `Товар: <b>${esc(obj.item || obj.id)}</b>` : '';
+    const price = obj.gold ? `Цена: <b>${esc(obj.gold)} 💰</b>` : '';
+    return [item, price].filter(Boolean).join(' · ') || esc(rawDetail);
+  }
+
+  if (kind === 'friend_invite' && obj) {
+    return `Приглашение игрока <b>${esc(obj.to || obj.name || rawDetail)}</b>`;
+  }
+
+  if (kind === 'feedback_sent' && obj) {
+    const cat = obj.k ? `Тема: <b>${esc(FB_CAT[obj.k] || obj.k)}</b>` : '';
+    const st = obj.stars ? `Оценка: <b>${'★'.repeat(obj.stars)}</b>` : '';
+    return [cat, st].filter(Boolean).join(' · ') || esc(rawDetail);
+  }
+
+  if (obj) {
+    return Object.entries(obj).map(([k, v]) => `${esc(k)}: <b>${esc(typeof v === 'object' ? JSON.stringify(v) : v)}</b>`).join(' · ');
+  }
+
+  return esc(String(rawDetail));
+}
+
 const fmtT = t => t ? new Date(t).toLocaleString('ru-RU') : '—';
 async function openPlayer(uid) {
   plSel = uid; renderPlayers();
   const box = $('plDetail'); box.hidden = false; box.innerHTML = '<div class="stat-sub">Загрузка…</div>';
-  const pres = plItems.find(p => p.uid === uid) || {};
+  const pres = plRawList.find(p => p.uid === uid) || plItems.find(p => p.uid === uid) || {};
   try {
     const get = path => db(path).catch(() => null);
     const [lead, prof, logs, errs, fb] = await Promise.all([get('leaders/' + uid), get('profiles/' + uid), get(`logs/${uid}?orderBy="$key"&limitToLast=300`), get(`errors?orderBy="uid"&equalTo="${uid}"&limitToLast=50`), get('feedback/' + uid)]);
@@ -707,13 +1141,31 @@ async function openPlayer(uid) {
     const d1Label = pres.d1 ? '✅ вернулся' : (pres.fs && Date.now() - Date.parse(pres.fs + 'T00:00:00Z') >= 864e5 ? '❌ не заходил' : '⏳ в процессе');
     const d7Label = pres.d7 ? '✅ вернулся' : (pres.fs && Date.now() - Date.parse(pres.fs + 'T00:00:00Z') >= 7 * 864e5 ? '❌ не заходил' : '⏳ в процессе');
     const playerStatus = pres.st || (lead && lead.st) || '';
+
+    const bm = st.byMode || {};
+    const onGames = (bm.online && bm.online.games) || (lead && (lead.g || lead.w)) || st.ogames || 0;
+    const frGames = (bm.friends && bm.friends.games) || 0;
+    const btGames = (bm.bots && bm.bots.games) || (st.games ? Math.max(0, st.games - onGames - frGames) : 0);
+
     box.innerHTML = `<div class="card-title" style="margin-top:6px"><span>${esc(pres.n || 'Игрок')}</span><span style="display:flex;gap:8px"><button class="btn" id="plResetStatus" style="color:var(--danger)">🚫 Сбросить статус</button><button class="btn" id="plClose">Закрыть</button></span></div>
-      <div class="pl-info">${cell('Id игрока', uid)}${cell('Профиль', pres.r ? 'сохранён' : 'гость')}${cell('Платформа', PLAT[pres.p] || pres.p)}${cell('Версия', pres.v)}${cell('Устройство', pres.m ? pres.m + (pres.i ? ' · ' + pres.i + '″' : '') : '')}${cell('Был в сети', fmtT(pres.t) + ' (' + ago(pres.t) + ')')}${cell('Сеть', pres.s)}${cell('Статус игрока', playerStatus ? `«${esc(playerStatus)}»` : '—')}
+      <div class="pl-info">${cell('Id игрока', uid)}${cell('Профиль', (pres.r || prof) ? 'сохранён' : 'гость')}${cell('Платформа', PLAT[pres.p] || pres.p)}${cell('Версия', pres.v)}${cell('Устройство', pres.m ? pres.m + (pres.i ? ' · ' + pres.i + '″' : '') : '')}${cell('Был в сети', fmtT(pres.t) + ' (' + ago(pres.t) + ')')}${cell('Сеть', pres.s)}${cell('Статус игрока', playerStatus ? `«${esc(playerStatus)}»` : '—')}
       ${cell('Первый день', pres.fs || '—')}${cell('Удержание D1', d1Label)}${cell('Удержание D7', d7Label)}
-      ${cell('Кубки', lead && lead.r)}${cell('Побед онлайн', lead && lead.w)}${cell('Уровень', w.prog && w.prog.lvl)}${cell('Опыт', w.prog && w.prog.xp)}${cell('Золото', w.gold)}${cell('Фигурок куплено', w.owned && w.owned.length)}${cell('Партий', st.games)}${cell('Побед', st.wins)}${cell('Рекорд очков', st.best)}${cell('Синхр. профиля', prof && prof.t ? fmtT(prof.t) : '')}${cell('Обращений', fb ? Object.keys(fb).length : 0)}</div>
+      ${cell('Кубки', lead && lead.r)}${cell('Побед онлайн', lead && lead.w)}${cell('Уровень', w.prog && w.prog.lvl)}${cell('Опыт', w.prog && w.prog.xp)}${cell('Золото', w.gold)}${cell('Фигурок куплено', w.owned && w.owned.length)}${cell('Всего партий', st.games)}${cell('Онлайн / Друзья / Боты', `${onGames} / ${frGames} / ${btGames}`)}${cell('Побед', st.wins)}${cell('Рекорд очков', st.best)}${cell('Синхр. профиля', prof && prof.t ? fmtT(prof.t) : '')}${cell('Обращений', fb ? Object.keys(fb).length : 0)}</div>
       <div class="card-title" style="margin-top:10px"><span>📜 Журнал событий (${rows.length})</span><span style="display:flex;gap:8px"><button class="btn" id="plCopy">Скопировать</button><button class="btn" id="plClear">Очистить</button></span></div>
-      <div class="pl-log" id="plLog">${rows.length ? rows.map(r => `<div class="${r.k === 'error' ? 'err' : ''}"><time>${fmtT(r.t)}</time><b>${esc(r.k)}</b><span>${esc(r.d || '')}</span></div>`).join('') : '<div class="stat-sub">Событий пока нет — журнал заполняется после выхода обновления с логами</div>'}</div>
-      ${errRows.length ? `<div class="card-title" style="margin-top:10px"><span>⚠️ Ошибки игрока (${errRows.length})</span></div><div class="pl-log">${errRows.sort((a, b) => b.t - a.t).map(r => `<div class="err"><time>${fmtT(r.t)}</time><b>error</b><span>${esc(r.d)}</span></div>`).join('')}</div>` : ''}`;
+      <div class="pl-log" id="plLog">${rows.length ? rows.map(r => {
+        const meta = LOG_TITLES[r.k] || {icon: '📌', title: r.k};
+        const detHtml = formatLogDetail(r.k, r.d);
+        return `<div class="pl-log-item${r.k === 'error' ? ' err' : ''}">
+          <div class="log-head">
+            <span class="log-ic">${meta.icon}</span>
+            <b class="log-title">${esc(meta.title)}</b>
+            <span class="log-tag">${esc(r.k)}</span>
+            <time class="log-time">${fmtT(r.t)}</time>
+          </div>
+          ${detHtml ? `<div class="log-desc">${detHtml}</div>` : (r.d ? `<div class="log-desc"><span>${esc(r.d)}</span></div>` : '')}
+        </div>`;
+      }).join('') : '<div class="stat-sub">Событий пока нет — журнал заполняется после выхода обновления с логами</div>'}</div>
+      ${errRows.length ? `<div class="card-title" style="margin-top:10px"><span>⚠️ Ошибки игрока (${errRows.length})</span></div><div class="pl-log">${errRows.sort((a, b) => b.t - a.t).map(r => `<div class="pl-log-item err"><div class="log-head"><span class="log-ic">⚠️</span><b class="log-title">error</b><span class="log-tag">error</span><time class="log-time">${fmtT(r.t)}</time></div><div class="log-desc"><span>${esc(r.d)}</span></div></div>`).join('')}</div>` : ''}`;
     $('plClose').onclick = () => { box.hidden = true; plSel = ''; renderPlayers(); };
     $('plResetStatus').onclick = async () => {
       const curSt = pres.st || (lead && lead.st);
@@ -741,13 +1193,17 @@ async function loadErrors() {
   try {
     const all = await db('errors?orderBy="$key"&limitToLast=80') || {};
     const rows = Object.values(all).filter(Boolean).sort((a, b) => (b.ts || 0) - (a.ts || 0));
-    box.innerHTML = `<div class="card-title" style="margin-top:6px"><span>⚠️ Последние ошибки (${rows.length})</span><button class="btn" id="plClose">Закрыть</button></div><div class="pl-log">${rows.map(r => `<div class="err"><time>${fmtT(r.ts)}</time><b>${esc(r.ver || '')}</b><span>${esc(r.m)}${r.uid ? ` · <a href="#" data-pl="${esc(r.uid)}" style="color:var(--accent)">игрок</a>` : ''}</span>${r.dev ? `<div style="font-size:11px;color:var(--muted);margin-top:2px">📱 ${esc(r.dev)}</div>` : ''}${r.trail ? `<div style="font-size:10.5px;color:var(--muted);opacity:.8">👣 ${esc(r.trail)}</div>` : ''}</div>`).join('') || '<div class="stat-sub">Ошибок нет</div>'}</div>`;
+    box.innerHTML = `<div class="card-title" style="margin-top:6px"><span>⚠️ Последние ошибки (${rows.length})</span><button class="btn" id="plClose">Закрыть</button></div><div class="pl-log">${rows.map(r => `<div class="pl-log-item err"><div class="log-head"><span class="log-ic">⚠️</span><b class="log-title">${esc(r.ver || 'error')}</b><span class="log-tag">error</span><time class="log-time">${fmtT(r.ts)}</time></div><div class="log-desc"><span>${esc(r.m)}${r.uid ? ` · <a href="#" data-pl="${esc(r.uid)}" style="color:var(--accent)">игрок</a>` : ''}</span>${r.dev ? `<div style="font-size:11px;color:var(--muted);margin-top:2px">📱 ${esc(r.dev)}</div>` : ''}${r.trail ? `<div style="font-size:10.5px;color:var(--muted);opacity:.8">👣 ${esc(r.trail)}</div>` : ''}</div></div>`).join('') || '<div class="stat-sub">Ошибок нет</div>'}</div>`;
     $('plClose').onclick = () => { box.hidden = true; };
   } catch (e) { box.innerHTML = '<div class="stat-sub">' + esc(e.message) + '</div>'; }
 }
 $('plList').addEventListener('click', e => { const b = e.target.closest('[data-uid]'); if (b) openPlayer(b.dataset.uid); });
 $('plDetail').addEventListener('click', e => { const a = e.target.closest('[data-pl]'); if (a) { e.preventDefault(); openPlayer(a.dataset.pl); } });
-$('plSearch').oninput = renderPlayers; $('btnPlReload').onclick = loadPlayers; $('btnErrors').onclick = loadErrors;
+$('plSearch').oninput = renderPlayers;
+$('btnPlReload').onclick = loadPlayers;
+$('btnErrors').onclick = loadErrors;
+if ($('btnFilterEmpty')) $('btnFilterEmpty').onclick = () => { hideEmptyGuests = !hideEmptyGuests; renderPlayers(); };
+if ($('btnPurgeEmpty')) $('btnPurgeEmpty').onclick = purgeEmptyGuests;
 
 function refreshAll() { loadVersions(); loadMaint(); loadPin(); loadStats(); loadFeedback(); loadNameSuggestions(); loadPlayers(); }
 if (auth) afterSignIn();

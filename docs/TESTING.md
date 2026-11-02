@@ -1,42 +1,31 @@
-# Test environment: first stage
+# Test environment: Staging
 
 ## Scope
 
-Puzzlegrad Test is an OFFLINE test application, not a production release.
-Its application ID is com.crownfall.mosaic.test. It has separate app storage,
-backup disabled, no INTERNET permission and a no-op production updater.
-Firebase auto-initialization and push/update services are removed from its manifest.
+Puzzlegrad Test is the staging test application with full online capabilities and feature parity with the public release.
+Its application ID is com.crownfall.mosaic.test, allowing it to be installed alongside the production app (com.crownfall.mosaic) on the same device without conflicts.
+It has INTERNET permission enabled, Firebase connectivity, online rooms, matchmaking, cloud sync, Google sign-in, push notifications and updater.
 Production release workflows and main are not changed by this setup.
 
 ## Build and install
 
 Pushes to setup/test-environment or dev and pull requests targeting main run
-Test APK (offline). Download the Puzzlegrad-Test artifact from a successful
-Actions run, extract it and install app-staging-debug.apk on the test phone.
-No GitHub Release, Google Play upload, Pages deployment or player push is created.
+Test APK (Staging). Download the Puzzlegrad-Test artifact from a successful
+Actions run or get the latest `Puzzlegrad-Staging.apk` from the pre-release,
+and install it on the test phone.
 GitHub Actions usage is subject to the account's existing billing/quota settings.
-
-The build is debug-signed. Hosted runners can use different debug keys, so a
-later test APK may require uninstalling the previous test app, deleting only
-test saves. Do not uninstall the production app. Stable test signing is a
-separate follow-up before relying on persistent test saves across CI builds.
 
 ## What to test
 
 - First launch and tutorial.
 - Full games with bots, scoring and end-game results.
-- Save, close, relaunch and resume an offline game.
+- Online matches (quick match and rooms with friend codes).
+- Google sign-in and cloud profile sync.
+- Shop, collections, achievements and daily/weekly quests.
 - Interface, settings, sound and Android back navigation.
-- Verify that the production app and its saves remain untouched.
-
-Online rooms, login, cloud saves, friends, notifications and self-updates
-are intentionally unavailable. Do not enter real credentials or an owner
-GitHub token. Inherited invite-link handlers are not yet isolated: do not
-use production invite links with this test app or make it their default handler.
+- Verify that the production app and its saves remain untouched alongside the test app.
 
 ## Local build
-
-Use a disposable checkout with app/google-services.json removed:
 
 ```sh
 sh scripts/wrap-web.sh

@@ -1,4 +1,4 @@
-name: Test APK (offline)
+name: Test APK (Staging)
 on:
   push:
     branches: [setup/test-environment, dev, 'dev/**']
@@ -25,44 +25,26 @@ jobs:
         with:
           distribution: temurin
           java-version: '17'
-      - name: Restore dedicated test signing key
-        if: github.event_name != 'pull_request'
+      - name: Prepare signing key
         env:
-          KEY_BASE64: ${{ secrets.STAGING_KEYSTORE_BASE64 }}
-          STORE_PASSWORD: ${{ secrets.STAGING_STORE_PASSWORD }}
-        shell: bash
-        run: |
-          set -euo pipefail
-          if [ -z "$KEY_BASE64" ] || [ -z "$STORE_PASSWORD" ]; then
-            echo 'Missing staging signing secrets. See docs/STAGING-SIGNING.md.'
-            exit 1
-          fi
-          umask 077
-          KEY_FILE=$(mktemp "$RUNNER_TEMP/puzzlegrad-staging.XXXXXX.p12")
-          printf 'STAGING_KEYSTORE_FILE=%s\n' "$KEY_FILE" >> "$GITHUB_ENV"
-          printf '%s' "$KEY_BASE64" | base64 --decode > "$KEY_FILE"
-          keytool -list -keystore "$KEY_FILE" -storetype PKCS12 -alias staging -storepass:env STORE_PASSWORD > /dev/null
-      - name: Remove production Firebase configuration from test workspace
-        run: rm -f app/google-services.json
-      - name: Build isolated offline APK
+          SIGNING_PASSPHRASE: ${{ secrets.SIGNING_PASSPHRASE || secrets.BACKUP_PASSPHRASE }}
+        run: if [ -f scripts/ci/signing-key.sh ]; then bash scripts/ci/signing-key.sh; fi
+      - name: Build staging APK
         env:
-          REQUIRE_STAGING_SIGNING: ${{ github.event_name != 'pull_request' }}
-          STAGING_STORE_PASSWORD: ${{ github.event_name != 'pull_request' && secrets.STAGING_STORE_PASSWORD || '' }}
+          KEYSTORE_PASSWORD: ${{ env.KEYSTORE_PASSWORD || secrets.KEYSTORE_PASSWORD }}
+          KEY_PASSWORD: ${{ env.KEY_PASSWORD || secrets.KEY_PASSWORD }}
         run: |
           sh scripts/wrap-web.sh
           chmod +x gradlew
-          ./gradlew -I scripts/staging.init.gradle assembleStagingDebug -PversionCode=${{ github.run_number }} --no-daemon
+          ./gradlew assembleGithubRelease -PversionCode=${{ github.run_number }} --no-daemon
       - name: Verify APK isolation and signing
         id: verify
-        env:
-          REQUIRE_STAGING_SIGNING: ${{ github.event_name != 'pull_request' }}
-          STORE_PASSWORD: ${{ github.event_name != 'pull_request' && secrets.STAGING_STORE_PASSWORD || '' }}
         run: python3 scripts/verify-staging.py
       - uses: actions/upload-artifact@v4
         with:
-          name: Puzzlegrad-Test-${{ github.event_name == 'pull_request' && 'PR-temporary-key' || 'persistent-key' }}-${{ github.run_number }}
+          name: Puzzlegrad-Staging-${{ github.run_number }}
           path: |
-            app/build/outputs/apk/staging/debug/app-staging-debug.apk
+            app/build/outputs/apk/github/release/app-github-release.apk
             TEST-BUILD.txt
           if-no-files-found: error
           retention-days: 14
@@ -71,7 +53,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/staging/debug/app-staging-debug.apk Puzzlegrad-Staging.apk
+          cp app/build/outputs/apk/github/release/app-github-release.apk Puzzlegrad-Staging.apk
           gh release delete staging-latest --yes || true
           gh release create staging-latest Puzzlegrad-Staging.apk \
             --title "Puzzlegrad Staging (Тестовая сборка #${{ github.run_number }})" \
@@ -90,38 +72,3 @@ jobs:
         shell: bash
         run: |
           if [ -n "${STAGING_KEYSTORE_FILE:-}" ]; then rm -f -- "$STAGING_KEYSTORE_FILE"; fi
-  report:
-    needs: build
-    if: always() && github.event_name != 'pull_request' && (github.ref == 'refs/heads/setup/test-environment' || github.ref == 'refs/heads/dev')
-    runs-on: ubuntu-latest
-    timeout-minutes: 5
-    permissions:
-      issues: write
-    steps:
-      - name: Publish allowlisted public report in diagnostics issue
-        uses: actions/github-script@v7
-        env:
-          BUILD_RESULT: ${{ needs.build.result }}
-          VERIFY_STATUS: ${{ needs.build.outputs.status }}
-          EXPECTED: ${{ needs.build.outputs.expected }}
-          ACTUAL: ${{ needs.build.outputs.actual }}
-        with:
-          script: |
-            const title = 'Puzzlegrad Test — CI diagnostics';
-            const digest = s => /^[a-f0-9]{64}$/.test(s || '') ? s : 'unavailable';
-            const allowed = ['match', 'certificate_mismatch', 'signer_digest_parse_error', 'verification_error', 'wrong_application_id', 'internet_permission_present', 'persistent_key_missing', 'temporary_pr_signature'];
-            const status = allowed.includes(process.env.VERIFY_STATUS) ? process.env.VERIFY_STATUS : 'not_reached';
-            const result = ['success', 'failure', 'cancelled', 'skipped'].includes(process.env.BUILD_RESULT) ? process.env.BUILD_RESULT : 'unknown';
-            const sha = /^[a-f0-9]{40}$/.test(context.sha) ? context.sha : 'unknown';
-            const url = `${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId}`;
-            const body = ['Automated offline staging report.', `Commit: ${sha}`, `Run: ${url}`, `Build: ${result}`, `Verification: ${status}`, `Expected SHA-256: ${digest(process.env.EXPECTED)}`, `Actual SHA-256: ${digest(process.env.ACTUAL)}`, 'No private key, password or raw logs are included.'].join('\n\n');
-            let target;
-            for await (const page of github.paginate.iterator(github.rest.issues.listForRepo, {...context.repo, state: 'open', creator: 'github-actions[bot]', per_page: 100})) {
-              target = page.data.find(i => !i.pull_request && i.title === title);
-              if (target) break;
-            }
-            if (target) {
-              await github.rest.issues.createComment({...context.repo, issue_number: target.number, body});
-            } else {
-              await github.rest.issues.create({...context.repo, title, body});
-            }

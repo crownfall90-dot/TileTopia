@@ -41,8 +41,8 @@ export function renderFramesGrid({frames, wallet, initial}) {
 export function renderLocationsGrid(locs) {
   return locs.map(l => `<div class="loc${l.open ? '' : ' locked'}">` +
     `<svg viewBox="0 0 160 90" aria-hidden="true">${l.art}</svg>` +
-    `<span class="badge">${l.open ? 'Открыта' : '<svg width="10" height="11" viewBox="0 0 10 11"><rect x="1" y="5" width="8" height="6" rx="1" fill="currentColor"/><path d="M3 5V3.5a2 2 0 014 0V5" stroke="currentColor" fill="none" stroke-width="1.4"/></svg>Скоро'}</span>` +
-    `<div class="li"><b>${l.name}</b><small>${l.open ? l.desc : l.desc + '. Появится в одном из следующих обновлений'}</small></div></div>`
+    `<span class="badge">${l.open ? 'Открыта' : 'Скоро'}</span>` +
+    `<div class="li"><b>${l.name}</b><small>${l.desc}</small></div></div>`
   ).join('');
 }
 
@@ -74,19 +74,24 @@ export function renderItemsStatusesHtml({shopStatuses = [], exclusiveStatuses = 
 }
 
 /** Generates HTML markup for frames tab in "My items". */
-export function renderItemsFramesHtml({frames = {}, ownedFrames = [], wornFrame = 'none', color = '#ef5350', profileInitial = '?'}) {
+export function renderItemsFramesHtml({frames = {}, ownedFrames = [], wornFrame = 'none', previewFrame = null, color = '#ef5350', profileInitial = '?'}) {
   const ownFr = Object.keys(frames).filter(k => k === 'none' || ownedFrames.includes(k) || (!frames[k].price && !frames[k].earn));
   const total = Object.keys(frames).length - 1;
   const have = ownFr.filter(k => k !== 'none').length;
   const lock = Object.entries(frames).filter(([k]) => !ownFr.includes(k));
   const initial = (profileInitial || '?').toUpperCase();
+  const effectiveWorn = previewFrame || wornFrame || 'none';
 
   return `<div class="icount">Собрано <b>${have}</b> из ${total}</div><div class="frgrid">${ownFr.map(k => {
     const f = frames[k];
-    const sel = (wornFrame || 'none') === k;
-    return `<button class="frb${sel ? ' sel' : ''}" data-ifr="${k}"><span class="av${f.ring ? ' fr' : ''}" style="--c:${color};${f.ring ? `--fr:${f.ring}` : ''}">${initial}</span><span>${f.name}</span><small>${sel ? 'Надета' : 'Надеть'}</small></button>`;
+    const sel = effectiveWorn === k;
+    const isPre = previewFrame === k && wornFrame !== k;
+    return `<button class="frb${sel ? ' sel' : ''}" data-ifr="${k}"><span class="av${f.ring ? ' fr' : ''}" style="--c:${color};${f.ring ? `--fr:${f.ring}` : ''}">${initial}</span><span>${f.name}</span><small>${isPre ? 'Примерка' : sel ? 'Надета' : 'Надеть'}</small></button>`;
   }).join('')}</div>`
-    + (lock.length ? `<div class="h3 sec">Ещё не открыты</div><div class="frgrid">${lock.map(([k, f]) => `<div class="frb lockd"><span class="av fr" style="--c:#2a3254;--fr:${f.ring}">?</span><span>${f.name}</span><small>${f.earn ? '🔒 ' + f.earn : `<i class="coin"></i>${f.price}`}</small></div>`).join('')}</div>` : '')
+    + (lock.length ? `<div class="h3 sec">Ещё не открыты (нажмите для примерки)</div><div class="frgrid">${lock.map(([k, f]) => {
+      const isPre = previewFrame === k;
+      return `<button class="frb lockd${isPre ? ' sel' : ''}" data-pfr="${k}" title="Нажмите для примерки"><span class="av fr" style="--c:${color};--fr:${f.ring}">${initial}</span><span>${f.name}</span><small>${isPre ? 'Примерка' : (f.earn ? '🔒 ' + f.earn : `<i class="coin"></i>${f.price}`)}</small></button>`;
+    }).join('')}</div>` : '')
     + '<button class="ghostbtn wide" data-ishop>В магазин</button>';
 }
 
@@ -102,5 +107,18 @@ export function renderItemsFigsHtml({figs = {}, ownedFigs = [], selectedFig = 'c
 
 /** Generates HTML markup for locations tab in "My items". */
 export function renderItemsLocsHtml(locs = []) {
-  return `<div class="icount">Открыто <b>${locs.filter(l => l.open).length}</b> из ${locs.length}</div><div class="locgrid">${locs.map(l => `<div class="loc${l.open ? '' : ' locked'}"><svg viewBox="0 0 160 90" aria-hidden="true">${l.art}</svg><b>${l.name}</b><small>${l.open ? 'Открыта' : 'Скоро'}</small></div>`).join('')}</div>`;
+  const openCount = locs.filter(l => l.open).length;
+  return `<div class="icount">Открыто <b>${openCount}</b> из ${locs.length}</div>
+    <p class="shint" style="margin:-2px 0 10px">Локации меняют оформление игрового поля, архитектуру городов и атмосферу королевства.</p>
+    <div class="locgrid">${locs.map(l => `
+      <div class="loccard${l.open ? ' active' : ' locked'}">
+        <div class="locart">
+          <svg viewBox="0 0 160 90" aria-hidden="true">${l.art}</svg>
+          <span class="locbadge ${l.open ? 'open' : 'soon'}">${l.open ? '✓ Активна' : 'В разработке'}</span>
+        </div>
+        <div class="locinfo">
+          <b>${l.name}</b>
+          <small>${l.desc || ''}</small>
+        </div>
+      </div>`).join('')}</div>`;
 }

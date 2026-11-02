@@ -105,5 +105,5 @@ export function renderTutorialOfferDialogHtml(hasFb = false) {
 }
 
 export function renderAskProfileDialogHtml(walletColor = '#ef5350') {
-  return `<div class="ocard prof"><div class="pav" id="pav" style="--c:${walletColor}">?</div><h3>Создайте профиль</h3><p>Придумайте никнейм и выберите цвет — их увидят соперники и рейтинг</p><input class="field" id="profName" maxlength="12" placeholder="Никнейм" autocomplete="off"><button class="cta wide" id="profOk" disabled>Готово</button><button class="ghostbtn" id="profLogin">У меня уже есть профиль — войти</button></div>`;
+  return `<div class="ocard prof"><div class="pav" id="pav" style="--c:${walletColor}">?</div><h3>Создайте профиль</h3><p>Придумайте никнейм и выберите цвет — их увидят соперники и рейтинг</p><div style="display:flex;gap:8px;align-items:center;margin-bottom:12px"><input class="field" id="profName" maxlength="12" placeholder="Никнейм" autocomplete="off" style="flex:1"><button type="button" class="iconbtn" id="profDice" title="Случайное имя" style="width:44px;height:44px;border-radius:10px;background:var(--surface-hover);font-size:20px;border:1px solid var(--line);cursor:pointer;flex:0 0 auto">🎲</button></div><button class="cta wide" id="profOk" disabled>Готово</button><button class="ghostbtn" id="profLogin">У меня уже есть профиль — войти</button></div>`;
 }

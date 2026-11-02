@@ -126,6 +126,14 @@ test('finishGoogle: a Google account with a profile signs in to it', async () =>
   assert.ok(log.toasts.some(t => t.startsWith('С возвращением')));
 });
 
+test('finishGoogle: CREDENTIAL_ALREADY_IN_USE falls back to signin and loads cloud profile', async () => {
+  const {env, log} = googleEnv(async (tok, session) => session ? fail('CREDENTIAL_ALREADY_IN_USE') : {idToken: 'S', localId: 'g1'}, {profile: {}});
+  await env.finishGoogle('tok', false, () => assert.fail('must not fail'));
+  assert.deepEqual(log.idp, [['tok', 'link'], ['tok', 'signin']]);
+  assert.equal(log.signup.length, 0);
+  assert.ok(log.toasts.some(t => t.startsWith('С возвращением')));
+});
+
 test('finishGoogle: a 200 answer without a session is never taken for a sign-in', async () => {
   // E-mail already registered with a password: signInWithIdp says needConfirmation and gives no idToken.
   const {env, log} = googleEnv(async (tok, session) => session ? fail('EMAIL_EXISTS') : fail('NEED_CONFIRMATION'));
