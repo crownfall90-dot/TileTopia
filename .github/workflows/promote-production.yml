@@ -107,3 +107,12 @@ jobs:
           python3 scripts/telegram-notify.py "1.0.$CODE" release-notes.md \
             "https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}/" \
             "https://github.com/${GITHUB_REPOSITORY}/releases/download/v${CODE}/Puzzlegrad-1.0.${CODE}.apk"
+
+      - name: Configure Telegram Mini App in Bot
+        continue-on-error: true
+        env:
+          TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+        run: |
+          if [ -n "$TELEGRAM_BOT_TOKEN" ]; then
+            python3 scripts/telegram-setup-bot.py "https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}/"
+          fi
