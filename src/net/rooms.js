@@ -1,7 +1,7 @@
 // src/net/rooms.js
 // Online room code generation, color allocation, security authorization (S-2), and rules resolution.
 
-export const BOT_NAMES = ['Бот Ёж', 'Бот Сова', 'Бот Лис', 'Бот Барсук'];
+export const BOT_NAMES = ['Бот Ёж', 'Бот Сова', 'Бот Лис', 'Бот Барсук', 'Бот Волк', 'Бот Медведь', 'Бот Рысь', 'Бот Бобёр'];
 
 export function newCode(length = 5) {
   const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789';
@@ -142,7 +142,9 @@ export function renderRoomSeatsHtml({
 
     const botLvl = x.botlvl || 'normal';
     const botLvlName = BOT_LVL_LABELS[botLvl] || 'Обычный';
-    const whoHtml = `<b>${safeName}${isMe ? ' (вы)' : ''}</b>${stTagFn(x.st)}<small>${isBot ? `Бот · ${botLvlName.toLowerCase()}` : isRoomHost ? 'Создатель комнаты' : (x.ready ? '✓ Готов к игре' : 'Ждём готовности')}</small>`;
+    const isFriend = !isMe && !isBot && x.uid && isFriendFn(x.uid);
+    const friendBadge = isFriend ? ' <span class="pill friend-pill" title="Ваш друг">🤝 Друг</span>' : '';
+    const whoHtml = `<b>${safeName}${isMe ? ' (вы)' : ''}</b>${stTagFn(x.st)}${friendBadge}<small>${isBot ? `Бот · ${botLvlName.toLowerCase()}` : isRoomHost ? 'Создатель комнаты' : (x.ready ? '✓ Готов к игре' : 'Ждём готовности')}</small>`;
     
     const canAddFriend = (!isMe && !isBot && x.uid && x.uid !== myUid && !isFriendFn(x.uid) && registered);
     const addFriendBtn = canAddFriend ? `<button class="chip addf" data-addf="${safeUid}" data-n="${safeName}" aria-label="В друзья">＋</button>` : '';
@@ -223,4 +225,73 @@ export function formatLobbyButtons({
       }
     };
   }
+}
+
+export function formatTableSizeHtml(currentMax = 4, isHost = false) {
+  const sizes = [2, 3, 4, 5];
+  return sizes.map(sz => {
+    const active = sz === currentMax ? ' active' : '';
+    const disabled = !isHost ? ' disabled' : '';
+    const label = sz === 2 ? '2 игрока' : sz === 4 ? '4 (реком.)' : `${sz}`;
+    return `<button class="ts-btn${active}" data-size="${sz}"${disabled} aria-label="Стол на ${sz} игроков">${label}</button>`;
+  }).join('');
+}
+
+export function formatOpenMatchBadge(openMatch = false, isHost = false, seatsCount = 1, maxSeats = 4) {
+  const className = 'matchbadge' + (openMatch ? ' on' : '') + (isHost ? ' host' : '');
+  const title = openMatch ? '🌐 Добор из онлайна (Открыта)' : '🔒 Только по коду (Приватная)';
+  const subtitle = isHost
+    ? (openMatch
+        ? `Игроки из быстрого поиска присоединяются (${seatsCount}/${maxSeats})`
+        : 'Нажмите, чтобы открыть комнату для случайных игроков')
+    : (openMatch
+        ? `Открытая комната · поиск игроков (${seatsCount}/${maxSeats})`
+        : 'Приватная комната только для друзей');
+  const innerHtml = `<div class="matchbadge-main"><b>${title}</b><small>${subtitle}</small></div><div class="cups-switch" aria-hidden="true"><span class="cups-switch-track"><span class="cups-switch-knob">${openMatch ? '🌐' : '🔒'}</span></span></div>`;
+  return {className, innerHtml, title, subtitle};
+}
+
+export function formatSeekStatus({openMatch = false, seatsCount = 1, maxSeats = 4, secWaiting = 0} = {}) {
+  const needed = Math.max(0, maxSeats - seatsCount);
+  const isFull = needed === 0;
+  let text = '';
+  let subText = '';
+  if (!openMatch) {
+    text = `В комнате ${seatsCount} из ${maxSeats}`;
+    subText = needed > 0 ? `Осталось свободных мест: ${needed}` : 'Комната заполнена';
+  } else if (isFull) {
+    text = 'Все игроки в сборе!';
+    subText = 'Комната заполнена, можно начинать';
+  } else {
+    text = `Ищем ещё ${needed} ${needed === 1 ? 'игрока' : 'игроков'} онлайн…`;
+    subText = `Найдено ${seatsCount} из ${maxSeats}${secWaiting > 0 ? ` · ${secWaiting}с` : ''}`;
+  }
+  return {
+    needed,
+    isFull,
+    text,
+    subText,
+    canFillBots: needed > 0
+  };
+}
+
+export function autoFillRoomBots(seats = [], targetMax = 4, botLevel = 'normal', figFn = () => 'classic') {
+  const nextSeats = seats.slice();
+  const existingNames = new Set(nextSeats.map(x => x.name));
+  const pool = ['Бот Ёж', 'Бот Сова', 'Бот Лис', 'Бот Барсук', 'Бот Волк', 'Бот Медведь', 'Бот Рысь', 'Бот Бобёр'];
+  
+  while (nextSeats.length < targetMax) {
+    const name = pool.find(n => !existingNames.has(n)) || `Бот ${nextSeats.length + 1}`;
+    existingNames.add(name);
+    nextSeats.push({
+      owner: null,
+      bot: true,
+      botlvl: botLevel || 'normal',
+      name,
+      fig: typeof figFn === 'function' ? figFn() : 'classic',
+      col: null,
+      ready: true
+    });
+  }
+  return nextSeats;
 }

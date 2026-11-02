@@ -304,6 +304,31 @@
               </button>
             </div>
 
+            <!-- Table size (2..5) -->
+            <div class="col-card" id="lbTableCard">
+              <div class="h3-bar">
+                <div class="h3-left">
+                  <span class="h3-icon">🪑</span>
+                  <span class="h3">Размер партии</span>
+                </div>
+                <span class="muted-note" id="lbTableNote">4 игрока</span>
+              </div>
+              <div class="table-size-group" id="lbTableSize"></div>
+            </div>
+
+            <!-- Open matchmaking toggle (Public vs Private) -->
+            <button class="matchbadge" id="lbOpenMatch" aria-label="Добор из онлайна"></button>
+
+            <!-- Live matchmaking status bar (shown when openMatch is active) -->
+            <div class="match-seeking-bar" id="lbMatchSeeking" hidden>
+              <div class="seek-pulse"><span></span><span></span><span></span></div>
+              <div class="seek-info">
+                <b id="lbSeekTitle">Ищем игроков онлайн…</b>
+                <small id="lbSeekSub">В комнате 2 из 4</small>
+              </div>
+              <button class="chip pri-chip" id="btnFillBotsNow">🤖 Заполнить ботами</button>
+            </div>
+
             <button class="cupsbadge" id="lbCups"></button>
 
             <div class="col-card">
@@ -320,7 +345,10 @@
                   <span class="h3-icon">👥</span>
                   <span class="h3" id="lbCount">Игроки</span>
                 </div>
-                <button class="chip addbot-chip" id="addBot">+ Добавить бота</button>
+                <div style="display:flex;gap:6px;align-items:center">
+                  <button class="chip addbot-chip" id="addBot">+ Добавить бота</button>
+                  <button class="chip pri-chip" id="btnFillBotsBar" hidden>🤖 Дополнить ботами</button>
+                </div>
               </div>
               <ul class="plist" id="plist"></ul>
             </div>
@@ -2566,7 +2594,17 @@ if (FB) setTimeout(() => { try { profileListen(); } catch (_) {} }, 3000);
 function netSend(msg) {
   return TRANSPORT.send(net.code, msg).catch(() => toast('Нет связи — проверьте интернет'));
 }
-function leaveRoom() { clearRematchTimer(); if (net && net.close) net.close(); if (net) netUp(net); net = null; }
+let openMatchTimer = 0;
+function leaveRoom() {
+  clearRematchTimer();
+  if (net && net.openMatch && typeof FIRE !== 'undefined' && FIRE && typeof FIRE.send === 'function') {
+    FIRE.send(MATCH_ROOM, {t: 'close', code: net.code}).catch(() => {});
+  }
+  clearInterval(openMatchTimer);
+  if (net && net.close) net.close();
+  if (net) netUp(net);
+  net = null;
+}
 /* Connection to the table (phase 1.3 of the roadmap): a short drop shows a quiet "reconnecting" line over the board;
    one longer than 30 s asks "Retry / To the menu". The game itself is never lost: moves are kept on the server and
    replayed without animation when the stream comes back. */
@@ -2605,7 +2643,7 @@ async function serverReachable(ms = 6000) {
 function noServer(retry) { confirmBox('Нет связи с игровым сервером<br><small>Проверьте интернет. Игра с ботами и на одном телефоне работает без сети</small>', 'Повторить', retry, 'Закрыть'); }
 function connect(code, asHost, quick) {
   leaveRoom();
-  const me = net = {code, host: false, hostId: null, seen: new Set(), uidOf: new Map(), secure: false, lobby: null, gameId: null, since: Date.now() / 1000, quick: !!quick};
+  const me = net = {code, host: false, hostId: null, seen: new Set(), uidOf: new Map(), secure: false, lobby: null, gameId: null, since: Date.now() / 1000, quick: !!quick, openMatch: !!quick, openMatchSince: quick ? Date.now() : 0};
   let opened = false;
   net.close = TRANSPORT.listen(code, {
     open() {
@@ -2625,7 +2663,7 @@ function connect(code, asHost, quick) {
   renderLobby();
 }
 // max: how many seats the creator chose for the room.
-function publishLobby(seats) { netSend({t: 'lobby', seats, rules: setup.rules, max: roomMax()}); }
+function publishLobby(seats) { netSend({t: 'lobby', seats, rules: setup.rules, max: roomMax(), openMatch: !!net.openMatch}); }
 const roomMax = () => (PG.net && PG.net.rooms) ? PG.net.rooms.roomMax(net, 5) : Math.min(5, Math.max(2, (net && (net.max || net.lobby && net.lobby.max)) || 5));
 /* Who may say what in a room (audit S-2). Every message carries d.u, the account id of the phone that wrote it (the
    database rules force it to be true). The first time a phone says hello its client id is tied to that account id;
@@ -2683,7 +2721,15 @@ function onNet(d) {
     if (s) { s.ready = !!m.ready; publishLobby(seats); renderLobby(); }
     return;
   }
-  if (m.t === 'lobby') { net.lobby = m; if (!net.host) Object.assign(setup.rules, m.rules); return renderLobby(); }
+  if (m.t === 'lobby') {
+    net.lobby = m;
+    if (!net.host) {
+      Object.assign(setup.rules, m.rules);
+      if (m.max) net.max = m.max;
+      net.openMatch = !!m.openMatch;
+    }
+    return renderLobby();
+  }
   if (m.t === 'start') {
     if (net.gameId === d.id) return;
     // Quick match: a room that started without us is no use — look for another one.
@@ -2874,6 +2920,48 @@ function renderLobby() {
     cb.innerHTML = `<div class="cupsbadge-main"><b>${title}</b><small>${subtitle}</small></div><div class="cups-switch" aria-hidden="true"><span class="cups-switch-track"><span class="cups-switch-knob">${cups ? '🏆' : '🤝'}</span></span></div>`;
   }
   cb.disabled = !net.host || !!net.gameId;
+
+  const maxSeats = roomMax();
+  if ($('#lbTableNote')) $('#lbTableNote').textContent = `${maxSeats} ${maxSeats === 2 ? 'игрока' : maxSeats === 5 ? 'игроков' : 'игрока'}`;
+  if ($('#lbTableSize') && typeof PG !== 'undefined' && PG.net && PG.net.rooms && PG.net.rooms.formatTableSizeHtml) {
+    $('#lbTableSize').innerHTML = PG.net.rooms.formatTableSizeHtml(maxSeats, net.host && !net.gameId);
+  }
+  const openMatch = !!(net.openMatch || (net.lobby && net.lobby.openMatch));
+  const mb = $('#lbOpenMatch');
+  if (mb) {
+    if (typeof PG !== 'undefined' && PG.net && PG.net.rooms && PG.net.rooms.formatOpenMatchBadge) {
+      const badge = PG.net.rooms.formatOpenMatchBadge(openMatch, net.host, seats.length, maxSeats);
+      mb.className = badge.className;
+      mb.innerHTML = badge.innerHtml;
+    }
+    mb.disabled = !net.host || !!net.gameId;
+  }
+  const seekBox = $('#lbMatchSeeking');
+  const elapsedSec = net.openMatchSince ? Math.floor((Date.now() - net.openMatchSince) / 1000) : 0;
+  if (seekBox) {
+    seekBox.hidden = !openMatch || !!net.gameId;
+    if (openMatch && !net.gameId) {
+      const seekStatus = (typeof PG !== 'undefined' && PG.net && PG.net.rooms && PG.net.rooms.formatSeekStatus)
+        ? PG.net.rooms.formatSeekStatus({openMatch, seatsCount: seats.length, maxSeats, secWaiting: elapsedSec})
+        : {text: `В комнате ${seats.length} из ${maxSeats}`, subText: '', isFull: seats.length >= maxSeats};
+      if ($('#lbSeekTitle')) $('#lbSeekTitle').textContent = seekStatus.text;
+      if ($('#lbSeekSub')) $('#lbSeekSub').textContent = seekStatus.subText;
+      if ($('#btnFillBotsNow')) $('#btnFillBotsNow').hidden = !net.host || seekStatus.isFull;
+    }
+  }
+  if ($('#btnFillBotsBar')) {
+    $('#btnFillBotsBar').hidden = !net.host || seats.length >= maxSeats || !!net.gameId;
+  }
+  if (net && net.host && openMatch && !net.gameId) {
+    if (!openMatchTimer) {
+      openMatchTimer = setInterval(tickOpenMatch, 7000);
+      tickOpenMatch();
+    }
+  } else if (openMatchTimer && (!net || !net.openMatch || net.gameId)) {
+    clearInterval(openMatchTimer);
+    openMatchTimer = 0;
+  }
+
   renderMyColor();
   const seats = (net.lobby && net.lobby.seats ? net.lobby.seats.slice() : []);
   if (net && !net.host && !seats.some(x => x.owner === myId)) {
@@ -3000,7 +3088,76 @@ $('#myColor').addEventListener('click', e => {
 });
 $('#create').onclick = () => openSetup('friends');
 const newCode = () => (PG.net && PG.net.rooms) ? PG.net.rooms.newCode() : (() => { const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; return Array.from({length: 5}, () => A[(Math.random() * A.length) | 0]).join(''); })();
-async function createRoom() { if (!(await serverReachable())) return noServer(createRoom); connect(newCode(), true); net.max = setup.onN || 2; show('lobby'); }
+async function createRoom() { if (!(await serverReachable())) return noServer(createRoom); connect(newCode(), true); net.max = setup.onN || 4; show('lobby'); }
+function tickOpenMatch() {
+  if (!net || !net.host || !net.openMatch || net.gameId || (typeof phase !== 'undefined' && phase === 'play')) return;
+  const seats = net.lobby && net.lobby.seats ? net.lobby.seats : [];
+  if (seats.length < roomMax()) {
+    if (typeof FIRE !== 'undefined' && FIRE && typeof FIRE.send === 'function') {
+      FIRE.send(MATCH_ROOM, {
+        t: 'seek',
+        code: net.code,
+        id: myId,
+        want: roomMax(),
+        mode: setup.rules.mode || 'classic',
+        n: seats.length
+      }).catch(() => {});
+    }
+  } else {
+    if (typeof FIRE !== 'undefined' && FIRE && typeof FIRE.send === 'function') {
+      FIRE.send(MATCH_ROOM, {t: 'close', code: net.code}).catch(() => {});
+    }
+  }
+}
+if ($('#lbTableSize')) {
+  $('#lbTableSize').onclick = e => {
+    const btn = e.target.closest('[data-size]');
+    if (!btn || !net || !net.host || net.gameId) return;
+    const target = parseInt(btn.dataset.size, 10);
+    const seats = net.lobby && net.lobby.seats ? net.lobby.seats : [];
+    if (target < seats.length) {
+      return toastAny(`Сначала уберите лишних игроков (сейчас ${seats.length})`);
+    }
+    net.max = target;
+    setup.onN = target;
+    publishLobby(seats);
+    renderLobby();
+    toastAny(`Размер партии: ${target} ${target === 2 ? 'игрока' : target === 5 ? 'игроков' : 'игрока'}`);
+  };
+}
+if ($('#lbOpenMatch')) {
+  $('#lbOpenMatch').onclick = () => {
+    if (!net || !net.host || net.gameId) return;
+    net.openMatch = !net.openMatch;
+    net.openMatchSince = net.openMatch ? Date.now() : 0;
+    const seats = net.lobby && net.lobby.seats ? net.lobby.seats : [];
+    if (net.openMatch) {
+      toastAny('Комната открыта: случайные игроки из онлайна могут войти!');
+      tickOpenMatch();
+    } else {
+      toastAny('Комната закрыта: вход только по коду и инвайтам');
+      if (typeof FIRE !== 'undefined' && FIRE && typeof FIRE.send === 'function') {
+        FIRE.send(MATCH_ROOM, {t: 'close', code: net.code}).catch(() => {});
+      }
+    }
+    publishLobby(seats);
+    renderLobby();
+  };
+}
+const fillRemainingBots = () => {
+  if (!net || !net.host || net.gameId) return;
+  const curSeats = net.lobby && net.lobby.seats ? net.lobby.seats.slice() : [];
+  const target = roomMax();
+  if (curSeats.length >= target) return;
+  const next = (typeof PG !== 'undefined' && PG.net && PG.net.rooms && PG.net.rooms.autoFillRoomBots)
+    ? PG.net.rooms.autoFillRoomBots(curSeats, target, wallet.botlvl || 'normal', randomFig)
+    : curSeats;
+  publishLobby(next);
+  renderLobby();
+  toastAny(`Добавлено ботов: ${target - curSeats.length}`);
+};
+if ($('#btnFillBotsNow')) $('#btnFillBotsNow').onclick = fillRemainingBots;
+if ($('#btnFillBotsBar')) $('#btnFillBotsBar').onclick = fillRemainingBots;
 $('#join').onclick = () => {
   const code = $('#codeIn').value.toUpperCase().replace(/[^A-Z0-9]/g, '');
   if (code.length !== 5) return toastAny('Код комнаты — 5 символов');
@@ -3038,7 +3195,13 @@ $('#plist').addEventListener('click', e => { const b = e.target.closest('[data-i
 // Rated games (quick match) use the same rules for everybody: only the mode is chosen.
 const ratedRules = mode => (PG.net && PG.net.rooms) ? PG.net.rooms.ratedRules(mode, MODES) : ({mode, ...MODES[mode].set, rivers: true, timer: 60, hints: true, tie: 'all'});
 function startOnline(seats) {
+  if (net && net.openMatch && typeof FIRE !== 'undefined' && FIRE && typeof FIRE.send === 'function') {
+    FIRE.send(MATCH_ROOM, {t: 'close', code: net.code}).catch(() => {});
+  }
   const rules = {...(net && net.quick ? ratedRules(mm ? mm.mode : setup.rules.mode) : setup.rules)};
+  if (seats.length >= 3 && rules.deck && rules.deck < 50 && !net.quick) {
+    rules.deck = 50;
+  }
   // Rules v2 only when every guest announced it (an old client would count points differently).
   rules.rv = seats.every(x => !x.owner || x.owner === myId || (net.peerV2 && net.peerV2.get(x.owner))) ? 2 : 1;
   netSend({t: 'start', sec: FB ? 1 : 0, seats: assignColors(seats).map(x => ({name: x.name, owner: x.owner || null, uid: x.uid || null, fig: x.fig || 'classic', col: x.col, ghost: x.ghost ? 1 : 0, st: PG.state.status.shownStatus(x.st), botlvl: x.botlvl || 'normal'})), rules, deck: makeDeck(rules), seed: (Math.random() * 1e9) | 0, quick: !!(net && net.quick)});
