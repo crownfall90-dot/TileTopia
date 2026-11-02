@@ -1,14 +1,14 @@
 # Google Play Store Listing (English)
 
 ## App Name
-**Puzzlegrad: Board Tile Game** *(27 / 30 characters)*
+**Tiletopia: Board Tile Game** *(26 / 30 characters)*
 
 ## Short Description
 **Tactical medieval tile-laying board game: build towns, roads, and mighty forts!** *(79 / 80 characters)*
 
 ## Full Description
 
-Welcome to **Puzzlegrad** — a cozy, strategic tile-placement board game set in a vibrant medieval world!
+Welcome to **Tiletopia** — a cozy, strategic tile-placement board game set in a vibrant medieval world!
 
 Place landscape tiles on the board, connect winding roads, fortify castles, enclose winding rivers, and place your meeples wisely to become the greatest ruler of the realm.
 
@@ -27,4 +27,4 @@ Place landscape tiles on the board, connect winding roads, fortify castles, encl
 • **Daily & Weekly Quests**: Complete fun daily objectives, open weekly treasure chests, and compete on global leaderboards.
 • **Clean & Respectful**: No intrusive interstitial ads or pay-to-win mechanics. Pure tabletop gaming joy.
 
-Build your legendary kingdom tile by tile in Puzzlegrad today!
+Build your legendary kingdom tile by tile in Tiletopia today!

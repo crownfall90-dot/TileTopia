@@ -1,8 +1,8 @@
 {
-  "name": "puzzlegrad",
+  "name": "tiletopia",
   "private": true,
   "type": "module",
-  "description": "Puzzlegrad game. Modules in src/ are bundled by Vite into one inline script (window.PG) that scripts/wrap-web.sh puts in front of web/game.html.",
+  "description": "Tiletopia game. Modules in src/ are bundled by Vite into one inline script (window.PG) that scripts/wrap-web.sh puts in front of web/game.html.",
   "scripts": {
     "build": "vite build",
     "test": "node --test tests/*.test.cjs"

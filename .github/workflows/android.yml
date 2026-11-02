@@ -52,8 +52,8 @@ jobs:
           echo "CODE=$CODE" >> "$GITHUB_ENV"
           chmod +x gradlew
           ./gradlew assembleGithubRelease bundlePlayRelease -PversionCode=$CODE --no-daemon
-          cp app/build/outputs/apk/github/release/app-github-release.apk "Puzzlegrad-1.0.$CODE.apk"
-          cp app/build/outputs/bundle/playRelease/app-play-release.aab "Puzzlegrad-1.0.$CODE-google-play.aab"
+          cp app/build/outputs/apk/github/release/app-github-release.apk "Tiletopia-1.0.$CODE.apk"
+          cp app/build/outputs/bundle/playRelease/app-play-release.aab "Tiletopia-1.0.$CODE-google-play.aab"
       # The .apk updates GitHub installs; the .aab is uploaded to Google Play by hand.
       - name: Publish release (the app checks it on start)
         env:
@@ -65,13 +65,13 @@ jobs:
           curl -fsSL "https://github.com/$GITHUB_REPOSITORY/releases/latest/download/latest.json" -o prev.json 2>/dev/null || echo '{}' > prev.json
           python3 -c 'import json; p=json.load(open("prev.json")).get("notes","").strip(); n=open("release-notes.md", encoding="utf-8").read().strip(); print("::warning::release-notes.md is the same as in the previous release - update it") if p and p == n else None'
           # latest.json: what the app reads to find updates (a plain file download has no rate limit).
-          python3 -c 'import json,os,sys; c=int(os.environ["CODE"]); r=os.environ["GITHUB_REPOSITORY"]; json.dump({"code": c, "version": "1.0.%d" % c, "notes": open("release-notes.md", encoding="utf-8").read().strip(), "url": "https://github.com/%s/releases/download/v%d/Puzzlegrad-1.0.%d.apk" % (r, c, c), "cert": os.environ.get("SIGNING_CERT_SHA256", "")}, open("latest.json", "w", encoding="utf-8"), ensure_ascii=False)'
-          # Puzzlegrad.apk: the same file under a fixed name, so releases/latest/download/Puzzlegrad.apk
+          python3 -c 'import json,os,sys; c=int(os.environ["CODE"]); r=os.environ["GITHUB_REPOSITORY"]; json.dump({"code": c, "version": "1.0.%d" % c, "notes": open("release-notes.md", encoding="utf-8").read().strip(), "url": "https://github.com/%s/releases/download/v%d/Tiletopia-1.0.%d.apk" % (r, c, c), "cert": os.environ.get("SIGNING_CERT_SHA256", "")}, open("latest.json", "w", encoding="utf-8"), ensure_ascii=False)'
+          # Tiletopia.apk: the same file under a fixed name, so releases/latest/download/Tiletopia.apk
           # (the link in invites and the web version) always downloads the newest app.
-          cp "Puzzlegrad-1.0.$CODE.apk" Puzzlegrad.apk
+          cp "Tiletopia-1.0.$CODE.apk" Tiletopia.apk
           # --target: the tag must point at the commit that was built (a rollback builds an older tag),
           # not at the branch head that started the run.
-          gh release create "v$CODE" "Puzzlegrad-1.0.$CODE.apk" Puzzlegrad.apk "Puzzlegrad-1.0.$CODE-google-play.aab" latest.json \
+          gh release create "v$CODE" "Tiletopia-1.0.$CODE.apk" Tiletopia.apk "Tiletopia-1.0.$CODE-google-play.aab" latest.json \
             --target "$(git rev-parse HEAD)" --title "1.0.$CODE" --notes-file release-notes.md --latest
       # Push "new version" to GitHub-build players; skipped until the FIREBASE_SERVICE_ACCOUNT secret exists.
       - name: Notify players

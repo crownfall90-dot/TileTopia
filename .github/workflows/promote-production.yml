@@ -68,16 +68,16 @@ jobs:
           echo "CODE=$CODE" >> "$GITHUB_ENV"
           chmod +x gradlew
           ./gradlew assembleGithubRelease bundlePlayRelease -PversionCode=$CODE --no-daemon
-          cp app/build/outputs/apk/github/release/app-github-release.apk "Puzzlegrad-1.0.$CODE.apk"
-          cp app/build/outputs/bundle/playRelease/app-play-release.aab "Puzzlegrad-1.0.$CODE-google-play.aab"
+          cp app/build/outputs/apk/github/release/app-github-release.apk "Tiletopia-1.0.$CODE.apk"
+          cp app/build/outputs/bundle/playRelease/app-play-release.aab "Tiletopia-1.0.$CODE-google-play.aab"
 
       - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          python3 -c 'import json,os; c=int(os.environ["CODE"]); r=os.environ["GITHUB_REPOSITORY"]; json.dump({"code": c, "version": "1.0.%d" % c, "notes": open("release-notes.md", encoding="utf-8").read().strip(), "url": "https://github.com/%s/releases/download/v%d/Puzzlegrad-1.0.%d.apk" % (r, c, c), "cert": os.environ.get("SIGNING_CERT_SHA256", "")}, open("latest.json", "w", encoding="utf-8"), ensure_ascii=False)'
-          cp "Puzzlegrad-1.0.$CODE.apk" Puzzlegrad.apk
-          gh release create "v$CODE" "Puzzlegrad-1.0.$CODE.apk" Puzzlegrad.apk "Puzzlegrad-1.0.$CODE-google-play.aab" latest.json \
+          python3 -c 'import json,os; c=int(os.environ["CODE"]); r=os.environ["GITHUB_REPOSITORY"]; json.dump({"code": c, "version": "1.0.%d" % c, "notes": open("release-notes.md", encoding="utf-8").read().strip(), "url": "https://github.com/%s/releases/download/v%d/Tiletopia-1.0.%d.apk" % (r, c, c), "cert": os.environ.get("SIGNING_CERT_SHA256", "")}, open("latest.json", "w", encoding="utf-8"), ensure_ascii=False)'
+          cp "Tiletopia-1.0.$CODE.apk" Tiletopia.apk
+          gh release create "v$CODE" "Tiletopia-1.0.$CODE.apk" Tiletopia.apk "Tiletopia-1.0.$CODE-google-play.aab" latest.json \
             --target "$(git rev-parse HEAD)" --title "1.0.$CODE" --notes-file release-notes.md --latest
 
       - name: Build and deploy Web to GitHub Pages
