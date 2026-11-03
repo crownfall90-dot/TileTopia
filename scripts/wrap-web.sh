@@ -18,8 +18,19 @@ else
   exit 1
 fi
 
+RAW_VER="${2:-}"
+if [ -z "$RAW_VER" ] || [ "$RAW_VER" = "dev" ]; then
+  LAST_CODE=$(git tag -l 'v*' 2>/dev/null | sed -n 's#^v\([0-9][0-9]*\)$#\1#p' | sort -n | tail -1)
+  RAW_VER="${LAST_CODE:-256}"
+fi
+case "$RAW_VER" in
+  1.0.*) webver="$RAW_VER" ;;
+  v*)    webver="1.0.${RAW_VER#v}" ;;
+  *)     webver="1.0.$RAW_VER" ;;
+esac
+
 if [ "$target" = web ]; then
-  site=build/web; out=$site/index.html; webver="веб ${2:-dev}"
+  site=build/web; out=$site/index.html
   rm -rf "$site"; mkdir -p "$site/staging"
   cp -r app/src/main/assets/fonts "$site/fonts"
   cp -r app/src/main/assets/fonts "$site/staging/fonts"
@@ -27,6 +38,10 @@ if [ "$target" = web ]; then
   cp -r web/icons "$site/staging/icons"
   cp web/manifest.webmanifest "$site/"
   cp web/manifest.webmanifest "$site/staging/"
+  if [ -f latest.json ]; then
+    cp latest.json "$site/"
+    cp latest.json "$site/staging/"
+  fi
   sed "s/__VERSION__/$(echo "${2:-dev}" | tr -cd 'A-Za-z0-9.-')/" web/sw.js > "$site/sw.js"
   touch "$site/.nojekyll"
   touch "$site/staging/.nojekyll"
@@ -137,7 +152,7 @@ BOOT
 
 if [ "$target" = web ]; then
   build_page "$out" "false" "$webver"
-  build_page "$site/staging/index.html" "true" "тест ${2:-dev}"
+  build_page "$site/staging/index.html" "true" "$webver"
 else
-  build_page "$out" "false" ""
+  build_page "$out" "false" "$webver"
 fi
