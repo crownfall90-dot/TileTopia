@@ -3881,9 +3881,10 @@ async function openPlayer(uid, name, col) {
   });
   const add = box.querySelector('#plAdd'); if (add) add.onclick = () => { add.disabled = true; add.textContent = '✓ Заявка отправлена'; addFriend(uid, n, 'profile'); };
   const [lead, pres] = await Promise.all([fbGet('leaders/' + uid).catch(() => null), fbGet('presence/' + uid).catch(() => null)]);
-  const ago = pres && pres.t ? Math.round((Date.now() - pres.t) / 60000) : null;
+  const lastT = (pres && pres.t) || (lead && lead.t) || 0;
+  const ago = lastT ? Math.round((Date.now() - lastT) / 60000) : null;
   const isOnline = pres && pres.s && pres.s !== 'off' && (ago == null || ago < 3);
-  const seenText = ago == null ? 'Офлайн' : isOnline ? 'В сети' : ago < 60 ? `был ${ago} мин назад` : ago < 1440 ? `был ${Math.round(ago / 60)} ч назад` : `был ${Math.round(ago / 1440)} дн назад`;
+  const seenText = ago == null ? 'Офлайн' : isOnline ? 'В сети' : ago < 60 ? `был(а) ${ago} мин назад` : ago < 1440 ? `был(а) ${Math.round(ago / 60)} ч назад` : Math.round(ago / 1440) === 1 ? 'был(а) вчера' : `был(а) ${Math.round(ago / 1440)} дн назад`;
   const sv = PG.state.status.shownStatus((pres && pres.st) || (lead && lead.st));
 
   const badgeEl = box.querySelector('#plBadge');
@@ -3896,7 +3897,7 @@ async function openPlayer(uid, name, col) {
   const winsEl = box.querySelector('#plWins');
   if (winsEl) winsEl.textContent = `${lead && +lead.w || 0}`;
   const stateEl = box.querySelector('#plState');
-  if (stateEl) stateEl.textContent = isOnline ? (STATE_TEXT[pres.s] || 'в игре') : 'не в сети';
+  if (stateEl) stateEl.textContent = isOnline ? (STATE_TEXT[pres.s] || 'в игре') : seenText;
 }
 document.addEventListener('click', e => { const b = e.target.closest('[data-pl]'); if (b && !e.target.closest('button.chip')) openPlayer(b.dataset.pl, b.dataset.n, b.dataset.c); });
 // Edit the profile: colour (free, any time) and nickname (the usual rename).
@@ -4298,7 +4299,14 @@ async function loadFriends() {
   const list = (await fbGet('friends/' + me)) || {};
   friends = await Promise.all(Object.entries(list).slice(0, FRIEND_MAX).map(async ([uid, v]) => {
     const [back, p] = await Promise.all([fbGet(`friends/${uid}/${me}`).catch(() => null), fbGet('presence/' + uid).catch(() => null)]);
-    return {uid, n: clean(p && p.n) || clean(v.n) || 'Игрок', st: PG.state.status.shownStatus(p && p.st), c: validCol(p && p.c) ? p.c : undefined, mutual: !!back, p, on: !!back && isOn(p)};
+    let lastT = (p && p.t) || 0;
+    if (!lastT) {
+      const l = await fbGet('leaders/' + uid).catch(() => null);
+      if (l && l.t) lastT = l.t;
+      else if (v && v.t) lastT = v.t;
+    }
+    const pres = p ? {...p, t: p.t || lastT} : (lastT ? {t: lastT, s: 'off'} : null);
+    return {uid, n: clean(p && p.n) || clean(v.n) || 'Игрок', st: PG.state.status.shownStatus(p && p.st), c: validCol(p && p.c) ? p.c : undefined, mutual: !!back, p: pres, on: !!back && isOn(p)};
   }));
   friends.sort((a, b) => b.on - a.on || b.mutual - a.mutual || ((b.p && b.p.t) || 0) - ((a.p && a.p.t) || 0));
 }
@@ -4644,7 +4652,7 @@ function renderFriends() {
         if (reqs.length) h += `<div class="h3">Заявки в друзья</div><ul class="flist">${reqs.map(([k, v]) => fRow({n: clean(v.n), c: '#f2b84b'}, `<button class="chip go" data-facc="${k.slice(0, -2)}">Принять</button><button class="chip x" data-fdrop="${k}" aria-label="Отклонить">✕</button>`, 'хочет дружить')).join('')}</ul>`;
         h += `<div class="h3"><span class="fdot on"></span>В сети</div><ul class="flist">${on.map(f => fRow(f, `<button class="chip go" data-finv="${f.uid}">${room && invited.code === room && invited.joined.has(f.uid) ? '✓ Принял' : room && invited.code === room && invited.uids.has(f.uid) ? 'Ещё раз' : 'Позвать'}</button>`, STATE_TEXT[f.p.s] || 'в игре')).join('') || '<li class="qnote">Никого из друзей нет в сети</li>'}</ul>`;
         if (off.length) h += `<div class="h3"><span class="fdot off"></span>Не в сети</div><ul class="flist">${off.map(f => fRow(f, `<button class="chip x" data-fdel="${f.uid}" aria-label="Удалить из друзей">✕</button>`, agoText(f.p && f.p.t))).join('')}</ul>`;
-        if (wait.length) h += `<div class="h3">Ждут ответа</div><ul class="flist">${wait.map(f => fRow(f, `<button class="chip x" data-fdel="${f.uid}" aria-label="Отменить заявку">✕</button>`, 'заявка отправлена')).join('')}</ul>`;
+        if (wait.length) h += `<div class="h3">Ждут ответа</div><ul class="flist">${wait.map(f => fRow(f, `<button class="chip x" data-fdel="${f.uid}" aria-label="Отменить заявку">✕</button>`, (f.p && f.p.t) ? agoText(f.p.t) : 'заявка отправлена')).join('')}</ul>`;
         if (!friends.length && !reqs.length) h += '<p class="shint">Добавьте друга по коду выше</p>';
         return h;
       })();

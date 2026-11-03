@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="utf-8">
+<title>Экспорт и галерея плиток Tiletopia</title>
+<style>
+  body { font-family: system-ui, -apple-system, sans-serif; background: #0e1428; color: #e6ecf8; margin: 0; padding: 24px; }
+  h1 { font-size: 26px; margin-bottom: 8px; color: #f2b84b; }
+  p { color: #9aa8c7; margin-bottom: 20px; font-size: 14px; }
+  .actions { display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap; }
+  button { background: #f2b84b; color: #161c33; border: 0; padding: 10px 18px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 14px; transition: transform .1s; }
+  button:hover { filter: brightness(1.1); }
+  button:active { transform: scale(0.97); }
+  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
+  .tile-card { background: #16203d; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 12px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; }
+  .tile-card img { width: 140px; height: 140px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); image-rendering: auto; }
+  .tile-id { font-weight: 800; font-size: 15px; color: #fff; }
+  .tile-name { font-size: 12.5px; color: #f2b84b; }
+  .tile-edges { font-family: monospace; font-size: 11px; color: #7f91ba; background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 6px; }
+  .dl-btn { background: rgba(255,255,255,0.08); color: #fff; padding: 6px 12px; font-size: 12px; border-radius: 8px; margin-top: 4px; }
+  .dl-btn:hover { background: rgba(255,255,255,0.15); }
+  #status { font-weight: bold; color: #3fc27a; margin-left: 12px; }
+</style>
+<script src="../build/bundle/pg.js"></script>
+</head>
+<body>
+<h1>🧩 Галерея и спрайты всех плиток Tiletopia</h1>
+<p>Все плитки игры, сгенерированные в детальном разрешении 512×512. Каждую плитку можно скачать отдельно или экспортировать сразу все.</p>
+<div class="actions">
+  <button id="dlAll">💾 Скачать все плитки архивом (.zip)</button>
+  <button id="dumpJson" style="background:#4c8dff;color:#fff">📋 Экспортировать в assets/tiles</button>
+  <span id="status">Загрузка плиток…</span>
+</div>
+<div class="grid" id="grid"></div>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+(() => {
+  const S = 512;
+  const V = [[0,-1],[1,0],[0,1],[-1,0]];
+  const PL0 = [{col: '#e24242'}, {col: '#4287f5'}, {col: '#3ec75e'}, {col: '#f5a742'}, {col: '#a842f5'}];
+  const MEEPLE_D = 'M50 4C62 4 68 12 68 22C68 30 64 34 60 37L88 46C96 49 98 56 96 62C94 68 88 70 82 68L68 64L76 100C77 106 73 108 68 108L56 108L50 86L44 108L32 108C27 108 23 106 24 100L32 64L18 68C12 70 6 68 4 62C2 56 4 49 12 46L40 37C36 34 32 30 32 22C32 12 38 4 50 4Z';
+
+  const {cv, drawTile} = PG.render.createArt({S, V, PL0, MEEPLE_D});
+  const TYPES = PG.engine.TYPES;
+
+  const grid = document.getElementById('grid');
+  const status = document.getElementById('status');
+  const tileImages = {};
+
+  const keys = Object.keys(TYPES);
+  status.textContent = `Генерация ${keys.length} плиток (512×512)…`;
+
+  keys.forEach(id => {
+    const dataUrl = drawTile(id);
+    tileImages[id] = dataUrl;
+    const def = TYPES[id];
+
+    const card = document.createElement('div');
+    card.className = 'tile-card';
+    card.innerHTML = `
+      <img src="${dataUrl}" alt="${id}">
+      <span class="tile-id">${id}</span>
+      <span class="tile-name">${def.name || def.rare ? (def.name || 'Редкая') : ''}</span>
+      <span class="tile-edges">${def.e} · ×${def.n || 1}</span>
+      <a class="dl-btn" href="${dataUrl}" download="tile_${id}.png">Скачать PNG</a>
+    `;
+    grid.appendChild(card);
+  });
+
+  status.textContent = `Все ${keys.length} плиток готовы (512×512 px)`;
+  window.TILE_DATA = tileImages;
+
+  document.getElementById('dlAll').onclick = async () => {
+    if (typeof JSZip === 'undefined') {
+      alert('JSZip ещё не загрузился, подождите секунду');
+      return;
+    }
+    status.textContent = 'Создание ZIP архива…';
+    const zip = new JSZip();
+    const folder = zip.folder("tiletopia_tiles_512x512");
+    
+    for (const [id, dataUrl] of Object.entries(tileImages)) {
+      const base64 = dataUrl.split(',')[1];
+      folder.file(`tile_${id}.png`, base64, {base64: true});
+    }
+
+    const blob = await zip.generateAsync({type:"blob"});
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = "tiletopia_tiles_512x512.zip";
+    link.click();
+    status.textContent = `ZIP скачан (${keys.length} плиток)`;
+  };
+})();
+</script>
+</body>
+</html>
