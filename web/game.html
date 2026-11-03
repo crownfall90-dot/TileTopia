@@ -122,7 +122,8 @@
           <div class="profile" id="profile"></div>
           <div class="sgroup prof" id="acct"></div>
           <button class="tutcard itemsentry" id="itemsBtn"><span>🎒</span><span><b>Мои предметы</b><small id="itemsSub">Статусы, рамки, фигурки, локации</small></span><i class="tgo">›</i></button>
-          <div class="pstats" id="stats"></div>
+          <button class="tutcard itemsentry" id="histBtn" data-go="history"><span>📜</span><span><b>История партий</b><small>Все сыгранные матчи и результаты</small></span><i class="tgo">›</i></button>
+          <div class="pstats" id="stats" data-go="history" title="Открыть историю партий" style="cursor:pointer"></div>
           <div class="seg ptabs" id="ptabs"><button data-pt="rewards" aria-pressed="true">Награды</button><button data-pt="cols" aria-pressed="false">Коллекции</button><button data-pt="top" aria-pressed="false">Рейтинг</button></div>
           <div class="col" id="ptab"></div>
         </div>
@@ -130,7 +131,7 @@
 
       <section class="screen scroll" id="scr-history" hidden>
         <div class="lb">
-          <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>История партий</b></div>
+          <div class="ltop"><button class="iconbtn" id="historyBack" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>История партий</b></div>
           <div class="col" id="historyList"></div>
         </div>
       </section>
@@ -518,7 +519,7 @@ const runsBot = i => !players[i].human && (!net || net.host);
 const localHumans = () => (typeof PG !== 'undefined' && PG.game && PG.game.humanPlayers && !net)
   ? PG.game.humanPlayers(players).length
   : players.filter((p, i) => isLocal(i)).length;
-const isMe = p => net ? p.owner === myId : p.human && humanCount() === 1;
+const isMe = p => p && (net ? (p.owner === myId || (p.resigned && p.prevOwner === myId)) : (p.human && humanCount() === 1));
 let gameRules = setup.rules, turnTok = 0;
 const humanCount = () => players.filter(p => p.human).length;
 // Card types (edges N E S W) live in src/engine/tiles.js.
@@ -2017,9 +2018,13 @@ function markGameFinished(key) {
 }
 function historySave(reason, final) {
   const id = gameKey(); if (!id) return;
-  const row = {id,at:Date.now(),reason:reason || 'deck',final:!!final,players:players.map(p => ({name:p.name,score:p.score,col:p.col,me:isMe(p),uid:p.uid || null,bot:!p.human}))};
-  if (typeof PG !== 'undefined' && PG.state && PG.state.save) return PG.state.save.saveHistoryEntry(localStorage, row);
-  try { const data = jsonRead(GAME_HISTORY_KEY, []), old = Array.isArray(data) ? data.filter(x => x && typeof x.id === 'string') : []; localStorage.setItem(GAME_HISTORY_KEY, JSON.stringify([row, ...old.filter(x => x.id !== id)].slice(0, 50))); } catch (_) {}
+  const row = {id,at:Date.now(),reason:reason || 'deck',final:!!final,players:players.map(p => ({name:p.name,score:p.score,col:p.col,me:isMe(p),uid:p.uid || null,bot:!p.human,resigned:!!p.resigned}))};
+  if (typeof PG !== 'undefined' && PG.state && PG.state.save) {
+    PG.state.save.saveHistoryEntry(localStorage, row);
+  } else {
+    try { const data = jsonRead(GAME_HISTORY_KEY, []), old = Array.isArray(data) ? data.filter(x => x && typeof x.id === 'string') : []; localStorage.setItem(GAME_HISTORY_KEY, JSON.stringify([row, ...old.filter(x => x.id !== id)].slice(0, 50))); } catch (_) {}
+  }
+  if (final && typeof cloudSaveSoon === 'function') cloudSaveSoon();
 }
 function saveGame() {
   if (!gameLog || net || tut || phase === 'end' || gameFinished(gameKey())) return;
@@ -2175,6 +2180,12 @@ function openGameMenu() {
     if (a === 'cancel') {
       if (!confirmOnce(b, 'Точно отменить? Нажмите ещё раз')) return;
       if (online) { netSend({t: 'resign', g: net.gameId, p: seat}); leaveRoom(); }
+      if (gameLog && gameLog.moves && gameLog.moves.length >= 1) {
+        const me = players.find(isMe);
+        if (me) me.resigned = true;
+        markGameFinished(gameKey());
+        historySave('cancel', true);
+      }
       token++; turnTok++; stopTimer(); clearSave(); closeGameMenu(); phase = 'end';
       toastAny('Партия отменена'); return show('menu');
     }
@@ -2183,6 +2194,9 @@ function openGameMenu() {
       if (!confirmOnce(b, 'Точно сдаться? Нажмите ещё раз')) return;
       const key = 'g' + net.gameId; // a resigned player gets no gold for this game
       if (!wallet.paid.includes(key)) { wallet.paid = [key, ...wallet.paid].slice(0, 30); saveWallet(); }
+      if (seat >= 0 && players[seat]) players[seat].resigned = true;
+      markGameFinished(gameKey());
+      historySave('resign', true);
       netSend({t: 'resign', g: net.gameId, p: seat}); return closeGameMenu();
     }
     if (a === 'draw') {
@@ -2198,9 +2212,14 @@ const activeHumans = () => players.map((p, i) => i).filter(i => players[i].human
 function onResign(p) {
   const pl = players[p];
   if (pl.resigned) return;
+  pl.prevOwner = pl.owner;
   // The seat is played by a bot from now on (run by the room creator's phone).
   pl.resigned = true; pl.human = false; pl.owner = null;
   toast(`${pl.name} сдаётся`); renderPlayers();
+  if (p === mySeat() || pl.prevOwner === myId) {
+    markGameFinished(gameKey());
+    historySave('resign', true);
+  }
   if (activeHumans().length <= 1) return endGame('resign');
   if (turn === p && ['remote', 'place', 'handover', 'ai'].includes(phase)) { cancelTurn(); if (net.host) { phase = 'ai'; aiTurn(); } else waitRemote(); }
 }
@@ -3861,12 +3880,17 @@ function renderHistory(el) {
   }
   if (!rows.length) { el.innerHTML = '<p class="shint">Здесь появятся ваши партии — сыграйте первую</p>'; return; }
   const when = t => { const d = new Date(t), p = n => String(n).padStart(2, '0'); return `${p(d.getDate())}.${p(d.getMonth() + 1)} ${p(d.getHours())}:${p(d.getMinutes())}`; };
-  const wins = rows.filter(r => r.reason !== 'draw' && r.players.slice().sort((a, b) => b.score - a.score)[0].me).length;
+  const wins = rows.filter(r => {
+    if (r.reason === 'draw' || r.reason === 'cancel') return false;
+    const ps = (Array.isArray(r.players) ? r.players.slice() : []).sort((a, b) => (a.resigned ? 1 : 0) - (b.resigned ? 1 : 0) || (b.score || 0) - (a.score || 0));
+    return Boolean(ps[0] && ps[0].me && !ps[0].resigned);
+  }).length;
   const sum = `<div class="hsum"><b>${rows.length}</b> последних партий · 🏆 <b>${wins}</b> побед · онлайн <b>${rows.filter(r => /^o:/.test(r.id)).length}</b></div>`;
   el.innerHTML = sum + rows.map(r => {
-    const ps = r.players.slice().sort((a, b) => b.score - a.score), me = ps.findIndex(p => p.me), online = /^o:/.test(r.id);
-    const head = r.reason === 'draw' ? 'Ничья' : me === 0 ? '🏆 Победа' : me > 0 ? `${me + 1}-е место` : 'Партия';
-    const who = ps.map(p => `<span class="hp${p.me ? ' me' : ''}"${online && p.uid && !p.me && !p.bot ? ` data-pl="${String(p.uid).replace(/[^\w-]/g, '').slice(0, 64)}" data-n="${clean(p.name)}" data-c="${validCol(p.col) ? p.col : ''}"` : ''}><i style="--c:${validCol(p.col) ? p.col : '#5b6684'}"></i>${clean(p.name)} <b>${+p.score || 0}</b>${online && p.uid && !p.me && !p.bot && !isFriend(p.uid) ? `<button class="chip hadd" data-uid="${String(p.uid).replace(/[^\w-]/g, '').slice(0, 64)}" data-n="${clean(p.name)}">+ в друзья</button>` : ''}</span>`).join('');
+    const ps = (Array.isArray(r.players) ? r.players.slice() : []).sort((a, b) => (a.resigned ? 1 : 0) - (b.resigned ? 1 : 0) || (b.score || 0) - (a.score || 0));
+    const me = ps.findIndex(p => p.me), myPlayer = me >= 0 ? ps[me] : null, online = /^o:/.test(r.id);
+    const head = r.reason === 'draw' ? 'Ничья' : (myPlayer && myPlayer.resigned) || r.reason === 'cancel' ? 'Поражение' : me === 0 ? '🏆 Победа' : me > 0 ? `${me + 1}-е место` : 'Партия';
+    const who = ps.map(p => `<span class="hp${p.me ? ' me' : ''}"${online && p.uid && !p.me && !p.bot ? ` data-pl="${String(p.uid).replace(/[^\w-]/g, '').slice(0, 64)}" data-n="${clean(p.name)}" data-c="${validCol(p.col) ? p.col : ''}"` : ''}><i style="--c:${validCol(p.col) ? p.col : '#5b6684'}"></i>${clean(p.name)}${p.resigned ? ' <small style="color:var(--muted)">(сдался)</small>' : ''} <b>${+p.score || 0}</b>${online && p.uid && !p.me && !p.bot && !isFriend(p.uid) ? `<button class="chip hadd" data-uid="${String(p.uid).replace(/[^\w-]/g, '').slice(0, 64)}" data-n="${clean(p.name)}">+ в друзья</button>` : ''}</span>`).join('');
     return `<div class="quest hrow"><span class="qi">${online ? '🌐' : '🤖'}</span><span class="qt"><b>${head}</b><small>${when(r.at)} · ${online ? 'онлайн' : 'офлайн'}</small><span class="hps">${who}</span></span></div>`;
   }).join('');
   el.querySelectorAll('.hadd').forEach(b => { b.onclick = () => { b.disabled = true; addFriend(b.dataset.uid, b.dataset.n, 'history'); }; });
@@ -5579,9 +5603,25 @@ function cloudSync(push) {
           if (cw.name) { const mineWins = (mine.nameAt || 0) > (cw.nameAt || 0); next.name = mineWins ? mine.name : cw.name; next.nameAt = Math.max(mine.nameAt || 0, cw.nameAt || 0) || undefined; }
           if (!same(next, mine)) { applyCloudWallet(next); refreshProfileUI(); }
         }
-        if (d && d.w && same(next, syncable(JSON.parse(d.w)))) { saveBase(wallet, d.t); return; }
+        if (d && d.h) {
+          try {
+            const cloudHist = JSON.parse(d.h);
+            const localHist = jsonRead(GAME_HISTORY_KEY, []);
+            const mergedHist = (typeof PG !== 'undefined' && PG.account && PG.account.sync && PG.account.sync.mergeHistory)
+              ? PG.account.sync.mergeHistory(localHist, cloudHist)
+              : (Array.isArray(cloudHist) && cloudHist.length && !localHist.length ? cloudHist : localHist);
+            if (JSON.stringify(mergedHist) !== JSON.stringify(localHist)) {
+              localStorage.setItem(GAME_HISTORY_KEY, JSON.stringify(mergedHist));
+              if (!$('#scr-history').hidden) renderHistory($('#historyList'));
+            }
+          } catch (_) {}
+        }
+        const currentHist = jsonRead(GAME_HISTORY_KEY, []);
+        if (d && d.w && same(next, syncable(JSON.parse(d.w))) && (!Array.isArray(currentHist) || !currentHist.length || (d.h && d.h === JSON.stringify(currentHist.slice(0, 30))))) { saveBase(wallet, d.t); return; }
         if (!push && d && d.w && base && base.t === d.t && same(next, base.w)) return; // nothing new anywhere
-        const w = await fetch(url, {method: 'PUT', headers: etag ? {'if-match': etag} : {}, body: JSON.stringify({w: JSON.stringify(wallet), s: JSON.stringify(setup.seats[0]), t: {'.sv': 'timestamp'}, by: {c: myId, v: appCode(), p: installKind()}})});
+        const bodyPayload = {w: JSON.stringify(wallet), s: JSON.stringify(setup.seats[0]), t: {'.sv': 'timestamp'}, by: {c: myId, v: appCode(), p: installKind()}};
+        if (Array.isArray(currentHist) && currentHist.length) bodyPayload.h = JSON.stringify(currentHist.slice(0, 30));
+        const w = await fetch(url, {method: 'PUT', headers: etag ? {'if-match': etag} : {}, body: JSON.stringify(bodyPayload)});
         if (w.status === 412) continue; // another device saved in between: merge again
         if (w.ok) { const saved = await w.json().catch(() => null); saveBase(wallet, saved && saved.t); }
         return;
@@ -5885,10 +5925,18 @@ function show(name) {
   if (name === 'menu') { friendsDot(); (typeof bootReady === 'undefined' ? Promise.resolve() : bootReady).then(() => { (typeof syncStart === 'undefined' ? Promise.resolve() : syncStart).then(() => { setTimeout(streakCheck, 300); setTimeout(checkNameProposal, 800); }); setTimeout(notifNudge, 1600); }); }
   clearTimeout(presenceSoon); presenceSoon = setTimeout(() => presenceMark(true), 1500);
 }
+let historyReturn = 'menu';
 document.addEventListener('click', e => {
   const b = e.target.closest('[data-tab],[data-go]'); if (!b) return;
-  show(b.dataset.tab || b.dataset.go);
+  const target = b.dataset.tab || b.dataset.go;
+  if (target === 'history') {
+    const cur = document.querySelector('.screen:not([hidden])');
+    historyReturn = cur ? cur.id.replace('scr-', '') : 'menu';
+  }
+  show(target);
 });
+const hb = $('#historyBack');
+if (hb) hb.onclick = e => { e.preventDefault(); e.stopPropagation(); show(historyReturn || 'menu'); };
 $('#again').onclick = () => rematchClick();
 const mqb = $('#menuQuestBanner');
 if (mqb) mqb.onclick = () => { ptab = 'rewards'; show('progress'); };

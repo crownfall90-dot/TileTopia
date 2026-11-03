@@ -56,6 +56,22 @@ test('account/sync: encodeProfilePayload, decodeProfilePayload, and mergeWallets
   assert.equal(merged.gold, 300, 'gold takes maximum');
   assert.deepEqual(merged.promos.sort(), ['A', 'B'], 'promos union');
   assert.deepEqual(merged.owned.sort(), ['classic', 'queen'], 'cosmetics union');
+
+  // History serialization and merging
+  const {mergeHistory} = await import('../src/account/sync.js');
+  const hist = [{id: 'l:1', at: 1000, players: [{name: 'A', me: true, score: 10}]}];
+  const encodedWithH = encodeProfilePayload(wallet, seats, 1700000000, hist);
+  assert.equal(typeof encodedWithH.h, 'string');
+  const decodedWithH = decodeProfilePayload(encodedWithH);
+  assert.equal(decodedWithH.history.length, 1);
+  assert.equal(decodedWithH.history[0].id, 'l:1');
+
+  const localH = [{id: 'l:1', at: 1000, final: false, players: []}, {id: 'l:2', at: 2000, final: true, players: []}];
+  const remoteH = [{id: 'l:1', at: 1100, final: true, players: []}, {id: 'o:3', at: 3000, final: true, players: []}];
+  const mergedH = mergeHistory(localH, remoteH);
+  assert.equal(mergedH.length, 3);
+  assert.equal(mergedH[0].id, 'o:3');
+  assert.equal(mergedH.find(x => x.id === 'l:1').final, true);
 });
 
 test('account/auth: sanitizeNickname, isValidNickname, getDisplayName', async () => {
