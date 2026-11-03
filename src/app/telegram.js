@@ -80,3 +80,31 @@ export function shareRoomToTelegram(code, message = 'Присоединяйся 
   const text = `${message}\nКод комнаты: ${safeCode}`;
   return `https://t.me/share/url?url=${encodeURIComponent(url)}&text=${encodeURIComponent(text)}`;
 }
+
+export const TELEGRAM_CHANNEL_URL = 'https://t.me/diarydevelopment';
+export const TELEGRAM_SUBSCRIPTION_REWARD = 500;
+
+export function openTelegramChannel(win = typeof window !== 'undefined' ? window : null) {
+  const tg = getTelegramWebApp(win);
+  if (tg && typeof tg.openTelegramLink === 'function') {
+    try {
+      tg.openTelegramLink(TELEGRAM_CHANNEL_URL);
+      return true;
+    } catch (_) {}
+  }
+  if (win && typeof win.open === 'function') {
+    win.open(TELEGRAM_CHANNEL_URL, '_blank');
+    return true;
+  }
+  return false;
+}
+
+export function claimTelegramReward(wallet, rewardAmount = TELEGRAM_SUBSCRIPTION_REWARD) {
+  if (!wallet) return {ok: false, alreadyClaimed: false, goldAwarded: 0};
+  if (wallet.tgSubClaimed || wallet.tgReward) {
+    return {ok: false, alreadyClaimed: true, goldAwarded: 0};
+  }
+  wallet.tgSubClaimed = true;
+  wallet.gold = (wallet.gold || 0) + rewardAmount;
+  return {ok: true, alreadyClaimed: false, goldAwarded: rewardAmount};
+}

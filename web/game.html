@@ -88,8 +88,9 @@
           <div class="ltop"><button class="iconbtn" id="settingsBack" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Настройки</b></div>
           <button class="instcard" id="installBtn" hidden><span class="iic"><img src="icons/icon-192.png" alt=""></span><span class="itx"><b>Установите игру</b><small>Полноэкранный режим и офлайн-доступ</small></span><span class="igo">Как?</span></button>
           <div id="prefs"></div>
-          <div class="h3">Поддержка</div>
+          <div class="h3">Поддержка и сообщество</div>
           <div class="sgroup">
+            <button class="srow btn" id="tgChannelBtn"><span class="sic">📢</span><span class="stx"><b>Телеграм-канал</b><small id="tgChannelSub">Новости и обновления · +500 золота</small></span><span class="chip pri" id="tgChannelBadge">+500 🪙</span></button>
             <button class="srow btn" id="feedbackBtn"><span class="sic">💬</span><span class="stx"><b>Написать разработчику</b><small>Идеи и отзывы</small></span><span class="sgo">›</span></button>
             <button class="srow btn" id="nameProposalBtn"><span class="sic">💡</span><span class="stx"><b>Конкурс на новое название</b><small id="nameProposalSub">Придумайте имя игры · +100 золота</small></span><span class="sgo">›</span></button>
           </div>
@@ -2135,6 +2136,7 @@ function renderPrefs() {
   try { renderInstall(); } catch (_) {} // the web shell may not be set up yet on the first call
   devGet('devToken'); $('#devBtn').hidden = !devGet('devPanel');
   if (typeof updateNameProposalBtnLabel === 'function') updateNameProposalBtnLabel();
+  if (typeof updateTgChannelBtn === 'function') updateTgChannelBtn();
 }
 $('#prefs').addEventListener('click', e => {
   const sw = e.target.closest('.tgl'), b = e.target.closest('.mseg button'); if (!sw && !b) return;
@@ -3155,9 +3157,9 @@ $('#myColor').addEventListener('click', e => {
   wallet.color = sw.dataset.sw; saveWallet(); renderMyColor();
   if (net) netSend({t: 'hello', v2: 1, st: myStatus(), id: myId, uid: myUid(), reg: registered() ? 1 : 0, name: myName(), fig: wallet.fig, col: wallet.color});
 });
-$('#create').onclick = () => openSetup('friends');
+$('#create').onclick = () => createRoom();
 const newCode = () => (PG.net && PG.net.rooms) ? PG.net.rooms.newCode() : (() => { const A = 'ABCDEFGHJKLMNPQRSTUVWXYZ23456789'; return Array.from({length: 5}, () => A[(Math.random() * A.length) | 0]).join(''); })();
-async function createRoom() { if (!(await serverReachable())) return noServer(createRoom); connect(newCode(), true); net.max = setup.onN || 4; show('lobby'); }
+async function createRoom() { if (!(await serverReachable())) return noServer(createRoom); connect(newCode(), true); net.max = setup.onN || 4; friendsBack = 'lobby'; show('lobby'); }
 function tickOpenMatch() {
   if (!net || !net.host || !net.openMatch || net.gameId || (typeof phase !== 'undefined' && phase === 'play')) return;
   const seats = net.lobby && net.lobby.seats ? net.lobby.seats : [];
@@ -4623,7 +4625,7 @@ function renderLobbyFriends() {
 function renderFriends() {
   const box = $('#flist'); if (!box || $('#scr-friends').hidden) return;
   const gate = !FB || !registered();
-  $('#fGate').hidden = !gate; $('#fMine').hidden = gate; $('#fJoinRow').hidden = gate;
+  $('#fGate').hidden = !gate; $('#fMine').hidden = gate; $('#fJoinRow').hidden = gate; $('#fRoom').hidden = gate;
   if (!FB) { $('#fGate').innerHTML = '<p>Друзья доступны в приложении с интернетом</p>'; box.innerHTML = ''; return; }
   if (gate) {
     const step = !wallet.name ? ['Придумайте никнейм', 'fgName'] : ['Войти или создать профиль', 'fgLogin'];
@@ -4635,7 +4637,9 @@ function renderFriends() {
   $('#fErr').hidden = has || !fcodeErr; $('#fCopy').hidden = !has; $('#fTap').hidden = !has;
   if (!has && fcodeErr) $('#fErr').firstChild.textContent = fcodeErr === 'rules' ? 'Друзья пока недоступны: сервер игры ещё не обновлён. Скоро заработает.' : 'Нет связи с сервером — проверьте интернет.';
   const room = net && !net.quick && !(net.gameId && phase !== 'end') ? net.code : null;
-  $('#fRoom').hidden = !room; if (room) $('#fRoom').innerHTML = `<span>Ваша комната <b>${room}</b>. Друзьям, которых вы позовёте, придёт приглашение</span><button class="chip go" data-froom>Открыть комнату</button>`;
+  $('#fRoom').hidden = false;
+  if (room) $('#fRoom').innerHTML = `<span>Ваша комната <b>${room}</b>. Друзьям, которых вы позовёте, придёт приглашение</span><button class="chip go" data-froom>Открыть комнату</button>`;
+  else $('#fRoom').innerHTML = `<span>Создайте комнату для совместной игры с друзьями</span><button class="chip go" data-fcreate>🎮 Создать комнату</button>`;
   const reqs = Object.entries(inbox).filter(([, v]) => v.k === 'f'), invs = Object.entries(inbox).filter(([, v]) => v.k === 'r');
   const on = friends.filter(f => f.on), off = friends.filter(f => f.mutual && !f.on), wait = friends.filter(f => !f.mutual);
   box.innerHTML = (typeof PG !== 'undefined' && PG.net && PG.net.friends && PG.net.friends.renderFriendsListHtml)
@@ -4665,6 +4669,7 @@ $('#scr-friends').addEventListener('click', e => {
   const t = e.target.closest('button'); if (!t) return;
   const d = t.dataset;
   if ('froom' in d) show('lobby');
+  else if ('fcreate' in d) createRoom();
   else if (d.finv) inviteFriend(d.finv);
   else if (d.facc) acceptFriend(d.facc);
   else if (d.fjoin) joinInvite(d.fjoin);
@@ -5078,6 +5083,127 @@ function updateNameProposalBtnLabel() {
   }
 }
 
+function openTelegramLink() {
+  const url = 'https://t.me/diarydevelopment';
+  if (typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === 'function') {
+    try { window.Telegram.WebApp.openTelegramLink(url); } catch (_) { window.open(url, '_blank'); }
+  } else {
+    window.open(url, '_blank');
+  }
+}
+
+function updateTgChannelBtn() {
+  const sub = document.getElementById('tgChannelSub');
+  const badge = document.getElementById('tgChannelBadge');
+  if (!sub) return;
+  const claimed = !!(wallet && (wallet.tgSubClaimed || wallet.tgReward));
+  let visited = false;
+  try { visited = !!sessionStorage.getItem('tg_visited'); } catch (_) {}
+  if (claimed) {
+    sub.textContent = 'Вы подписаны на канал · награда получена';
+    if (badge) {
+      badge.textContent = '✓ 500';
+      badge.className = 'chip ok';
+    }
+  } else if (visited) {
+    sub.innerHTML = 'Нажмите «Я подписался» · <b style="color:var(--brass)">Забрать +500</b>';
+    if (badge) {
+      badge.textContent = 'Забрать 🪙';
+      badge.className = 'chip pri';
+    }
+  } else {
+    sub.innerHTML = 'Новости и обновления · <b style="color:var(--brass)">+500 золота</b>';
+    if (badge) {
+      badge.textContent = '+500 🪙';
+      badge.className = 'chip pri';
+    }
+  }
+}
+
+function claimTgSubscriptionReward() {
+  const claimFn = (typeof PG !== 'undefined' && PG.app && PG.app.telegram && PG.app.telegram.claimTelegramReward)
+    ? PG.app.telegram.claimTelegramReward
+    : (w, amt) => {
+      if (!w || w.tgSubClaimed || w.tgReward) return {ok: false};
+      w.tgSubClaimed = true;
+      w.gold = (w.gold || 0) + amt;
+      return {ok: true, goldAwarded: amt};
+    };
+
+  const res = claimFn(wallet, 500);
+  if (res && res.ok) {
+    saveWallet();
+    beep('coin');
+    track('claim_tg_subscription_reward', {gold: 500});
+    toastAny('🎉 Спасибо за подписку! Вам начислено +500 золота');
+    updateTgChannelBtn();
+    renderAccount();
+    if (typeof renderMenuProfile === 'function') renderMenuProfile();
+  } else {
+    toastAny('Вы уже получили награду за подписку');
+  }
+}
+
+function showTelegramDialog() {
+  const old = document.getElementById('tgSubBox'); if (old) old.remove();
+  const box = document.createElement('div');
+  box.className = 'over';
+  box.id = 'tgSubBox';
+  box.style.position = 'fixed';
+  let visited = false;
+  try { visited = !!sessionStorage.getItem('tg_visited'); } catch (_) {}
+
+  const renderContent = () => {
+    box.innerHTML = `<div class="ocard prof tg-dialog">
+      <div style="font-size:44px">📢</div>
+      <h3>Телеграм-канал игры</h3>
+      <p>Подпишитесь на официальный канал <b>@diarydevelopment</b>, чтобы первыми получать промокоды, анонсы турниров и общаться с игроками!</p>
+      <div class="tg-reward-box">
+        <span>🎁 Награда за подписку:</span>
+        <b>+500 золота</b>
+      </div>
+      <button class="cta wide" id="tgGoBtn">${visited ? '✓ Канал открыт (перейти ещё раз)' : '1. Перейти в канал'}</button>
+      <button class="${visited ? 'cta wide' : 'ghostbtn wide'}" id="tgClaimBtn" style="${visited ? 'background:linear-gradient(180deg,#55d688 0%,#3fc27a 100%);color:#0b2214;font-weight:700;' : ''}">2. Я подписался · Забрать 500 🪙</button>
+      <button class="ghostbtn" id="tgCloseBtn">Закрыть</button>
+    </div>`;
+  };
+  renderContent();
+  document.body.append(box);
+
+  box.onclick = e => {
+    if (e.target === box || e.target.id === 'tgCloseBtn') return box.remove();
+    if (e.target.id === 'tgGoBtn') {
+      visited = true;
+      try { sessionStorage.setItem('tg_visited', '1'); } catch (_) {}
+      openTelegramLink();
+      toastAny('Перейдите в канал, подпишитесь и возвращайтесь за наградой!');
+      renderContent();
+      updateTgChannelBtn();
+    } else if (e.target.id === 'tgClaimBtn') {
+      if (!visited) {
+        visited = true;
+        try { sessionStorage.setItem('tg_visited', '1'); } catch (_) {}
+        openTelegramLink();
+        toastAny('Сначала откройте канал и подпишитесь, затем нажмите «Я подписался»!');
+        renderContent();
+        return;
+      }
+      box.remove();
+      claimTgSubscriptionReward();
+    }
+  };
+}
+
+function openTelegramChannel() {
+  const claimed = !!(wallet && (wallet.tgSubClaimed || wallet.tgReward));
+  if (claimed) {
+    openTelegramLink();
+    toastAny('Открываем канал @diarydevelopment…');
+  } else {
+    showTelegramDialog();
+  }
+}
+
 function showNameProposalDialog(force) {
   return; // the name contest is over: the game is called Tiletopia
   if (document.getElementById('nameProposalBox')) return;
@@ -5233,6 +5359,7 @@ function checkNameProposal(force) {
   showNameProposalDialog(force);
 }
 
+if ($('#tgChannelBtn')) $('#tgChannelBtn').onclick = openTelegramChannel;
 if ($('#feedbackBtn')) $('#feedbackBtn').onclick = openFeedback;
 if ($('#nameProposalBtn')) $('#nameProposalBtn').onclick = () => showNameProposalDialog(true);
 if (FB) setTimeout(() => { if (registered()) { inboxListen(); inboxPoll(); loadFriends().then(friendsDot).catch(() => {}); } }, 2500);
