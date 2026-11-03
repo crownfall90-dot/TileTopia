@@ -15,7 +15,7 @@ test('play: in-app deletion path, web deletion page and policy are there and agr
   assert.match(game, /async function deleteMyAccount\(\)/);
   for (const p of ['profiles/', 'presence/', 'leaders/', 'friends/', 'inbox/', 'logs/', 'feedback/', 'suggestions/names/', 'playerNo/', 'fcodeOf/']) assert.ok(game.includes(`'${p}'`), 'deletes ' + p);
   assert.match(game, /idt\('delete'/, 'deletes the sign-in too');
-  assert.match(game, /data-hacct="del"/, 'profile card has a delete button');
+  assert.ok(!game.includes('data-hacct="del"'), 'profile card does not have delete button (moved exclusively to Settings)');
   assert.match(game, /id="plReport"/, 'a player can be reported (user-generated nicknames and statuses)');
   const page = read('web/delete-account.html');
   assert.match(page, /Settings → Account and data/);
