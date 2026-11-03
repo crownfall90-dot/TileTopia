@@ -111,14 +111,23 @@ export function renderHistoryHtml(rows = [], isFriendFn = () => false) {
     const d = new Date(t), p = n => String(n).padStart(2, '0');
     return `${p(d.getDate())}.${p(d.getMonth() + 1)} ${p(d.getHours())}:${p(d.getMinutes())}`;
   };
-  const wins = rows.filter(r => r.reason !== 'draw' && r.players.slice().sort((a, b) => b.score - a.score)[0].me).length;
+  const wins = rows.filter(r => {
+    if (r.reason === 'draw' || r.reason === 'cancel') return false;
+    const ps = (Array.isArray(r.players) ? r.players.slice() : []).sort((a, b) => (a.resigned ? 1 : 0) - (b.resigned ? 1 : 0) || (b.score || 0) - (a.score || 0));
+    return Boolean(ps[0] && ps[0].me && !ps[0].resigned);
+  }).length;
   const sum = `<div class="hsum"><b>${rows.length}</b> последних партий · 🏆 <b>${wins}</b> побед · онлайн <b>${rows.filter(r => /^o:/.test(r.id)).length}</b></div>`;
 
   return sum + rows.map(r => {
-    const ps = r.players.slice().sort((a, b) => b.score - a.score);
+    const ps = (Array.isArray(r.players) ? r.players.slice() : []).sort((a, b) => (a.resigned ? 1 : 0) - (b.resigned ? 1 : 0) || (b.score || 0) - (a.score || 0));
     const me = ps.findIndex(p => p.me);
+    const myPlayer = me >= 0 ? ps[me] : null;
     const online = /^o:/.test(r.id);
-    const head = r.reason === 'draw' ? 'Ничья' : me === 0 ? '🏆 Победа' : me > 0 ? `${me + 1}-е место` : 'Партия';
+    const head = r.reason === 'draw' ? 'Ничья'
+      : (myPlayer && myPlayer.resigned) || r.reason === 'cancel' ? 'Поражение'
+      : me === 0 ? '🏆 Победа'
+      : me > 0 ? `${me + 1}-е место`
+      : 'Партия';
     const who = ps.map(p => {
       const cleanName = String(p.name || 'Игрок').replace(/[<>&"]/g, '');
       const validCol = typeof p.col === 'string' && /^#[0-9a-f]{6}$/i.test(p.col) ? p.col : '';
@@ -126,7 +135,8 @@ export function renderHistoryHtml(rows = [], isFriendFn = () => false) {
       const isFr = isFriendFn(p.uid);
       const plData = (online && p.uid && !p.me && !p.bot) ? ` data-pl="${uidStr}" data-n="${cleanName}" data-c="${validCol}"` : '';
       const addBtn = (online && p.uid && !p.me && !p.bot && !isFr) ? `<button class="chip hadd" data-uid="${uidStr}" data-n="${cleanName}">+ в друзья</button>` : '';
-      return `<span class="hp${p.me ? ' me' : ''}"${plData}><i style="--c:${validCol || '#5b6684'}"></i>${cleanName} <b>${+p.score || 0}</b>${addBtn}</span>`;
+      const resignedTag = p.resigned ? ' <small style="color:var(--muted)">(сдался)</small>' : '';
+      return `<span class="hp${p.me ? ' me' : ''}"${plData}><i style="--c:${validCol || '#5b6684'}"></i>${cleanName}${resignedTag} <b>${+p.score || 0}</b>${addBtn}</span>`;
     }).join('');
     return `<div class="quest hrow"><span class="qi">${online ? '🌐' : '🤖'}</span><span class="qt"><b>${head}</b><small>${when(r.at)} · ${online ? 'онлайн' : 'офлайн'}</small><span class="hps">${who}</span></span></div>`;
   }).join('');
