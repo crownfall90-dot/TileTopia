@@ -63,9 +63,9 @@ export function renderFriendsListHtml({
   if (reqs.length) {
     h += `<div class="h3 fsec-hdr"><span>📩</span><b>Заявки в друзья</b><em>${reqs.length}</em></div><ul class="flist">${reqs.map(([k, v]) => fRow({n: cleanFn(v.n), c: '#f2b84b', uid: v.u}, `<button class="chip go" data-facc="${k.slice(0, -2)}">Принять</button><button class="chip x" data-fdrop="${k}" aria-label="Отклонить">✕</button>`, 'хочет дружить')).join('')}</ul>`;
   }
-  h += `<div class="h3 fsec-hdr"><span>🟢</span><b>В сети · ${on.length}</b></div><ul class="flist">${on.map(f => fRow(f, `<button class="chip go" data-finv="${f.uid}">${room && invited.code === room && invited.joined && invited.joined.has(f.uid) ? '✓ Принял' : room && invited.code === room && invited.uids && invited.uids.has(f.uid) ? 'Ещё раз' : 'Позвать'}</button>`, (f.p && stateTextMap[f.p.s]) || 'в игре')).join('') || '<li class="qnote fempty-note">Никого из друзей нет в сети</li>'}</ul>`;
+  h += `<div class="h3 fsec-hdr"><span class="fdot on"></span><b>В сети</b></div><ul class="flist">${on.map(f => fRow(f, `<button class="chip go" data-finv="${f.uid}">${room && invited.code === room && invited.joined && invited.joined.has(f.uid) ? '✓ Принял' : room && invited.code === room && invited.uids && invited.uids.has(f.uid) ? 'Ещё раз' : 'Позвать'}</button>`, (f.p && stateTextMap[f.p.s]) || 'в игре')).join('') || '<li class="qnote fempty-note">Никого из друзей нет в сети</li>'}</ul>`;
   if (off.length) {
-    h += `<div class="h3 fsec-hdr"><span>⚪</span><b>Не в сети · ${off.length}</b></div><ul class="flist">${off.map(f => fRow(f, `<button class="chip x" data-fdel="${f.uid}" aria-label="Удалить из друзей">✕</button>`, agoTextFn(f.p && f.p.t))).join('')}</ul>`;
+    h += `<div class="h3 fsec-hdr"><span class="fdot off"></span><b>Не в сети</b></div><ul class="flist">${off.map(f => fRow(f, `<button class="chip x" data-fdel="${f.uid}" aria-label="Удалить из друзей">✕</button>`, agoTextFn(f.p && f.p.t))).join('')}</ul>`;
   }
   if (wait.length) {
     h += `<div class="h3 fsec-hdr"><span>⏳</span><b>Ждут ответа</b><em>${wait.length}</em></div><ul class="flist">${wait.map(f => fRow(f, `<button class="chip x" data-fdel="${f.uid}" aria-label="Отменить заявку">✕</button>`, 'заявка отправлена')).join('')}</ul>`;

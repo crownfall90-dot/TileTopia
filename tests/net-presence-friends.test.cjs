@@ -112,10 +112,12 @@ test('net/friends: cleanFriendCode, formatInvitePayload, formatFriendRequestPayl
   assert.ok(listHtml.includes('Заявки в друзья'));
   assert.ok(listHtml.includes('Саша'));
   assert.ok(listHtml.includes('data-facc="u2"'));
-  assert.ok(listHtml.includes('В сети · 1'));
+  assert.ok(listHtml.includes('В сети'));
+  assert.ok(!listHtml.includes('В сети ·'));
   assert.ok(listHtml.includes('Даша'));
   assert.ok(listHtml.includes('Ещё раз'));
-  assert.ok(listHtml.includes('Не в сети · 1'));
+  assert.ok(listHtml.includes('Не в сети'));
+  assert.ok(!listHtml.includes('Не в сети ·'));
   assert.ok(listHtml.includes('Коля'));
   assert.ok(listHtml.includes('Ждут ответа'));
   assert.ok(listHtml.includes('Миша'));

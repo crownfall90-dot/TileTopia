@@ -278,6 +278,11 @@ html.app .saybtn:not([hidden])+.deck{margin-left:0}
 .bnav button:active{transform:scale(.93)}
 .bnav button.hasdot::after{content:"";position:absolute;top:5px;right:calc(50% - 19px);width:10px;height:10px;border-radius:50%;background:#ef5350;border:2px solid #1c2650;box-shadow:0 0 8px rgba(239,83,80,.7)}
 .bnav .fnum{bottom:auto;top:20px;right:calc(50% - 18px);border-color:#1c2650}
+.fnav-label{display:inline-flex;align-items:center;position:relative}
+.fnav-dot{display:inline-block;width:7px;height:7px;border-radius:50%;background:#3fc27a;box-shadow:0 0 6px rgba(63,194,122,.85);margin-left:4px;vertical-align:middle;flex:0 0 7px}
+.fdot{display:inline-block;width:8px;height:8px;border-radius:50%;margin-right:6px;vertical-align:middle;flex:0 0 8px}
+.fdot.on{background:#3fc27a;box-shadow:0 0 6px rgba(63,194,122,.7)}
+.fdot.off{background:#5b6684}
 .scr.hasnav .screen{padding-bottom:calc(92px + var(--ib,0px))}
 .coach{position:absolute;left:12px;right:62px;z-index:9;display:flex;align-items:center;gap:12px;padding:12px 14px 16px;border-radius:18px;background:linear-gradient(160deg,#2b3f75,#1b2547);border:1.5px solid rgba(242,184,75,.6);box-shadow:0 14px 34px rgba(0,0,0,.45);animation:chestpop .3s ease-out;overflow:hidden}
 .coach .cic{font-size:28px;flex:0 0 auto;animation:wob 2.4s ease-in-out infinite}
