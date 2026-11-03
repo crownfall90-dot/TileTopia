@@ -93,15 +93,11 @@
             <button class="srow btn" id="feedbackBtn"><span class="sic">💬</span><span class="stx"><b>Написать разработчику</b><small>Идеи и отзывы</small></span><span class="sgo">›</span></button>
             <button class="srow btn" id="nameProposalBtn"><span class="sic">💡</span><span class="stx"><b>Конкурс на новое название</b><small id="nameProposalSub">Придумайте имя игры · +100 золота</small></span><span class="sgo">›</span></button>
           </div>
-          <div class="h3">Аккаунт и данные</div>
-          <div class="sgroup">
-            <button class="srow btn" id="delAccBtn"><span class="sic">🗑️</span><span class="stx"><b>Удалить аккаунт и данные</b><small>Профиль, золото, друзья и рейтинг будут удалены навсегда</small></span><span class="sgo">›</span></button>
-            <a class="srow btn" href="https://crownfall90-dot.github.io/play/delete-account.html" target="_blank" rel="noopener"><span class="sic">📄</span><span class="stx"><b>Как удалить данные</b><small>Страница с инструкцией и сроками хранения</small></span><span class="sgo">›</span></a>
-          </div>
           <div class="h3">О приложении</div>
           <div class="sgroup">
             <div class="srow"><span class="sic">ℹ️</span><span class="stx"><b>Версия</b></span><b class="sval" id="verFull">—</b></div>
             <button class="srow btn" id="checkUpd"><span class="sic">🔄</span><span class="stx"><b>Проверить обновления</b></span><span class="sgo">›</span></button>
+            <button class="srow btn" id="delAccBtn"><span class="sic">🗂️</span><span class="stx"><b>Аккаунт и данные</b><small>Управление данными и удаление аккаунта</small></span><span class="sgo">›</span></button>
             <a class="srow btn" href="https://crownfall90-dot.github.io/play/privacy.html" target="_blank" rel="noopener"><span class="sic">🔒</span><span class="stx"><b>Политика конфиденциальности</b></span><span class="sgo">›</span></a>
             <button class="srow btn" id="devBtn" hidden><span class="sic">📣</span><span class="stx"><b>Панель владельца</b></span><span class="sgo">›</span></button>
           </div>
@@ -5767,10 +5763,29 @@ function renderAccount() {
    them in other lists, inbox, event log, feedback, name suggestions, friend code), then the sign-in itself (Firebase
    Authentication), then everything on this phone. What cannot be removed from here: room messages (cleaned up
    after 7 days) and aggregated, non-personal analytics. See docs/product/GOOGLE-PLAY-DATA-SAFETY.md. */
+function confirmWordDialog(word, title, promptHtml, btnText, onConfirm) {
+  const box = document.createElement('div'); box.className = 'over'; box.style.position = 'fixed';
+  box.innerHTML = `<div class="ocard acc"><h3>${title}</h3><p style="font-size:14px;color:var(--muted);margin:0 0 14px">${promptHtml}</p><input class="field" id="cwInp" maxlength="20" placeholder="${word}" autocomplete="off" autocapitalize="characters" style="margin-bottom:14px;text-align:center;font-weight:700;letter-spacing:1px"><button class="cta wide" id="cwGo" disabled style="background:#ef5350;margin-bottom:8px">${btnText}</button><button class="ghostbtn" id="cwNo">Отмена</button></div>`;
+  document.body.append(box);
+  const inp = box.querySelector('#cwInp'), go = box.querySelector('#cwGo'), no = box.querySelector('#cwNo');
+  inp.oninput = () => { go.disabled = clean(inp.value).trim().toUpperCase() !== word.toUpperCase(); };
+  no.onclick = () => box.remove();
+  go.onclick = () => { box.remove(); if (typeof onConfirm === 'function') onConfirm(); };
+  setTimeout(() => inp.focus(), 200);
+}
 function askDeleteAccount() {
   confirmBox('Удалить аккаунт и все данные?<br><small style="font-weight:500;color:var(--muted)">Профиль, уровень, золото, фигурки, друзья и место в рейтинге будут удалены с сервера и с этого телефона. Отменить это нельзя.</small>', 'Продолжить', () => {
-    confirmBox('Точно удалить навсегда?<br><small style="font-weight:500;color:var(--muted)">Вернуть прогресс будет невозможно.</small>', 'Да, удалить', deleteMyAccount);
+    confirmBox('Точно удалить навсегда?<br><small style="font-weight:500;color:var(--muted)">Вернуть прогресс будет невозможно. Все достижения, золото и предметы сгорят навсегда.</small>', 'Я понимаю риски', () => {
+      confirmWordDialog('УДАЛИТЬ', 'Удаление аккаунта', 'Чтобы случайно не удалить аккаунт, введите слово <b>УДАЛИТЬ</b> для подтверждения:', 'Удалить аккаунт навсегда', deleteMyAccount);
+    });
   });
+}
+function accountDataDialog() {
+  const box = document.createElement('div'); box.className = 'over'; box.style.position = 'fixed';
+  box.innerHTML = `<div class="ocard acc"><h3>Аккаунт и данные</h3><p style="font-size:14px;color:var(--muted);margin:0 0 16px">Управление вашими данными в игре Tiletopia</p><div class="sgroup" style="margin-bottom:16px"><a class="srow btn" href="https://crownfall90-dot.github.io/play/delete-account.html" target="_blank" rel="noopener"><span class="sic">📄</span><span class="stx"><b>Как удалить данные</b><small>Инструкция и сроки хранения</small></span><span class="sgo">›</span></a><button class="srow btn" id="dlgDelAction"><span class="sic">🗑️</span><span class="stx"><b style="color:#ef5350">Удалить аккаунт и данные</b><small>Безвозвратное удаление всех данных</small></span><span class="sgo">›</span></button></div><button class="ghostbtn" id="accDataClose">Закрыть</button></div>`;
+  document.body.append(box);
+  box.querySelector('#accDataClose').onclick = () => box.remove();
+  box.querySelector('#dlgDelAction').onclick = () => { box.remove(); askDeleteAccount(); };
 }
 async function deleteMyAccount() {
   if (!FB) return toastAny('Удаление доступно в версии с интернетом');
@@ -5802,7 +5817,7 @@ async function deleteMyAccount() {
     toastAny('Не удалось удалить данные: проверьте интернет и попробуйте ещё раз');
   }
 }
-$('#delAccBtn').onclick = askDeleteAccount;
+$('#delAccBtn').onclick = accountDataDialog;
 async function signOut() {
   toastAny('Выходим…');
   try { await Promise.race([cloudSync(true), new Promise(r => setTimeout(r, 5000))]); } catch (_) {}
@@ -6056,20 +6071,17 @@ window.onUpdateAvailable = (info, manual) => {
   if (net && net.gameId && phase !== 'end' && info.code > appCode() && !(net.upd && net.upd.c >= info.code) && players.some(p => p.owner === myId)) { netSend({t: 'upd', g: net.gameId, c: info.code}); updOpen(info.code); }
   if (updBox && document.body.contains(updBox)) return;
   boot.checked = true;
-  // "Later" quiets this version for half an hour unless the player asked to check.
-  if (!manual && updLater[info.version] && Date.now() - updLater[info.version] < 30 * 60 * 1000) return;
   const box = updBox = document.createElement('div'); box.className = 'over'; box.style.position = 'fixed';
-  box.innerHTML = `<div class="ocard"><h3>Вышло обновление ${info.version}</h3><p>Что нового:</p><div class="notes-list"></div><div class="prog" hidden><i></i></div><button class="cta wide" id="upd">Обновить</button><a class="ghostbtn manual" id="manual" hidden href="https://github.com/crownfall90-dot/play/releases/latest">Скачать вручную</a><button class="ghostbtn" id="later">Позже</button></div>`;
+  box.innerHTML = `<div class="ocard"><h3>Вышло обновление ${info.version}</h3><p>Что нового:</p><div class="notes-list"></div><div class="prog" hidden><i></i></div><button class="cta wide" id="upd">Обновить</button><a class="ghostbtn manual" id="manual" hidden href="https://github.com/crownfall90-dot/play/releases/latest">Скачать вручную</a></div>`;
   box.querySelector('.notes-list').textContent = info.notes || 'Исправления и улучшения';
   if (players.length && phase !== 'end' && phase !== 'idle') box.querySelector('p').textContent = (net ? 'Партия на паузе: после обновления вернитесь в комнату — игра продолжится, когда обновятся все. ' : 'Партия сохранится. ') + 'Что нового:';
   document.body.append(box);
-  // Offered on the splash: the dialog sits above it and "Later" opens the game.
+  // Offered on the splash: the dialog sits above it.
   if (!boot.gone) {
     boot.update = true; box.style.zIndex = 101; box.style.background = 'linear-gradient(transparent 35%,rgba(8,12,24,.75))'; box.style.backdropFilter = 'none'; box.style.alignItems = 'flex-end'; box.style.paddingBottom = 'calc(24px + var(--ib,0px))';
     const s = document.querySelector('#boot small'); if (s) s.textContent = 'Доступна новая версия';
     const bt = $('#boot'); if (bt) bt.classList.add('withupd');
   }
-  box.querySelector('#later').onclick = () => { updLater[info.version] = Date.now(); box.remove(); if (boot.update) { boot.update = false; bootHide(); } };
   box.querySelector('#upd').onclick = e => { e.currentTarget.disabled = true; e.currentTarget.textContent = 'Скачиваем…'; box.querySelector('.prog').hidden = false; AndroidApp.startUpdate(info.url); };
   window.onUpdateProgress = pct => { const i = box.querySelector('.prog i'); if (i) i.style.width = pct + '%'; };
   // If installing fails, the release page in the browser is the way out.
