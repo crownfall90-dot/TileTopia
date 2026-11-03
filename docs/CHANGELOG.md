@@ -2056,3 +2056,18 @@
 - feat(ui): планшеты — колонка по центру; создание профиля переделано; цвет игрока в рейтинге и у друзей
 - docs(release): журнал изменений 1.0.253
 
+## 1.0.255 — 2026-11-03
+
+**Игрокам:**
+- Убран красный кружок у золота в магазине
+- Если обновить приложение нельзя, показывается одна кнопка «Скачать новую версию вручную»
+
+**В коде:**
+- Merge pull request #241 from crownfall90-dot/dev/stage2-account-network-20261029
+- fix(update): убран красный кружок у золота; одна кнопка ручной загрузки при невозможном обновлении
+- chore(firebase): google-services.json с Android OAuth-клиентами для app.crownfall.tiletopia
+- fix(update): старые версии распознают смену подписи/пакета через package и cert в latest.json и предлагают переустановку
+- docs: record actual account regression and staging build results
+- docs(release): журнал изменений 1.0.254
+
+
