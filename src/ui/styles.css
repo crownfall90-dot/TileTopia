@@ -1205,3 +1205,21 @@ html.app .screen.scroll{--sp:var(--it,0px);padding-top:0}/* the status-bar gap i
 .loc.locked .badge{background:rgba(10,14,26,.85);color:var(--muted);border:1px solid rgba(255,255,255,.14);box-shadow:none}
 
 #nameProposalBtn{display:none!important}
+
+/* tablets and large screens in the app: the game stays a phone-sized column in the middle instead of stretching (the
+   buttons, cards and the board were drawn at phone proportions, which looked huge and shifted on a 11" tablet) */
+@media (min-width:700px){
+  html.app body{display:flex;justify-content:center;background:radial-gradient(1100px 700px at 50% 0%,#1a2650,#0a0f20 70%)}
+  html.app .page{width:min(100%,560px);max-width:560px}
+  html.app .phone{max-width:560px;margin:0 auto;box-shadow:0 0 0 1px rgba(255,255,255,.07),0 0 80px rgba(0,0,0,.55)}
+}
+@media (min-width:1100px){html.app .page{width:min(100%,620px);max-width:620px}html.app .phone{max-width:620px}}
+/* profile creation: a clear column — avatar, nickname with a dice, colour swatches, buttons */
+.newprof{width:min(360px,92vw);max-width:none;text-align:center}
+.newprof p{margin:2px 0 12px;font-size:13px;color:var(--muted)}
+.newprof .plabel{display:block;text-align:left;font:700 11.5px var(--f-display);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:10px 2px 6px}
+.newprof .nickrow{display:flex;gap:8px;align-items:stretch}.newprof .nickrow .field{flex:1;min-width:0;text-align:left}
+.newprof .dicebtn{flex:0 0 46px;border-radius:12px;background:rgba(255,255,255,.07);border:1px solid var(--line);font-size:21px;cursor:pointer}
+.newprof .cpick{flex-wrap:nowrap;justify-content:space-between;gap:6px;margin:2px 0 14px;padding:4px 2px}.newprof .cpick button{width:34px;height:34px;flex:0 0 auto}
+.newprof .cpick button[aria-checked="true"]{outline:3px solid #fff;outline-offset:2px}
+.newprof .cta{margin-top:2px}

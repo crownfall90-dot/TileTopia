@@ -204,7 +204,8 @@ class Updater {
                 android.content.pm.PackageInstaller pi = activity.getPackageManager().getPackageInstaller();
                 android.content.pm.PackageInstaller.SessionParams params = new android.content.pm.PackageInstaller.SessionParams(
                         android.content.pm.PackageInstaller.SessionParams.MODE_FULL_INSTALL);
-                params.setAppPackageName(activity.getPackageName());
+                // No setAppPackageName: since the rebrand the APK is app.crownfall.tiletopia, while phones that
+                // still have the old com.crownfall.mosaic would reject a session pinned to their own package.
                 params.setSize(apk.length());
                 int id = pi.createSession(params);
                 try (android.content.pm.PackageInstaller.Session session = pi.openSession(id)) {

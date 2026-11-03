@@ -1957,3 +1957,87 @@
 - Merge pull request #233 from crownfall90-dot/docs/release-1.0.249
 - docs(release): журнал изменений 1.0.249
 
+## 1.0.251 — 2026-11-02
+
+**Игрокам:**
+- Редизайн онлайн-лобби: удобные карточки создания комнаты и подключения по 5-значному коду
+- Исправлено отображение игроков в партии: ровные карточки без перекрытий с четкими фишками и счётом
+- Расширенная коллекция быстрых эмоций: 18 ярких реакций с праздничными искрами и 18 фраз
+- Витрина локаций стола в гардеробе: компактная сетка по 2 в ряд с плашками «Открыта» и «Скоро»
+- Улучшенный вход через Google и мягкое сохранение прогресса без потери наград
+- Подбор никнеймов по кубику 🎲 и выбор сложности ботов в комнатах с друзьями
+
+**В коде:**
+- Merge pull request #236 from crownfall90-dot/dev/stage2-account-network-20261029
+- fix(ci): добавить надёжный fallback для release-notes в promote-production
+- feat(admin): clear releases dashboard, accurate live stats and empty guest separation
+- docs: record actual account regression and staging build results
+- feat(ui): redesign online lobby, fix player HUD display, expand emotes, 2-column upcoming locations
+- docs: record actual account regression and staging build results
+- fix(auth): handle CREDENTIAL_ALREADY_IN_USE on Google sign-in and robust ID token extraction
+- docs: record actual account regression and staging build results
+- fix(staging): build release candidate with com.crownfall.mosaic and release key for working Google Sign-In
+- docs(release): prepare release-notes for 1.0.251, fix wrap-web encoding
+- docs: record actual account regression and staging build results
+- feat(ux): universal nickname dice generator, board location themes, offline bot emotes, soft save prompt
+- docs: record actual account regression and staging build results
+- feat(ui,admin): relocate history tab to top-right menu button, filter empty guests, add match stats and human action logs
+- docs: record actual account regression and staging build results
+- feat(items): витрина профиля с примеркой рамок и статусом, обновление локаций, выбор сложности ботов в лобби
+- docs: record actual account regression and staging build results
+- feat(ui): редизайн лобби, переключатель кубков, устранение лагов приглашений и выбор звёзд в отзывах
+- docs(security): отметить публикацию правил Firebase S-2 в бэклоге и передаче
+- docs: record actual account regression and staging build results
+- ci: добавить workflow_dispatch для account-verify
+- fix(staging): добавить InstallResult и REQUEST_INSTALL_PACKAGES для Updater
+- docs: record actual account regression and staging build results
+- feat(staging): включить интернет, Firebase и полный функционал в тестовой сборке
+- Merge pull request #235 from crownfall90-dot/docs/release-1.0.250
+- docs(release): журнал изменений 1.0.250
+
+## 1.0.252 — 2026-11-02
+
+**Игрокам:**
+- Поддержка Telegram Mini App: играйте прямо внутри Telegram в боте с тактильным откликом и удобным входом
+- Совместная игра с друзьями против онлайна: выбор размера партии от 2 до 5 игроков
+- Открытые комнаты: переключатель «Добор из онлайна» для подключения случайных игроков к группе друзей
+- Быстрый старт: кнопка «Заполнить ботами и начать» для игры в 3–5 человек без долгого ожидания
+- Бейдж дружбы 🤝 в лобби комнат для наглядного отображения союзников
+- Адаптивный баланс колоды при игре на 3–5 участников
+
+**В коде:**
+- Merge pull request #237 from crownfall90-dot/dev/stage2-account-network-20261029
+- feat(telegram): добавить автонастройку Mini App в promote-production и обновить release-notes
+- feat(telegram): интеграция Telegram Mini App, поддержка WebApp SDK, виброотклик, никнеймы и автонастройка бота
+- docs: record actual account regression and staging build results
+- feat(net): совместная игра друзей против онлайна, селектор стола на 2-5 игроков и добор ботами
+- docs: отметить успешный выпуск релиза 1.0.251 в HANDOFF
+
+## 1.0.253 — 2026-11-03
+
+**Игрокам:**
+- Поддержка Telegram Mini App: играйте прямо внутри Telegram в боте с тактильным откликом и удобным входом
+- Совместная игра с друзьями против онлайна: выбор размера партии от 2 до 5 игроков
+- Открытые комнаты: переключатель «Добор из онлайна» для подключения случайных игроков к группе друзей
+- Быстрый старт: кнопка «Заполнить ботами и начать» для игры в 3–5 человек без долгого ожидания
+- Бейдж дружбы 🤝 в лобби комнат для наглядного отображения союзников
+- Адаптивный баланс колоды при игре на 3–5 участников
+- Игра теперь называется Tiletopia: новое название на экранах, в уведомлениях и ссылках
+- Настройки → «Аккаунт и данные» → «Удалить аккаунт и данные»: игрок сам удаляет профиль, прогресс, друзей и вход
+- В карточке игрока можно пожаловаться на никнейм или статус
+- Исправлена ошибка, из-за которой окно комнаты могло не открываться
+
+**В коде:**
+- Merge pull request #238 from crownfall90-dot/dev/stage2-account-network-20261029
+- Merge remote-tracking branch 'origin/dev/stage2-account-network-20261029' into dev/stage2-account-network-20261029
+- fix(ci): проверка staging принимает новое имя пакета app.crownfall.tiletopia
+- docs: record actual account regression and staging build results
+- feat(play): удаление аккаунта и данных, страница удаления, правила, без рекламного ID; название Tiletopia; исправлено окно комнаты
+- Merge remote-tracking branch 'origin/dev/stage2-account-network-20261029' into dev/stage2-account-network-20261029
+- docs(store): актуализировать описание игры, правила пати 2-5 и контакты Tiletopia
+- docs: record actual account regression and staging build results
+- Rebrand to Tiletopia (app.crownfall.tiletopia)
+- docs: record actual account regression and staging build results
+- feat(telegram): добавить ссылки на Telegram Mini App и платформы в анонс релиза
+- docs: record actual account regression and staging build results
+
