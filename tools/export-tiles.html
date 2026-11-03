@@ -2,96 +2,271 @@
 <html lang="ru">
 <head>
 <meta charset="utf-8">
-<title>Экспорт и галерея плиток Tiletopia</title>
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex,nofollow">
+<title>🧩 Галерея и спрайты плиток Tiletopia (512×512)</title>
 <style>
-  body { font-family: system-ui, -apple-system, sans-serif; background: #0e1428; color: #e6ecf8; margin: 0; padding: 24px; }
-  h1 { font-size: 26px; margin-bottom: 8px; color: #f2b84b; }
-  p { color: #9aa8c7; margin-bottom: 20px; font-size: 14px; }
-  .actions { display: flex; gap: 12px; margin-bottom: 24px; align-items: center; flex-wrap: wrap; }
-  button { background: #f2b84b; color: #161c33; border: 0; padding: 10px 18px; border-radius: 12px; font-weight: 700; cursor: pointer; font-size: 14px; transition: transform .1s; }
-  button:hover { filter: brightness(1.1); }
-  button:active { transform: scale(0.97); }
-  .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 16px; }
-  .tile-card { background: #16203d; border: 1px solid rgba(255,255,255,0.08); border-radius: 16px; padding: 12px; text-align: center; display: flex; flex-direction: column; align-items: center; gap: 8px; }
-  .tile-card img { width: 140px; height: 140px; border-radius: 12px; box-shadow: 0 4px 12px rgba(0,0,0,0.4); image-rendering: auto; }
-  .tile-id { font-weight: 800; font-size: 15px; color: #fff; }
-  .tile-name { font-size: 12.5px; color: #f2b84b; }
-  .tile-edges { font-family: monospace; font-size: 11px; color: #7f91ba; background: rgba(0,0,0,0.3); padding: 2px 8px; border-radius: 6px; }
-  .dl-btn { background: rgba(255,255,255,0.08); color: #fff; padding: 6px 12px; font-size: 12px; border-radius: 8px; margin-top: 4px; }
-  .dl-btn:hover { background: rgba(255,255,255,0.15); }
-  #status { font-weight: bold; color: #3fc27a; margin-left: 12px; }
+  * { box-sizing: border-box; }
+  body {
+    font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+    background: #0a0e1c;
+    color: #e6ecf8;
+    margin: 0;
+    padding: 24px;
+    min-height: 100vh;
+  }
+  .container { max-width: 1400px; margin: 0 auto; }
+  header {
+    background: linear-gradient(135deg, #131a33 0%, #1a254a 100%);
+    border: 1px solid rgba(255,255,255,0.08);
+    border-radius: 20px;
+    padding: 24px 28px;
+    margin-bottom: 24px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.4);
+  }
+  h1 { margin: 0 0 8px; font-size: 28px; color: #f2b84b; display: flex; align-items: center; gap: 10px; }
+  p { margin: 0 0 16px; color: #9aa8c7; font-size: 14.5px; line-height: 1.5; }
+  .actions { display: flex; gap: 12px; align-items: center; flex-wrap: wrap; margin-top: 16px; }
+  .btn-primary {
+    background: #f2b84b;
+    color: #12182c;
+    text-decoration: none;
+    border: 0;
+    padding: 12px 22px;
+    border-radius: 12px;
+    font-weight: 800;
+    cursor: pointer;
+    font-size: 14.5px;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
+    transition: transform .15s, filter .15s;
+    box-shadow: 0 4px 15px rgba(242,184,75,0.3);
+  }
+  .btn-primary:hover { filter: brightness(1.1); transform: translateY(-1px); }
+  .btn-primary:active { transform: scale(0.98); }
+  .btn-sec {
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    text-decoration: none;
+    padding: 12px 18px;
+    border-radius: 12px;
+    font-weight: 600;
+    font-size: 14px;
+    transition: background .15s;
+  }
+  .btn-sec:hover { background: rgba(255,255,255,0.15); }
+  .search-box {
+    background: rgba(0,0,0,0.3);
+    border: 1px solid rgba(255,255,255,0.15);
+    border-radius: 12px;
+    padding: 10px 16px;
+    color: #fff;
+    font-size: 14px;
+    min-width: 260px;
+    outline: none;
+  }
+  .search-box:focus { border-color: #f2b84b; }
+  .filters { display: flex; gap: 8px; margin-bottom: 24px; flex-wrap: wrap; }
+  .filter-btn {
+    background: rgba(255,255,255,0.05);
+    border: 1px solid rgba(255,255,255,0.08);
+    color: #9aa8c7;
+    padding: 8px 16px;
+    border-radius: 20px;
+    font-size: 13.5px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all .15s;
+  }
+  .filter-btn:hover { color: #fff; background: rgba(255,255,255,0.1); }
+  .filter-btn.active { background: #4c8dff; color: #fff; border-color: #4c8dff; }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 18px;
+  }
+  .tile-card {
+    background: #141c38;
+    border: 1px solid rgba(255,255,255,0.07);
+    border-radius: 18px;
+    padding: 16px;
+    text-align: center;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 10px;
+    transition: transform .15s, border-color .15s, box-shadow .15s;
+  }
+  .tile-card:hover {
+    transform: translateY(-3px);
+    border-color: rgba(242,184,75,0.4);
+    box-shadow: 0 8px 24px rgba(0,0,0,0.5);
+  }
+  .tile-img-wrap {
+    width: 170px;
+    height: 170px;
+    background: #0d1224;
+    border-radius: 14px;
+    padding: 6px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    box-shadow: inset 0 2px 8px rgba(0,0,0,0.6);
+  }
+  .tile-card img {
+    width: 100%;
+    height: 100%;
+    object-fit: contain;
+    border-radius: 10px;
+    image-rendering: auto;
+  }
+  .tile-id { font-weight: 800; font-size: 16px; color: #fff; letter-spacing: 0.5px; }
+  .tile-name { font-size: 12.5px; color: #f2b84b; font-weight: 500; min-height: 18px; }
+  .tile-meta { display: flex; gap: 6px; font-size: 11.5px; color: #7f91ba; }
+  .tile-tag { background: rgba(255,255,255,0.06); padding: 3px 8px; border-radius: 6px; font-family: monospace; }
+  .dl-btn {
+    background: rgba(255,255,255,0.08);
+    color: #fff;
+    text-decoration: none;
+    padding: 8px 14px;
+    font-size: 12.5px;
+    font-weight: 600;
+    border-radius: 10px;
+    width: 100%;
+    text-align: center;
+    transition: background .15s;
+    margin-top: 4px;
+  }
+  .dl-btn:hover { background: #4c8dff; }
+  .stats-bar {
+    font-size: 13.5px;
+    color: #6d80ab;
+    margin-bottom: 16px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
 </style>
-<script src="../build/bundle/pg.js"></script>
 </head>
 <body>
-<h1>🧩 Галерея и спрайты всех плиток Tiletopia</h1>
-<p>Все плитки игры, сгенерированные в детальном разрешении 512×512. Каждую плитку можно скачать отдельно или экспортировать сразу все.</p>
-<div class="actions">
-  <button id="dlAll">💾 Скачать все плитки архивом (.zip)</button>
-  <button id="dumpJson" style="background:#4c8dff;color:#fff">📋 Экспортировать в assets/tiles</button>
-  <span id="status">Загрузка плиток…</span>
+<div class="container">
+  <header>
+    <h1>🧩 Галерея плиток Tiletopia</h1>
+    <p>Все 37 игровых плиток в высоком разрешении <b>512×512 px</b>. Каждую плитку можно посмотреть в деталях и скачать отдельно, либо загрузить все сразу одним архивом для доработки и дизайна.</p>
+    <div class="actions">
+      <a class="btn-primary" href="./tiletopia-all-tiles-512x512.zip" download>💾 Скачать весь архив (.zip 1.7 МБ)</a>
+      <a class="btn-sec" href="../staging/">🎮 Открыть тестовую игру (Staging)</a>
+      <input type="text" id="search" class="search-box" placeholder="🔍 Поиск по названию или ID (cap, fort, wCity…)">
+    </div>
+  </header>
+
+  <div class="filters" id="filters">
+    <button class="filter-btn active" data-filter="all">Все плитки (37)</button>
+    <button class="filter-btn" data-filter="city">Города</button>
+    <button class="filter-btn" data-filter="road">Дороги</button>
+    <button class="filter-btn" data-filter="cap">Монастыри (капеллы)</button>
+    <button class="filter-btn" data-filter="river">Реки и озёра</button>
+    <button class="filter-btn" data-filter="special">Особые и скалы</button>
+  </div>
+
+  <div class="stats-bar">
+    <span id="counter">Показано: 37 из 37</span>
+    <span>Разрешение каждого спрайта: 512×512 px PNG</span>
+  </div>
+
+  <div class="grid" id="grid"></div>
 </div>
-<div class="grid" id="grid"></div>
-<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+
 <script>
-(() => {
-  const S = 512;
-  const V = [[0,-1],[1,0],[0,1],[-1,0]];
-  const PL0 = [{col: '#e24242'}, {col: '#4287f5'}, {col: '#3ec75e'}, {col: '#f5a742'}, {col: '#a842f5'}];
-  const MEEPLE_D = 'M50 4C62 4 68 12 68 22C68 30 64 34 60 37L88 46C96 49 98 56 96 62C94 68 88 70 82 68L68 64L76 100C77 106 73 108 68 108L56 108L50 86L44 108L32 108C27 108 23 106 24 100L32 64L18 68C12 70 6 68 4 62C2 56 4 49 12 46L40 37C36 34 32 30 32 22C32 12 38 4 50 4Z';
+const TILES = [
+  {id: 'cap', name: 'Капелла (монастырь)', cat: 'cap', desc: '4 поля'},
+  {id: 'capRS', name: 'Капелла с трактом', cat: 'cap', desc: '1 дорога, 3 поля'},
+  {id: 'capRL', name: 'Капелла с заездом слева', cat: 'cap', desc: 'Поворот дороги'},
+  {id: 'capRR', name: 'Капелла с заездом справа', cat: 'cap', desc: 'Поворот дороги'},
+  {id: 'rS', name: 'Прямая дорога', cat: 'road', desc: 'Тракт сквозь поля'},
+  {id: 'rC', name: 'Поворот дороги', cat: 'road', desc: 'Угол 90°'},
+  {id: 'r3', name: 'Перекрёсток трёх дорог', cat: 'road', desc: 'Т-образная развилка'},
+  {id: 'r4', name: 'Перекрёсток четырёх дорог', cat: 'road', desc: 'Крестовина дорог'},
+  {id: 'rEnd', name: 'Обрыв / тупик дороги', cat: 'road special', desc: 'Скалистый обрыв'},
+  {id: 'rMine', name: 'Шахта и рудник', cat: 'road special', desc: 'Дорога к руднику'},
+  {id: 'rRock', name: 'Дорога у скалы', cat: 'road special', desc: 'Каменная гряда'},
+  {id: 'rocks', name: 'Скалистый мыс', cat: 'special', desc: 'Горная цепь'},
+  {id: 'fort', name: 'Застава / Форт', cat: 'special', desc: 'Деревянный форт'},
+  {id: 'fortR', name: 'Форт с трактом', cat: 'special road', desc: 'Охраняемый въезд'},
+  {id: 'brHalf', name: 'Мостовой переход (стык)', cat: 'special road', desc: 'Половина моста'},
+  {id: 'c4', name: 'Большой город', cat: 'city', desc: '4 городские стены'},
+  {id: 'c3', name: 'Город с трёх сторон', cat: 'city', desc: 'Большой квартал'},
+  {id: 'c3r', name: 'Город с трёх сторон и дорога', cat: 'city road', desc: 'Городские ворота'},
+  {id: 'c2', name: 'Угол города (2 стены)', cat: 'city', desc: 'Угловой бастион'},
+  {id: 'c2r', name: 'Угол города и тракты', cat: 'city road', desc: 'Угловые ворота'},
+  {id: 'band', name: 'Город-перемычка', cat: 'city', desc: 'Сквозной квартал'},
+  {id: 'xcrcr', name: 'Город и две дороги', cat: 'city road', desc: 'Северная стена'},
+  {id: 'xccfr', name: 'Город и тупик дороги', cat: 'city road', desc: 'Базарная площадь'},
+  {id: 'xccrf', name: 'Город и дорога', cat: 'city road', desc: 'Восточный выезд'},
+  {id: 'xcrcf', name: 'Город и перекрёсток', cat: 'city road', desc: 'Торговый узел'},
+  {id: 'xcfrf', name: 'Город и поворот дороги', cat: 'city road', desc: 'Пригород'},
+  {id: 'xcffr', name: 'Город и изгиб дороги', cat: 'city road', desc: 'Пригородный поворот'},
+  {id: 'xcrff', name: 'Город и прямой тракт', cat: 'city road', desc: 'Главная дорога'},
+  {id: 'xcrrr', name: 'Город и тройник дорог', cat: 'city road', desc: 'Перекрёсток у ворот'},
+  {id: 'wS', name: 'Прямая река', cat: 'river', desc: 'Русло реки'},
+  {id: 'wC', name: 'Изгиб реки', cat: 'river', desc: 'Речной поворот'},
+  {id: 'wTee', name: 'Слияние рек', cat: 'river', desc: 'Тройной приток'},
+  {id: 'wLake', name: 'Озеро / исток реки', cat: 'river', desc: 'Большое озеро'},
+  {id: 'wEnd', name: 'Речной тупик / устье', cat: 'river', desc: 'Заводь реки'},
+  {id: 'wBr', name: 'Мост через реку', cat: 'river road', desc: 'Каменный мост'},
+  {id: 'wRC', name: 'Река и поворот дороги', cat: 'river road', desc: 'Береговой тракт'},
+  {id: 'wCity', name: 'Речная набережная у города', cat: 'river city', desc: 'Город у реки'},
+];
 
-  const {cv, drawTile} = PG.render.createArt({S, V, PL0, MEEPLE_D});
-  const TYPES = PG.engine.TYPES;
+const grid = document.getElementById('grid');
+const counter = document.getElementById('counter');
+const searchInput = document.getElementById('search');
+let activeFilter = 'all';
 
-  const grid = document.getElementById('grid');
-  const status = document.getElementById('status');
-  const tileImages = {};
+function render() {
+  const q = searchInput.value.trim().toLowerCase();
+  grid.innerHTML = '';
+  let count = 0;
 
-  const keys = Object.keys(TYPES);
-  status.textContent = `Генерация ${keys.length} плиток (512×512)…`;
+  TILES.forEach(t => {
+    const matchesFilter = activeFilter === 'all' || t.cat.includes(activeFilter);
+    const matchesQuery = !q || t.id.toLowerCase().includes(q) || t.name.toLowerCase().includes(q) || t.desc.toLowerCase().includes(q);
 
-  keys.forEach(id => {
-    const dataUrl = drawTile(id);
-    tileImages[id] = dataUrl;
-    const def = TYPES[id];
-
-    const card = document.createElement('div');
-    card.className = 'tile-card';
-    card.innerHTML = `
-      <img src="${dataUrl}" alt="${id}">
-      <span class="tile-id">${id}</span>
-      <span class="tile-name">${def.name || def.rare ? (def.name || 'Редкая') : ''}</span>
-      <span class="tile-edges">${def.e} · ×${def.n || 1}</span>
-      <a class="dl-btn" href="${dataUrl}" download="tile_${id}.png">Скачать PNG</a>
-    `;
-    grid.appendChild(card);
+    if (matchesFilter && matchesQuery) {
+      count++;
+      const card = document.createElement('div');
+      card.className = 'tile-card';
+      const imgSrc = `./tile_${t.id}.png`;
+      card.innerHTML = `
+        <div class="tile-img-wrap">
+          <img src="${imgSrc}" alt="${t.id}" loading="lazy">
+        </div>
+        <div class="tile-id">${t.id}</div>
+        <div class="tile-name">${t.name}</div>
+        <div class="tile-meta">
+          <span class="tile-tag">${t.desc}</span>
+        </div>
+        <a class="dl-btn" href="${imgSrc}" download="tile_${t.id}.png">Скачать PNG</a>
+      `;
+      grid.appendChild(card);
+    }
   });
 
-  status.textContent = `Все ${keys.length} плиток готовы (512×512 px)`;
-  window.TILE_DATA = tileImages;
+  counter.textContent = `Показано: ${count} из ${TILES.length}`;
+}
 
-  document.getElementById('dlAll').onclick = async () => {
-    if (typeof JSZip === 'undefined') {
-      alert('JSZip ещё не загрузился, подождите секунду');
-      return;
-    }
-    status.textContent = 'Создание ZIP архива…';
-    const zip = new JSZip();
-    const folder = zip.folder("tiletopia_tiles_512x512");
-    
-    for (const [id, dataUrl] of Object.entries(tileImages)) {
-      const base64 = dataUrl.split(',')[1];
-      folder.file(`tile_${id}.png`, base64, {base64: true});
-    }
+document.getElementById('filters').addEventListener('click', e => {
+  if (e.target.classList.contains('filter-btn')) {
+    document.querySelectorAll('.filter-btn').forEach(b => b.classList.remove('active'));
+    e.target.classList.add('active');
+    activeFilter = e.target.dataset.filter;
+    render();
+  }
+});
 
-    const blob = await zip.generateAsync({type:"blob"});
-    const link = document.createElement('a');
-    link.href = URL.createObjectURL(blob);
-    link.download = "tiletopia_tiles_512x512.zip";
-    link.click();
-    status.textContent = `ZIP скачан (${keys.length} плиток)`;
-  };
-})();
+searchInput.addEventListener('input', render);
+render();
 </script>
 </body>
 </html>

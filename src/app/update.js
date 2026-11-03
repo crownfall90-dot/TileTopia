@@ -49,3 +49,25 @@ export function formatUpdCountdown(secondsLeft) {
   return `Само продолжится через ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 }
 
+export function isUpdateMandatory(info, minRequiredCode = 0) {
+  if (!info) return false;
+  if (info.mandatory === true || info.force === true) return true;
+  if (minRequiredCode && typeof info.code === 'number' && info.code <= minRequiredCode) return true;
+  return false;
+}
+
+export function shouldPromptUpdate(info, {manual = false, minRequiredCode = 0} = {}) {
+  if (!info) return false;
+  if (manual) return true;
+  return isUpdateMandatory(info, minRequiredCode);
+}
+
+export function formatUpdateSettingsBadge(info) {
+  if (!info || !info.version) return 'Проверить обновления';
+  if (info.mandatory === true || info.force === true) {
+    return `Обновить до ${info.version} (важно!)`;
+  }
+  return `Обновить до ${info.version} (по желанию)`;
+}
+
+

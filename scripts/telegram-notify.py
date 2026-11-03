@@ -87,6 +87,7 @@ def parse_release_notes(notes: str, version: str) -> dict:
     """Splits release notes into player-facing sections: new (quotes), changed, removed, and poll."""
     new_items, changed_items, removed_items = [], [], []
     custom_poll = ''
+    is_mandatory_flag = False
 
     current_section = None
     has_explicit_sections = False
@@ -95,6 +96,10 @@ def parse_release_notes(notes: str, version: str) -> dict:
         line = raw_line.strip()
         if not line:
             continue
+
+        # Check for mandatory/optional indicators in notes
+        if any(tag in line.lower() for tag in ['[обязательное]', '[критическое]', '[mandatory]', 'обязательное обновление']):
+            is_mandatory_flag = True
 
         # Bullet items start with -, •, *
         is_bullet = line.startswith(('-', '•', '*'))
@@ -116,6 +121,11 @@ def parse_release_notes(notes: str, version: str) -> dict:
                 continue
             elif header_clean in ('опрос', 'вопрос', 'poll', 'feedback', 'опрос тестерам', 'вопрос игрокам'):
                 current_section = 'poll'
+                has_explicit_sections = True
+                continue
+            elif header_clean in ('обязательное', 'критическое', 'mandatory', 'важное'):
+                is_mandatory_flag = True
+                current_section = 'new'
                 has_explicit_sections = True
                 continue
             elif line.startswith('#'):
@@ -160,21 +170,28 @@ def parse_release_notes(notes: str, version: str) -> dict:
 
     # Pick deterministic variation based on version
     seed = sum(ord(c) for c in version) if version else 0
-    headline = HEADLINES[seed % len(HEADLINES)].format(ver=html.escape(version))
     poll_q = custom_poll or COMMUNITY_QUESTIONS[seed % len(COMMUNITY_QUESTIONS)]
 
     return {
-        'headline': headline,
         'new': new_items[:8],
         'changed': changed_items[:6],
         'removed': removed_items[:4],
         'poll_question': poll_q,
+        'is_mandatory': is_mandatory_flag,
     }
 
-def build(version: str, notes: str, web_url: str = '', apk_url: str = '', bot_url: str = '') -> str:
+def build(version: str, notes: str, web_url: str = '', apk_url: str = '', bot_url: str = '', mandatory: bool = False) -> str:
     parsed = parse_release_notes(notes, version)
+    is_mand = mandatory or parsed.get('is_mandatory', False)
 
-    text = f"{parsed['headline']}\n\n"
+    if is_mand:
+        headline = f"🚨 <b>Tiletopia {html.escape(version)} — Важное обязательное обновление!</b>"
+        notice = "<blockquote>⚠️ <b>Обязательное обновление:</b> включает важные исправления для сетевой игры и стабильности матчей. Пожалуйста, обновите игру для продолжения онлайн-битв!</blockquote>\n\n"
+    else:
+        headline = f"🛠 <b>Tiletopia {html.escape(version)} — мелкие фиксы и доработки</b>"
+        notice = "<blockquote>ℹ️ <b>Это не крупное обновление, а небольшие доработки и фиксы</b>, которые позже войдут в обязательное обновление. Играть можно без обновления, а по желанию в настройках игры уже можно обновиться!</blockquote>\n\n"
+
+    text = f"{headline}\n\n{notice}"
 
     # 1. Что нового (выделяется красивой цитатой blockquote)
     if parsed['new']:
@@ -182,7 +199,6 @@ def build(version: str, notes: str, web_url: str = '', apk_url: str = '', bot_ur
         quote_content = '\n'.join(f'• {html.escape(i)}' for i in parsed['new'])
         text += f'<blockquote>{quote_content}</blockquote>\n\n'
     elif not parsed['changed'] and not parsed['removed']:
-        # Fallback if no specific player items found
         text += '✨ <b>Что нового:</b>\n'
         text += '<blockquote>• Множество улучшений геймплея, плавности и стабильности сетевой игры!</blockquote>\n\n'
 
@@ -265,7 +281,8 @@ def main() -> int:
             bot_url = f'https://t.me/{bot_user}'
 
     raw_notes = open(notes_file, encoding='utf-8').read() if os.path.isfile(notes_file) else ''
-    text = build(version, raw_notes, web, apk, bot_url)
+    is_mandatory = '--mandatory' in flags or os.environ.get('MANDATORY_RELEASE', '').lower() in ('1', 'true', 'yes')
+    text = build(version, raw_notes, web, apk, bot_url, mandatory=is_mandatory)
 
     # 1. Send the announcement message
     body = json.dumps({'chat_id': chat, 'text': text, 'parse_mode': 'HTML', 'disable_web_page_preview': True}).encode('utf-8')

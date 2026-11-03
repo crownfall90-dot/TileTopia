@@ -57,6 +57,7 @@ if [ "$target" = web ]; then
   sed 's|<head>|<head><meta name="robots" content="noindex,nofollow">|' tools/export-tiles.html > "$site/tiles/index.html"
   if [ -d assets/tiles ]; then
     cp -r assets/tiles "$site/"
+    cp -r assets/tiles/* "$site/tiles/"
   fi
 else
   out=app/src/main/assets/index.html

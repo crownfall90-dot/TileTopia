@@ -412,6 +412,25 @@ body:not(.authed) main > .card:not(#loginCard) { display: none; }
     </div>
   </div>
 
+  <!-- 5.5 ПОЛИТИКА ОБНОВЛЕНИЙ -->
+  <div class="card">
+    <div class="card-title">
+      <span>🚀 Политика обновлений</span>
+      <span style="font-size:12px;color:var(--success)" id="updatePolicyBadge">Следующее: Необязательное</span>
+    </div>
+    <p class="stat-sub">Необязательные обновления не шлют пуши всем игрокам и не блокируют игру при входе (мелкие фиксы). Обязательные обновления требуют установки и пушат всех игроков.</p>
+    <div style="display:flex;gap:8px;flex-wrap:wrap;margin-bottom:12px">
+      <button class="btn" id="btnNextOptional" style="background:#2b3a67;color:#fff">🟢 Сделать следующее НЕОБЯЗАТЕЛЬНЫМ</button>
+      <button class="btn btn-danger" id="btnNextMandatory" style="background:var(--danger);color:#fff">🚨 Сделать следующее ОБЯЗАТЕЛЬНЫМ</button>
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;flex-wrap:wrap">
+      <span style="font-size:13px;color:#9aa8c7">Минимальная версия для онлайна:</span>
+      <input class="field" id="inputMinCode" style="width:110px;margin:0" placeholder="260">
+      <button class="btn" id="btnSaveMinCode">Сохранить</button>
+      <button class="btn" id="btnMakeCurrentMandatory" style="background:#4c8dff;color:#fff">⚡ Сделать последнюю обязательной</button>
+    </div>
+  </div>
+
   <!-- 6. ГЕНЕРАТОР ПРОМОКОДОВ -->
   <div class="card">
     <div class="card-title">
@@ -565,6 +584,53 @@ $('btnEnableMaint').onclick = async () => {
 };
 $('btnDisableMaint').onclick = async () => {
   try { await db('config/maintenance', 'PUT', {active: false, message: $('maintMessage').value.trim().slice(0, 500)}); log('Техработы выключены'); loadMaint(); } catch (e) { log('Не удалось: ' + e.message); }
+};
+
+/* ---------- update policy ---------- */
+async function loadUpdatePolicy() {
+  try {
+    const r = await fetch(`${DB}/config/update.json`);
+    const u = r.ok ? await r.json() : null;
+    const isNextMandatory = !!(u && u.nextMandatory);
+    $('updatePolicyBadge').textContent = isNextMandatory ? 'СЛЕДУЮЩЕЕ: ОБЯЗАТЕЛЬНОЕ 🚨' : 'Следующее: Необязательное 🟢';
+    $('updatePolicyBadge').style.color = isNextMandatory ? 'var(--danger)' : 'var(--success)';
+    if (u && u.minRequiredCode) $('inputMinCode').value = u.minRequiredCode;
+  } catch (_) {}
+}
+$('btnNextOptional').onclick = async () => {
+  try {
+    await db('config/update/nextMandatory', 'PUT', false);
+    log('Следующее обновление установлено как НЕОБЯЗАТЕЛЬНОЕ');
+    loadUpdatePolicy();
+  } catch (e) { log('Ошибка: ' + e.message); }
+};
+$('btnNextMandatory').onclick = async () => {
+  try {
+    await db('config/update/nextMandatory', 'PUT', true);
+    log('Следующее обновление установлено как ОБЯЗАТЕЛЬНОЕ');
+    loadUpdatePolicy();
+  } catch (e) { log('Ошибка: ' + e.message); }
+};
+$('btnSaveMinCode').onclick = async () => {
+  const code = parseInt($('inputMinCode').value, 10);
+  if (!code || code < 1) return log('Введите корректный номер версии (например, 260)');
+  try {
+    await db('config/update/minRequiredCode', 'PUT', code);
+    log('Минимальная обязательная версия установлена: ' + code);
+    loadUpdatePolicy();
+  } catch (e) { log('Ошибка: ' + e.message); }
+};
+$('btnMakeCurrentMandatory').onclick = async () => {
+  try {
+    const r = await fetch(`https://api.github.com/repos/${REPO}/releases/latest`);
+    const rel = r.ok ? await r.json() : null;
+    const code = rel ? parseInt(rel.tag_name.replace(/\D/g, ''), 10) : 0;
+    if (!code) return log('Не удалось определить номер последней версии с GitHub');
+    await db('config/update/minRequiredCode', 'PUT', code);
+    log('Текущая версия ' + code + ' теперь обязательна для всех игроков!');
+    $('inputMinCode').value = code;
+    loadUpdatePolicy();
+  } catch (e) { log('Ошибка: ' + e.message); }
 };
 
 /* ---------- promo codes ---------- */
@@ -1205,7 +1271,7 @@ $('btnErrors').onclick = loadErrors;
 if ($('btnFilterEmpty')) $('btnFilterEmpty').onclick = () => { hideEmptyGuests = !hideEmptyGuests; renderPlayers(); };
 if ($('btnPurgeEmpty')) $('btnPurgeEmpty').onclick = purgeEmptyGuests;
 
-function refreshAll() { loadVersions(); loadMaint(); loadPin(); loadStats(); loadFeedback(); loadNameSuggestions(); loadPlayers(); }
+function refreshAll() { loadVersions(); loadMaint(); loadUpdatePolicy(); loadPin(); loadStats(); loadFeedback(); loadNameSuggestions(); loadPlayers(); }
 if (auth) afterSignIn();
 </script>
 </body>

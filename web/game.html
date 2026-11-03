@@ -2151,7 +2151,18 @@ $('#prefs').addEventListener('click', e => {
 
 // Only the label changes: replacing the button's text would wipe its icon and arrow.
 const checkLabel = t => { const b = $('#checkUpd b'); if (b) b.textContent = t; };
-$('#checkUpd').onclick = () => { checkLabel('Проверяем…'); AndroidApp.checkUpdates(); setTimeout(() => checkLabel('Проверить обновления'), 4000); };
+function updateSettingsUpdateBtn(info) {
+  const b = $('#checkUpd b');
+  if (!b) return;
+  if (info && info.code > appCode()) {
+    b.textContent = (typeof PG !== 'undefined' && PG.app && PG.app.update && PG.app.update.formatUpdateSettingsBadge)
+      ? PG.app.update.formatUpdateSettingsBadge(info)
+      : (info.mandatory ? `Обновить до ${info.version} (важно!)` : `Обновить до ${info.version} (по желанию)`);
+  } else {
+    b.textContent = 'Проверить обновления';
+  }
+}
+$('#checkUpd').onclick = () => { checkLabel('Проверяем…'); AndroidApp.checkUpdates(); setTimeout(() => { if (lastUpd && lastUpd.code > appCode()) updateSettingsUpdateBtn(lastUpd); else checkLabel('Проверить обновления'); }, 4000); };
 // A version this session already heard about (and the player put off) is still an update, whatever a later check says.
 window.onNoUpdate = () => { checkLabel('Проверить обновления'); if (lastUpd && lastUpd.code > appCode()) return window.onUpdateAvailable(lastUpd, true); toastAny('У вас последняя версия'); };
 window.onCheckFailed = () => { checkLabel('Проверить обновления'); toastAny('Не удалось проверить обновления — попробуйте чуть позже'); };
@@ -6321,15 +6332,36 @@ function reinstallDialog(info) {
 window.onUpdateAvailable = (info, manual) => {
   if (info && info.reinstall) return reinstallDialog(info);
   lastUpd = info;
+  if (typeof updateSettingsUpdateBtn === 'function') updateSettingsUpdateBtn(info);
+
+  // Determine whether this update is mandatory (breaking protocol, desync fix, or admin enforced)
+  const isMandatory = (typeof PG !== 'undefined' && PG.app && PG.app.update && PG.app.update.isUpdateMandatory)
+    ? PG.app.update.isUpdateMandatory(info, window.MIN_REQUIRED_CODE || 0)
+    : !!(info && (info.mandatory === true || info.force === true || (window.MIN_REQUIRED_CODE && info.code <= window.MIN_REQUIRED_CODE)));
+
+  // If update is optional (not mandatory) and check was automatic (on startup or periodic),
+  // do NOT interrupt the player with a blocking popup dialog!
+  if (!manual && !isMandatory) {
+    boot.checked = true;
+    bootHide();
+    return;
+  }
+
   // In an online game the whole table waits for the update (see "update pause").
   if (net && net.gameId && phase !== 'end' && info.code > appCode() && !(net.upd && net.upd.c >= info.code) && players.some(p => p.owner === myId)) { netSend({t: 'upd', g: net.gameId, c: info.code}); updOpen(info.code); }
   if (updBox && document.body.contains(updBox)) return;
   boot.checked = true;
   const box = updBox = document.createElement('div'); box.className = 'over'; box.style.position = 'fixed';
-  box.innerHTML = `<div class="ocard"><h3>Вышло обновление ${info.version}</h3><p>Что нового:</p><div class="notes-list"></div><div class="prog" hidden><i></i></div><button class="cta wide" id="upd">Обновить</button><a class="ghostbtn manual" id="manual" hidden href="https://github.com/crownfall90-dot/play/releases/latest">Скачать вручную</a></div>`;
+  const titleText = isMandatory ? `Вышло обязательное обновление ${info.version}` : `Вышло обновление ${info.version}`;
+  const subText = isMandatory ? 'Для продолжения сетевой игры требуется обновление. Что нового:' : (info && info.mandatory === false ? 'Необязательный патч (мелкие фиксы). Что нового:' : 'Что нового:');
+  box.innerHTML = `<div class="ocard"><h3>${titleText}</h3><p>${subText}</p><div class="notes-list"></div><div class="prog" hidden><i></i></div><button class="cta wide" id="upd">Обновить</button>${!isMandatory ? '<button class="ghostbtn" id="updLater" style="margin-top:6px">Позже</button>' : ''}<a class="ghostbtn manual" id="manual" hidden href="https://github.com/crownfall90-dot/play/releases/latest">Скачать вручную</a></div>`;
   box.querySelector('.notes-list').textContent = info.notes || 'Исправления и улучшения';
   if (players.length && phase !== 'end' && phase !== 'idle') box.querySelector('p').textContent = (net ? 'Партия на паузе: после обновления вернитесь в комнату — игра продолжится, когда обновятся все. ' : 'Партия сохранится. ') + 'Что нового:';
   document.body.append(box);
+  if (!isMandatory) {
+    const ltr = box.querySelector('#updLater');
+    if (ltr) ltr.onclick = () => { box.remove(); bootHide(); };
+  }
   // Offered on the splash: the dialog sits above it.
   if (!boot.gone) {
     boot.update = true; box.style.zIndex = 101; box.style.background = 'linear-gradient(transparent 35%,rgba(8,12,24,.75))'; box.style.backdropFilter = 'none'; box.style.alignItems = 'flex-end'; box.style.paddingBottom = 'calc(24px + var(--ib,0px))';
@@ -6462,8 +6494,24 @@ async function checkMaintenance() {
     else { const box = document.getElementById('maintBox'); if (box) box.remove(); } // switched off: the game is back
   } catch (_) {}
 }
+async function checkUpdatePolicy() {
+  if (typeof FB === 'undefined' || !FB || !FB.dbUrl) return;
+  try {
+    const r = await fetch(`${FB.dbUrl}/config/update.json`);
+    if (!r.ok) return;
+    const cfg = await r.json();
+    if (cfg && cfg.minRequiredCode) {
+      window.MIN_REQUIRED_CODE = cfg.minRequiredCode;
+      if (lastUpd) {
+        if (typeof updateSettingsUpdateBtn === 'function') updateSettingsUpdateBtn(lastUpd);
+        if (appCode() < cfg.minRequiredCode) window.onUpdateAvailable(lastUpd, false);
+      }
+    }
+  } catch (_) {}
+}
 // Checked at start, on every return to the app, and every minute while the maintenance screen is up.
 document.addEventListener('visibilitychange', () => { if (!document.hidden) checkMaintenance(); });
+document.addEventListener('visibilitychange', () => { if (!document.hidden) checkUpdatePolicy(); });
 setInterval(() => { if (document.getElementById('maintBox')) checkMaintenance(); }, 60000);
 function showMaintenanceScreen(msg) {
   if (document.getElementById('maintBox')) return;
@@ -6500,7 +6548,7 @@ window.addEventListener('keydown', e => {
 });
 
 injectArt();
-dailyBonus(); renderResume(); renderPrefs(); checkMaintenance();
+dailyBonus(); renderResume(); renderPrefs(); checkMaintenance(); checkUpdatePolicy();
 devVerify();
 // First open and the days people come back (D1, D3, D7), each reported once.
 (() => {
