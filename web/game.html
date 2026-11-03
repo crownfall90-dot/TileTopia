@@ -27,12 +27,12 @@
       <nav class="bnav" id="bnav" hidden aria-label="Разделы">
         <button data-nav="menu" aria-label="Главная"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6.5 8 6.5"/><path d="M6 9.5V19a1 1 0 001 1h3.5v-5h3v5H17a1 1 0 001-1V9.5"/></svg><span>Главная</span></button>
         <button data-nav="progress" id="progBtn" aria-label="Профиль, задания и достижения"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c.8-3.8 3.6-5.8 7-5.8s6.2 2 7 5.8"/></svg><span>Профиль</span></button>
-        <button data-nav="friends" id="friendsBtn" aria-label="Друзья"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 19.5c.6-3.3 3-5 6-5s5.4 1.7 6 5"/><path d="M18 8v6M15 11h6"/></svg><em class="fnum" hidden>0</em><span>Друзья</span></button>
+        <button data-nav="friends" id="friendsBtn" aria-label="Друзья"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 19.5c.6-3.3 3-5 6-5s5.4 1.7 6 5"/><path d="M18 8v6M15 11h6"/></svg><span class="fnav-label">Друзья<i class="fnav-dot" id="fNavDot" hidden></i></span></button>
         <button data-nav="shop" id="navShop" aria-label="Магазин"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16l-1.2 10.2a2 2 0 01-2 1.8H7.2a2 2 0 01-2-1.8z"/><path d="M8.5 9V7a3.5 3.5 0 017 0v2"/></svg><span>Магазин</span></button>
       </nav>
       <section class="screen" id="scr-menu" hidden>
         <div class="mtop">
-          <button class="mprof" id="mprof" data-go="progress" aria-label="Профиль, уровень и золото"></button>
+          <button class="mprof" id="mprof" data-go="progress" aria-label="Профиль, кубки, уровень и золото"></button>
           <div class="mtools"><button class="mtool" data-go="history" aria-label="История партий" title="История партий"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg></button><button class="mtool" data-go="rules" aria-label="Как играть"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 014.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17.2h.01"/></svg></button><button class="mtool" id="menuSettings" aria-label="Настройки"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg></button></div>
         </div>
         <div class="hero"><div class="mini" id="mini"></div></div>
@@ -47,7 +47,7 @@
           </button>
           <div class="jig" id="jigMenu"><button class="playon" id="playOnline" data-jp data-jc="gold" data-je="b:tab"><span class="pglow"></span>
             <span class="pic"><svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.9" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c2.6 2.6 3.8 5.6 3.8 9s-1.2 6.4-3.8 9c-2.6-2.6-3.8-5.6-3.8-9S9.4 5.6 12 3z"/></svg></span>
-            <span class="ptx"><b>Играть онлайн</b><span class="psub"><small>Поиск соперников</small><em class="online onlineN" hidden><i></i><b>0</b> в сети</em></span></span></button>
+            <span class="ptx"><b>Играть онлайн</b><span class="psub"><small>Поиск соперников</small></span></span></button>
           <div class="modes">
             <button class="mode" data-go="lobby" data-jp data-jc="#4c8dff" data-je="r:tab"><span class="mic" style="--m:#4c8dff"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 19.5c.6-3.3 3-5 6-5s5.4 1.7 6 5"/><circle cx="17" cy="9" r="2.5"/><path d="M16.5 14.3c2.4.2 4 1.7 4.5 4.2"/></svg></span><b>С&nbsp;друзьями</b><small>По коду</small></button>
             <button class="mode" data-mode="bots" data-jp data-jc="#3fc27a" data-je="t:notch,l:notch,r:tab"><span class="mic" style="--m:#3fc27a"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="4.5" y="8" width="15" height="11" rx="3.5"/><path d="M12 8V4.5M9.2 13h.01M14.8 13h.01M9.5 16.2h5"/><circle cx="12" cy="4" r=".6"/></svg></span><b>С ботами</b><small>Одиночная</small></button>
@@ -108,7 +108,7 @@
 
       <section class="screen scroll" id="scr-friends" hidden>
         <div class="lb">
-          <div class="ltop"><button class="iconbtn" id="fBack" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Друзья</b></div>
+          <div class="ltop"><button class="iconbtn" id="fBack" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Друзья</b><i class="fnav-dot" id="fScreenOnlineDot" hidden style="margin-left:6px" title="В сети"></i></div>
           <p class="froom" id="fRoom" hidden></p>
           <div class="ocard fgate" id="fGate" hidden></div>
           <div class="codecard" id="fMine">
@@ -131,8 +131,7 @@
           <div class="profile" id="profile"></div>
           <div class="sgroup prof" id="acct"></div>
           <button class="tutcard itemsentry" id="itemsBtn"><span>🎒</span><span><b>Мои предметы</b><small id="itemsSub">Статусы, рамки, фигурки, локации</small></span><i class="tgo">›</i></button>
-          <button class="tutcard itemsentry" id="histBtn" data-go="history"><span>📜</span><span><b>История партий</b><small>Все сыгранные матчи и результаты</small></span><i class="tgo">›</i></button>
-          <div class="pstats" id="stats" data-go="history" title="Открыть историю партий" style="cursor:pointer"></div>
+          <div class="pstats" id="stats"></div>
           <div class="seg ptabs" id="ptabs"><button data-pt="rewards" aria-pressed="true">Награды</button><button data-pt="cols" aria-pressed="false">Коллекции</button><button data-pt="top" aria-pressed="false">Рейтинг</button></div>
           <div class="col" id="ptab"></div>
         </div>
@@ -244,7 +243,7 @@
       </section>
 
       <section class="screen" id="scr-match" hidden>
-        <div class="lb"><div class="ltop"><button class="iconbtn" id="mBack" aria-label="Отменить поиск"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Играть онлайн</b><em class="online onlineN" hidden style="margin-left:auto"><i></i><b>0</b> в сети</em></div></div>
+        <div class="lb"><div class="ltop"><button class="iconbtn" id="mBack" aria-label="Отменить поиск"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Играть онлайн</b></div></div>
         <div class="mwrap">
           <div class="pz" id="mLoad"><div class="pzb"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
           <h3 class="mtitle" id="mTitle">Ищем соперников…</h3>
@@ -312,7 +311,6 @@
               <small class="code-hint">Нажмите на код, чтобы скопировать</small>
               <button class="chip pri lb-invite" id="lbInvite">
                 <span>👥 Пригласить друзей</span>
-                <span class="fonline-badge" id="lbOnlineN" hidden>0</span>
               </button>
             </div>
 
@@ -2489,16 +2487,7 @@ $('#lbCups').onclick = () => { if (!net || !net.host || net.gameId) return; setu
 function updateLobbyOnlineBadge() {
   const badge = $('#lbOnlineN');
   if (!badge) return;
-  const ok = FB && registered();
-  const seats = net && net.lobby ? net.lobby.seats : [];
-  const inRoom = new Set(seats.map(x => x.uid).filter(Boolean));
-  const on = ok ? friends.filter(f => f.on && !inRoom.has(f.uid)).length : 0;
-  if (on > 0) {
-    badge.textContent = on;
-    badge.hidden = false;
-  } else {
-    badge.hidden = true;
-  }
+  badge.hidden = true;
 }
 
 function renderInviteSheetRows(box) {
@@ -2648,7 +2637,8 @@ async function presenceCount() {
     const all = (await r.json()) || {};
     presenceList = Object.entries(all).map(([uid, v]) => ({uid, ...v})).filter(x => x.s && x.n && x.s !== 'off').sort((a, b) => (b.uid === (fbAuth && fbAuth.uid)) - (a.uid === (fbAuth && fbAuth.uid)) || b.t - a.t);
     const n = presenceList.length;
-    document.querySelectorAll('.onlineN').forEach(e => { e.hidden = !n; e.querySelector('b').textContent = n; });
+    document.querySelectorAll('.onlineN').forEach(e => { e.hidden = true; });
+    friendsDot();
   } catch (_) {}
 }
 let presenceTimer = 0;
@@ -3756,7 +3746,7 @@ function renderMenuProfile() {
   const el = $('#mprof'); if (!el) return;
   try { earnedCheck(); } catch (_) {}
   const need = xpNeed(PROG.lvl), name = profileName();
-  el.innerHTML = `<span class="av${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${name[0] || '?'}</span><span class="mpi"><b>${name}</b><span class="mpl"><em>Ур. ${PROG.lvl}</em><i class="mxp"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></i></span></span><span class="mpg"><i class="coin"></i><b class="goldN">${wallet.gold}</b></span>`;
+  el.innerHTML = `<span class="av${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${name[0] || '?'}</span><span class="mpi"><b>${name}</b><span class="mpl"><em>Ур. ${PROG.lvl}</em><i class="mxp"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></i></span></span><div class="mp-badges"><span class="mpc" title="Кубки рейтинга">🏆 <b class="cupsN">${PROG.cups || 0}</b></span><span class="mpg" title="Золото"><i class="coin"></i><b class="goldN">${wallet.gold}</b></span></div>`;
   renderMenuQuestBanner();
 }
 function renderProgress() {
@@ -3765,10 +3755,10 @@ function renderProgress() {
   // One card: avatar, nickname and e-mail with the edit button, then level and experience; the account buttons
   // (#acct, below) join it.
   const mail = fbAuth && fbAuth.email ? String(fbAuth.email).replace(/[<>&"]/g, '') : 'Профиль не сохранён';
-  $('#profile').innerHTML = `<div class="pctop"><span class="av big${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${(name[0] || '?').toUpperCase()}</span><span class="pwho"><b>${name}</b>${myStatus() ? `<em class="fst">${myStatus()}</em>` : ''}<small class="pmail">${mail}</small></span><button class="iconbtn" id="profEdit" aria-label="Редактировать профиль"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button></div><div class="pclvl"><div class="lvl">${ring(PROG.xp / need)}<b>${PROG.lvl}</b></div><div class="pi"><b class="pl1">Уровень ${PROG.lvl}</b><div class="xpbar"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></div><small>${PROG.xp} / ${need} опыта до ${PROG.lvl + 1} уровня</small></div></div><div class="pchips"><span>🏆 <b>${PROG.cups}</b> кубков</span><span><i class="coin"></i> <b>${wallet.gold}</b> золота</span><span>🏅 <b>${ACH.filter(a => PROG.ach[a.id] === 'got').length}</b>/${ACH.length} наград</span></div>${FB ? `<div class="pacts">${fbAuth && fbAuth.email ? '<button class="chip" data-hacct="out">Выйти из аккаунта</button><button class="chip x" data-hacct="del">Удалить аккаунт</button>' : '<button class="chip pri" data-hacct="in">Войти или создать профиль</button>'}</div>` : ''}`;
+  $('#profile').innerHTML = `<div class="pctop"><span class="av big${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${(name[0] || '?').toUpperCase()}</span><span class="pwho"><b>${name}</b>${myStatus() ? `<em class="fst">${myStatus()}</em>` : ''}<small class="pmail">${mail}</small></span><button class="iconbtn" id="profEdit" aria-label="Редактировать профиль"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button></div><div class="pclvl"><div class="lvl">${ring(PROG.xp / need)}<b>${PROG.lvl}</b></div><div class="pi"><b class="pl1">Уровень ${PROG.lvl}</b><div class="xpbar"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></div><small>${PROG.xp} / ${need} опыта до ${PROG.lvl + 1} уровня</small></div></div><div class="pchips"><span>🏆 <b>${PROG.cups}</b> кубков</span><span><i class="coin"></i> <b>${wallet.gold}</b> золота</span><span>🏅 <b>${ACH.filter(a => PROG.ach[a.id] === 'got').length}</b>/${ACH.length} наград</span></div>${FB ? `<div class="pacts">${fbAuth && fbAuth.email ? '<button class="chip" data-hacct="out">Выйти из аккаунта</button>' : '<button class="chip pri" data-hacct="in">Войти или создать профиль</button>'}</div>` : ''}`;
   $('#profEdit').onclick = editProfile;
   // the buttons live in the profile card; the account block below it keeps the handlers (renderAccount)
-  document.querySelectorAll('#profile [data-hacct]').forEach(b => { b.onclick = () => { if (b.dataset.hacct === 'del') return askDeleteAccount(); const t = $(b.dataset.hacct === 'out' ? '#acLogout' : '#acLogin'); if (t) t.click(); }; });
+  document.querySelectorAll('#profile [data-hacct]').forEach(b => { b.onclick = () => { const t = $(b.dataset.hacct === 'out' ? '#acLogout' : '#acLogin'); if (t) t.click(); }; });
   const st = PROG.st = normalizeStats(PROG.st);
   const rate = st.games ? Math.round(100 * st.wins / st.games) : 0;
   const bm = st.byMode || {};
@@ -4432,7 +4422,11 @@ const onLobbyScreen = () => !$('#scr-lobby').hidden;
 function friendsDot() {
   const b = $('#friendsBtn'); if (!b) return;
   b.classList.toggle('hasdot', Object.values(inbox).some(v => v.k === 'f' || v.k === 'r'));
-  const n = friendsOnline(), e = b.querySelector('.fnum'); e.hidden = !n; e.textContent = ''; b.title = n ? `Друзей в сети: ${n}` : '';
+  const hasOnline = friendsOnline() > 0;
+  const d = $('#fNavDot'); if (d) d.hidden = !hasOnline;
+  const sd = $('#fScreenOnlineDot'); if (sd) sd.hidden = !hasOnline;
+  const legacy = b.querySelector('.fnum'); if (legacy) { legacy.hidden = !hasOnline; legacy.textContent = ''; }
+  b.title = hasOnline ? 'Друзья в сети' : '';
 }
 /* ---------------- statuses, my items ----------------
    A status is a short line under the nickname (see src/state/status.js). Ready ones are sold in the shop, a hand-written
@@ -4608,7 +4602,7 @@ function fillOnline(sec, title, list, show, inRoom, room) {
   const on = show ? friends.filter(f => f.on && !inRoom.has(f.uid)) : [];
   sec.hidden = !on.length;
   if (!on.length) return;
-  title.textContent = `Друзья онлайн · ${on.length}`;
+  title.textContent = 'Друзья онлайн';
   const html = on.map(f => fRow(f, `<button class="chip go" data-linv="${f.uid}">${
     room && invited.code === room && invited.joined.has(f.uid) ? '✓ Принял' :
     room && invited.code === room && invited.uids.has(f.uid) ? 'Ещё раз' : 'Позвать'
@@ -4648,8 +4642,8 @@ function renderFriends() {
         let h = '';
         if (invs.length) h += `<div class="h3">Зовут играть</div><ul class="flist">${invs.map(([k, v]) => fRow({n: clean(v.n), c: '#f2b84b'}, `<button class="chip go" data-fjoin="${k}">Войти</button><button class="chip x" data-fdrop="${k}" aria-label="Отклонить">✕</button>`, 'комната ' + clean(v.code))).join('')}</ul>`;
         if (reqs.length) h += `<div class="h3">Заявки в друзья</div><ul class="flist">${reqs.map(([k, v]) => fRow({n: clean(v.n), c: '#f2b84b'}, `<button class="chip go" data-facc="${k.slice(0, -2)}">Принять</button><button class="chip x" data-fdrop="${k}" aria-label="Отклонить">✕</button>`, 'хочет дружить')).join('')}</ul>`;
-        h += `<div class="h3">В сети · ${on.length}</div><ul class="flist">${on.map(f => fRow(f, `<button class="chip go" data-finv="${f.uid}">${room && invited.code === room && invited.joined.has(f.uid) ? '✓ Принял' : room && invited.code === room && invited.uids.has(f.uid) ? 'Ещё раз' : 'Позвать'}</button>`, STATE_TEXT[f.p.s] || 'в игре')).join('') || '<li class="qnote">Никого из друзей нет в сети</li>'}</ul>`;
-        if (off.length) h += `<div class="h3">Не в сети · ${off.length}</div><ul class="flist">${off.map(f => fRow(f, `<button class="chip x" data-fdel="${f.uid}" aria-label="Удалить из друзей">✕</button>`, agoText(f.p && f.p.t))).join('')}</ul>`;
+        h += `<div class="h3"><span class="fdot on"></span>В сети</div><ul class="flist">${on.map(f => fRow(f, `<button class="chip go" data-finv="${f.uid}">${room && invited.code === room && invited.joined.has(f.uid) ? '✓ Принял' : room && invited.code === room && invited.uids.has(f.uid) ? 'Ещё раз' : 'Позвать'}</button>`, STATE_TEXT[f.p.s] || 'в игре')).join('') || '<li class="qnote">Никого из друзей нет в сети</li>'}</ul>`;
+        if (off.length) h += `<div class="h3"><span class="fdot off"></span>Не в сети</div><ul class="flist">${off.map(f => fRow(f, `<button class="chip x" data-fdel="${f.uid}" aria-label="Удалить из друзей">✕</button>`, agoText(f.p && f.p.t))).join('')}</ul>`;
         if (wait.length) h += `<div class="h3">Ждут ответа</div><ul class="flist">${wait.map(f => fRow(f, `<button class="chip x" data-fdel="${f.uid}" aria-label="Отменить заявку">✕</button>`, 'заявка отправлена')).join('')}</ul>`;
         if (!friends.length && !reqs.length) h += '<p class="shint">Добавьте друга по коду выше</p>';
         return h;

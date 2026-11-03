@@ -36,8 +36,8 @@ test('history tab relocated: button in main menu header, profile has 3 tabs, ded
   // 5. show() wires history
   assert.ok(gameHtml.includes("if (name === 'history') renderHistory($('#historyList'))"), 'show() calls renderHistory for history screen');
 
-  // 6. Profile screen provides direct access to history via #histBtn
-  assert.ok(gameHtml.includes('id="histBtn"'), 'profile has #histBtn entry button');
+  // 6. Profile screen does not have match history button anymore (history is exclusively in main menu header)
+  assert.ok(!gameHtml.includes('id="histBtn"'), 'profile does not have #histBtn entry button');
 });
 
 test('firebase rules: admin read allowed for profiles', () => {
