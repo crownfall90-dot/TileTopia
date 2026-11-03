@@ -32,7 +32,7 @@
       </nav>
       <section class="screen" id="scr-menu" hidden>
         <div class="mtop">
-          <button class="mprof" id="mprof" data-go="progress" aria-label="Профиль, уровень и золото"></button>
+          <button class="mprof" id="mprof" data-go="progress" aria-label="Профиль, кубки, уровень и золото"></button>
           <div class="mtools"><button class="mtool" data-go="history" aria-label="История партий" title="История партий"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg></button><button class="mtool" data-go="rules" aria-label="Как играть"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 014.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17.2h.01"/></svg></button><button class="mtool" id="menuSettings" aria-label="Настройки"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg></button></div>
         </div>
         <div class="hero"><div class="mini" id="mini"></div></div>
@@ -3755,7 +3755,7 @@ function renderMenuProfile() {
   const el = $('#mprof'); if (!el) return;
   try { earnedCheck(); } catch (_) {}
   const need = xpNeed(PROG.lvl), name = profileName();
-  el.innerHTML = `<span class="av${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${name[0] || '?'}</span><span class="mpi"><b>${name}</b><span class="mpl"><em>Ур. ${PROG.lvl}</em><i class="mxp"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></i></span></span><span class="mpg"><i class="coin"></i><b class="goldN">${wallet.gold}</b></span>`;
+  el.innerHTML = `<span class="av${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${name[0] || '?'}</span><span class="mpi"><b>${name}</b><span class="mpl"><em>Ур. ${PROG.lvl}</em><i class="mxp"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></i></span></span><div class="mp-badges"><span class="mpc" title="Кубки рейтинга">🏆 <b class="cupsN">${PROG.cups || 0}</b></span><span class="mpg" title="Золото"><i class="coin"></i><b class="goldN">${wallet.gold}</b></span></div>`;
   renderMenuQuestBanner();
 }
 function renderProgress() {

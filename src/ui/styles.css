@@ -121,7 +121,10 @@ html.app input,html.app textarea,html.app a,html.app [contenteditable],html.app 
 .mprof .mpi b{font:800 14px/1.05 var(--f-display);color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mprof .mpl{display:flex;align-items:center;gap:6px}.mprof .mpl em{font:700 11px var(--f-body);font-style:normal;color:#ffd877;white-space:nowrap}
 .mprof .mxp{display:block;width:58px;height:5px;border-radius:3px;background:rgba(255,255,255,.12);overflow:hidden}.mprof .mxp i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#ffd877,#f2b84b)}
-.mprof .mpg{display:flex;align-items:center;gap:5px;padding-left:9px;margin-left:2px;border-left:1px solid rgba(255,255,255,.12);font:800 14px var(--f-display);color:#ffd877;font-variant-numeric:tabular-nums}
+.mprof .mp-badges{display:flex;flex-direction:column;justify-content:center;gap:3px;padding-left:8px;margin-left:auto;border-left:1px solid rgba(255,255,255,.14);flex:0 0 auto}
+.mprof .mpc{display:flex;align-items:center;gap:4px;font:800 12px var(--f-display);color:#ffe07a;font-variant-numeric:tabular-nums;line-height:1}
+.mprof .mpg{display:flex;align-items:center;gap:4px;font:800 12px var(--f-display);color:#ffd877;font-variant-numeric:tabular-nums;line-height:1;padding:0;margin:0;border:0}
+.mprof .mpg .coin{width:13px;height:13px}
 .mtools{display:flex;align-items:center;gap:4px;padding:4px;border-radius:999px;background:linear-gradient(180deg,rgba(32,44,82,.85),rgba(16,22,48,.92));border:1.5px solid rgba(255,255,255,.14);box-shadow:0 8px 24px rgba(0,0,0,.35);flex:0 0 auto}
 .mtool{position:relative;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:none;border:0;color:#fff;cursor:pointer;padding:0;transition:transform .15s ease}
 .mtool svg{width:20px;height:20px}.mtool:hover{color:#ffd877}.mtool:active{transform:scale(.92)}

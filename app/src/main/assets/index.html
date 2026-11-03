@@ -199,7 +199,10 @@ html.app input,html.app textarea,html.app a,html.app [contenteditable],html.app 
 .mprof .mpi b{font:800 14px/1.05 var(--f-display);color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .mprof .mpl{display:flex;align-items:center;gap:6px}.mprof .mpl em{font:700 11px var(--f-body);font-style:normal;color:#ffd877;white-space:nowrap}
 .mprof .mxp{display:block;width:58px;height:5px;border-radius:3px;background:rgba(255,255,255,.12);overflow:hidden}.mprof .mxp i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#ffd877,#f2b84b)}
-.mprof .mpg{display:flex;align-items:center;gap:5px;padding-left:9px;margin-left:2px;border-left:1px solid rgba(255,255,255,.12);font:800 14px var(--f-display);color:#ffd877;font-variant-numeric:tabular-nums}
+.mprof .mp-badges{display:flex;flex-direction:column;justify-content:center;gap:3px;padding-left:8px;margin-left:auto;border-left:1px solid rgba(255,255,255,.14);flex:0 0 auto}
+.mprof .mpc{display:flex;align-items:center;gap:4px;font:800 12px var(--f-display);color:#ffe07a;font-variant-numeric:tabular-nums;line-height:1}
+.mprof .mpg{display:flex;align-items:center;gap:4px;font:800 12px var(--f-display);color:#ffd877;font-variant-numeric:tabular-nums;line-height:1;padding:0;margin:0;border:0}
+.mprof .mpg .coin{width:13px;height:13px}
 .mtools{display:flex;align-items:center;gap:4px;padding:4px;border-radius:999px;background:linear-gradient(180deg,rgba(32,44,82,.85),rgba(16,22,48,.92));border:1.5px solid rgba(255,255,255,.14);box-shadow:0 8px 24px rgba(0,0,0,.35);flex:0 0 auto}
 .mtool{position:relative;width:40px;height:40px;border-radius:50%;display:grid;place-items:center;background:none;border:0;color:#fff;cursor:pointer;padding:0;transition:transform .15s ease}
 .mtool svg{width:20px;height:20px}.mtool:hover{color:#ffd877}.mtool:active{transform:scale(.92)}
@@ -1351,7 +1354,7 @@ html.app .screen.scroll{--sp:var(--it,0px);padding-top:0}/* the status-bar gap i
       </nav>
       <section class="screen" id="scr-menu" hidden>
         <div class="mtop">
-          <button class="mprof" id="mprof" data-go="progress" aria-label="Профиль, уровень и золото"></button>
+          <button class="mprof" id="mprof" data-go="progress" aria-label="Профиль, кубки, уровень и золото"></button>
           <div class="mtools"><button class="mtool" data-go="history" aria-label="История партий" title="История партий"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg></button><button class="mtool" data-go="rules" aria-label="Как играть"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 014.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17.2h.01"/></svg></button><button class="mtool" id="menuSettings" aria-label="Настройки"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg></button></div>
         </div>
         <div class="hero"><div class="mini" id="mini"></div></div>
@@ -5074,7 +5077,7 @@ function renderMenuProfile() {
   const el = $('#mprof'); if (!el) return;
   try { earnedCheck(); } catch (_) {}
   const need = xpNeed(PROG.lvl), name = profileName();
-  el.innerHTML = `<span class="av${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${name[0] || '?'}</span><span class="mpi"><b>${name}</b><span class="mpl"><em>Ур. ${PROG.lvl}</em><i class="mxp"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></i></span></span><span class="mpg"><i class="coin"></i><b class="goldN">${wallet.gold}</b></span>`;
+  el.innerHTML = `<span class="av${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${name[0] || '?'}</span><span class="mpi"><b>${name}</b><span class="mpl"><em>Ур. ${PROG.lvl}</em><i class="mxp"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></i></span></span><div class="mp-badges"><span class="mpc" title="Кубки рейтинга">🏆 <b class="cupsN">${PROG.cups || 0}</b></span><span class="mpg" title="Золото"><i class="coin"></i><b class="goldN">${wallet.gold}</b></span></div>`;
   renderMenuQuestBanner();
 }
 function renderProgress() {
