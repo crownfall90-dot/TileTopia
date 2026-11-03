@@ -481,6 +481,35 @@ if (!MODES[setup.rules.mode]) setup.rules.mode = 'classic';
 if (![30, 50, 100].includes(setup.rules.deck)) setup.rules.deck = MODES[setup.rules.mode].set.deck; // the old sizes (40, 60, whole deck) became 30 / 50 / 100
 if (![4, 5, 6, 8].includes(setup.rules.meeples)) setup.rules.meeples = MODES[setup.rules.mode].set.meeples;
 const clean = v => String(v || '').replace(/[<>&"'`]/g, '').trim().slice(0, 12);
+const appVersion = () => {
+  if (window.AndroidApp && typeof AndroidApp.versionName === 'function') {
+    const v = AndroidApp.versionName();
+    if (v) return String(v).trim();
+  }
+  if (window.WEB_VERSION && typeof window.WEB_VERSION === 'string') {
+    const s = window.WEB_VERSION.trim();
+    if (s && s !== 'dev' && s !== 'веб-макет' && s !== 'TEST') {
+      if (s.startsWith('1.0.')) return s;
+      const num = s.replace(/^[^\d]*/, '');
+      if (num) return '1.0.' + num;
+    }
+  }
+  return '1.0.256';
+};
+if (!window.AndroidApp) {
+  try {
+    fetch('latest.json?t=' + Date.now())
+      .then(r => r.json())
+      .then(d => {
+        if (d && d.version) {
+          window.WEB_VERSION = d.version;
+          const el = document.getElementById('verFull');
+          if (el) el.textContent = appVersion();
+        }
+      })
+      .catch(() => {});
+  } catch (_) {}
+}
 // Who controls a seat: people on this phone (offline) or this phone's own seat (online); bots run on one phone only.
 const isLocal = i => (typeof PG !== 'undefined' && PG.game && PG.game.isLocalPlayer)
   ? PG.game.isLocalPlayer(players[i], myId, !!net)
@@ -2088,7 +2117,7 @@ function renderPrefs() {
     return rows.length ? `<div class="h3">${title}</div><div class="sgroup">${rows.map(row).join('')}</div>` : '';
   }).join('');
   renderAccount();
-  $('#verFull').textContent = window.AndroidApp ? AndroidApp.versionName() : window.WEB_VERSION || 'веб-макет';
+  $('#verFull').textContent = appVersion();
   $('#checkUpd').hidden = !window.AndroidApp;
   try { renderInstall(); } catch (_) {} // the web shell may not be set up yet on the first call
   devGet('devToken'); $('#devBtn').hidden = !devGet('devPanel');
@@ -2568,7 +2597,7 @@ function devInfo() {
 }
 function versionSeen() {
   // Kept outside the profile: it belongs to this device, not to the account.
-  const v = isAndroid ? AndroidApp.versionName() : String(window.WEB_VERSION || '');
+  const v = appVersion();
   let seen = null; try { seen = JSON.parse(localStorage.getItem('verSeen')); } catch (_) {}
   if (!seen || seen.v !== v) { seen = {v, t: Date.now()}; try { localStorage.setItem('verSeen', JSON.stringify(seen)); } catch (_) {} }
   return seen;
@@ -4861,7 +4890,7 @@ function getDeviceDiagnostics() {
     online: !!nav.onLine,
     fps: window._currentFps || 60,
     lagsRecorded: (window._recentLags && window._recentLags.length) || 0,
-    ver: window.WEB_VERSION || (window.AndroidApp && AndroidApp.versionName ? AndroidApp.versionName() : 'dev'),
+    ver: appVersion(),
     ua: ua.slice(0, 180)
   };
 }
@@ -5084,7 +5113,7 @@ function showNameProposalDialog(force) {
       const tok = fbAuth ? await fbToken() : null;
       const uid = (fbAuth && fbAuth.uid) || (FBC && FBC.session() && FBC.session().uid) || 'u_' + Math.random().toString(36).slice(2, 10);
       const author = typeof profileName === 'function' ? profileName() : (wallet.name || 'Игрок');
-      const ver = window.WEB_VERSION || (window.AndroidApp && AndroidApp.versionName ? AndroidApp.versionName() : 'dev');
+      const ver = appVersion();
       if (FB && FB.dbUrl) {
         const url = `${FB.dbUrl}/suggestions/names/${uid}.json` + (tok ? `?auth=${tok}` : '');
         await fetch(url, {
@@ -5915,7 +5944,7 @@ if (isApp) {
   document.documentElement.classList.add('app');
   if (isWeb) document.documentElement.classList.add('web');
   if (isStaging) initStagingGate();
-  showWhatsNew(isAndroid ? AndroidApp.versionName() : window.WEB_VERSION);
+  showWhatsNew(appVersion());
   // The same physical size on every phone: the app reports the screen size in inches (see uiScale in
   // MainActivity) and the whole page is zoomed by that factor. Web browsers keep 100%.
   if (isAndroid && AndroidApp.uiScale) { const z = +AndroidApp.uiScale(); if (z > 0 && Math.abs(z - 1) > .01) document.documentElement.style.zoom = z; }
@@ -6185,7 +6214,7 @@ function reportError(msg) {
           body: JSON.stringify({
             m: String(msg).slice(0, 500),
             ua: (navigator.userAgent || '').slice(0, 200),
-            ver: window.WEB_VERSION || (window.AndroidApp ? AndroidApp.versionName() : 'dev'),
+            ver: appVersion(),
             uid: (FBC && FBC.session() && FBC.session().uid) || undefined,
             dev: devStr,
             trail: trailStr,
@@ -6254,7 +6283,7 @@ devVerify();
   for (const k of [1, 3, 7]) if (days >= k && days < k + 2 && !(wallet.rd || {})[k]) { wallet.rd = Object.assign(wallet.rd || {}, {[k]: 1}); saveWallet(); track('return_d' + k, {days}); }
 })();
 try { if (localStorage.getItem('delNote')) { localStorage.removeItem('delNote'); setTimeout(() => toastAny('Данные игры удалены. Чтобы удалить и сам вход, войдите в аккаунт заново и повторите удаление.'), 1500); } } catch (_) {}
-plog('open', {p: installKind(), v: window.WEB_VERSION || (window.AndroidApp ? AndroidApp.versionName() : 'dev')});
+plog('open', {p: installKind(), v: appVersion()});
 if (window.WEBAPP && FB && FB.googleClientId) googleReturn();
 // back from Google's page with the browser's Back button: the page comes from the cache with the button still pressed
 addEventListener('pageshow', e => { if (e.persisted) document.querySelectorAll('#accGoogle').forEach(b => { b.disabled = false; }); });
