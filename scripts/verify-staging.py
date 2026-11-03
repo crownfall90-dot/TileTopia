@@ -45,7 +45,7 @@ def verify():
 
     if tools:
         badging = run([str(tools / 'aapt'), 'dump', 'badging', str(apk)])
-        if not re.search(r"^package: name='com\.crownfall\.mosaic", badging, re.M):
+        if not re.search(r"^package: name='(com\.crownfall\.mosaic|app\.crownfall\.tiletopia)", badging, re.M):
             report['status'] = 'wrong_application_id'
             return False
         permissions = run([str(tools / 'aapt'), 'dump', 'permissions', str(apk)])
