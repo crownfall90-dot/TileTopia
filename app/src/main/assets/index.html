@@ -157,6 +157,8 @@ html.app input,html.app textarea,html.app a,html.app [contenteditable],html.app 
 .srow[hidden]{display:none}
 .srow.btn{cursor:pointer}.srow.btn:active{background:rgba(255,255,255,.08)}
 .srow .chip{flex:0 0 auto;margin-left:auto;height:30px;padding:0 10px;font-size:12px}
+.tg-reward-box{display:flex;align-items:center;justify-content:space-between;padding:10px 14px;border-radius:12px;background:rgba(242,184,75,.12);border:1px solid rgba(242,184,75,.3);margin:10px 0 14px;font-size:13.5px;color:#fce49d}
+.tg-reward-box b{color:var(--brass);font-size:15px}
 .sic{flex:0 0 38px;height:38px;border-radius:12px;display:grid;place-items:center;font-size:19px;background:rgba(255,255,255,.08);border:1px solid rgba(255,255,255,.12);box-shadow:0 2px 8px rgba(0,0,0,.2)}
 .stx{flex:1;min-width:0;display:flex;flex-direction:column;gap:2px}.stx b{font:700 14.5px var(--f-body);color:#fff}.stx small{color:#cbd7ed;font-size:12px;line-height:1.3}
 .sval{font:700 14px var(--f-display);color:var(--muted);font-variant-numeric:tabular-nums}.sgo{color:var(--muted);font-size:22px;line-height:1}
@@ -6400,16 +6402,33 @@ function updateNameProposalBtnLabel() {
   }
 }
 
+function openTelegramLink() {
+  const url = 'https://t.me/diarydevelopment';
+  if (typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === 'function') {
+    try { window.Telegram.WebApp.openTelegramLink(url); } catch (_) { window.open(url, '_blank'); }
+  } else {
+    window.open(url, '_blank');
+  }
+}
+
 function updateTgChannelBtn() {
   const sub = document.getElementById('tgChannelSub');
   const badge = document.getElementById('tgChannelBadge');
   if (!sub) return;
   const claimed = !!(wallet && (wallet.tgSubClaimed || wallet.tgReward));
+  let visited = false;
+  try { visited = !!sessionStorage.getItem('tg_visited'); } catch (_) {}
   if (claimed) {
     sub.textContent = 'Вы подписаны на канал · награда получена';
     if (badge) {
       badge.textContent = '✓ 500';
       badge.className = 'chip ok';
+    }
+  } else if (visited) {
+    sub.innerHTML = 'Нажмите «Я подписался» · <b style="color:var(--brass)">Забрать +500</b>';
+    if (badge) {
+      badge.textContent = 'Забрать 🪙';
+      badge.className = 'chip pri';
     }
   } else {
     sub.innerHTML = 'Новости и обновления · <b style="color:var(--brass)">+500 золота</b>';
@@ -6420,13 +6439,7 @@ function updateTgChannelBtn() {
   }
 }
 
-function openTelegramChannel() {
-  const url = 'https://t.me/diarydevelopment';
-  if (typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp && typeof window.Telegram.WebApp.openTelegramLink === 'function') {
-    try { window.Telegram.WebApp.openTelegramLink(url); } catch (_) { window.open(url, '_blank'); }
-  } else {
-    window.open(url, '_blank');
-  }
+function claimTgSubscriptionReward() {
   const claimFn = (typeof PG !== 'undefined' && PG.app && PG.app.telegram && PG.app.telegram.claimTelegramReward)
     ? PG.app.telegram.claimTelegramReward
     : (w, amt) => {
@@ -6446,7 +6459,67 @@ function openTelegramChannel() {
     renderAccount();
     if (typeof renderMenuProfile === 'function') renderMenuProfile();
   } else {
+    toastAny('Вы уже получили награду за подписку');
+  }
+}
+
+function showTelegramDialog() {
+  const old = document.getElementById('tgSubBox'); if (old) old.remove();
+  const box = document.createElement('div');
+  box.className = 'over';
+  box.id = 'tgSubBox';
+  box.style.position = 'fixed';
+  let visited = false;
+  try { visited = !!sessionStorage.getItem('tg_visited'); } catch (_) {}
+
+  const renderContent = () => {
+    box.innerHTML = `<div class="ocard prof tg-dialog">
+      <div style="font-size:44px">📢</div>
+      <h3>Телеграм-канал игры</h3>
+      <p>Подпишитесь на официальный канал <b>@diarydevelopment</b>, чтобы первыми получать промокоды, анонсы турниров и общаться с игроками!</p>
+      <div class="tg-reward-box">
+        <span>🎁 Награда за подписку:</span>
+        <b>+500 золота</b>
+      </div>
+      <button class="cta wide" id="tgGoBtn">${visited ? '✓ Канал открыт (перейти ещё раз)' : '1. Перейти в канал'}</button>
+      <button class="${visited ? 'cta wide' : 'ghostbtn wide'}" id="tgClaimBtn" style="${visited ? 'background:linear-gradient(180deg,#55d688 0%,#3fc27a 100%);color:#0b2214;font-weight:700;' : ''}">2. Я подписался · Забрать 500 🪙</button>
+      <button class="ghostbtn" id="tgCloseBtn">Закрыть</button>
+    </div>`;
+  };
+  renderContent();
+  document.body.append(box);
+
+  box.onclick = e => {
+    if (e.target === box || e.target.id === 'tgCloseBtn') return box.remove();
+    if (e.target.id === 'tgGoBtn') {
+      visited = true;
+      try { sessionStorage.setItem('tg_visited', '1'); } catch (_) {}
+      openTelegramLink();
+      toastAny('Перейдите в канал, подпишитесь и возвращайтесь за наградой!');
+      renderContent();
+      updateTgChannelBtn();
+    } else if (e.target.id === 'tgClaimBtn') {
+      if (!visited) {
+        visited = true;
+        try { sessionStorage.setItem('tg_visited', '1'); } catch (_) {}
+        openTelegramLink();
+        toastAny('Сначала откройте канал и подпишитесь, затем нажмите «Я подписался»!');
+        renderContent();
+        return;
+      }
+      box.remove();
+      claimTgSubscriptionReward();
+    }
+  };
+}
+
+function openTelegramChannel() {
+  const claimed = !!(wallet && (wallet.tgSubClaimed || wallet.tgReward));
+  if (claimed) {
+    openTelegramLink();
     toastAny('Открываем канал @diarydevelopment…');
+  } else {
+    showTelegramDialog();
   }
 }
 
