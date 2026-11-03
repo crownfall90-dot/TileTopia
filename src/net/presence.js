@@ -49,7 +49,13 @@ export function agoText(t, now = Date.now()) {
   if (!t) return 'не в сети';
   const m = Math.round((now - t) / 60000);
   if (m < 1) return 'был(а) в сети только что';
-  return 'был(а) в сети ' + (m < 60 ? m + ' мин назад' : m < 1440 ? Math.round(m / 60) + ' ч назад' : Math.round(m / 1440) + ' дн назад');
+  if (m < 60) return 'был(а) в сети ' + m + ' мин назад';
+  const h = Math.round(m / 60);
+  if (h < 24) return 'был(а) в сети ' + h + ' ч назад';
+  const d = Math.round(m / 1440);
+  if (d === 1) return 'был(а) в сети вчера';
+  if (d < 30) return 'был(а) в сети ' + d + ' дн назад';
+  return 'был(а) в сети давно';
 }
 
 /** Renders online players popup list markup. */

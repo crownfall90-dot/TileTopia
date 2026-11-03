@@ -68,7 +68,7 @@ export function renderFriendsListHtml({
     h += `<div class="h3 fsec-hdr"><span class="fdot off"></span><b>Не в сети</b></div><ul class="flist">${off.map(f => fRow(f, `<button class="chip x" data-fdel="${f.uid}" aria-label="Удалить из друзей">✕</button>`, agoTextFn(f.p && f.p.t))).join('')}</ul>`;
   }
   if (wait.length) {
-    h += `<div class="h3 fsec-hdr"><span>⏳</span><b>Ждут ответа</b><em>${wait.length}</em></div><ul class="flist">${wait.map(f => fRow(f, `<button class="chip x" data-fdel="${f.uid}" aria-label="Отменить заявку">✕</button>`, 'заявка отправлена')).join('')}</ul>`;
+    h += `<div class="h3 fsec-hdr"><span>⏳</span><b>Ждут ответа</b><em>${wait.length}</em></div><ul class="flist">${wait.map(f => fRow(f, `<button class="chip x" data-fdel="${f.uid}" aria-label="Отменить заявку">✕</button>`, (f.p && f.p.t) ? agoTextFn(f.p.t) : 'заявка отправлена')).join('')}</ul>`;
   }
   if (!on.length && !off.length && !wait.length && !reqs.length) {
     h += '<p class="shint">Добавьте друга по коду выше</p>';
