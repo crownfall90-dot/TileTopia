@@ -9,6 +9,9 @@ const read = f => fs.readFileSync(__dirname + '/../' + f, 'utf8');
 test('play: in-app deletion path, web deletion page and policy are there and agree', () => {
   const game = read('web/game.html');
   assert.match(game, /id="delAccBtn"/, 'Settings has "Delete account and data"');
+  assert.match(game, /function accountDataDialog\(\)/, 'Account and data opens dedicated dialog from About app');
+  assert.match(game, /function confirmWordDialog\(/, 'Multi-step protection with keyword confirmation exists');
+  assert.match(game, /confirmWordDialog\('УДАЛИТЬ'/, 'askDeleteAccount requires typing УДАЛИТЬ');
   assert.match(game, /async function deleteMyAccount\(\)/);
   for (const p of ['profiles/', 'presence/', 'leaders/', 'friends/', 'inbox/', 'logs/', 'feedback/', 'suggestions/names/', 'playerNo/', 'fcodeOf/']) assert.ok(game.includes(`'${p}'`), 'deletes ' + p);
   assert.match(game, /idt\('delete'/, 'deletes the sign-in too');
