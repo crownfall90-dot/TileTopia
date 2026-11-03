@@ -110,7 +110,15 @@
           <div class="ltop"><button class="iconbtn" id="fBack" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Друзья</b></div>
           <p class="froom" id="fRoom" hidden></p>
           <div class="ocard fgate" id="fGate" hidden></div>
-          <div class="codecard" id="fMine"><small>Ваш код друга</small><div class="code sm" id="fcode" role="button" tabindex="0" aria-label="Скопировать код друга"></div><small class="tapcopy" id="fTap">Нажмите, чтобы скопировать</small><p class="ferr" id="fErr" hidden>…<button class="chip" id="fRetry">Повторить</button></p><button class="chip" id="fCopy">🔗 Скопировать ссылку</button></div>
+          <div class="codecard" id="fMine">
+            <span class="codecard-tag">🤝 Ваш код для друзей</span>
+            <div class="code sm" id="fcode" role="button" tabindex="0" aria-label="Скопировать код друга"></div>
+            <small class="tapcopy" id="fTap">Нажмите на код, чтобы скопировать</small>
+            <p class="ferr" id="fErr" hidden>…<button class="chip" id="fRetry">Повторить</button></p>
+            <div class="fcode-actions">
+              <button class="chip fchip-share" id="fCopy">🔗 Скопировать ссылку</button>
+            </div>
+          </div>
           <div class="joinrow" id="fJoinRow"><input class="field codein" id="fCodeIn" maxlength="6" placeholder="Код друга" autocomplete="off" autocapitalize="characters"><button class="cta" id="fAdd">Добавить</button></div>
           <div class="col" id="flist"></div>
         </div>
@@ -3836,10 +3844,41 @@ async function openPlayer(uid, name, col) {
   const old = document.getElementById('plBox'); if (old) old.remove();
   const box = document.createElement('div'); box.className = 'over'; box.id = 'plBox'; box.style.position = 'fixed';
   const me = uid === myUid(), n = clean(name) || 'Игрок', c = validCol(col) ? col : '#5b6684';
-  box.innerHTML = `<div class="ocard prof pcard"><span class="av big" style="--c:${c}">${n[0].toUpperCase()}</span><h3>${n}</h3><p class="pstat" id="plStat">…</p>
-    ${me ? '' : `<button class="cta wide" id="plAdd"${isFriend(uid) ? ' disabled' : ''}>${isFriend(uid) ? 'Уже в друзьях' : 'Добавить в друзья'}</button>`}${me ? '' : '<button class="ghostbtn" id="plReport">⚠️ Пожаловаться на игрока</button>'}<button class="ghostbtn" id="plNo">Закрыть</button></div>`;
+  const room = net && !net.quick && !(net.gameId && phase !== 'end') ? net.code : null;
+  const isFr = isFriend(uid);
+  box.innerHTML = `<div class="ocard prof pcard pl-dialog">
+    <div class="pl-header">
+      <span class="av big" style="--c:${c}">${n[0].toUpperCase()}</span>
+      <div class="pl-titles">
+        <h3 class="pl-name">${n}</h3>
+        <span class="pl-online-badge off" id="plBadge">Загрузка данных…</span>
+      </div>
+    </div>
+    <div class="pl-stats-grid" id="plStatsGrid">
+      <div class="pl-stat-item"><span class="pl-stat-val" id="plCups">…</span><span class="pl-stat-lbl">Кубки</span></div>
+      <div class="pl-stat-item"><span class="pl-stat-val" id="plWins">…</span><span class="pl-stat-lbl">Победы</span></div>
+      <div class="pl-stat-item"><span class="pl-stat-val" id="plState">…</span><span class="pl-stat-lbl">Статус</span></div>
+    </div>
+    <div class="pl-actions">
+      ${me ? '' : isFr && room ? `<button class="cta wide" id="plInvite">🎮 Позвать в комнату ${room}</button>` : ''}
+      ${me ? '' : !isFr ? `<button class="cta wide" id="plAdd">+ Добавить в друзья</button>` : `<button class="ghostbtn" id="plDel">Удалить из друзей</button>`}
+      ${me ? '' : '<button class="ghostbtn muted-btn" id="plReport">⚠️ Пожаловаться на игрока</button>'}
+      <button class="ghostbtn" id="plNo">Закрыть</button>
+    </div>
+  </div>`;
   document.body.append(box);
   box.onclick = e => { if (e.target === box || e.target.id === 'plNo') box.remove(); };
+  const del = box.querySelector('#plDel');
+  if (del) del.onclick = () => {
+    box.remove();
+    confirmBox(`Удалить ${n} из друзей?`, 'Удалить', () => removeFriend(uid));
+  };
+  const inv = box.querySelector('#plInvite');
+  if (inv) inv.onclick = () => {
+    inviteFriend(uid);
+    inv.disabled = true;
+    inv.textContent = '✓ Приглашение отправлено';
+  };
   // Report a nickname or a status (user-generated text): goes to the developer's feedback inbox.
   const rep = box.querySelector('#plReport'); if (rep) rep.onclick = () => confirmBox(`Пожаловаться на игрока «${n}»?<br><small style="font-weight:500;color:var(--muted)">Мы проверим никнейм и статус и примем меры.</small>`, 'Пожаловаться', async () => {
     try {
@@ -3848,13 +3887,24 @@ async function openPlayer(uid, name, col) {
       toastAny('Жалоба отправлена. Спасибо!'); track('player_report'); rep.disabled = true; rep.textContent = 'Жалоба отправлена';
     } catch (_) { toastAny('Не получилось отправить жалобу: проверьте интернет'); }
   });
-  const add = box.querySelector('#plAdd'); if (add) add.onclick = () => { add.disabled = true; add.textContent = 'Заявка отправлена'; addFriend(uid, n, 'profile'); };
+  const add = box.querySelector('#plAdd'); if (add) add.onclick = () => { add.disabled = true; add.textContent = '✓ Заявка отправлена'; addFriend(uid, n, 'profile'); };
   const [lead, pres] = await Promise.all([fbGet('leaders/' + uid).catch(() => null), fbGet('presence/' + uid).catch(() => null)]);
   const ago = pres && pres.t ? Math.round((Date.now() - pres.t) / 60000) : null;
-  const seen = ago == null ? '' : pres.s && pres.s !== 'off' && ago < 3 ? '🟢 в сети' : ago < 60 ? `был ${ago} мин назад` : ago < 1440 ? `был ${Math.round(ago / 60)} ч назад` : `был ${Math.round(ago / 1440)} дн назад`;
-  const sv = PG.state.status.shownStatus((pres && pres.st) || (lead && lead.st)), h3 = box.querySelector('h3');
-  if (sv && h3 && !h3.nextElementSibling.classList.contains('fst')) h3.insertAdjacentHTML('afterend', `<em class="fst">${sv}</em>`);
-  const st = box.querySelector('#plStat'); if (st) st.textContent = [`🏆 ${lead && +lead.r || 0} кубков`, lead && lead.w ? `${+lead.w} побед онлайн` : '', seen].filter(Boolean).join(' · ');
+  const isOnline = pres && pres.s && pres.s !== 'off' && (ago == null || ago < 3);
+  const seenText = ago == null ? 'Офлайн' : isOnline ? 'В сети' : ago < 60 ? `был ${ago} мин назад` : ago < 1440 ? `был ${Math.round(ago / 60)} ч назад` : `был ${Math.round(ago / 1440)} дн назад`;
+  const sv = PG.state.status.shownStatus((pres && pres.st) || (lead && lead.st));
+
+  const badgeEl = box.querySelector('#plBadge');
+  if (badgeEl) {
+    badgeEl.className = 'pl-online-badge ' + (isOnline ? 'on' : 'off');
+    badgeEl.innerHTML = (isOnline ? '<i>●</i> В сети' : '<i>○</i> ' + seenText) + (sv ? ` · <em class="fst">${sv}</em>` : '');
+  }
+  const cupsEl = box.querySelector('#plCups');
+  if (cupsEl) cupsEl.textContent = `🏆 ${lead && +lead.r || 0}`;
+  const winsEl = box.querySelector('#plWins');
+  if (winsEl) winsEl.textContent = `${lead && +lead.w || 0}`;
+  const stateEl = box.querySelector('#plState');
+  if (stateEl) stateEl.textContent = isOnline ? (STATE_TEXT[pres.s] || 'в игре') : 'не в сети';
 }
 document.addEventListener('click', e => { const b = e.target.closest('[data-pl]'); if (b && !e.target.closest('button.chip')) openPlayer(b.dataset.pl, b.dataset.n, b.dataset.c); });
 // Edit the profile: colour (free, any time) and nickname (the usual rename).
@@ -3975,9 +4025,9 @@ async function renderTop() {
     const mine = rows.findIndex(x => x.uid === me);
 
     const av = (x, i) => `<span class="av" style="--c:${validCol(x.c) ? x.c : PALETTE[i % PALETTE.length].col}">${(clean(x.n) || '?')[0].toUpperCase()}</span>`;
-    const podium = [1, 0, 2].map(i => rows[i] ? `<div class="pod p${i + 1}${rows[i].uid === me ? ' me' : ''}">${av(rows[i], i)}<b>${clean(rows[i].n) || 'Игрок'}</b>${stTag(rows[i].st)}<small>🏆 ${rows[i].r}</small><div class="ped"><i>${i + 1}</i></div></div>` : '<div class="pod empty"></div>').join('');
-    const list = rows.slice(3, 10).map((x, k) => `<div class="lead${x.uid === me ? ' me' : ''}"><i>${k + 4}</i>${av(x, k + 3)}<span>${clean(x.n) || 'Игрок'}${x.uid === me ? ' (вы)' : ''}${stTag(x.st)}</span><b>🏆 ${x.r}</b></div>`).join('');
-    const myRow = mine >= 10 ? `<div class="lead me myrank"><i>${mine + 1}</i>${av(rows[mine], mine)}<span>Вы</span><b>🏆 ${rows[mine].r}</b></div>`
+    const podium = [1, 0, 2].map(i => rows[i] ? `<div class="pod p${i + 1}${rows[i].uid === me ? ' me' : ''}" data-pl="${rows[i].uid}" data-n="${clean(rows[i].n) || 'Игрок'}" data-c="${validCol(rows[i].c) ? rows[i].c : ''}">${av(rows[i], i)}<b>${clean(rows[i].n) || 'Игрок'}</b>${stTag(rows[i].st)}<small>🏆 ${rows[i].r}</small><div class="ped"><i>${i + 1}</i></div></div>` : '<div class="pod empty"></div>').join('');
+    const list = rows.slice(3, 10).map((x, k) => `<div class="lead${x.uid === me ? ' me' : ''}" data-pl="${x.uid}" data-n="${clean(x.n) || 'Игрок'}" data-c="${validCol(x.c) ? x.c : ''}"><i>${k + 4}</i>${av(x, k + 3)}<span>${clean(x.n) || 'Игрок'}${x.uid === me ? ' (вы)' : ''}${stTag(x.st)}</span><b>🏆 ${x.r}</b></div>`).join('');
+    const myRow = mine >= 10 ? `<div class="lead me myrank" data-pl="${rows[mine].uid}" data-n="${clean(rows[mine].n) || 'Вы'}" data-c="${validCol(rows[mine].c) ? rows[mine].c : ''}"><i>${mine + 1}</i>${av(rows[mine], mine)}<span>Вы</span><b>🏆 ${rows[mine].r}</b></div>`
       : mine < 0 ? `<div class="lead me myrank"><i>—</i><span>Вы пока не в рейтинге</span><b>🏆 ${PROG.cups}</b></div>` : '';
 
     const scopeTabs = `<div class="scope-tabs"><button class="chip${topScope === 'all' ? ' pri' : ''}" id="topScopeAll">Все игроки</button><button class="chip${topScope === 'friends' ? ' pri' : ''}" id="topScopeFriends">Среди друзей</button></div>`;
