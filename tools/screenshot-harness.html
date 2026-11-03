@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no, viewport-fit=cover">
+<title>Screenshot Harness</title>
+<style>
+  html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: #0b1126; }
+  iframe { border: none; width: 100%; height: 100%; display: block; }
+</style>
+</head>
+<body>
+<iframe id="frame" src="../build/web/index.html"></iframe>
+<script>
+const params = new URLSearchParams(location.search);
+const targetScreen = params.get('screen') || 'menu';
+const frame = document.getElementById('frame');
+
+frame.onload = () => {
+  try {
+    const fw = frame.contentWindow;
+    const fd = frame.contentDocument;
+
+    // Mock wallet and state
+    const now = Date.now();
+    fw.localStorage.setItem('wallet', JSON.stringify({
+      gold: 1450,
+      name: 'Король Дорог',
+      color: '#3fc27a',
+      statusKey: 'sh:str',
+      owned: ['sh:str', 'sh:city', 'knight'],
+      fig: 'knight'
+    }));
+
+    fw.localStorage.setItem('setup', JSON.stringify({
+      n: 3,
+      onN: 2,
+      seats: [
+        {name: 'Король Дорог', human: true, col: '#3fc27a'},
+        {name: 'Аня', human: false, col: '#e24242'},
+        {name: 'Дима', human: false, col: '#4287f5'}
+      ],
+      rules: {deck: 0, rivers: true, meeples: 7, timer: 0, hints: true, cups: true}
+    }));
+
+    // Inject friends
+    if (fw.friends !== undefined) {
+      fw.friends = [
+        {uid: 'u_anya', n: 'Аня', on: true, mutual: true, c: '#e24242', st: 'В игре', p: {s: 'online', t: now - 30000}},
+        {uid: 'u_dima', n: 'Дима', on: false, mutual: true, c: '#4287f5', st: 'Исследователь', p: {s: 'off', t: now - 12 * 60000}},
+        {uid: 'u_sonya', n: 'Соня', on: false, mutual: true, c: '#f2b84b', p: {s: 'off', t: now - 2 * 3600000}},
+        {uid: 'u_max', n: 'Максим', on: false, mutual: true, c: '#b06cf0', p: {s: 'off', t: now - 28 * 3600000}},
+        {uid: 'u_katya', n: 'Катя', on: false, mutual: true, c: '#ff7675', p: {s: 'off', t: now - 4 * 86400000}}
+      ];
+    }
+
+    // Rating / cups
+    if (fw.PROG && fw.PROG.cups !== undefined) {
+      fw.PROG.cups = 480;
+    }
+
+    // Show screen
+    if (typeof fw.show === 'function') {
+      fw.show(targetScreen);
+    }
+
+    // Remove splash / boot if present
+    const boot = fd.getElementById('boot');
+    if (boot) boot.remove();
+
+    // Disable CSS animations for crisp capture
+    const st = fd.createElement('style');
+    st.textContent = `
+      * { animation-duration: 0s !important; transition-duration: 0s !important; }
+      .mini { animation: none !important; transform: rotateX(56deg) rotateZ(-8deg) scale3d(.8,.8,.8) !important; }
+    `;
+    fd.head.appendChild(st);
+
+    if (targetScreen === 'friends' && typeof fw.renderFriends === 'function') {
+      fw.renderFriends();
+    }
+    if (targetScreen === 'menu' && typeof fw.renderMenuProfile === 'function') {
+      fw.renderMenuProfile();
+    }
+
+    window._screenReady = true;
+  } catch (err) {
+    console.error(err);
+    window._screenReady = true;
+  }
+};
+</script>
+</body>
+</html>

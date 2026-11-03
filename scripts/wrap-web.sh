@@ -52,6 +52,12 @@ if [ "$target" = web ]; then
   mkdir -p "$site/admin"
   sed 's|<head>|<head><meta name="robots" content="noindex,nofollow">|' tools/founder-admin.html > "$site/admin/index.html"
   printf '%s\n' '<!doctype html><meta charset="utf-8"><meta name="robots" content="noindex"><meta http-equiv="refresh" content="0;url=./#feedback"><a href="./#feedback">Отзывы теперь в админ-панели</a>' > "$site/admin/feedback.html"
+  # Designer & tiles gallery (accessible for designer reviews and assets download)
+  mkdir -p "$site/tiles"
+  sed 's|<head>|<head><meta name="robots" content="noindex,nofollow">|' tools/export-tiles.html > "$site/tiles/index.html"
+  if [ -d assets/tiles ]; then
+    cp -r assets/tiles "$site/"
+  fi
 else
   out=app/src/main/assets/index.html
 fi
