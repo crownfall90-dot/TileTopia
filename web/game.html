@@ -37,7 +37,7 @@
         </div>
         <div class="hero"><div class="mini" id="mini"></div></div>
         <div class="mbody">
-          <h2 class="logo">Puzzle<span>grad</span></h2>
+          <h2 class="logo">Tile<span>topia</span></h2>
           <p class="tag">Стройте города, дороги и крепости</p>
           <button class="resume" id="resume" hidden><span class="ric"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l10.5-6.5z"/></svg></span><span class="rtx"><b>Продолжить партию</b><small id="resumeInfo"></small></span></button>
           <button class="mquest-banner" id="menuQuestBanner" aria-label="Ежедневные задания">
@@ -92,6 +92,11 @@
           <div class="sgroup">
             <button class="srow btn" id="feedbackBtn"><span class="sic">💬</span><span class="stx"><b>Написать разработчику</b><small>Идеи и отзывы</small></span><span class="sgo">›</span></button>
             <button class="srow btn" id="nameProposalBtn"><span class="sic">💡</span><span class="stx"><b>Конкурс на новое название</b><small id="nameProposalSub">Придумайте имя игры · +100 золота</small></span><span class="sgo">›</span></button>
+          </div>
+          <div class="h3">Аккаунт и данные</div>
+          <div class="sgroup">
+            <button class="srow btn" id="delAccBtn"><span class="sic">🗑️</span><span class="stx"><b>Удалить аккаунт и данные</b><small>Профиль, золото, друзья и рейтинг будут удалены навсегда</small></span><span class="sgo">›</span></button>
+            <a class="srow btn" href="https://crownfall90-dot.github.io/play/delete-account.html" target="_blank" rel="noopener"><span class="sic">📄</span><span class="stx"><b>Как удалить данные</b><small>Страница с инструкцией и сроками хранения</small></span><span class="sgo">›</span></a>
           </div>
           <div class="h3">О приложении</div>
           <div class="sgroup">
@@ -2933,6 +2938,7 @@ function renderLobby() {
   }
   cb.disabled = !net.host || !!net.gameId;
 
+  const seats = (net.lobby && net.lobby.seats ? net.lobby.seats.slice() : []); // declared before the badges below use it
   const maxSeats = roomMax();
   if ($('#lbTableNote')) $('#lbTableNote').textContent = `${maxSeats} ${maxSeats === 2 ? 'игрока' : maxSeats === 5 ? 'игроков' : 'игрока'}`;
   if ($('#lbTableSize') && typeof PG !== 'undefined' && PG.net && PG.net.rooms && PG.net.rooms.formatTableSizeHtml) {
@@ -2975,7 +2981,6 @@ function renderLobby() {
   }
 
   renderMyColor();
-  const seats = (net.lobby && net.lobby.seats ? net.lobby.seats.slice() : []);
   if (net && !net.host && !seats.some(x => x.owner === myId)) {
     seats.push({owner: myId, uid: myUid(), name: myName(), st: myStatus(), fig: wallet.fig, col: wallet.color, ready: false, pending: true});
   }
@@ -3706,10 +3711,10 @@ function renderProgress() {
   // One card: avatar, nickname and e-mail with the edit button, then level and experience; the account buttons
   // (#acct, below) join it.
   const mail = fbAuth && fbAuth.email ? String(fbAuth.email).replace(/[<>&"]/g, '') : 'Профиль не сохранён';
-  $('#profile').innerHTML = `<div class="pctop"><span class="av big${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${(name[0] || '?').toUpperCase()}</span><span class="pwho"><b>${name}</b>${myStatus() ? `<em class="fst">${myStatus()}</em>` : ''}<small class="pmail">${mail}</small></span><button class="iconbtn" id="profEdit" aria-label="Редактировать профиль"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button></div><div class="pclvl"><div class="lvl">${ring(PROG.xp / need)}<b>${PROG.lvl}</b></div><div class="pi"><b class="pl1">Уровень ${PROG.lvl}</b><div class="xpbar"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></div><small>${PROG.xp} / ${need} опыта до ${PROG.lvl + 1} уровня</small></div></div><div class="pchips"><span>🏆 <b>${PROG.cups}</b> кубков</span><span><i class="coin"></i> <b>${wallet.gold}</b> золота</span><span>🏅 <b>${ACH.filter(a => PROG.ach[a.id] === 'got').length}</b>/${ACH.length} наград</span></div>${FB ? `<div class="pacts">${fbAuth && fbAuth.email ? '<button class="chip" data-hacct="out">Выйти из аккаунта</button>' : '<button class="chip pri" data-hacct="in">Войти или создать профиль</button>'}</div>` : ''}`;
+  $('#profile').innerHTML = `<div class="pctop"><span class="av big${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${(name[0] || '?').toUpperCase()}</span><span class="pwho"><b>${name}</b>${myStatus() ? `<em class="fst">${myStatus()}</em>` : ''}<small class="pmail">${mail}</small></span><button class="iconbtn" id="profEdit" aria-label="Редактировать профиль"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button></div><div class="pclvl"><div class="lvl">${ring(PROG.xp / need)}<b>${PROG.lvl}</b></div><div class="pi"><b class="pl1">Уровень ${PROG.lvl}</b><div class="xpbar"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></div><small>${PROG.xp} / ${need} опыта до ${PROG.lvl + 1} уровня</small></div></div><div class="pchips"><span>🏆 <b>${PROG.cups}</b> кубков</span><span><i class="coin"></i> <b>${wallet.gold}</b> золота</span><span>🏅 <b>${ACH.filter(a => PROG.ach[a.id] === 'got').length}</b>/${ACH.length} наград</span></div>${FB ? `<div class="pacts">${fbAuth && fbAuth.email ? '<button class="chip" data-hacct="out">Выйти из аккаунта</button><button class="chip x" data-hacct="del">Удалить аккаунт</button>' : '<button class="chip pri" data-hacct="in">Войти или создать профиль</button>'}</div>` : ''}`;
   $('#profEdit').onclick = editProfile;
   // the buttons live in the profile card; the account block below it keeps the handlers (renderAccount)
-  document.querySelectorAll('#profile [data-hacct]').forEach(b => { b.onclick = () => { const t = $(b.dataset.hacct === 'out' ? '#acLogout' : '#acLogin'); if (t) t.click(); }; });
+  document.querySelectorAll('#profile [data-hacct]').forEach(b => { b.onclick = () => { if (b.dataset.hacct === 'del') return askDeleteAccount(); const t = $(b.dataset.hacct === 'out' ? '#acLogout' : '#acLogin'); if (t) t.click(); }; });
   const st = PROG.st = normalizeStats(PROG.st);
   const rate = st.games ? Math.round(100 * st.wins / st.games) : 0;
   const bm = st.byMode || {};
@@ -3788,9 +3793,17 @@ async function openPlayer(uid, name, col) {
   const box = document.createElement('div'); box.className = 'over'; box.id = 'plBox'; box.style.position = 'fixed';
   const me = uid === myUid(), n = clean(name) || 'Игрок', c = validCol(col) ? col : '#5b6684';
   box.innerHTML = `<div class="ocard prof pcard"><span class="av big" style="--c:${c}">${n[0].toUpperCase()}</span><h3>${n}</h3><p class="pstat" id="plStat">…</p>
-    ${me ? '' : `<button class="cta wide" id="plAdd"${isFriend(uid) ? ' disabled' : ''}>${isFriend(uid) ? 'Уже в друзьях' : 'Добавить в друзья'}</button>`}<button class="ghostbtn" id="plNo">Закрыть</button></div>`;
+    ${me ? '' : `<button class="cta wide" id="plAdd"${isFriend(uid) ? ' disabled' : ''}>${isFriend(uid) ? 'Уже в друзьях' : 'Добавить в друзья'}</button>`}${me ? '' : '<button class="ghostbtn" id="plReport">⚠️ Пожаловаться на игрока</button>'}<button class="ghostbtn" id="plNo">Закрыть</button></div>`;
   document.body.append(box);
   box.onclick = e => { if (e.target === box || e.target.id === 'plNo') box.remove(); };
+  // Report a nickname or a status (user-generated text): goes to the developer's feedback inbox.
+  const rep = box.querySelector('#plReport'); if (rep) rep.onclick = () => confirmBox(`Пожаловаться на игрока «${n}»?<br><small style="font-weight:500;color:var(--muted)">Мы проверим никнейм и статус и примем меры.</small>`, 'Пожаловаться', async () => {
+    try {
+      const pres = await fbGet('presence/' + uid).catch(() => null);
+      await fbPut(`feedback/${myUid()}/rep_${Date.now().toString(36)}`, {k: 'report', m: `Жалоба на игрока ${uid}: ник «${n}», статус «${PG.state.status.shownStatus(pres && pres.st) || ''}»`.slice(0, 1400), t: {'.sv': 'timestamp'}});
+      toastAny('Жалоба отправлена. Спасибо!'); track('player_report'); rep.disabled = true; rep.textContent = 'Жалоба отправлена';
+    } catch (_) { toastAny('Не получилось отправить жалобу: проверьте интернет'); }
+  });
   const add = box.querySelector('#plAdd'); if (add) add.onclick = () => { add.disabled = true; add.textContent = 'Заявка отправлена'; addFriend(uid, n, 'profile'); };
   const [lead, pres] = await Promise.all([fbGet('leaders/' + uid).catch(() => null), fbGet('presence/' + uid).catch(() => null)]);
   const ago = pres && pres.t ? Math.round((Date.now() - pres.t) / 60000) : null;
@@ -4884,7 +4897,7 @@ function openFeedback() {
     5: '5/5 — Отличная игра! 🔥'
   };
 
-  const namePromo = !wallet.nameSuggested ? `
+  const namePromo = false && !wallet.nameSuggested ? `
     <div class="fb-name-promo" id="fbNamePromo">
       <span>💡 <b>Конкурс названий:</b> предложите новое имя игры</span>
       <span class="chip go" style="margin:0;padding:3px 8px;font-size:11px">+100 🟡</span>
@@ -4966,6 +4979,7 @@ function updateNameProposalBtnLabel() {
 }
 
 function showNameProposalDialog(force) {
+  return; // the name contest is over: the game is called Tiletopia
   if (document.getElementById('nameProposalBox')) return;
   const box = document.createElement('div');
   box.className = 'over';
@@ -4984,7 +4998,7 @@ function showNameProposalDialog(force) {
       </div>
     </div>
     <p class="namecard-desc">
-      Мы ищем звучное и увлекательное название взамен <b>Puzzlegrad</b>. Поделитесь вашей идеей!
+      Мы ищем звучное и увлекательное название взамен <b>Tiletopia</b>. Поделитесь вашей идеей!
     </p>
     <div class="namecard-prizes">
       <div class="nprize-card gold">
@@ -5747,6 +5761,47 @@ function renderAccount() {
   if ($('#acLogout')) $('#acLogout').onclick = () => confirmBox('Выйти из аккаунта?<br><small style="font-weight:500;color:var(--muted)">Прогресс сохранится в аккаунте. На этом устройстве начнётся новая игра, а войти можно будет в любой аккаунт</small>', 'Выйти', signOut);
 }
 // Leave the account: push what is not saved yet, forget this profile on the device and start over as a guest.
+/* ---------------- delete my account and data (Google Play: in-app deletion) ----------------
+   Removes everything this player has on the server (profile and progress, presence, rating, friends and the links to
+   them in other lists, inbox, event log, feedback, name suggestions, friend code), then the sign-in itself (Firebase
+   Authentication), then everything on this phone. What cannot be removed from here: room messages (cleaned up
+   after 7 days) and aggregated, non-personal analytics. See docs/product/GOOGLE-PLAY-DATA-SAFETY.md. */
+function askDeleteAccount() {
+  confirmBox('Удалить аккаунт и все данные?<br><small style="font-weight:500;color:var(--muted)">Профиль, уровень, золото, фигурки, друзья и место в рейтинге будут удалены с сервера и с этого телефона. Отменить это нельзя.</small>', 'Продолжить', () => {
+    confirmBox('Точно удалить навсегда?<br><small style="font-weight:500;color:var(--muted)">Вернуть прогресс будет невозможно.</small>', 'Да, удалить', deleteMyAccount);
+  });
+}
+async function deleteMyAccount() {
+  if (!FB) return toastAny('Удаление доступно в версии с интернетом');
+  toastAny('Удаляем данные…');
+  try {
+    await fbToken();
+    const me = myUid();
+    if (me) {
+      const mine = (await fbGet('friends/' + me).catch(() => null)) || {};
+      const paths = Object.keys(mine).map(f => `friends/${f}/${me}`)
+        .concat(['profiles/', 'presence/', 'leaders/', 'friends/', 'inbox/', 'logs/', 'feedback/', 'suggestions/names/', 'playerNo/', 'fcodeOf/'].map(p => p + me));
+      if (wallet.fcode) paths.push('fcodes/' + wallet.fcode);
+      await Promise.all(paths.map(p => fbDel(p)));
+      // The profile is the main record: if it is still there the deletion did not go through (no network, old rules).
+      const left = await fbGet('profiles/' + me).catch(() => 'error');
+      if (left) return toastAny('Не удалось удалить данные: проверьте интернет и попробуйте ещё раз');
+    }
+    let authLeft = false;
+    try { await fbToken(); await idt('delete', {idToken: fbAuth.idToken}); }
+    catch (e) { authLeft = !!(e && e.error && /CREDENTIAL_TOO_OLD|TOKEN_EXPIRED/.test(String(e.error.message))); if (!authLeft && e && e.error) authLeft = true; }
+    track('account_delete');
+    try { if (window.AndroidApp && AndroidApp.resetAnalytics) AndroidApp.resetAnalytics(); } catch (_) {}
+    clearTimeout(cloudTimer);
+    try { localStorage.clear(); } catch (_) {}
+    try { sessionStorage.clear(); } catch (_) {}
+    if (authLeft) { try { localStorage.setItem('delNote', '1'); } catch (_) {} }
+    location.reload();
+  } catch (_) {
+    toastAny('Не удалось удалить данные: проверьте интернет и попробуйте ещё раз');
+  }
+}
+$('#delAccBtn').onclick = askDeleteAccount;
 async function signOut() {
   toastAny('Выходим…');
   try { await Promise.race([cloudSync(true), new Promise(r => setTimeout(r, 5000))]); } catch (_) {}
@@ -5815,7 +5870,7 @@ function initStagingGate() {
   }
   const overlay = document.createElement('div');
   overlay.id = 'stagingGate';
-  overlay.innerHTML = '<div style="position:fixed;inset:0;background:#0b0d13;z-index:999999;display:flex;align-items:center;justify-content:center;font-family:sans-serif;color:#fff;padding:16px"><div style="background:#141721;border:1px solid rgba(255,255,255,0.12);padding:32px 24px;border-radius:16px;max-width:380px;width:100%;text-align:center;box-shadow:0 24px 48px rgba(0,0,0,0.8)"><div style="font-size:40px;margin-bottom:12px">🛡️</div><h2 style="font-size:20px;font-weight:700;margin-bottom:8px">Puzzlegrad Staging</h2><p style="font-size:13px;color:#8b94a7;margin-bottom:20px;line-height:1.4">Закрытая тестовая среда. Для доступа введите персональный PIN-код тестера.</p><input type="password" id="stagingGatePin" maxlength="8" placeholder="PIN-код" style="width:100%;box-sizing:border-box;padding:12px;font-size:20px;text-align:center;letter-spacing:6px;border-radius:10px;border:1px solid #2a3142;background:#0a0c10;color:#fff;margin-bottom:16px;outline:none"><button id="stagingGateBtn" style="width:100%;box-sizing:border-box;padding:12px;background:#4f8ef7;border:none;border-radius:10px;color:#fff;font-size:15px;font-weight:600;cursor:pointer">Войти в тест</button><div id="stagingGateErr" style="color:#ef5350;font-size:13px;margin-top:12px;display:none">Неверный PIN-код</div></div></div>';
+  overlay.innerHTML = '<div style="position:fixed;inset:0;background:#0b0d13;z-index:999999;display:flex;align-items:center;justify-content:center;font-family:sans-serif;color:#fff;padding:16px"><div style="background:#141721;border:1px solid rgba(255,255,255,0.12);padding:32px 24px;border-radius:16px;max-width:380px;width:100%;text-align:center;box-shadow:0 24px 48px rgba(0,0,0,0.8)"><div style="font-size:40px;margin-bottom:12px">🛡️</div><h2 style="font-size:20px;font-weight:700;margin-bottom:8px">Tiletopia Staging</h2><p style="font-size:13px;color:#8b94a7;margin-bottom:20px;line-height:1.4">Закрытая тестовая среда. Для доступа введите персональный PIN-код тестера.</p><input type="password" id="stagingGatePin" maxlength="8" placeholder="PIN-код" style="width:100%;box-sizing:border-box;padding:12px;font-size:20px;text-align:center;letter-spacing:6px;border-radius:10px;border:1px solid #2a3142;background:#0a0c10;color:#fff;margin-bottom:16px;outline:none"><button id="stagingGateBtn" style="width:100%;box-sizing:border-box;padding:12px;background:#4f8ef7;border:none;border-radius:10px;color:#fff;font-size:15px;font-weight:600;cursor:pointer">Войти в тест</button><div id="stagingGateErr" style="color:#ef5350;font-size:13px;margin-top:12px;display:none">Неверный PIN-код</div></div></div>';
   document.body.appendChild(overlay);
 
   const checkPin = () => {
@@ -5871,7 +5926,7 @@ if (isWeb) {
     });
   } catch (_) {}
   addEventListener('beforeinstallprompt', e => { e.preventDefault(); installEvt = e; renderInstall(); });
-  addEventListener('appinstalled', () => { installEvt = null; renderInstall(); toastAny('Игра установлена — ищите иконку Puzzlegrad'); });
+  addEventListener('appinstalled', () => { installEvt = null; renderInstall(); toastAny('Игра установлена — ищите иконку Tiletopia'); });
 }
 function renderInstall() {
   const b = $('#installBtn'); if (!b) return;
@@ -5887,7 +5942,7 @@ function installDialog() {
       ? `<li><b class="n">1</b><span>Откройте эту страницу в <b>Safari</b></span></li><li><b class="n">2</b><span>Нажмите «Поделиться» ${SHARE_ICON}</span></li><li><b class="n">3</b><span>Выберите <b>«На экран «Домой»»</b></span></li>`
       : `<li><b class="n">1</b><span>Нажмите «Поделиться» ${SHARE_ICON} внизу экрана</span></li><li><b class="n">2</b><span>Прокрутите и выберите <b>«На экран «Домой»»</b></span></li><li><b class="n">3</b><span>Нажмите <b>«Добавить»</b> — иконка появится на экране</span></li>`)
     : `<li><b class="n">1</b><span>Откройте меню браузера <b>⋮</b></span></li><li><b class="n">2</b><span>Выберите <b>«Добавить на главный экран»</b> или <b>«Установить приложение»</b></span></li>`;
-  box.innerHTML = `<div class="ocard"><div style="font-size:40px">📲</div><h3>Установить Puzzlegrad</h3><p>Быстрый запуск на весь экран и работа без интернета</p><ol class="inststeps">${steps}</ol>${isIOS ? '' : '<a class="ghostbtn manual" href="https://github.com/crownfall90-dot/play/releases/latest/download/Puzzlegrad.apk" rel="noopener">Скачать приложение для Android</a>'}<button class="cta wide" data-x>Понятно</button></div>`;
+  box.innerHTML = `<div class="ocard"><div style="font-size:40px">📲</div><h3>Установить Tiletopia</h3><p>Быстрый запуск на весь экран и работа без интернета</p><ol class="inststeps">${steps}</ol>${isIOS ? '' : '<a class="ghostbtn manual" href="https://github.com/crownfall90-dot/play/releases/latest/download/Tiletopia.apk" rel="noopener">Скачать приложение для Android</a>'}<button class="cta wide" data-x>Понятно</button></div>`;
   document.body.append(box);
   box.onclick = e => { if (e.target === box || e.target.closest('[data-x]')) box.remove(); };
 }
@@ -5965,13 +6020,13 @@ function reinstallDialog(info) {
   const box = document.createElement('div'); box.className = 'over'; box.id = 'reinst'; box.style.position = 'fixed';
   const draw = () => {
     const linked = linkedNow(), mail = linked ? String(fbAuth.email).replace(/[<>&"]/g, '') : '';
-    box.innerHTML = `<div class="ocard reinst"><div class="rbig">🔐</div><h3>Новое приложение Puzzlegrad</h3>
+    box.innerHTML = `<div class="ocard reinst"><div class="rbig">🔐</div><h3>Новое приложение Tiletopia</h3>
       <p>Мы сменили цифровую подпись приложения — это защита от подделок. Поверх старого новое не встанет: нужно один раз переустановить. Это 1 минута.</p>
       <ol class="rsteps2">
         <li class="${linked ? 'ok' : ''}"><i>1</i><div><b>${linked ? 'Прогресс сохранён в профиле' : 'Сохраните прогресс'}</b><small>${linked ? mail : 'Войдите или создайте профиль — иначе золото и уровень пропадут'}</small></div>${linked ? '<em>✓</em>' : '<button class="chip pri" id="rsSave">Сохранить</button>'}</li>
-        <li><i>2</i><div><b>Скачайте новую версию</b><small>Файл Puzzlegrad.apk сохранится в «Загрузки»</small></div><button class="chip pri" id="rsGet">Скачать</button></li>
+        <li><i>2</i><div><b>Скачайте новую версию</b><small>Файл Tiletopia.apk сохранится в «Загрузки»</small></div><button class="chip pri" id="rsGet">Скачать</button></li>
         <li><i>3</i><div><b>Удалите эту версию</b><small>Откроются настройки приложения — нажмите «Удалить»</small></div><button class="chip" id="rsDel">Удалить</button></li>
-        <li><i>4</i><div><b>Установите скачанный файл</b><small>Откройте Puzzlegrad.apk из «Загрузок», запустите игру и войдите в тот же профиль</small></div></li>
+        <li><i>4</i><div><b>Установите скачанный файл</b><small>Откройте Tiletopia.apk из «Загрузок», запустите игру и войдите в тот же профиль</small></div></li>
       </ol>
       <button class="ghostbtn" id="rsLater">Позже</button></div>`;
     const q = sel => box.querySelector(sel);
@@ -6186,6 +6241,7 @@ devVerify();
   const days = Math.round((d0 - Date.parse(wallet.firstSeen + 'T00:00:00Z')) / 864e5);
   for (const k of [1, 3, 7]) if (days >= k && days < k + 2 && !(wallet.rd || {})[k]) { wallet.rd = Object.assign(wallet.rd || {}, {[k]: 1}); saveWallet(); track('return_d' + k, {days}); }
 })();
+try { if (localStorage.getItem('delNote')) { localStorage.removeItem('delNote'); setTimeout(() => toastAny('Данные игры удалены. Чтобы удалить и сам вход, войдите в аккаунт заново и повторите удаление.'), 1500); } } catch (_) {}
 plog('open', {p: installKind(), v: window.WEB_VERSION || (window.AndroidApp ? AndroidApp.versionName() : 'dev')});
 if (window.WEBAPP && FB && FB.googleClientId) googleReturn();
 // back from Google's page with the browser's Back button: the page comes from the cache with the button still pressed

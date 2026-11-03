@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Configures the Telegram Bot to launch Puzzlegrad as a Telegram Mini App.
+"""Configures the Telegram Bot to launch Tiletopia as a Telegram Mini App.
 
 Sets:
 1. Default chat Menu Button -> WebApp (https://crownfall90-dot.github.io/play/)
@@ -49,7 +49,7 @@ def setup_bot(token: str, web_url: str = DEFAULT_WEB_URL) -> bool:
     # 3. Set bot commands
     commands = {
         'commands': [
-            {'command': 'play', 'description': 'Запустить игру Puzzlegrad (Mini App)'},
+            {'command': 'play', 'description': 'Запустить игру Tiletopia (Mini App)'},
             {'command': 'help', 'description': 'Как играть, правила и ссылки'}
         ]
     }
@@ -59,7 +59,7 @@ def setup_bot(token: str, web_url: str = DEFAULT_WEB_URL) -> bool:
     # 4. Set bot descriptions
     desc = {
         'description': (
-            '🧩 Puzzlegrad — средневековая стратегическая настольная игра прямо в Telegram!\n\n'
+            '🧩 Tiletopia — средневековая стратегическая настольная игра прямо в Telegram!\n\n'
             '• Стройте города, дороги и монастыри\n'
             '• Играйте онлайн с друзьями и в быстрых матчах\n'
             '• Умные боты, коллекция фишек и рамок\n\n'
@@ -72,7 +72,7 @@ def setup_bot(token: str, web_url: str = DEFAULT_WEB_URL) -> bool:
         pass
 
     short_desc = {
-        'short_description': '🧩 Puzzlegrad — играй в средневековую мозаику онлайн с друзьями прямо в Telegram!'
+        'short_description': '🧩 Tiletopia — играй в средневековую мозаику онлайн с друзьями прямо в Telegram!'
     }
     try:
         api_call(token, 'setMyShortDescription', short_desc)

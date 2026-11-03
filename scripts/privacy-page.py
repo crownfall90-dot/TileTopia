@@ -4,6 +4,9 @@ import html, re, sys
 def inline(t):
     t = html.escape(t)
     t = re.sub(r'(https?://[^\s<)]+)', r'<a href="\1">\1</a>', t)
+    t = re.sub(r'\*\*(.+?)\*\*', r'<b>\1</b>', t)
+    t = re.sub(r'`([^`]+)`', r'<code>\1</code>', t)
+    t = re.sub(r'(?<![\w*])\*([^*]+)\*(?![\w*])', r'<i>\1</i>', t)
     return t
 
 out, ul = [], False
@@ -18,7 +21,7 @@ for line in open('docs/privacy-policy.md', encoding='utf-8').read().splitlines()
 if ul: out.append('</ul>')
 page = '''<!doctype html>
 <html lang="ru"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Политика конфиденциальности — Puzzlegrad</title>
+<title>Политика конфиденциальности — Tiletopia</title>
 <style>
 body{margin:0;background:#101729;color:#eef1f8;font:16px/1.55 system-ui,sans-serif}
 main{max-width:680px;margin:0 auto;padding:24px 18px 48px}

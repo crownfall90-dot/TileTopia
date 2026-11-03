@@ -2,7 +2,7 @@
 
 ## Scope
 
-Puzzlegrad Test is the staging test application with full online capabilities and feature parity with the public release.
+Tiletopia Test is the staging test application with full online capabilities and feature parity with the public release.
 Its application ID is com.crownfall.mosaic.test, allowing it to be installed alongside the production app (com.crownfall.mosaic) on the same device without conflicts.
 It has INTERNET permission enabled, Firebase connectivity, online rooms, matchmaking, cloud sync, Google sign-in, push notifications and updater.
 Production release workflows and main are not changed by this setup.
@@ -10,8 +10,8 @@ Production release workflows and main are not changed by this setup.
 ## Build and install
 
 Pushes to setup/test-environment or dev and pull requests targeting main run
-Test APK (Staging). Download the Puzzlegrad-Test artifact from a successful
-Actions run or get the latest `Puzzlegrad-Staging.apk` from the pre-release,
+Test APK (Staging). Download the Tiletopia-Test artifact from a successful
+Actions run or get the latest `Tiletopia-Staging.apk` from the pre-release,
 and install it on the test phone.
 GitHub Actions usage is subject to the account's existing billing/quota settings.
 

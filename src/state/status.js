@@ -30,7 +30,7 @@ export const EXCLUSIVE_STATUSES = [
   {id: 'flawless', text: 'Безупречный', how: 'Выполните все задания дня каждый день месяца без пропусков', ic: '🌙'},
   {id: 'allach', text: 'Коллекционер', how: 'Получите все достижения', ic: '🏆'},
   {id: 'legend', text: 'Легенда', how: 'Достигните 30 уровня', ic: '👑'},
-  {id: 'old', text: 'Олд', how: 'Играли в Puzzlegrad до 2027 года', ic: '🗿'},
+  {id: 'old', text: 'Олд', how: 'Играли в Tiletopia до 2027 года', ic: '🗿'},
   {id: 'champion', text: 'Чемпион', how: 'Скоро: первое место в рейтинге недели', ic: '🥇', soon: true},
 ];
 

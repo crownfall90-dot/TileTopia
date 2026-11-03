@@ -362,7 +362,7 @@ public class MainActivity extends Activity {
                 android.content.Intent send = new android.content.Intent(android.content.Intent.ACTION_SEND);
                 send.setType("text/plain");
                 send.putExtra(android.content.Intent.EXTRA_TEXT, text);
-                try { startActivity(android.content.Intent.createChooser(send, "Пригласить в Puzzlegrad")); } catch (Exception ignored) { }
+                try { startActivity(android.content.Intent.createChooser(send, "Пригласить в Tiletopia")); } catch (Exception ignored) { }
             });
         }
 
@@ -484,6 +484,17 @@ public class MainActivity extends Activity {
                     else b.putString(k, String.valueOf(v));
                 }
                 com.google.firebase.analytics.FirebaseAnalytics.getInstance(MainActivity.this).logEvent(name, b);
+            } catch (Exception e) {
+                report(e);
+            }
+        }
+
+        /** Account deletion: forget what Firebase Analytics collected on this device and start a new anonymous instance. */
+        @JavascriptInterface
+        public void resetAnalytics() {
+            try {
+                if (FirebaseApp.getApps(MainActivity.this).isEmpty()) return;
+                com.google.firebase.analytics.FirebaseAnalytics.getInstance(MainActivity.this).resetAnalyticsData();
             } catch (Exception e) {
                 report(e);
             }

@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
-<title>Puzzlegrad — Founder Command Center</title>
+<title>Tiletopia — Founder Command Center</title>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap">
 <style>
 :root {
@@ -188,7 +188,7 @@ body:not(.authed) main > .card:not(#loginCard) { display: none; }
 
 <header class="header">
   <div class="logo">
-    <span>🏰 Puzzlegrad</span>
+    <span>🏰 Tiletopia</span>
     <span class="badge-owner">Founder Center</span>
   </div>
   <div style="display:flex;gap:12px;align-items:center">
@@ -392,7 +392,7 @@ body:not(.authed) main > .card:not(#loginCard) { display: none; }
     </div>
     <div style="display:flex;flex-direction:column;gap:8px">
       <a class="btn" href="https://crownfall90-dot.github.io/play/staging/" target="_blank" style="text-decoration:none;text-align:center">🌐 Открыть Staging Web (тест)</a>
-      <a class="btn" href="https://github.com/crownfall90-dot/play/releases/download/staging-latest/Puzzlegrad-Staging.apk" target="_blank" style="text-decoration:none;text-align:center">📲 Скачать Staging APK (для Android)</a>
+      <a class="btn" href="https://github.com/crownfall90-dot/play/releases/download/staging-latest/Tiletopia-Staging.apk" target="_blank" style="text-decoration:none;text-align:center">📲 Скачать Staging APK (для Android)</a>
       <button class="btn" id="btnCopyInvite">📋 Скопировать ссылку и PIN для тестера</button>
     </div>
     <div class="stat-sub">Тестовый APK собирается без интернета. Тестовая веб-версия работает на общем сервере, PIN хранится в базе (<code>config/testerPin</code>).</div>
@@ -589,8 +589,8 @@ $('btnSavePin').onclick = async () => {
 };
 async function loadPin() { const r = await fetch(`${DB}/config/testerPin.json`); const p = r.ok ? await r.json() : null; if (p) $('inputTesterPin').value = p; }
 $('btnCopyInvite').onclick = () => {
-  const msg = '🏰 Приглашение на закрытый тест Puzzlegrad:\n• Тестовая веб-версия: https://crownfall90-dot.github.io/play/staging/\n• PIN-код: ' + $('inputTesterPin').value +
-    '\n• Тестовый APK (Android, без интернета): https://github.com/' + REPO + '/releases/download/staging-latest/Puzzlegrad-Staging.apk';
+  const msg = '🏰 Приглашение на закрытый тест Tiletopia:\n• Тестовая веб-версия: https://crownfall90-dot.github.io/play/staging/\n• PIN-код: ' + $('inputTesterPin').value +
+    '\n• Тестовый APK (Android, без интернета): https://github.com/' + REPO + '/releases/download/staging-latest/Tiletopia-Staging.apk';
   navigator.clipboard.writeText(msg).then(() => log('Приглашение скопировано')).catch(() => prompt('Скопируйте вручную:', msg));
 };
 
@@ -770,7 +770,7 @@ async function loadVersions() {
     if (prod) {
       $('curVersion').textContent = prod.name;
       $('prodStatus').textContent = prod.name + ' · ' + new Date(prod.published_at).toLocaleString('ru-RU');
-      if ($('btnDownloadProd')) $('btnDownloadProd').href = `https://github.com/${REPO}/releases/download/${prod.tag_name}/Puzzlegrad.apk`;
+      if ($('btnDownloadProd')) $('btnDownloadProd').href = `https://github.com/${REPO}/releases/download/${prod.tag_name}/Tiletopia.apk`;
     }
     if (stg) {
       const stgName = stg.name.replace(/^.*#/, 'сборка #').replace(/\)$/, '');

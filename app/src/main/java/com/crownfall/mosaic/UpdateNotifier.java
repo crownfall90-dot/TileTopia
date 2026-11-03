@@ -85,7 +85,7 @@ public class UpdateNotifier extends JobService {
         Notification.Builder b = Build.VERSION.SDK_INT >= 26 ? new Notification.Builder(c, CHANNEL) : new Notification.Builder(c);
         try {
         nm.notify(1, b.setSmallIcon(R.drawable.ic_stat_update)
-                .setContentTitle("Вышло обновление Puzzlegrad" + (version == null || version.isEmpty() ? "" : " " + version))
+                .setContentTitle("Вышло обновление Tiletopia" + (version == null || version.isEmpty() ? "" : " " + version))
                 .setContentText(text)
                 .setStyle(new Notification.BigTextStyle().bigText(text))
                 .setContentIntent(open)
@@ -97,7 +97,7 @@ public class UpdateNotifier extends JobService {
 
     /** An announcement from the game's owner: its own channel, a new notification each time. */
     static void news(Context c, String title, String body) {
-        if (title == null || title.isEmpty()) title = "Puzzlegrad";
+        if (title == null || title.isEmpty()) title = "Tiletopia";
         if (body == null) body = "";
         NotificationManager nm = (NotificationManager) c.getSystemService(Context.NOTIFICATION_SERVICE);
         if (Build.VERSION.SDK_INT >= 26) {

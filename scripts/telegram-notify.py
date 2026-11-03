@@ -25,7 +25,7 @@ def fetch_bot_username(token: str) -> str:
 def build(version: str, notes: str, web_url: str = '', apk_url: str = '', bot_url: str = '') -> str:
     lines = [l.strip().lstrip('-•* ').strip() for l in notes.splitlines() if l.strip()]
     items = '\n'.join(f'• {html.escape(l)}' for l in lines[:12])
-    text = f'🧩 <b>Puzzlegrad {html.escape(version)}</b> — вышло обновление!\n\n'
+    text = f'🧩 <b>Tiletopia {html.escape(version)}</b> — вышло обновление!\n\n'
     if items:
         text += f'{items}\n\n'
     text += '🎮 <b>Где играть:</b>\n'

@@ -80,7 +80,7 @@ test('game/tutorial: createTutorialConfig, advanceTutorialStep, dialog renderers
 
   // renderTutorialOfferDialogHtml
   const offerHtml = tutorial.renderTutorialOfferDialogHtml(true);
-  assert.ok(offerHtml.includes('Добро пожаловать в Puzzlegrad!'));
+  assert.ok(offerHtml.includes('Добро пожаловать в Tiletopia!'));
   assert.ok(offerHtml.includes('data-t="go"'));
   assert.ok(offerHtml.includes('data-t="login"'));
 

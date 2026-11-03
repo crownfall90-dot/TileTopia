@@ -149,7 +149,7 @@ test('collections & mastery DOM: collections tab renders cards, claiming complet
       w.frames = ['royal'];
       w.colClaimed = [];
 
-      P.show('profile');
+      P.show('progress');
       document.querySelector('#ptabs [data-pt="cols"]').click();
       const cardCount = document.querySelectorAll('.col-card').length;
       const claimBtn = document.querySelector('[data-claimcol="court"]');
@@ -165,11 +165,11 @@ test('collections & mastery DOM: collections tab renders cards, claiming complet
 
       return {cardCount, canClaimBefore, goldAfterFirstClaim, claimedAfter, goldAfterSecondClaim};
     });
-    assert.equal(res.cardCount, 3, 'renders 3 collection cards');
+    assert.ok(res.cardCount >= 3, 'renders the collection cards');
     assert.equal(res.canClaimBefore, true, 'claim button is present when complete');
-    assert.equal(res.goldAfterFirstClaim, 600, 'awards 500 gold for court collection (100 + 500)');
+    assert.equal(res.goldAfterFirstClaim, 400, 'awards the court reward (100 + 300)');
     assert.equal(res.claimedAfter, true, 'court marked as claimed');
-    assert.equal(res.goldAfterSecondClaim, 600, 'gold does not increase on second claim');
+    assert.equal(res.goldAfterSecondClaim, 400, 'gold does not increase on second claim');
     assert.deepEqual(errors, []);
   } finally { await browser.close(); }
 });

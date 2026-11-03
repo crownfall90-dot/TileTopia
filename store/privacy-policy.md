@@ -1,8 +1,8 @@
-# Privacy Policy for Tiletopia / Puzzlegrad
+# Privacy Policy for Tiletopia / Tiletopia
 
 *Last updated: November 3, 2026*
 
-This Privacy Policy explains how **Tiletopia company** ("we", "our", or "the app") handles player information in **Puzzlegrad / Tiletopia**. Puzzlegrad is designed as a privacy-respecting tabletop game with minimal data collection.
+This Privacy Policy explains how **Tiletopia company** ("we", "our", or "the app") handles player information in **Tiletopia / Tiletopia**. Tiletopia is designed as a privacy-respecting tabletop game with minimal data collection.
 
 ---
 
@@ -14,7 +14,7 @@ This Privacy Policy explains how **Tiletopia company** ("we", "our", or "the app
 
 ### B. Gameplay Data
 - Game progress (level, experience points, unlocked cosmetics, in-game virtual gold, avatar frames, custom statuses, match statistics, and leaderboards) is stored in Firebase Realtime Database.
-- Gold in Puzzlegrad is virtual currency earned solely through gameplay and cannot be bought or sold for real money.
+- Gold in Tiletopia is virtual currency earned solely through gameplay and cannot be bought or sold for real money.
 
 ### C. Technical & Crash Telemetry
 - To diagnose performance issues, crashes, and device compatibility, the app collects non-personally identifiable diagnostic telemetry:
@@ -27,7 +27,7 @@ This Privacy Policy explains how **Tiletopia company** ("we", "our", or "the app
 ---
 
 ## 2. Information Sharing and Third Parties
-- **No Advertising Trackers**: Puzzlegrad contains no third-party advertising SDKs and does not sell or share user data with data brokers.
+- **No Advertising Trackers**: Tiletopia contains no third-party advertising SDKs and does not sell or share user data with data brokers.
 - **Service Providers**: We use Google Cloud / Firebase (Firebase Authentication, Realtime Database, Cloud Messaging) for account authentication, database storage, and push notifications.
 
 ---
@@ -39,7 +39,7 @@ This Privacy Policy explains how **Tiletopia company** ("we", "our", or "the app
 ---
 
 ## 4. Children's Privacy
-Puzzlegrad does not knowingly collect personal information from children under 13. The game contains no age-inappropriate content and is rated for general audiences (PEGI 3 / Everyone).
+Tiletopia does not knowingly collect personal information from children under 13. The game contains no age-inappropriate content and is rated for general audiences (PEGI 3 / Everyone).
 
 ---
 

@@ -1,4 +1,4 @@
-# Координация агентов — Puzzlegrad
+# Координация агентов — Tiletopia
 
 > Этот файл — «доска задач» между двумя AI-агентами.
 > Обновляй свою секцию, коммить и пушь после каждого шага.
@@ -68,7 +68,7 @@
   - Переработана сетка и оформление карточек: красивый предпросмотр SVG-арта, бейджи (`✓ Активна` / `В разработке`), названия и описания ландшафта, золотой акцент активной локации.
 - **Тестовый APK (Staging)**:
   - Ссылка на актуальный релиз: `https://github.com/crownfall90-dot/play/releases/tag/staging-latest`
-  - Прямая ссылка на APK с интернетом: `https://github.com/crownfall90-dot/play/releases/download/staging-latest/Puzzlegrad-Staging.apk`
+  - Прямая ссылка на APK с интернетом: `https://github.com/crownfall90-dot/play/releases/download/staging-latest/Tiletopia-Staging.apk`
 
 ### 02.11.2026, ночь — Редизайн лобби, переключатель кубков, устранение лагов приглашений и форма обратной связи (Antigravity)
 - **Форма обратной связи («Написать разработчику»)**:
@@ -99,7 +99,7 @@
 - **Выполнено по требованию пользователя («для тестовой версии нужно добавить интернет и все функции которые и в публичном»):**
   - **Манифест Staging (`app/src/staging/AndroidManifest.xml`)**:
     - Убраны все директивы `tools:node="remove"`: разрешены `INTERNET`, `RECEIVE_BOOT_COMPLETED`, `POST_NOTIFICATIONS`, `UpdateNotifier`, `PushService` и `FirebaseInitProvider`.
-    - Сохранена метка приложения `Puzzlegrad Test` и `allowBackup="false"`.
+    - Сохранена метка приложения `Tiletopia Test` и `allowBackup="false"`.
   - **Автообновление Staging (`app/src/staging/java/com/crownfall/mosaic/Updater.java`)**:
     - Заглушка заменена на полноценный рабочий класс `Updater` (как в публичной github-сборке) с поддержкой GitHub Releases API, проверки обновлений в фоне, скачивания и установки через PackageInstaller.
   - **Firebase Configuration (`app/google-services.json` & `app/build.gradle`)**:
@@ -116,7 +116,7 @@
 - **Выпуск 1.0.250 (тег `v250`) успешно опубликован в Production**:
   - PR #234 слит в `main`.
   - Запущен `promote-production.yml` (Run #41360134979, 1m59s).
-  - Сборка боевого APK и AAB: успешно собраны и подписаны (`Puzzlegrad-1.0.250.apk`, `Puzzlegrad-1.0.250-google-play.aab`).
+  - Сборка боевого APK и AAB: успешно собраны и подписаны (`Tiletopia-1.0.250.apk`, `Tiletopia-1.0.250-google-play.aab`).
   - GitHub Release: опубликован релиз `1.0.250` с обновлением `latest.json` и заметками для игроков.
   - Деплой Web на GitHub Pages: успешно опубликован (`https://crownfall90-dot.github.io/play/`).
   - Оповещения: FCM отправлен (`HAS_FCM: true`), Telegram анонс отправлен (`Telegram: sent` в `@diarydevelopment`).
@@ -174,7 +174,7 @@
 - **Выпуск 1.0.249 (тег `v249`) успешно опубликован в Production**:
   - PR #232 слит в `main`.
   - Запущен `promote-production.yml` (Run #41347758794, 2m22s).
-  - Сборка боевого APK и AAB: успешно собраны и подписаны (`Puzzlegrad-1.0.249.apk`, `Puzzlegrad-1.0.249-google-play.aab`).
+  - Сборка боевого APK и AAB: успешно собраны и подписаны (`Tiletopia-1.0.249.apk`, `Tiletopia-1.0.249-google-play.aab`).
   - GitHub Release: опубликован релиз `1.0.249` с обновлением `latest.json` и заметками для игроков.
   - Деплой Web на GitHub Pages: успешно опубликован (`https://crownfall90-dot.github.io/play/`).
   - Оповещения: FCM отправлен (`HAS_FCM: true`), Telegram анонс отправлен (`Telegram: sent` в `@diarydevelopment`).
@@ -185,7 +185,7 @@
 ### 01.11.2026, день — Релиз 1.0.248 (Promote to Production) (Antigravity)
 - **Выпуск 1.0.248 (тег `v245`) успешно опубликован в Production**:
   - Run: [Run #41301818782](https://github.com/crownfall90-dot/play/actions/runs/41301818782) на ветке `main` (exit code 0, 2m26s).
-  - Сборка боевого APK и AAB: успешно собраны и подписаны (`Puzzlegrad-1.0.248.apk`, `Puzzlegrad-1.0.248-google-play.aab`).
+  - Сборка боевого APK и AAB: успешно собраны и подписаны (`Tiletopia-1.0.248.apk`, `Tiletopia-1.0.248-google-play.aab`).
   - GitHub Release: опубликован релиз `1.0.248` с обновлением `latest.json` и заметками для игроков.
   - Деплой GitHub Pages: обновлена веб-версия по адресу `https://crownfall90-dot.github.io/play/`.
   - Push-уведомление игрокам: шаг `Notify players via FCM` выполнен успешно (`HAS_FCM: true`).
@@ -201,7 +201,7 @@
 ### 01.11.2026, утро — Релиз 1.0.244 (Promote to Production) (Antigravity)
 - **Выпуск 1.0.244 (тег `v244`) успешно опубликован в Production**:
   - Run: [Run #41269034234](https://github.com/crownfall90-dot/play/actions/runs/41269034234) на ветке `main` (exit code 0, 2m02s).
-  - Сборка боевого APK и AAB: успешно собраны и подписаны (`Puzzlegrad-1.0.244.apk`, `Puzzlegrad-1.0.244.aab`).
+  - Сборка боевого APK и AAB: успешно собраны и подписаны (`Tiletopia-1.0.244.apk`, `Tiletopia-1.0.244.aab`).
   - GitHub Release: опубликован релиз `1.0.244` со ссылками на скачивание и заметками для игроков.
   - Деплой GitHub Pages: обновлена веб-версия по адресу `https://crownfall90-dot.github.io/play/`.
   - Push-уведомление игрокам: шаг `Notify players via FCM` выполнен успешно (`HAS_FCM: true`).
@@ -495,7 +495,7 @@
   * Добавлен плавающий бейдж `showStagingWatermark()` (`🧪 STAGING TEST BUILD`) для визуального отличия от прода.
 * **`.github/workflows/staging.yml`**:
   * Включён триггер на ветки разработки (`dev/**`), ручной запуск (`workflow_dispatch`) и права записи релизов.
-  * Добавлена публикация постоянного GitHub Pre-Release `staging-latest` с прямым файлом `Puzzlegrad-Staging.apk` для мгновенной загрузки тестерами без логина на GitHub.
+  * Добавлена публикация постоянного GitHub Pre-Release `staging-latest` с прямым файлом `Tiletopia-Staging.apk` для мгновенной загрузки тестерами без логина на GitHub.
 * **`tools/founder-admin.html`**:
   * Добавлены кнопки прямого открытия Staging Web (`https://crownfall90-dot.github.io/play/staging/`) и скачивания Staging APK.
   * Добавлена кнопка «📋 Скопировать ссылку и PIN для тестера» — генерирует готовый текст приглашения в один клик.
@@ -725,7 +725,7 @@ tests/
 - Трейс действий `_actionTrail` (кольцевой буфер последних 20 действий).
 - Расширен `reportError(msg)`: теперь в `/errors` передаются диагностические данные устройства `dev` и цепочка последних действий `trail`.
 
-### 3. Конкурс на новое название игры (смена Puzzlegrad)
+### 3. Конкурс на новое название игры (смена Tiletopia)
 - Создан диалог `showNameProposalDialog()`:
   - Автоматически предлагается при входе в игру на главном экране (`checkNameProposal()`), если игрок ещё не предложил название (`!wallet.nameSuggested`).
   - При отправке: начисление **+100 золота** (`wallet.gold += 100`, звук монеты, `wallet.nameSuggested = true`, сохранение `wallet.suggestedGameName`).

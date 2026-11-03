@@ -74,7 +74,7 @@ export function updateTelegramBackButton(visible, onClickFn, win = typeof window
   } catch (_) {}
 }
 
-export function shareRoomToTelegram(code, message = 'Присоединяйся к моей партии в Puzzlegrad! 🧩', webUrl = 'https://crownfall90-dot.github.io/play/') {
+export function shareRoomToTelegram(code, message = 'Присоединяйся к моей партии в Tiletopia! 🧩', webUrl = 'https://crownfall90-dot.github.io/play/') {
   const safeCode = String(code || '').toUpperCase().replace(/[^A-Z0-9]/g, '').slice(0, 5);
   const url = `${webUrl}?room=${safeCode}`;
   const text = `${message}\nКод комнаты: ${safeCode}`;

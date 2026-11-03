@@ -10,7 +10,9 @@
 | Значок 512×512 | `store/icon-512.png` |
 | Баннер 1024×500 | `store/feature-1024x500.png` |
 | Скриншоты телефона 1080×1920 | `store/screenshots/` |
-| Политика конфиденциальности | https://github.com/crownfall90-dot/play/blob/main/docs/privacy-policy.md |
+| Политика конфиденциальности | https://crownfall90-dot.github.io/play/privacy.html |
+| Страница удаления аккаунта | https://crownfall90-dot.github.io/play/delete-account.html |
+| Ответы для «Безопасности данных» | `docs/product/GOOGLE-PLAY-DATA-SAFETY.md` |
 
 Скриншоты и графика пересобираются командой `node scripts/store-assets.js` после `./scripts/wrap-web.sh`.
 

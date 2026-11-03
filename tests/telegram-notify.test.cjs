@@ -5,7 +5,7 @@ const py = (code, env = {}) => spawnSync(pyBin, ['-c', code], {cwd: __dirname + 
 test('telegram: message lists changes, escapes HTML, links and platforms', () => {
   const r = py("import importlib.util as u;s=u.spec_from_file_location('t','scripts/telegram-notify.py');m=u.module_from_spec(s);s.loader.exec_module(m);print(m.build('1.0.9','- Новое <b>окно</b>\\n- Ещё','https://x/y/','https://x/a.apk','https://t.me/mybot'))");
   assert.equal(r.status, 0, r.stderr);
-  assert.match(r.stdout, /Puzzlegrad 1\.0\.9/);
+  assert.match(r.stdout, /Tiletopia 1\.0\.9/);
   assert.match(r.stdout, /• Новое &lt;b&gt;окно&lt;\/b&gt;/);
   assert.match(r.stdout, /Android:.*APK-приложение/);
   assert.match(r.stdout, /Все устройства.*сайт в браузере/);

@@ -13,10 +13,10 @@ test('reinstall: a release signed with another key opens the step-by-step reinst
     const {page, errors} = await openGame(browser, instrumentedCopy(), null);
     // the app's bridge, only the call this flow uses (set after start: the page decides at start whether it is the app)
     await page.evaluate(() => { document.querySelectorAll('body > .over,#boot').forEach(e => e.remove()); window.__settings = 0; window.AndroidApp = {openAppSettings() { window.__settings++; }}; });
-    await page.evaluate(() => window.onUpdateAvailable({code: 999, version: '1.0.999', notes: 'x', url: 'https://example.invalid/Puzzlegrad.apk', reinstall: true}, false));
+    await page.evaluate(() => window.onUpdateAvailable({code: 999, version: '1.0.999', notes: 'x', url: 'https://example.invalid/Tiletopia.apk', reinstall: true}, false));
     const box = await page.waitForSelector('#reinst');
     const t = await box.textContent();
-    for (const want of ['Новое приложение Puzzlegrad', 'Сохраните прогресс', 'Скачайте новую версию', 'Удалите эту версию', 'Установите скачанный файл']) assert.ok(t.includes(want), want);
+    for (const want of ['Новое приложение Tiletopia', 'Сохраните прогресс', 'Скачайте новую версию', 'Удалите эту версию', 'Установите скачанный файл']) assert.ok(t.includes(want), want);
     assert.equal(await page.evaluate(() => !!document.querySelector('#upd')), false, 'no in-place update button');
     // without a profile the first tap on "remove" only warns; the second opens the system page
     await page.click('#rsDel');

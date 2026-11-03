@@ -7,10 +7,10 @@ test('account/google: jwtPayload decodes UTF-8 and handles malformed tokens', as
   const {jwtPayload, jwtEmail, googleIdpBody, classifyGoogleError} = await import('../src/account/google.js');
 
   // UTF-8 payload
-  const token = 'header.' + Buffer.from(JSON.stringify({email: 'test@example.com', name: 'Пазлград'})).toString('base64url') + '.sig';
+  const token = 'header.' + Buffer.from(JSON.stringify({email: 'test@example.com', name: 'Tiletopia'})).toString('base64url') + '.sig';
   const payload = jwtPayload(token);
   assert.equal(payload.email, 'test@example.com');
-  assert.equal(payload.name, 'Пазлград');
+  assert.equal(payload.name, 'Tiletopia');
   assert.equal(jwtEmail(token), 'test@example.com');
 
   // Malformed token

@@ -1,4 +1,4 @@
-# Puzzlegrad: постоянный контекст разработки
+# Tiletopia: постоянный контекст разработки
 
 Репозиторий: crownfall90-dot/play. Рабочая ветка: dev/stage2-account-network-20261029. Main автоматически не менять.
 

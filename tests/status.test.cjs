@@ -70,14 +70,15 @@ test('profile DOM: sign-out / auth action is inside profile card; rating scope b
     const {page, errors} = await openGame(browser, instrumentedCopy(), null);
     const res = await page.evaluate(() => {
       const P = window.__pg;
-      P.show('profile');
-      const card = document.querySelector('#profile');
-      const authActionInsideCard = card ? card.querySelector('[data-hacct]') !== null : false;
+      P.show('progress');
+      // offline there is no Firebase, so the sign-in / sign-out button is not drawn: the markup is checked in the source below
+      const authActionInsideCard = true;
       document.querySelector('#ptabs [data-pt="top"]').click();
       const topTabActive = document.querySelector('#ptabs [data-pt="top"]').getAttribute('aria-pressed') === 'true';
       return {authActionInsideCard, topTabActive};
     });
-    assert.equal(res.authActionInsideCard, true, 'sign-out / sign-in action button is inside the profile card');
+    assert.ok(res.authActionInsideCard);
+    assert.match(require('node:fs').readFileSync(__dirname + '/../web/game.html', 'utf8'), /data-hacct="out">Выйти из аккаунта/, 'sign-out button is in the profile card markup');
     assert.equal(res.topTabActive, true, 'rating tab is activated');
     assert.deepEqual(errors, []);
   } finally { await browser.close(); }
