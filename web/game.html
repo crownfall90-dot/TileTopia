@@ -6043,8 +6043,7 @@ function reinstallDialog(info) {
         <li><i>2</i><div><b>Скачайте новую версию</b><small>Файл Tiletopia.apk сохранится в «Загрузки»</small></div><button class="chip pri" id="rsGet">Скачать</button></li>
         <li><i>3</i><div><b>Удалите эту версию</b><small>Откроются настройки приложения — нажмите «Удалить»</small></div><button class="chip" id="rsDel">Удалить</button></li>
         <li><i>4</i><div><b>Установите скачанный файл</b><small>Откройте Tiletopia.apk из «Загрузок», запустите игру и войдите в тот же профиль</small></div></li>
-      </ol>
-      <button class="ghostbtn" id="rsLater">Позже</button></div>`;
+      </ol></div>`;
     const q = sel => box.querySelector(sel);
     if (q('#rsSave')) q('#rsSave').onclick = () => accountDialog('link');
     q('#rsGet').onclick = () => { track('reinstall_download'); location.href = info.url; };
@@ -6053,7 +6052,6 @@ function reinstallDialog(info) {
       track('reinstall_remove');
       if (window.AndroidApp && AndroidApp.openAppSettings) AndroidApp.openAppSettings();
     };
-    q('#rsLater').onclick = () => box.remove();
   };
   draw();
   if (linkedNow()) cloudSave().catch(() => {});

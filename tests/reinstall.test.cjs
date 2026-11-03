@@ -23,7 +23,8 @@ test('reinstall: a release signed with another key opens the step-by-step reinst
     assert.equal(await page.evaluate(() => window.__settings), 0);
     await page.click('#rsDel');
     assert.equal(await page.evaluate(() => window.__settings), 1);
-    await page.click('#rsLater');
+    assert.equal(await page.evaluate(() => !!document.querySelector('#rsLater')), false, 'no later button in reinstall dialog');
+    await page.evaluate(() => document.getElementById('reinst')?.remove());
     assert.equal(await page.evaluate(() => !!document.getElementById('reinst')), false);
     // the same key: the usual update dialog
     await page.evaluate(() => window.onUpdateAvailable({code: 999, version: '1.0.999', notes: 'x', url: 'u', reinstall: false}, true));
