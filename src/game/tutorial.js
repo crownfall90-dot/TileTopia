@@ -105,5 +105,9 @@ export function renderTutorialOfferDialogHtml(hasFb = false) {
 }
 
 export function renderAskProfileDialogHtml(walletColor = '#ef5350') {
-  return `<div class="ocard prof"><div class="pav" id="pav" style="--c:${walletColor}">?</div><h3>Создайте профиль</h3><p>Придумайте никнейм и выберите цвет — их увидят соперники и рейтинг</p><div style="display:flex;gap:8px;align-items:center;margin-bottom:12px"><input class="field" id="profName" maxlength="12" placeholder="Никнейм" autocomplete="off" style="flex:1"><button type="button" class="iconbtn" id="profDice" title="Случайное имя" style="width:44px;height:44px;border-radius:10px;background:var(--surface-hover);font-size:20px;border:1px solid var(--line);cursor:pointer;flex:0 0 auto">🎲</button></div><button class="cta wide" id="profOk" disabled>Готово</button><button class="ghostbtn" id="profLogin">У меня уже есть профиль — войти</button></div>`;
+  return `<div class="ocard prof newprof"><div class="pav" id="pav" style="--c:${walletColor}">?</div><h3>Создайте профиль</h3><p>Придумайте никнейм и выберите цвет — их увидят соперники и рейтинг</p>
+    <label class="plabel" for="profName">Никнейм</label>
+    <div class="nickrow"><input class="field" id="profName" maxlength="12" placeholder="От 2 до 12 символов" autocomplete="off"><button type="button" class="dicebtn" id="profDice" title="Случайное имя" aria-label="Случайное имя">🎲</button></div>
+    <div class="plabel" id="profColorLabel">Цвет</div>
+    <button class="cta wide" id="profOk" disabled>Готово</button><button class="ghostbtn" id="profLogin">У меня уже есть профиль — войти</button></div>`;
 }

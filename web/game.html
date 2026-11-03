@@ -2555,7 +2555,7 @@ async function presenceMark(on) {
     if (!fbAuth.uid) return;
     const url = `${FB.dbUrl}/presence/${fbAuth.uid}.json?auth=${tok}`;
     const vs = versionSeen(), di = devInfo(), dev = {p: installKind(), v: vs.v, u: vs.t, ...(di.m ? {m: di.m, i: di.i} : {})};
-    const ret = {st: myStatus(), fs: wallet.firstSeen || today(), d1: (wallet.rd && wallet.rd[1]) ? 1 : 0, d7: (wallet.rd && wallet.rd[7]) ? 1 : 0};
+    const ret = {c: validCol(wallet.color) ? wallet.color : '', st: myStatus(), fs: wallet.firstSeen || today(), d1: (wallet.rd && wallet.rd[1]) ? 1 : 0, d7: (wallet.rd && wallet.rd[7]) ? 1 : 0};
     if (on) await fetch(url, {method: 'PUT', body: JSON.stringify({t: {'.sv': 'timestamp'}, n: profileName(), s: presenceState(), r: registered() ? 1 : 0, ...dev, ...ret})});
     else await fetch(url, {method: 'PUT', keepalive: true, body: JSON.stringify({t: {'.sv': 'timestamp'}, n: profileName(), s: 'off', ...dev, ...ret})});
   } catch (_) {}
@@ -3879,7 +3879,7 @@ async function syncRating(force) {
   if (!FB || (PROG.up >= PROG.cups && !force)) return;
   try {
     const tok = await fbToken(), target = Math.min(PROG.cups, PROG.up + 30);
-    const r = await fetch(`${FB.dbUrl}/leaders/${fbAuth.uid}.json?auth=${tok}`, {method: 'PUT', body: JSON.stringify({n: profileName(), st: myStatus(), r: target, w: PROG.st.owins, t: {'.sv': 'timestamp'}})});
+    const r = await fetch(`${FB.dbUrl}/leaders/${fbAuth.uid}.json?auth=${tok}`, {method: 'PUT', body: JSON.stringify({n: profileName(), st: myStatus(), c: validCol(wallet.color) ? wallet.color : '', r: target, w: PROG.st.owins, t: {'.sv': 'timestamp'}})});
     if (r.ok) {
       PROG.up = target; saveWallet(); progressDot();
       if (PROG.up < PROG.cups) setTimeout(syncRating, 61000);
@@ -3925,7 +3925,7 @@ async function renderTop() {
     }
     const mine = rows.findIndex(x => x.uid === me);
 
-    const av = (x, i) => `<span class="av" style="--c:${PALETTE[i % PALETTE.length].col}">${(clean(x.n) || '?')[0].toUpperCase()}</span>`;
+    const av = (x, i) => `<span class="av" style="--c:${validCol(x.c) ? x.c : PALETTE[i % PALETTE.length].col}">${(clean(x.n) || '?')[0].toUpperCase()}</span>`;
     const podium = [1, 0, 2].map(i => rows[i] ? `<div class="pod p${i + 1}${rows[i].uid === me ? ' me' : ''}">${av(rows[i], i)}<b>${clean(rows[i].n) || 'Игрок'}</b>${stTag(rows[i].st)}<small>🏆 ${rows[i].r}</small><div class="ped"><i>${i + 1}</i></div></div>` : '<div class="pod empty"></div>').join('');
     const list = rows.slice(3, 10).map((x, k) => `<div class="lead${x.uid === me ? ' me' : ''}"><i>${k + 4}</i>${av(x, k + 3)}<span>${clean(x.n) || 'Игрок'}${x.uid === me ? ' (вы)' : ''}${stTag(x.st)}</span><b>🏆 ${x.r}</b></div>`).join('');
     const myRow = mine >= 10 ? `<div class="lead me myrank"><i>${mine + 1}</i>${av(rows[mine], mine)}<span>Вы</span><b>🏆 ${rows[mine].r}</b></div>`
@@ -4039,11 +4039,12 @@ $('#tutBtn').onclick = startTutorial;
 // Profile: pick a nickname (and a colour) once, after the tutorial or on skipping it.
 // The player's colour, picked together with the nickname (it stays the preferred colour; at a table where it is taken
 // the game gives another one for that game only).
+let colorSyncT = 0;
 function colorPick(input, av) {
   const row = document.createElement('div'); row.className = 'cpick'; row.setAttribute('role', 'radiogroup'); row.setAttribute('aria-label', 'Цвет');
   const draw = () => { row.innerHTML = PALETTE.map(p => `<button type="button" role="radio" aria-checked="${p.col === wallet.color}" aria-label="${p.name}" data-c="${p.col}" style="--c:${p.col}"></button>`).join(''); };
   draw();
-  row.onclick = e => { const b = e.target.closest('[data-c]'); if (!b) return; wallet.color = setup.seats[0].col = b.dataset.c; saveWallet(); saveSetup(); if (av) av.style.setProperty('--c', b.dataset.c); draw(); };
+  row.onclick = e => { const b = e.target.closest('[data-c]'); if (!b) return; wallet.color = setup.seats[0].col = b.dataset.c; saveWallet(); saveSetup(); clearTimeout(colorSyncT); colorSyncT = setTimeout(() => { try { presenceMark(true); syncRating(true); } catch (_) {} }, 600); if (av) av.style.setProperty('--c', b.dataset.c); draw(); };
   input.after(row);
 }
 function askProfile() {
@@ -4054,7 +4055,7 @@ function askProfile() {
     : `<div class="ocard prof"><div class="pav" id="pav" style="--c:${wallet.color}">?</div><h3>Создайте профиль</h3><p>Придумайте никнейм и выберите цвет — их увидят соперники и рейтинг</p><input class="field" id="profName" maxlength="12" placeholder="Никнейм" autocomplete="off"><button class="cta wide" id="profOk" disabled>Готово</button><button class="ghostbtn" id="profLogin">У меня уже есть профиль — войти</button></div>`;
   document.body.append(box);
   const inp = box.querySelector('#profName'), ok = box.querySelector('#profOk'), av = box.querySelector('#pav'), dice = box.querySelector('#profDice');
-  colorPick(inp, av);
+  colorPick(box.querySelector('#profColorLabel') || inp, av);
   inp.oninput = () => { const n = clean(inp.value); ok.disabled = n.length < 2 || n === 'Вы'; av.textContent = (n[0] || '?').toUpperCase(); };
   if (dice) {
     dice.onclick = () => {
@@ -4206,7 +4207,7 @@ async function loadFriends() {
   const list = (await fbGet('friends/' + me)) || {};
   friends = await Promise.all(Object.entries(list).slice(0, FRIEND_MAX).map(async ([uid, v]) => {
     const [back, p] = await Promise.all([fbGet(`friends/${uid}/${me}`).catch(() => null), fbGet('presence/' + uid).catch(() => null)]);
-    return {uid, n: clean(p && p.n) || clean(v.n) || 'Игрок', st: PG.state.status.shownStatus(p && p.st), mutual: !!back, p, on: !!back && isOn(p)};
+    return {uid, n: clean(p && p.n) || clean(v.n) || 'Игрок', st: PG.state.status.shownStatus(p && p.st), c: validCol(p && p.c) ? p.c : undefined, mutual: !!back, p, on: !!back && isOn(p)};
   }));
   friends.sort((a, b) => b.on - a.on || b.mutual - a.mutual || ((b.p && b.p.t) || 0) - ((a.p && a.p.t) || 0));
 }
