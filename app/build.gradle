@@ -23,7 +23,7 @@ android {
     namespace 'com.crownfall.mosaic'
     compileSdk 35
     defaultConfig {
-        applicationId 'com.crownfall.mosaic'
+        applicationId 'app.crownfall.tiletopia'
         minSdk 24
         targetSdk 35
         versionCode vc
