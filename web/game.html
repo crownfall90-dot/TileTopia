@@ -6074,8 +6074,9 @@ window.onUpdateAvailable = (info, manual) => {
   window.onUpdateProgress = pct => { const i = box.querySelector('.prog i'); if (i) i.style.width = pct + '%'; };
   // If installing fails, the release page in the browser is the way out.
   window.onUpdateError = msg => {
-    const b = box.querySelector('#upd'); b.disabled = false; b.textContent = 'Повторить';
-    box.querySelector('.prog').hidden = true; box.querySelector('#manual').hidden = false;
+    // The update cannot be installed over this copy: one way out, the download of the new version.
+    const b = box.querySelector('#upd'); b.hidden = true;
+    box.querySelector('.prog').hidden = true; const m = box.querySelector('#manual'); m.hidden = false; m.textContent = 'Скачать новую версию вручную'; m.href = info.url; m.className = 'cta wide';
     toastAny(msg);
   };
 };

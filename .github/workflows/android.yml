@@ -65,7 +65,7 @@ jobs:
           curl -fsSL "https://github.com/$GITHUB_REPOSITORY/releases/latest/download/latest.json" -o prev.json 2>/dev/null || echo '{}' > prev.json
           python3 -c 'import json; p=json.load(open("prev.json")).get("notes","").strip(); n=open("release-notes.md", encoding="utf-8").read().strip(); print("::warning::release-notes.md is the same as in the previous release - update it") if p and p == n else None'
           # latest.json: what the app reads to find updates (a plain file download has no rate limit).
-          python3 -c 'import json,os,sys; c=int(os.environ["CODE"]); r=os.environ["GITHUB_REPOSITORY"]; json.dump({"code": c, "version": "1.0.%d" % c, "notes": open("release-notes.md", encoding="utf-8").read().strip(), "url": "https://github.com/%s/releases/download/v%d/Tiletopia-1.0.%d.apk" % (r, c, c), "cert": os.environ.get("SIGNING_CERT_SHA256", "")}, open("latest.json", "w", encoding="utf-8"), ensure_ascii=False)'
+          python3 -c 'import json,os,sys; c=int(os.environ["CODE"]); r=os.environ["GITHUB_REPOSITORY"]; json.dump({"code": c, "version": "1.0.%d" % c, "notes": open("release-notes.md", encoding="utf-8").read().strip(), "url": "https://github.com/%s/releases/download/v%d/Tiletopia-1.0.%d.apk" % (r, c, c), "cert": os.environ.get("SIGNING_CERT_SHA256") or "d4409cee878c4142c7d28039571023d693071fd8c88bfdd72b73aa52f2154d76", "package": "app.crownfall.tiletopia"}, open("latest.json", "w", encoding="utf-8"), ensure_ascii=False)'
           # Tiletopia.apk: the same file under a fixed name, so releases/latest/download/Tiletopia.apk
           # (the link in invites and the web version) always downloads the newest app.
           cp "Tiletopia-1.0.$CODE.apk" Tiletopia.apk

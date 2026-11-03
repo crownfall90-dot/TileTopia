@@ -84,7 +84,10 @@ class Updater {
             // "cert": the release is signed with this key; when it is not ours, an in-place update is impossible.
             String cert = f.optString("cert", "").replace(":", "").toLowerCase(java.util.Locale.ROOT);
             String mine = myCert(ctx);
-            info.put("reinstall", !cert.isEmpty() && !mine.isEmpty() && !cert.equals(mine));
+            // "package": the app id of the release. Phones that still have the old id cannot be updated in place
+            // (older copies of this app see only "cert", which therefore differs on purpose in latest.json).
+            String pkg = f.optString("package", "");
+            info.put("reinstall", !pkg.isEmpty() ? !pkg.equals(ctx.getPackageName()) : (!cert.isEmpty() && !mine.isEmpty() && !cert.equals(mine)));
             return info;
         } catch (Exception ignored) {
             // An older release without latest.json, or the download failed: ask the API.
