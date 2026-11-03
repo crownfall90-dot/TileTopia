@@ -101,7 +101,7 @@ export function advanceTutorialStep(tutState, wallet, steps = TUT_STEPS) {
 }
 
 export function renderTutorialOfferDialogHtml(hasFb = false) {
-  return `<div class="ocard"><div style="font-size:44px">🏰</div><h3>Добро пожаловать в Puzzlegrad!</h3><p>Новичок? Короткое обучение, затем вы придумаете никнейм — так создаётся профиль</p><button class="cta wide" data-t="go">Начать · обучение</button>${hasFb ? '<button class="ghostbtn" data-t="login">У меня есть профиль — войти</button>' : ''}<button class="linkbtn" data-t="no">Пропустить обучение</button></div>`;
+  return `<div class="ocard"><div style="font-size:44px">🏰</div><h3>Добро пожаловать в Tiletopia!</h3><p>Новичок? Короткое обучение, затем вы придумаете никнейм — так создаётся профиль</p><button class="cta wide" data-t="go">Начать · обучение</button>${hasFb ? '<button class="ghostbtn" data-t="login">У меня есть профиль — войти</button>' : ''}<button class="linkbtn" data-t="no">Пропустить обучение</button></div>`;
 }
 
 export function renderAskProfileDialogHtml(walletColor = '#ef5350') {

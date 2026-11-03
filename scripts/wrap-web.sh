@@ -31,6 +31,7 @@ if [ "$target" = web ]; then
   touch "$site/.nojekyll"
   touch "$site/staging/.nojekyll"
   "$PY_BIN" scripts/privacy-page.py "$site/privacy.html"
+  cp web/delete-account.html "$site/delete-account.html"
   # Owner pages (the in-game owner panel links here). No secrets inside: the data behind them is
   # admin-only in the Firebase rules. Kept out of search engines.
   mkdir -p "$site/admin"
@@ -84,15 +85,15 @@ build_page() {
   if (z < .995) document.querySelector('meta[name=viewport]').setAttribute('content', 'width=' + Math.round(w / z) + ',viewport-fit=cover,user-scalable=no');
 })();
 </script>
-<meta name="description" content="Puzzlegrad — стройте города, дороги и крепости из общей стопки. Играйте онлайн, с друзьями и с ботами.">
+<meta name="description" content="Tiletopia — стройте города, дороги и крепости из общей стопки. Играйте онлайн, с друзьями и с ботами.">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Puzzlegrad">
-<meta property="og:title" content="Puzzlegrad"><meta property="og:description" content="Стройте города, дороги и крепости — играйте с друзьями онлайн"><meta property="og:image" content="icons/icon-512.png">
+<meta name="apple-mobile-web-app-title" content="Tiletopia">
+<meta property="og:title" content="Tiletopia"><meta property="og:description" content="Стройте города, дороги и крепости — играйте с друзьями онлайн"><meta property="og:image" content="icons/icon-512.png">
 <script>
 (function () {
   setTimeout(function () {

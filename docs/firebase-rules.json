@@ -43,7 +43,7 @@
       "$uid": {
         ".read": "auth != null",
         "$fid": {
-          ".write": "auth != null && auth.uid === $uid && (!newData.exists() || (auth.token.email != null && root.child('profiles').child(auth.uid).exists() && root.child('profiles').child($fid).exists()))",
+          ".write": "auth != null && ((auth.uid === $uid && (!newData.exists() || (auth.token.email != null && root.child('profiles').child(auth.uid).exists() && root.child('profiles').child($fid).exists()))) || (auth.uid === $fid && !newData.exists()))",
           ".validate": "!newData.exists() || (newData.hasChildren(['n', 't']) && newData.child('n').isString() && newData.child('n').val().length <= 12)"
         }
       }
@@ -60,14 +60,14 @@
     "fcodes": {
       "$code": {
         ".read": "auth != null",
-        ".write": "auth != null && !data.exists() && newData.val() === auth.uid && auth.token.email != null && root.child('profiles').child(auth.uid).exists()",
+        ".write": "auth != null && ((!data.exists() && newData.val() === auth.uid && auth.token.email != null && root.child('profiles').child(auth.uid).exists()) || (data.exists() && data.val() === auth.uid && !newData.exists()))",
         ".validate": "$code.length === 6"
       }
     },
     "fcodeOf": {
       "$uid": {
         ".read": "auth != null && auth.uid === $uid",
-        ".write": "auth != null && auth.uid === $uid && !data.exists() && auth.token.email != null && root.child('profiles').child(auth.uid).exists()",
+        ".write": "auth != null && auth.uid === $uid && ((!data.exists() && auth.token.email != null && root.child('profiles').child(auth.uid).exists()) || !newData.exists())",
         ".validate": "newData.isString() && root.child('fcodes').child(newData.val()).val() === $uid"
       }
     },
@@ -79,7 +79,7 @@
     "playerNo": {
       "$uid": {
         ".read": "auth != null && auth.uid === $uid",
-        ".write": "auth != null && auth.uid === $uid && !data.exists() && newData.val() === root.child('guestN').val()"
+        ".write": "auth != null && auth.uid === $uid && ((!data.exists() && newData.val() === root.child('guestN').val()) || !newData.exists())"
       }
     },
     "feedback": {
@@ -88,7 +88,8 @@
         "$key": {
           ".write": "auth != null && auth.uid === $uid",
           ".validate": "newData.hasChildren(['k', 'm', 't']) && newData.child('k').isString() && newData.child('m').isString() && newData.child('m').val().length <= 1500 && newData.child('t').val() === now"
-        }
+        },
+        ".write": "auth != null && auth.uid === $uid && !newData.exists()"
       }
     },
     "suggestions": {
@@ -148,7 +149,8 @@
         "$id": {
           ".write": "auth != null && ((auth.uid === $uid && !data.exists()) || root.child('admins').child(auth.uid).val() === true)",
           ".validate": "!newData.exists() || (newData.hasChildren(['t', 'k']) && newData.child('t').val() === now && newData.child('k').isString() && newData.child('k').val().length <= 24 && (!newData.child('d').exists() || (newData.child('d').isString() && newData.child('d').val().length <= 240)) && (!newData.child('c').exists() || newData.child('c').isNumber()))"
-        }
+        },
+        ".write": "auth != null && auth.uid === $uid && !newData.exists()"
       }
     }
   }

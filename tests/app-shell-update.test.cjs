@@ -6,7 +6,7 @@ const assert = require('node:assert/strict');
 test('app/web: platform detection and standalone mode', async () => {
   const W = await import('../src/app/web.js');
   assert.equal(W.SITE_URL, 'https://crownfall90-dot.github.io/play/');
-  assert.ok(W.APK_URL.includes('Puzzlegrad.apk'));
+  assert.ok(W.APK_URL.includes('Tiletopia.apk'));
 
   // Standalone detection
   assert.equal(W.isStandalone({standalone: true}, null), true);

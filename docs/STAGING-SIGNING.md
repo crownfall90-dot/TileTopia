@@ -1,4 +1,4 @@
-# Persistent signing for Puzzlegrad Test
+# Persistent signing for Tiletopia Test
 
 This document supersedes the temporary CI signing instructions in TESTING.md.
 Only com.crownfall.mosaic.test is involved. Never use the production key.
@@ -9,7 +9,7 @@ Use PowerShell and keytool from an installed JDK (Android Studio bundles a JDK).
 Run in a private directory outside the repository:
 
 ```powershell
-keytool -genkeypair -keystore puzzlegrad-test.p12 -storetype PKCS12 -alias staging -keyalg RSA -keysize 3072 -validity 10000 -dname "CN=Puzzlegrad Test"
+keytool -genkeypair -keystore puzzlegrad-test.p12 -storetype PKCS12 -alias staging -keyalg RSA -keysize 3072 -validity 10000 -dname "CN=Tiletopia Test"
 ```
 
 Enter a strong unique password at the prompt and keep it in a password manager.
@@ -50,7 +50,7 @@ Preserve the
 first trusted certificate fingerprint and compare it on later builds.
 
 The test APK already installed from an ephemeral runner normally has a different
-key. Expect ONE uninstall/reinstall of Puzzlegrad Test, losing its test saves.
+key. Expect ONE uninstall/reinstall of Tiletopia Test, losing its test saves.
 Never uninstall the production game. After migration, test a later trusted
 build by installing it over the persistent test app and checking saved games.
 Keep versionCode increasing; the existing staging workflow run number is used.

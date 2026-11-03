@@ -1,13 +1,13 @@
-<p align="center"><img src="store/icon-512.png" width="112" alt="Puzzlegrad"></p>
+<p align="center"><img src="store/icon-512.png" width="112" alt="Tiletopia"></p>
 
-<h1 align="center">Puzzlegrad</h1>
+<h1 align="center">Tiletopia</h1>
 
 <p align="center"><b>Стройте города, дороги и крепости из общей стопки карт-пазлов.</b><br>
 Короткие партии на 8–30 минут: с ботами, на одном телефоне, онлайн на кубки и в комнатах с друзьями.</p>
 
 <p align="center">
   <a href="https://crownfall90-dot.github.io/play/"><b>▶ Играть в браузере</b></a> ·
-  <a href="https://github.com/crownfall90-dot/play/releases/latest/download/Puzzlegrad.apk"><b>⬇ Скачать для Android</b></a> ·
+  <a href="https://github.com/crownfall90-dot/play/releases/latest/download/Tiletopia.apk"><b>⬇ Скачать для Android</b></a> ·
   <a href="docs/privacy-policy.md">Политика конфиденциальности</a>
 </p>
 
@@ -22,7 +22,7 @@
 - **Профиль на всех устройствах**: телефон, приложение и браузер — один прогресс.
 
 ## Установка
-- **Android:** скачайте [Puzzlegrad.apk](https://github.com/crownfall90-dot/play/releases/latest/download/Puzzlegrad.apk) и откройте файл. Приложение обновляется само.
+- **Android:** скачайте [Tiletopia.apk](https://github.com/crownfall90-dot/play/releases/latest/download/Tiletopia.apk) и откройте файл. Приложение обновляется само.
 - **iPhone и компьютер:** откройте [веб-версию](https://crownfall90-dot.github.io/play/) и добавьте на главный экран.
 
 ## Поддержка
@@ -36,7 +36,7 @@
 <details>
 <summary>Для разработчиков проекта</summary>
 
-Это рабочий репозиторий команды Puzzlegrad. Начните с [docs/product/README.md](docs/product/README.md) (видение, режимы, удержание, очередь задач, аудит), затем [docs/coordination/HANDOFF.md](docs/coordination/HANDOFF.md).
+Это рабочий репозиторий команды Tiletopia. Начните с [docs/product/README.md](docs/product/README.md) (видение, режимы, удержание, очередь задач, аудит), затем [docs/coordination/HANDOFF.md](docs/coordination/HANDOFF.md).
 
 - `web/game.html` + `src/` — игра (модули собираются Vite в `build/bundle/pg.js`), `app/` — Android-оболочка, `scripts/` — сборка и обслуживание, `tests/` — тесты (`npm run build && node --test tests/*.test.cjs`).
 - Выпуск — только по команде владельца через «Promote to Production»; заметки для игроков — `release-notes.md`.

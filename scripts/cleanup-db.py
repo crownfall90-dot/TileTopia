@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Puzzlegrad database cleanup script (S-3).
+Tiletopia database cleanup script (S-3).
 Prunes stale database nodes to prevent storage bloat and performance degradation:
 - Rooms older than 7 days
 - Presence older than 24 hours
@@ -41,7 +41,7 @@ def get_token():
 def api_request(path, method="GET", body=None, token=("", "")):
     kind, value = token
     url = f"{DB_URL.rstrip('/')}/{path.lstrip('/')}.json"
-    headers = {"User-Agent": "Puzzlegrad-Cleanup/1.0"}
+    headers = {"User-Agent": "Tiletopia-Cleanup/1.0"}
     if kind == "bearer":
         headers["Authorization"] = f"Bearer {value}"
     elif kind == "secret":
@@ -120,7 +120,7 @@ def cleanup(dry_run=True, room_days=7, presence_hours=24, log_days=30):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Puzzlegrad Realtime Database Cleanup")
+    parser = argparse.ArgumentParser(description="Tiletopia Realtime Database Cleanup")
     parser.add_argument("--dry-run", action="store_true", default=True, help="Preview deletions without deleting")
     parser.add_argument("--execute", action="store_true", help="Perform real deletions")
     parser.add_argument("--room-days", type=int, default=7, help="Max room age in days")

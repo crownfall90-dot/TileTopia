@@ -42,7 +42,7 @@ jobs:
         run: python3 scripts/verify-staging.py
       - uses: actions/upload-artifact@v4
         with:
-          name: Puzzlegrad-Staging-${{ github.run_number }}
+          name: Tiletopia-Staging-${{ github.run_number }}
           path: |
             app/build/outputs/apk/github/release/app-github-release.apk
             TEST-BUILD.txt
@@ -53,10 +53,10 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          cp app/build/outputs/apk/github/release/app-github-release.apk Puzzlegrad-Staging.apk
+          cp app/build/outputs/apk/github/release/app-github-release.apk Tiletopia-Staging.apk
           gh release delete staging-latest --yes || true
-          gh release create staging-latest Puzzlegrad-Staging.apk \
-            --title "Puzzlegrad Staging (Тестовая сборка #${{ github.run_number }})" \
+          gh release create staging-latest Tiletopia-Staging.apk \
+            --title "Tiletopia Staging (Тестовая сборка #${{ github.run_number }})" \
             --notes "Тестовая сборка для закрытого тестирования (Staging). Обновляется автоматически при изменениях в ветках разработки." \
             --prerelease
       - name: Upload public diagnostics even on verification failure

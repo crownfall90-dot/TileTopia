@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-Puzzlegrad database backup script.
+Tiletopia database backup script.
 Dumps all critical Firebase Realtime Database trees (profiles, leaders, fcodes, presence)
 to a timestamped JSON file.
 Uses service account credentials if available (via scripts/fbadmin.py)
@@ -37,7 +37,7 @@ def get_token():
 def fetch_node(node, token):
     kind, value = token
     url = f"{DB_URL.rstrip('/')}/{node}.json"
-    headers = {"User-Agent": "Puzzlegrad-Backup/1.0"}
+    headers = {"User-Agent": "Tiletopia-Backup/1.0"}
     # A service-account access token goes in the Authorization header; ?auth= takes only a database secret
     # or a user's ID token (it answers 401 to an OAuth access token).
     if kind == "bearer":

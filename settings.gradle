@@ -1,5 +1,5 @@
 pluginManagement { repositories { google(); maven { url 'https://maven-central.storage-download.googleapis.com/maven2/' }; mavenCentral(); gradlePluginPortal() } }
 // Google's mirror of Maven Central first: Maven Central itself rate-limits busy build machines.
 dependencyResolutionManagement { repositories { google(); maven { url 'https://maven-central.storage-download.googleapis.com/maven2/' }; mavenCentral() } }
-rootProject.name = "Puzzlegrad"
+rootProject.name = "Tiletopia"
 include ':app'

@@ -1203,3 +1203,5 @@ html.app .screen.scroll{--sp:var(--it,0px);padding-top:0}/* the status-bar gap i
 .loc .badge{position:absolute;top:6px;left:6px;font:800 9.5px var(--f-body);letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:6px;background:#2ecc71;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.35)}
 .loc.locked svg{filter:saturate(.25) brightness(.6)}
 .loc.locked .badge{background:rgba(10,14,26,.85);color:var(--muted);border:1px solid rgba(255,255,255,.14);box-shadow:none}
+
+#nameProposalBtn{display:none!important}

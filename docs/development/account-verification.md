@@ -1,174 +1,178 @@
 # Account verification
-Source: aa0da9171ef69ef4d7ec22b55b7ad2e8936a723d
+Source: 76675ef621db2a5c4f5ce7130b1c7e248e4f960f
 Tests exit code: 0
 Staging assembleGithubRelease exit code: 0
 No APK publication, FCM send, production Firebase access, main change or signing-key rotation.
 ## tests
 ```text
-ate/save: getLastOnline validates timestamp freshness
-ok 196 - state/save: getLastOnline validates timestamp freshness
+p too # SKIP playwright is not installed (npm ci)
   ---
-  duration_ms: 0.365621
+  duration_ms: 2.385927
   ...
-# Subtest: state/save: saveHistoryEntry caps at 50 matches
-ok 197 - state/save: saveHistoryEntry caps at 50 matches
+# Subtest: telegram: message lists changes, escapes HTML, links and platforms
+ok 206 - telegram: message lists changes, escapes HTML, links and platforms
   ---
-  duration_ms: 3.82459
-  ...
-# Subtest: status module: clean, filter, buy, wear, earned
-ok 198 - status module: clean, filter, buy, wear, earned
-  ---
-  duration_ms: 20.933951
-  ...
-# Subtest: screens: shop statuses and "my items" open without errors, buying puts the status on
-ok 199 - screens: shop statuses and "my items" open without errors, buying puts the status on # SKIP playwright is not installed (npm ci)
-  ---
-  duration_ms: 0.987008
-  ...
-# Subtest: profile DOM: sign-out / auth action is inside profile card; rating scope buttons exist
-ok 200 - profile DOM: sign-out / auth action is inside profile card; rating scope buttons exist # SKIP playwright is not installed (npm ci)
-  ---
-  duration_ms: 0.236671
-  ...
-# Subtest: section title bar sticks to the top in the app too
-ok 201 - section title bar sticks to the top in the app too # SKIP playwright is not installed (npm ci)
-  ---
-  duration_ms: 1.780595
-  ...
-# Subtest: telegram: message lists changes, escapes HTML, links
-ok 202 - telegram: message lists changes, escapes HTML, links
-  ---
-  duration_ms: 103.136369
+  duration_ms: 88.541656
   ...
 # Subtest: telegram: without secrets it skips quietly and never leaks
-ok 203 - telegram: without secrets it skips quietly and never leaks
+ok 207 - telegram: without secrets it skips quietly and never leaks
   ---
-  duration_ms: 83.505853
+  duration_ms: 79.256932
+  ...
+# Subtest: telegram: isTelegramWebApp detects Telegram environment
+ok 208 - telegram: isTelegramWebApp detects Telegram environment
+  ---
+  duration_ms: 16.248963
+  ...
+# Subtest: telegram: initTelegramWebApp expands and configures theme colors
+ok 209 - telegram: initTelegramWebApp expands and configures theme colors
+  ---
+  duration_ms: 1.5143
+  ...
+# Subtest: telegram: getTelegramUser extracts user profile and start param
+ok 210 - telegram: getTelegramUser extracts user profile and start param
+  ---
+  duration_ms: 0.583151
+  ...
+# Subtest: telegram: telegramHaptic triggers impact and notification feedback
+ok 211 - telegram: telegramHaptic triggers impact and notification feedback
+  ---
+  duration_ms: 0.512831
+  ...
+# Subtest: telegram: shareRoomToTelegram builds share URL with room code
+ok 212 - telegram: shareRoomToTelegram builds share URL with room code
+  ---
+  duration_ms: 0.450467
+  ...
+# Subtest: telegram: telegram-setup-bot.py handles missing token gracefully
+ok 213 - telegram: telegram-setup-bot.py handles missing token gracefully
+  ---
+  duration_ms: 78.474021
   ...
 # Subtest: tutorial: all steps, from the first card to the win
-ok 204 - tutorial: all steps, from the first card to the win # SKIP playwright is not installed (npm ci)
+ok 214 - tutorial: all steps, from the first card to the win # SKIP playwright is not installed (npm ci)
   ---
-  duration_ms: 2.638812
+  duration_ms: 2.457214
   ...
 # Subtest: ui/hud: cityD generates SVG path data for corners and edges
-ok 205 - ui/hud: cityD generates SVG path data for corners and edges
+ok 215 - ui/hud: cityD generates SVG path data for corners and edges
   ---
-  duration_ms: 2.102464
+  duration_ms: 1.441417
   ...
 # Subtest: ui/hud: ownSvg generates data-URI for claimed features
-ok 206 - ui/hud: ownSvg generates data-URI for claimed features
+ok 216 - ui/hud: ownSvg generates data-URI for claimed features
   ---
-  duration_ms: 0.513266
+  duration_ms: 0.391261
   ...
 # Subtest: ui/hud: renderPlayersListHtml renders player elements with turn badges and scores
-ok 207 - ui/hud: renderPlayersListHtml renders player elements with turn badges and scores
+ok 217 - ui/hud: renderPlayersListHtml renders player elements with turn badges and scores
   ---
-  duration_ms: 0.629652
+  duration_ms: 0.42692
   ...
 # Subtest: ui/results: winTitle produces appropriate win title
-ok 208 - ui/results: winTitle produces appropriate win title
+ok 218 - ui/results: winTitle produces appropriate win title
   ---
-  duration_ms: 0.234888
+  duration_ms: 0.195933
   ...
 # Subtest: ui/results: renderPodiumHtml and renderBreakdownTableHtml format podium and scores
-ok 209 - ui/results: renderPodiumHtml and renderBreakdownTableHtml format podium and scores
+ok 219 - ui/results: renderPodiumHtml and renderBreakdownTableHtml format podium and scores
   ---
-  duration_ms: 0.512294
+  duration_ms: 0.338576
   ...
 # Subtest: ui/menu: formatGameMenuHtml formats offline pause menu
-ok 210 - ui/menu: formatGameMenuHtml formats offline pause menu
+ok 220 - ui/menu: formatGameMenuHtml formats offline pause menu
   ---
-  duration_ms: 5.214207
+  duration_ms: 1.949792
   ...
 # Subtest: ui/menu: formatGameMenuHtml formats online game menu with resign & draw
-ok 211 - ui/menu: formatGameMenuHtml formats online game menu with resign & draw
+ok 221 - ui/menu: formatGameMenuHtml formats online game menu with resign & draw
   ---
-  duration_ms: 0.343399
+  duration_ms: 0.283333
   ...
 # Subtest: ui/menu: formatGameMenuHtml formats menu when all humans left and only bots remain
-ok 212 - ui/menu: formatGameMenuHtml formats menu when all humans left and only bots remain
+ok 222 - ui/menu: formatGameMenuHtml formats menu when all humans left and only bots remain
   ---
-  duration_ms: 0.26849
+  duration_ms: 0.217822
   ...
 # Subtest: ui/menu: areAllOpponentsAway checks opponent drop status
-ok 213 - ui/menu: areAllOpponentsAway checks opponent drop status
+ok 223 - ui/menu: areAllOpponentsAway checks opponent drop status
   ---
-  duration_ms: 1.369349
+  duration_ms: 0.327478
   ...
 # Subtest: ui/feedback: formatFeedbackPayload formats categories, stars, and device diagnostics
-ok 214 - ui/feedback: formatFeedbackPayload formats categories, stars, and device diagnostics
+ok 224 - ui/feedback: formatFeedbackPayload formats categories, stars, and device diagnostics
   ---
-  duration_ms: 1.951453
+  duration_ms: 1.989107
   ...
 # Subtest: ui/feedback: renderFeedbackCardHtml renders categories, star rating and hero
-ok 215 - ui/feedback: renderFeedbackCardHtml renders categories, star rating and hero
+ok 225 - ui/feedback: renderFeedbackCardHtml renders categories, star rating and hero
   ---
-  duration_ms: 0.437735
+  duration_ms: 0.469253
   ...
 # Subtest: ui/owner: devGet and devSet handle native preferences bridge and storage
-ok 216 - ui/owner: devGet and devSet handle native preferences bridge and storage
+ok 226 - ui/owner: devGet and devSet handle native preferences bridge and storage
   ---
-  duration_ms: 0.385888
+  duration_ms: 0.448781
   ...
 # Subtest: ui/owner: formatDevStatus formats workflow run status and dates
-ok 217 - ui/owner: formatDevStatus formats workflow run status and dates
+ok 227 - ui/owner: formatDevStatus formats workflow run status and dates
   ---
-  duration_ms: 24.041836
+  duration_ms: 20.677184
   ...
 # Subtest: ui/setup: renderModeCardsHtml renders cards with labels and icons
-ok 218 - ui/setup: renderModeCardsHtml renders cards with labels and icons
+ok 228 - ui/setup: renderModeCardsHtml renders cards with labels and icons
   ---
-  duration_ms: 1.897041
+  duration_ms: 2.000388
   ...
 # Subtest: ui/setup: renderRuleRowsHtml filters rules and marks active options
-ok 219 - ui/setup: renderRuleRowsHtml filters rules and marks active options
+ok 229 - ui/setup: renderRuleRowsHtml filters rules and marks active options
   ---
-  duration_ms: 0.414652
+  duration_ms: 0.485832
   ...
 # Subtest: ui/setup: profileName and hero meta
-ok 220 - ui/setup: profileName and hero meta
+ok 230 - ui/setup: profileName and hero meta
   ---
-  duration_ms: 0.469134
+  duration_ms: 0.49032
   ...
 # Subtest: ui/setup: adjustSeatsForMode switches between local players and bots
-ok 221 - ui/setup: adjustSeatsForMode switches between local players and bots
+ok 231 - ui/setup: adjustSeatsForMode switches between local players and bots
   ---
-  duration_ms: 0.304086
+  duration_ms: 0.346477
   ...
 # Subtest: ui/setup: renderSwatchesHtml, renderSetupMeHtml and renderSetupSeatsHtml
-ok 222 - ui/setup: renderSwatchesHtml, renderSetupMeHtml and renderSetupSeatsHtml
+ok 232 - ui/setup: renderSwatchesHtml, renderSetupMeHtml and renderSetupSeatsHtml
   ---
-  duration_ms: 0.653707
+  duration_ms: 0.706053
   ...
 # Subtest: ui/shop: renderGiftCard, renderFiguresGrid, renderFramesGrid, renderLocationsGrid
-ok 223 - ui/shop: renderGiftCard, renderFiguresGrid, renderFramesGrid, renderLocationsGrid
+ok 233 - ui/shop: renderGiftCard, renderFiguresGrid, renderFramesGrid, renderLocationsGrid
   ---
-  duration_ms: 24.371276
+  duration_ms: 15.866267
   ...
 # Subtest: ui/progress: ringSvg, renderMasteryGrid, renderBuildingStats, renderCollectionCard
-ok 224 - ui/progress: ringSvg, renderMasteryGrid, renderBuildingStats, renderCollectionCard
+ok 234 - ui/progress: ringSvg, renderMasteryGrid, renderBuildingStats, renderCollectionCard
   ---
-  duration_ms: 10.380188
+  duration_ms: 5.135898
   ...
 # Subtest: water edges: every water side has the river mouth, every pair lines up in all turns
-ok 225 - water edges: every water side has the river mouth, every pair lines up in all turns # SKIP playwright is not installed (npm ci)
+ok 235 - water edges: every water side has the river mouth, every pair lines up in all turns # SKIP playwright is not installed (npm ci)
   ---
-  duration_ms: 2.663158
+  duration_ms: 2.339869
   ...
-1..225
-# tests 225
+1..235
+# tests 235
 # suites 0
-# pass 202
+# pass 211
 # fail 0
 # cancelled 0
-# skipped 23
+# skipped 24
 # todo 0
-# duration_ms 4199.120258
+# duration_ms 3537.230461
 
 ```
 ## build
 ```text
 
-BUILD SUCCESSFUL in 1m 28s
+BUILD SUCCESSFUL in 1m 43s
 46 actionable tasks: 46 executed
 ```

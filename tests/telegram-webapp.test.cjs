@@ -108,7 +108,7 @@ test('telegram: telegramHaptic triggers impact and notification feedback', async
 test('telegram: shareRoomToTelegram builds share URL with room code', async () => {
   const {shareRoomToTelegram} = await import('../src/app/telegram.js');
 
-  const shareUrl = shareRoomToTelegram('M4P7X', 'Сыграем в Puzzlegrad!');
+  const shareUrl = shareRoomToTelegram('M4P7X', 'Сыграем в Tiletopia!');
   assert.ok(shareUrl.startsWith('https://t.me/share/url?'));
   assert.ok(shareUrl.includes('M4P7X'));
   assert.ok(shareUrl.includes('crownfall90-dot.github.io%2Fplay'));

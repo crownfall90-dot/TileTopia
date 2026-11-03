@@ -30,4 +30,4 @@ jobs:
           gh release view "$TAG" --json body -q .body > notes.md
           python3 scripts/telegram-notify.py "1.0.$CODE" notes.md \
             "https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}/" \
-            "https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/Puzzlegrad-1.0.${CODE}.apk"
+            "https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/Tiletopia-1.0.${CODE}.apk"

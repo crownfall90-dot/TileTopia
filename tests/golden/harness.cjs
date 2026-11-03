@@ -12,7 +12,7 @@ window.__pg = {
   startGame, makeDeck, show, sound,
   state: () => ({phase, applied, players, tiles, gameLog}),
   myId, selectSlot, rotate, net: () => net, turnNow: () => turn,
-  openFeedback, jigsawFrame, botLevel, prog: () => PROG, wallet: () => wallet, pendingInvites, setInvited: v => { invited = v; }, setFriends: v => { friends = v; }, setNet: v => { net = v; },
+  openFeedback, jigsawFrame, deleteMyAccount, botLevel, prog: () => PROG, wallet: () => wallet, pendingInvites, setInvited: v => { invited = v; }, setFriends: v => { friends = v; }, setNet: v => { net = v; },
 };
 `;
 
