@@ -84,11 +84,12 @@ test('net/friends: cleanFriendCode, formatInvitePayload, formatFriendRequestPayl
   assert.equal(req.v, 'XYZ123');
 
   // Friend row markup
-  const rowHtml = renderFriendRow({n: 'Маша', on: true, c: '#4c8dff'}, '<button>Позвать</button>', 'в меню');
+  const rowHtml = renderFriendRow({uid: 'u-test', n: 'Маша', on: true, c: '#4c8dff'}, '<button>Позвать</button>', 'в меню');
   assert.ok(rowHtml.includes('Маша'));
   assert.ok(rowHtml.includes('class="lead frow on"'));
   assert.ok(rowHtml.includes('--c:#4c8dff'));
   assert.ok(rowHtml.includes('М'));
+  assert.ok(rowHtml.includes('data-pl="u-test"'));
   assert.ok(rowHtml.includes('<button>Позвать</button>'));
   assert.ok(rowHtml.includes('в меню'));
 
