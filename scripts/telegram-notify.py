@@ -13,8 +13,9 @@ DEV_FILTER_PATTERNS = [
     r'экспорт\s+спрайт',
     r'спрайт',
     r'плитк.*(?:отдельн|архив|zip|дизайн)',
-    r'для\s+дизайнера',
-    r'дизайнеру',
+    r'дизайн',
+    r'внутренн',
+    r'internal',
     r'staging',
     r'стеджинг',
     r'пин-код',
@@ -117,6 +118,10 @@ def parse_release_notes(notes: str, version: str) -> dict:
                 current_section = 'poll'
                 has_explicit_sections = True
                 continue
+            elif line.startswith('#'):
+                current_section = 'internal'
+                has_explicit_sections = True
+                continue
 
         clean_item = line.lstrip('-•*# ').strip()
         if not clean_item:
@@ -137,6 +142,8 @@ def parse_release_notes(notes: str, version: str) -> dict:
                 changed_items.append(clean_item)
             elif current_section == 'removed':
                 removed_items.append(clean_item)
+            elif current_section == 'internal':
+                continue
             else:
                 new_items.append(clean_item)
         else:
