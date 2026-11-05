@@ -1,5 +1,5 @@
 // src/ui/menu.js
-// In-game pause menu, surrender/draw options, and menu card rendering.
+// In-game pause menu, surrender options (no draws in strategy), and menu card rendering.
 
 export function formatGameMenuHtml({online, live, seat, allBots}) {
   const title = online ? 'Онлайн-партия' : live ? 'Пауза' : 'Меню';
@@ -7,8 +7,8 @@ export function formatGameMenuHtml({online, live, seat, allBots}) {
   const canDrawOrResign = Boolean(online && live && seat >= 0 && !allBots);
   const canCancel = Boolean((!online && live) || allBots);
 
-  const drawResignHtml = canDrawOrResign
-    ? '<div class="row2b"><button class="ghostbtn" data-a="draw">Предложить ничью</button><button class="ghostbtn danger" data-a="resign">Сдаться</button></div>'
+  const resignHtml = canDrawOrResign
+    ? '<button class="ghostbtn danger wide" data-a="resign">Сдаться</button>'
     : '';
 
   const cancelHtml = canCancel
@@ -19,7 +19,7 @@ export function formatGameMenuHtml({online, live, seat, allBots}) {
     (subtitle ? `<p>${subtitle}</p>` : '<p></p>') +
     '<button class="cta wide" data-a="resume">Продолжить</button>' +
     '<button class="ghostbtn" data-a="settings">Настройки</button>' +
-    drawResignHtml +
+    resignHtml +
     cancelHtml +
     '<button class="ghostbtn" data-a="menu">Выйти в главное меню</button></div>';
 }

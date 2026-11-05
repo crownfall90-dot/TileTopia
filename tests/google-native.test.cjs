@@ -49,7 +49,11 @@ test('explicit native button uses dedicated Google option (source check)', () =>
   assert.ok(java.includes('String code = googleErrorCode(e)'));
 });
 
-test('actual Java error classifier separates cancellation, missing credentials and failure', () => {
+const hasJavac = (() => {
+  try { return cp.spawnSync('javac', ['-version']).status === 0; } catch (_) { return false; }
+})();
+
+test('actual Java error classifier separates cancellation, missing credentials and failure', {skip: !hasJavac && 'javac is not installed'}, () => {
   const method = java.match(/static String googleErrorCode\(GetCredentialException e\) \{[\s\S]*?\n    \}/);
   assert.ok(method, 'googleErrorCode method should match');
   const dir = fs.mkdtempSync(path.join(os.tmpdir(), 'google-error-'));

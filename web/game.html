@@ -1,3 +1,5 @@
+// Telegram Mini App instant bootstrap
+if (typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp) { try { window.Telegram.WebApp.ready(); window.Telegram.WebApp.expand(); } catch(_) {} }
 <title>Tiletopia</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -32,6 +34,7 @@
       </nav>
       <section class="screen" id="scr-menu" hidden>
         <div class="mtop">
+          <button class="iconbtn" data-go="history" aria-label="История партий" hidden style="display:none"></button>
           <button class="mprof" id="mprof" data-go="progress" aria-label="Профиль, кубки, уровень и золото"></button>
           <button class="menu-hub-btn" id="btnMenuHub" aria-label="Меню" title="Меню">
             <span class="mhub-tilt">
@@ -170,40 +173,40 @@
           <div class="seg rtabs" id="rtabs"><button data-rt="basics" aria-pressed="true">Основы</button><button data-rt="score" aria-pressed="false">Очки</button><button data-rt="meeple" aria-pressed="false">Фишки</button><button data-rt="more" aria-pressed="false">Ещё</button></div>
 
           <div class="rpane" data-rp="basics">
-            <div class="rgoal"><span>🏰</span><div><b>Цель</b><p>Стройте королевство из общей стопки карт. Когда стопка кончилась — <b>у кого больше очков, тот победил</b>.</p></div></div>
-            <div class="h3">Ваш ход — три шага</div>
+            <div class="rgoal"><span>🏰</span><div><b>Плиточная стратегия</b><p>Tiletopia — пошаговая средневековая стратегия. Игроки по очереди берут квадратные плитки земель из общего запаса и выкладывают на поле, возводя города, прокладывая дороги и основывая монастыри. <b>Побеждает сильнейший тактик!</b></p></div></div>
+            <div class="hitem" style="border:1.5px solid rgba(242,184,75,.4);background:rgba(242,184,75,.08)"><span class="hic">⚔️</span><div><b>Никаких ничьих — победа обязательна!</b><p>В игре полностью исключены ничьи. Если в конце партии счёт очков равный, победитель определяется тай-брейком: завершивший больше объектов ➔ сохранивший больше миплов ➔ по очерёдности за столом. Кто-то обязан победить!</p></div></div>
+            <div class="h3">Ваш ход — три действия</div>
             <ol class="rsteps">
-              <li><i>1</i><span class="ric">🃏</span><div><b>Возьмите карту</b><p>Верхняя карта стопки показана внизу. Её можно поворачивать.</p></div></li>
-              <li><i>2</i><span class="ric">🧩</span><div><b>Приложите к полю</b><p>Края карты должны совпасть с соседними: город с городом, дорога с дорогой, река с рекой. Подходящие места подсвечены.</p></div></li>
-              <li><i>3</i><span class="ric">🧍</span><div><b>Поставьте фишку</b><p>По желанию — на город, дорогу или крепость только что положенной карты. Потом — «Поставить».</p></div></li>
+              <li><i>1</i><span class="ric">🧩</span><div><b>Возьмите плитку</b><p>Плитка из запаса показана внизу экрана. Её можно поворачивать кнопкой «Повернуть».</p></div></li>
+              <li><i>2</i><span class="ric">🗺️</span><div><b>Приложите к полю</b><p>Все края обязаны совпасть с соседями: город к городу, дорога к дороге, река к реке. Доступные места подсвечены.</p></div></div>
+              <li><i>3</i><span class="ric">🧍</span><div><b>Выставьте мипла (подданного)</b><p>По желанию отправьте мипла на объект только что выставленной плитки (рыцарь в город, разбойник на дорогу, монах в монастырь). Затем — «Поставить».</p></div></div>
             </ol>
-            <div class="h3">Подсказки</div>
-            <div class="hitem"><span class="hic">💡</span><div><b>Игра подсказывает ход</b><p>На вашем ходу подсвечивается лучшее место и пишется, сколько очков даст город или дорога и сколько краёв осталось закрыть. Лампочка справа от поля сразу ставит карту на это место.</p><em>В настройках: «Всегда», «По кнопке» или «Выкл»</em></div></div>
-            <div class="h3">Время хода</div>
-            <div class="hitem"><span class="hic">⏱</span><div><b>Часы у того, чей ход</b><p>Время хода показано у игрока, который сейчас ходит. За 10 секунд до конца телефон вибрирует. Если время вышло, ход делает бот — по смыслу, а не наугад.</p></div></div>
+            <div class="h3">Умные подсказки</div>
+            <div class="hitem"><span class="hic">💡</span><div><b>Подсказка лучшего хода</b><p>Игра анализирует поле и может подсказать самое выгодное место для плитки с расчётом будущих очков. Лампочка справа от стола ставит плитку на оптимальную позицию.</p><em>В настройках: «Всегда», «По кнопке» или «Выкл»</em></div></div>
+            <div class="h3">Контроль времени</div>
+            <div class="hitem"><span class="hic">⏱</span><div><b>Таймер хода</b><p>На ход даётся фиксированное время. За 10 секунд срабатывает вибрация. Если время вышло, продуманный ход за вас совершает алгоритм бота.</p></div></div>
           </div>
 
           <div class="rpane" data-rp="score" hidden>
-            <div class="h3">Очки за достроенное</div>
-            <div class="hitem"><span class="rimg t-rS"></span><div><b>🛤 Дорога</b><p>Доведите дорогу до конца с обеих сторон: до города, перекрёстка, тупика или замкните в кольцо.</p><em>1 очко за каждую карту дороги</em></div></div>
-            <div class="hitem"><span class="rimg t-c2"></span><div><b>🏰 Город</b><p>Закройте картами все края города, чтобы со всех сторон он был окружён.</p><em>2 очка за каждую карту города</em></div></div>
-            <div class="hitem"><span class="rimg t-fort"></span><div><b>🏯 Крепость</b><p>Окружите крепость картами со всех 8 сторон, включая углы.</p><em>9 очков</em></div></div>
-            <div class="hitem"><span class="rimg t-brHalf"></span><div><b>🌉 Большой мост</b><p>Соедините две половины моста друг с другом — дорога через него становится ценнее.</p><em>очки за такую дорогу удваиваются</em></div></div>
-            <div class="hitem"><span class="hic">⏳</span><div><b>Недостроенное в конце</b><p>Когда стопка кончилась, всё, что не достроено, всё равно приносит очки.</p><em>по 1 очку за карту</em></div></div>
-            <div class="h3">Золото за место</div>
-            <div class="goldrow"><span>🥇<b>+15</b></span><span>🥈<b>+10</b></span><span>🥉<b>+5</b></span><span>4<b>0</b></span><span>5<b>−5</b></span></div>
-            <p class="rnote">С ботами и онлайн. За одним телефоном золото не начисляется</p>
+            <div class="h3">Подсчёт очков за завершённые объекты</div>
+            <div class="hitem"><span class="rimg t-rS"></span><div><b>🛤 Дорога (Тракт)</b><p>Завершается, когда с обоих концов упирается в перекрёсток, город, монастырь или замыкается в кольцо.</p><em>1 очко за каждую плитку дороги</em></div></div>
+            <div class="hitem"><span class="rimg t-c2"></span><div><b>🏰 Город</b><p>Завершается, когда крепостные стены полностью сомкнуты со всех сторон без единой бреши.</p><em>2 очка за каждую плитку города</em></div></div>
+            <div class="hitem"><span class="rimg t-fort"></span><div><b>🏯 Монастырь (Крепость)</b><p>Завершается, когда монастырь полностью окружён 8 соседними плитками (включая диагонали).</p><em>9 очков (1 очко за плитку монастыря + по 1 за каждого соседа)</em></div></div>
+            <div class="hitem"><span class="rimg t-brHalf"></span><div><b>🌉 Большой каменный мост</b><p>Соедините две половины моста — дорога через него становится вдвое прибыльнее!</p><em>очки за весь тракт удваиваются (×2)</em></div></div>
+            <div class="hitem"><span class="hic">⏳</span><div><b>Недостроенные объекты в финале</b><p>Когда запас плиток исчерпан, все недостроенные владения приносят половинную ценность.</p><em>по 1 очку за каждую плитку города, дороги или монастыря</em></div></div>
+            <div class="h3">Награды за победу</div>
+            <div class="goldrow"><span>🥇<b>+10 🏆</b></span><span>🥈<b>+5 🏆</b></span><span>🥉<b>+2 🏆</b></span><span>4<b>0 🏆</b></span><span>5<b>0 🏆</b></span></div>
+            <p class="rnote">Максимум 10 кубков за победу в рейтинге! Дополнительно начисляется золото: 🥇 +15💰, 🥈 +10💰, 🥉 +5💰</p>
           </div>
 
           <div class="rpane" data-rp="meeple" hidden>
-            <div class="h3">Как работают фишки</div>
-            <div class="hitem"><span class="hic">☝️</span><div><b>Одна фишка за ход</b><p>Ставится на только что положенную карту — на город, дорогу или крепость.</p></div></div>
-            <div class="hitem"><span class="hic">🔒</span><div><b>Занятое не занять</b><p>Если на объекте уже стоит чья-то фишка, поставить туда свою нельзя — даже когда объект соединён с вашим через новую карту.</p></div></div>
-            <div class="hitem"><span class="hic">🎯</span><div><b>Больше фишек — объект ваш</b><p>Очки за достроенный объект получает тот, у кого на нём больше фишек. Если поровну — очки получает каждый из них.</p></div></div>
-            <div class="hitem"><span class="hic">↩️</span><div><b>Фишка возвращается</b><p>Как только объект достроен и очки начислены, фишка снова у вас в запасе.</p></div></div>
-            <div class="hitem"><span class="hic">🧩</span><div><b>Склейка — так борются за объект</b><p>На занятый фишкой объект вторую фишку не поставить. Зато можно поставить свою фишку на отдельный кусочек рядом и потом положить карту, которая соединит кусочки: фишки сложатся. Больше фишек — объект ваш, поровну — очки получают оба.</p><em>Подсказка скажет, когда карта склеивает объекты</em></div></div>
-    <div class="hitem"><span class="hic">🤝</span><div><b>Респект</b><p>Достроили объект, на котором стоят только чужие фишки.</p><em>+1 очко вам</em></div></div>
-            <div class="hitem"><span class="hic">🧍</span><div><b>Свободная фишка</b><p>Все карты достроенного объекта ваши — можно поставить на него свободную фишку и забрать очки.</p></div></div>
+            <div class="h3">Стратегия управления миплами</div>
+            <div class="hitem"><span class="hic">♟️</span><div><b>Один мипл за ход</b><p>Мипл выставляется строго на только что выложенную плитку — на город, дорогу или монастырь.</p></div></div>
+            <div class="hitem"><span class="hic">🔒</span><div><b>Правило занятого объекта</b><p>Нельзя поставить мипла на объект, где уже есть чей-то подданный. Захват чужого объекта возможен только через хитрое объединение!</p></div></div>
+            <div class="hitem"><span class="hic">⚔️</span><div><b>Битва за объект: большинство миплов</b><p>Если две части объекта слились воедино, очки за него получает игрок с перевесом по миплам. Если миплов поровну — побеждает тот, кто выложил больше плиток этого объекта!</p></div></div>
+            <div class="hitem"><span class="hic">↩️</span><div><b>Возврат миплов в резерв</b><p>Как только объект достроен и очки начислены, миплы немедленно возвращаются в ваш запас для новых завоеваний.</p></div></div>
+            <div class="hitem"><span class="hic">🧩</span><div><b>Тактика слияния («Склейка»)</b><p>Начните свой город или дорогу рядом с чужим объектом, выставив мипла. В следующих ходах соедините их связующей плиткой. Так можно оспорить или отобрать огромный город соперника!</p></div></div>
+            <div class="hitem"><span class="hic">🤝</span><div><b>Благородство зодчего (+1 очко)</b><p>Если вы достроили чужой объект, где нет ваших миплов, игра благодарит вас +1 очком за помощь в градостроительстве.</p></div></div>
           </div>
 
           <div class="rpane" data-rp="more" hidden>
@@ -212,7 +215,7 @@
             <div class="hitem"><span class="hic">⛲</span><div><b>Исток</b><p>Река начинается из родника: с другой стороны карты воды нет.</p></div></div>
             <div class="hitem"><span class="hic">🚧</span><div><b>Обрыв</b><p>Дорога к обрыву: за обрывом ставить можно только обрыв, видна половина карты.</p></div></div>
             <div class="h3">Онлайн и друзья</div>
-            <div class="hitem"><span class="hic">⚡</span><div><b>Быстрая игра</b><p>Сразу к первой игре, где ждут игроков. Все онлайн-партии идут на рейтинг: 1-е место +30 кубков, 2-е +15, 3-е +5, ничья +10.</p></div></div>
+            <div class="hitem"><span class="hic">⚡</span><div><b>Быстрая игра</b><p>Сразу к первой игре, где ждут игроков. Все онлайн-партии идут на рейтинг: 1-е место +10 кубков, 2-е +5, 3-е +2 (ничьих нет!).</p></div></div>
             <div class="hitem"><span class="hic">👀</span><div><b>Видно ход соперника</b><p>Ещё до подтверждения вы видите, куда игрок хочет поставить карту и как её поворачивает. Карта подсвечена цветом игрока.</p></div></div>
             <div class="hitem"><span class="hic">💬</span><div><b>Фразы и эмодзи</b><p>Быстрые фразы — не чаще раза в несколько секунд.</p></div></div>
             <div class="hitem"><span class="hic">💤</span><div><b>Игра свёрнута</b><p>Если игра свёрнута больше минуты, вас выводит из онлайн-партии. Вернуться можно.</p></div></div>
@@ -588,7 +591,7 @@
               </div>
               <div class="sm-info">
                 <div class="sm-top">
-                  <b>С друзьями</b>
+                  <b>С&nbsp;друзьями</b>
                   <span class="sm-tag blue">Комната</span>
                 </div>
                 <small>Закрытые столы по коду, приглашения в один клик</small>
@@ -633,7 +636,7 @@
                   <b>Быстрая дуэль</b>
                   <span class="sm-tag orange">20 сек</span>
                 </div>
-                <small>Динамичная схватка 1×1 на 30 картах с таймером</small>
+                <small>Динамичная схватка 1×1 на 30 плитках с таймером</small>
               </div>
               <span class="sm-arrow">›</span>
             </button>
@@ -1676,7 +1679,15 @@ async function endGame(reason) {
   setStatus('Партия окончена'); $('.tray').classList.add('ended');
 }
 const winTitle = (p, final) => isMe(p) ? (final ? 'Вы победили!' : 'Вы лидируете') : `${final ? 'Побеждает' : 'Лидирует'} ${p.name}`;
-const ranked = () => players.map((p, i) => ({...p, i})).sort((a, b) => (a.resigned ? 1 : 0) - (b.resigned ? 1 : 0) || b.score - a.score);
+const ranked = () => players.map((p, i) => ({...p, i})).sort((a, b) => {
+  if (a.resigned !== b.resigned) return a.resigned ? 1 : -1;
+  if (b.score !== a.score) return b.score - a.score;
+  const aFeat = (a.stats?.c || 0) + (a.stats?.r || 0) + (a.stats?.f || 0);
+  const bFeat = (b.stats?.c || 0) + (b.stats?.r || 0) + (b.stats?.f || 0);
+  if (bFeat !== aFeat) return bFeat - aFeat;
+  if (b.meeples !== a.meeples) return b.meeples - a.meeples;
+  return a.i - b.i;
+});
 
 /* ---------------- setup ---------------- */
 
@@ -2587,7 +2598,7 @@ function openGameMenu() {
     <p>${online ? 'Партия идёт, пока вы в меню' : live ? 'Боты ждут, время хода остановлено' : ''}</p>
     <button class="cta wide" data-a="resume">Продолжить</button>
     <button class="ghostbtn" data-a="settings">Настройки</button>
-    ${online && live && seat >= 0 && !allBots ? `<div class="row2b"><button class="ghostbtn" data-a="draw">Предложить ничью</button><button class="ghostbtn danger" data-a="resign">Сдаться</button></div>` : ''}
+    ${online && live && seat >= 0 && !allBots ? `<button class="ghostbtn danger wide" data-a="resign">Сдаться</button>` : ''}
     ${(!online && live) || allBots ? '<button class="ghostbtn danger" data-a="cancel">Отменить партию</button>' : ''}
     <button class="ghostbtn" data-a="menu">Выйти в главное меню</button></div>`;
   document.body.append(box);
@@ -4121,7 +4132,7 @@ function gameDone(place, score) {
   const privCups = !!(net && !net.quick && gameRules.cups && players.filter(p => p.human).length >= 2 && !hasBots);
   if (privCups) { const d = today(); if (PROG.pc && PROG.pc.d === d) PROG.pc.n++; else PROG.pc = {d, n: 1}; }
   const rated = !!(!hasBots && net && (net.quick || (privCups && PROG.pc.n <= 5)));
-  const cups = rated ? (place < 0 ? 10 : [30, 15, 5, 0, 0][place]) : 0;
+  const cups = rated ? ([10, 5, 2, 0, 0][place] || 0) : 0;
   if (rated) { PROG.cups += cups; syncRating(); }
   saveWallet(); progressDot();
   // experience and a new level are shown by the results board itself (rewardChips)
@@ -4405,7 +4416,7 @@ $('#ptab').addEventListener('click', e => {
 async function syncRating(force) {
   if (!FB || (PROG.up >= PROG.cups && !force)) return;
   try {
-    const tok = await fbToken(), target = Math.min(PROG.cups, PROG.up + 30);
+    const tok = await fbToken(), target = Math.min(PROG.cups, PROG.up + 10);
     const r = await fetch(`${FB.dbUrl}/leaders/${fbAuth.uid}.json?auth=${tok}`, {method: 'PUT', body: JSON.stringify({n: profileName(), st: myStatus(), c: validCol(wallet.color) ? wallet.color : '', r: target, w: PROG.st.owins, t: {'.sv': 'timestamp'}})});
     if (r.ok) {
       PROG.up = target; saveWallet(); progressDot();
@@ -4539,9 +4550,9 @@ async function renderTop() {
     : '';
 
   const scopeTabs = `<div class="scope-tabs"><button class="chip${topScope === 'all' ? ' pri' : ''}" id="topScopeAll">Все игроки (Топ-20)</button><button class="chip${topScope === 'friends' ? ' pri' : ''}" id="topScopeFriends">Среди друзей</button></div>`;
-  const seasonTag = `<div style="text-align:center;color:var(--muted);font-size:12px;margin-bottom:8px">Сезонная лига · <b>${curWeek}</b> (сброс в понедельник)</div>`;
+  const seasonTag = `<div style="text-align:center;color:var(--muted);font-size:12px;margin-bottom:8px">Лига · Сезон <b>${curWeek}</b> (сброс в понедельник)</div>`;
 
-  el.innerHTML = seasonTag + scopeTabs + `<div class="podium">${podium}</div>` + `<div class="leader-tile-list">${list}</div>` + myRow + '<p class="qnote">Нажмите на игрока, чтобы посмотреть профиль · За победу в рейтинге +30 🏆</p>';
+  el.innerHTML = seasonTag + scopeTabs + `<div class="podium">${podium}</div>` + `<div class="leader-tile-list">${list}</div>` + myRow + '<p class="qnote">Нажмите на игрока, чтобы посмотреть профиль · За победу в рейтинге +10 🏆</p>';
 
   const btnAll = el.querySelector('#topScopeAll'), btnFriends = el.querySelector('#topScopeFriends');
   if (btnAll) btnAll.onclick = () => { topScope = 'all'; renderTop(); };
@@ -7105,18 +7116,28 @@ window.__ready = true;
 // In the app the loader stays a moment as a splash, long enough to see a few tiles land.
 // On app start the splash lays one full fitting 3x3 (restarted once the real pieces are in).
 { const el = $('#boot'); if (el) {
-  if (!isApp) { boot.min = boot.checked = true; bootHide(); }
-  else loaderReady.then(() => {
-    const pieces = el.querySelectorAll('.pz i');
-    pieces.forEach(i => { i.style.animation = 'none'; void i.offsetWidth; i.style.animation = ''; });
-    setTimeout(() => {
-      boot.min = true; bootHide();
-      if (!boot.gone && !boot.update) { const s = el.querySelector('small'); if (s) s.textContent = 'Проверяем обновления…'; }
-    }, 3000);
-    // An older app shell, or no answer at all: do not hold the game.
-    setTimeout(() => { boot.checked = true; bootHide(); }, 6000);
-  });
+  if (!isAndroid) {
+    boot.min = boot.checked = true;
+    el.classList.add('gone');
+    setTimeout(() => { try { el.remove(); } catch(e){} }, 200);
+    if (typeof bootDone === 'function') bootDone();
+  } else {
+    loaderReady.then(() => {
+      const pieces = el.querySelectorAll('.pz i');
+      pieces.forEach(i => { i.style.animation = 'none'; void i.offsetWidth; i.style.animation = ''; });
+      setTimeout(() => {
+        boot.min = true; bootHide();
+        if (!boot.gone && !boot.update) { const s = el.querySelector('small'); if (s) s.textContent = 'Проверяем обновления…'; }
+      }, 1500);
+      setTimeout(() => { boot.checked = true; bootHide(); }, 3000);
+    });
+  }
 } }
+setTimeout(() => {
+  const b = document.getElementById('boot');
+  if (b) { b.classList.add('gone'); setTimeout(() => { try { b.remove(); } catch(_) {} }, 200); }
+  if (typeof bootDone === 'function') bootDone();
+}, 2000);
 // Mode bottom sheet and quick play handlers
 (function() {
 // Init Menu Hub Sliding Sheet

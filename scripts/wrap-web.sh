@@ -59,6 +59,10 @@ if [ "$target" = web ]; then
     cp -r assets/tiles "$site/"
     cp -r assets/tiles/* "$site/tiles/"
   fi
+  if [ -d store ]; then
+    cp -r store "$site/"
+    cp -r store "$site/staging/"
+  fi
 else
   out=app/src/main/assets/index.html
 fi
