@@ -110,7 +110,7 @@
             <div class="srow"><span class="sic">ℹ️</span><span class="stx"><b>Версия</b></span><b class="sval" id="verFull">—</b></div>
             <button class="srow btn" id="checkUpd"><span class="sic">🔄</span><span class="stx"><b>Проверить обновления</b></span><span class="sgo">›</span></button>
             <button class="srow btn" id="delAccBtn"><span class="sic">🗂️</span><span class="stx"><b>Аккаунт и данные</b><small>Управление данными и удаление аккаунта</small></span><span class="sgo">›</span></button>
-            <a class="srow btn" href="https://crownfall90-dot.github.io/play/privacy.html" target="_blank" rel="noopener"><span class="sic">🔒</span><span class="stx"><b>Политика конфиденциальности</b></span><span class="sgo">›</span></a>
+            <a class="srow btn" href="https://crownfall90-dot.github.io/TileTopia/privacy.html" target="_blank" rel="noopener"><span class="sic">🔒</span><span class="stx"><b>Политика конфиденциальности</b></span><span class="sgo">›</span></a>
             <button class="srow btn" id="devBtn" hidden><span class="sic">📣</span><span class="stx"><b>Панель владельца</b></span><span class="sgo">›</span></button>
           </div>
           <p class="shint scenter">Tiletopia</p>
@@ -5266,6 +5266,7 @@ async function devStatus(el) {
   } catch (_) { el.textContent = 'Нет связи с GitHub'; return null; }
 }
 function devPanel() {
+  if (fbAuth && fbAuth.idToken) { try { localStorage.setItem('pgAdminAuth', JSON.stringify({idToken: fbAuth.idToken, refreshToken: fbAuth.refreshToken || '', uid: fbAuth.uid, email: fbAuth.email || '', exp: Date.now() + 3500000})); } catch (_) {} }
   const box = document.createElement('div'); box.className = 'over'; box.style.position = 'fixed';
   const draw = () => {
     const tok = devGet('devToken');
@@ -6539,7 +6540,7 @@ function askDeleteAccount() {
 }
 function accountDataDialog() {
   const box = document.createElement('div'); box.className = 'over'; box.style.position = 'fixed';
-  box.innerHTML = `<div class="ocard acc"><h3>Аккаунт и данные</h3><p style="font-size:14px;color:var(--muted);margin:0 0 16px">Управление вашими данными в игре Tiletopia</p><div class="sgroup" style="margin-bottom:16px"><a class="srow btn" href="https://crownfall90-dot.github.io/play/delete-account.html" target="_blank" rel="noopener"><span class="sic">📄</span><span class="stx"><b>Как удалить данные</b><small>Инструкция и сроки хранения</small></span><span class="sgo">›</span></a><button class="srow btn" id="dlgDelAction"><span class="sic">🗑️</span><span class="stx"><b style="color:#ef5350">Удалить аккаунт и данные</b><small>Безвозвратное удаление всех данных</small></span><span class="sgo">›</span></button></div><button class="ghostbtn" id="accDataClose">Закрыть</button></div>`;
+  box.innerHTML = `<div class="ocard acc"><h3>Аккаунт и данные</h3><p style="font-size:14px;color:var(--muted);margin:0 0 16px">Управление вашими данными в игре Tiletopia</p><div class="sgroup" style="margin-bottom:16px"><a class="srow btn" href="https://crownfall90-dot.github.io/TileTopia/delete-account.html" target="_blank" rel="noopener"><span class="sic">📄</span><span class="stx"><b>Как удалить данные</b><small>Инструкция и сроки хранения</small></span><span class="sgo">›</span></a><button class="srow btn" id="dlgDelAction"><span class="sic">🗑️</span><span class="stx"><b style="color:#ef5350">Удалить аккаунт и данные</b><small>Безвозвратное удаление всех данных</small></span><span class="sgo">›</span></button></div><button class="ghostbtn" id="accDataClose">Закрыть</button></div>`;
   document.body.append(box);
   box.querySelector('#accDataClose').onclick = () => box.remove();
   box.querySelector('#dlgDelAction').onclick = () => { box.remove(); askDeleteAccount(); };

@@ -2,8 +2,8 @@
 
 > **Версия приложения:** 1.0.260  
 > **Платформы:** Android (APK / AAB), Web (PWA / GitHub Pages), Telegram Mini App  
-> **Приватный сайт для дизайнера (Staging):** [https://crownfall90-dot.github.io/play/staging/](https://crownfall90-dot.github.io/play/staging/) *(PIN-код для входа: `2026`)*  
-> **Интерактивная веб-галерея плиток:** [https://crownfall90-dot.github.io/play/tiles/](https://crownfall90-dot.github.io/play/tiles/)  
+> **Приватный сайт для дизайнера (Staging):** [https://crownfall90-dot.github.io/TileTopia/staging/](https://crownfall90-dot.github.io/TileTopia/staging/) *(PIN-код для входа: `2026`)*  
+> **Интерактивная веб-галерея плиток:** [https://crownfall90-dot.github.io/TileTopia/tiles/](https://crownfall90-dot.github.io/TileTopia/tiles/)  
 > **Архив со всеми плитками 512×512 (ZIP):** [Скачать архивом (1.7 MB)](https://github.com/crownfall90-dot/TileTopia/raw/main/assets/tiles/tiletopia-all-tiles-512x512.zip)
 
 ---
@@ -13,7 +13,7 @@
 - Все плитки игры экспортированы отдельными изображениями высокого разрешения **512×512 px** в папку [`assets/tiles/`](file:///E:/play/assets/tiles/).
 - Для просмотра плиток в браузере откройте [`tools/export-tiles.html`](file:///E:/play/tools/export-tiles.html) или онлайн-галерею по ссылке выше.
 - Каждую плитку можно дорабатывать в Photoshop, Figma или Aseprite, сохраняя оригинальные названия (`tile_cap.png`, `tile_rS.png` и т.д.).
-- Чтобы посмотреть, как интерфейс выглядит на реальном устройстве, перейдите в [Staging-версию](https://crownfall90-dot.github.io/play/staging/) и введите код `2026`.
+- Чтобы посмотреть, как интерфейс выглядит на реальном устройстве, перейдите в [Staging-версию](https://crownfall90-dot.github.io/TileTopia/staging/) и введите код `2026`.
 
 ---
 

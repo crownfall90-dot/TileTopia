@@ -39,7 +39,7 @@ ath d="M15 5l-7 7 7 7"/></svg></button><b>Настройки</b></div>
           <div class="sgroup">
             <div class="srow"><span class="sic">ℹ️</span><span class="stx"><b>Версия</b></span><b class="sval" id="verFull">—</b></div>
             <button class="srow btn" id="checkUpd"><span class="sic">🔄</span><span class="stx"><b>Проверить обновления</b></span><span class="sgo">›</span></button>
-            <a class="srow btn" href="https://crownfall90-dot.github.io/play/privacy.html" target="_blank" rel="noopener"><span class="sic">🔒</span><span class="stx"><b>Политика конфиденциальности</b></span>
+            <a class="srow btn" href="https://crownfall90-dot.github.io/TileTopia/privacy.html" target="_blank" rel="noopener"><span class="sic">🔒</span><span class="stx"><b>Политика конфиденциальности</b></span>
 ```
 ## onGoogleToken
 Line 4426

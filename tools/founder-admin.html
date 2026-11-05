@@ -233,7 +233,7 @@ body:not(.authed) main > .card:not(#loginCard) { display: none; }
         <p class="stat-sub" style="font-size:11.5px;line-height:1.35">Обновляется автоматически при коммитах в dev-ветки. <b>Без пуш-уведомлений и без постов в канал.</b></p>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
           <a class="btn btn-sm" id="btnDownloadStaging" href="https://github.com/crownfall90-dot/TileTopia/releases/tag/staging-latest" target="_blank" rel="noopener" style="font-size:12px;padding:6px 10px;text-decoration:none">📥 Скачать APK</a>
-          <a class="btn btn-sm" id="btnOpenStaging" href="https://crownfall90-dot.github.io/play/staging/" target="_blank" rel="noopener" style="font-size:12px;padding:6px 10px;text-decoration:none">🌐 Тестовый веб</a>
+          <a class="btn btn-sm" id="btnOpenStaging" href="https://crownfall90-dot.github.io/TileTopia/staging/" target="_blank" rel="noopener" style="font-size:12px;padding:6px 10px;text-decoration:none">🌐 Тестовый веб</a>
         </div>
       </div>
 
@@ -247,7 +247,7 @@ body:not(.authed) main > .card:not(#loginCard) { display: none; }
         <p class="stat-sub" style="font-size:11.5px;line-height:1.35">Доступна всем игрокам. При выкатке <b>рассылает FCM-пуш игрокам</b> и <b>публикует пост в Telegram-канал</b>.</p>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
           <a class="btn btn-sm" id="btnDownloadProd" href="https://github.com/crownfall90-dot/TileTopia/releases/latest" target="_blank" rel="noopener" style="font-size:12px;padding:6px 10px;text-decoration:none">📥 Боевой APK</a>
-          <a class="btn btn-sm" id="btnOpenProd" href="https://crownfall90-dot.github.io/play/" target="_blank" rel="noopener" style="font-size:12px;padding:6px 10px;text-decoration:none">🌐 Боевой сайт</a>
+          <a class="btn btn-sm" id="btnOpenProd" href="https://crownfall90-dot.github.io/TileTopia/" target="_blank" rel="noopener" style="font-size:12px;padding:6px 10px;text-decoration:none">🌐 Боевой сайт</a>
           <a class="btn btn-sm" id="btnOpenTelegram" href="https://t.me/diarydevelopment" target="_blank" rel="noopener" style="font-size:12px;padding:6px 10px;text-decoration:none">📢 Канал</a>
         </div>
       </div>
@@ -391,7 +391,7 @@ body:not(.authed) main > .card:not(#loginCard) { display: none; }
       </div>
     </div>
     <div style="display:flex;flex-direction:column;gap:8px">
-      <a class="btn" href="https://crownfall90-dot.github.io/play/staging/" target="_blank" style="text-decoration:none;text-align:center">🌐 Открыть Staging Web (тест)</a>
+      <a class="btn" href="https://crownfall90-dot.github.io/TileTopia/staging/" target="_blank" style="text-decoration:none;text-align:center">🌐 Открыть Staging Web (тест)</a>
       <a class="btn" href="https://github.com/crownfall90-dot/TileTopia/releases/download/staging-latest/Tiletopia-Staging.apk" target="_blank" style="text-decoration:none;text-align:center">📲 Скачать Staging APK (для Android)</a>
       <button class="btn" id="btnCopyInvite">📋 Скопировать ссылку и PIN для тестера</button>
     </div>
@@ -502,7 +502,21 @@ const log = (msg) => { if (!document.body.classList.contains('authed')) $('login
 
 /* ---------- sign-in ---------- */
 let auth = null; // {idToken, refreshToken, uid, email, exp}
-try { auth = JSON.parse(sessionStorage.getItem('pgAdminAuth')); } catch (_) {}
+try { auth = JSON.parse(sessionStorage.getItem('pgAdminAuth') || localStorage.getItem('pgAdminAuth')); } catch (_) {}
+try {
+  const hash = new URLSearchParams(location.hash.slice(1));
+  const query = new URLSearchParams(location.search);
+  const idTok = hash.get('idToken') || query.get('idToken');
+  const refTok = hash.get('refreshToken') || query.get('refreshToken');
+  const uid = hash.get('uid') || query.get('uid');
+  const email = hash.get('email') || query.get('email');
+  if (idTok && uid) {
+    auth = {idToken: idTok, refreshToken: refTok || '', uid, email: email || '', exp: Date.now() + 3500000};
+    sessionStorage.setItem('pgAdminAuth', JSON.stringify(auth));
+    localStorage.setItem('pgAdminAuth', JSON.stringify(auth));
+    history.replaceState(null, '', location.pathname);
+  }
+} catch (_) {}
 async function idt(method, body) {
   const r = await fetch(`https://identitytoolkit.googleapis.com/v1/accounts:${method}?key=${API_KEY}`, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(body)});
   const j = await r.json().catch(() => ({})); if (!r.ok) throw new Error((j.error && j.error.message) || 'HTTP ' + r.status); return j;
@@ -510,7 +524,10 @@ async function idt(method, body) {
 function keep(j, email) {
   if (!j.idToken) throw new Error(j.needConfirmation ? 'Эта почта уже зарегистрирована с паролем — войдите по почте' : (j.errorMessage || 'Нет сессии'));
   auth = {idToken: j.idToken, refreshToken: j.refreshToken, uid: j.localId, email: email || j.email || '', exp: Date.now() + (+j.expiresIn || 3600) * 1000 - 60000};
-  try { sessionStorage.setItem('pgAdminAuth', JSON.stringify(auth)); } catch (_) {}
+  try {
+    sessionStorage.setItem('pgAdminAuth', JSON.stringify(auth));
+    localStorage.setItem('pgAdminAuth', JSON.stringify(auth));
+  } catch (_) {}
 }
 async function token() {
   if (!auth) throw new Error('Сначала войдите');
@@ -518,7 +535,10 @@ async function token() {
   const r = await fetch(`https://securetoken.googleapis.com/v1/token?key=${API_KEY}`, {method: 'POST', headers: {'Content-Type': 'application/x-www-form-urlencoded'}, body: 'grant_type=refresh_token&refresh_token=' + encodeURIComponent(auth.refreshToken)});
   const j = await r.json(); if (!r.ok) { signOut(); throw new Error('Вход истёк — войдите снова'); }
   auth.idToken = j.id_token; auth.refreshToken = j.refresh_token; auth.exp = Date.now() + (+j.expires_in || 3600) * 1000 - 60000;
-  try { sessionStorage.setItem('pgAdminAuth', JSON.stringify(auth)); } catch (_) {}
+  try {
+    sessionStorage.setItem('pgAdminAuth', JSON.stringify(auth));
+    localStorage.setItem('pgAdminAuth', JSON.stringify(auth));
+  } catch (_) {}
   return auth.idToken;
 }
 async function db(path, method = 'GET', body) {
@@ -543,7 +563,7 @@ async function afterSignIn() {
     $('btnLogout').hidden = false;
   }
 }
-function signOut() { document.body.classList.remove('authed'); auth = null; try { sessionStorage.removeItem('pgAdminAuth'); } catch (_) {} $('loginCard').hidden = false; $('btnLogout').hidden = true; $('connStatus').textContent = '● Не выполнен вход'; $('connStatus').style.color = 'var(--muted)'; }
+function signOut() { document.body.classList.remove('authed'); auth = null; try { sessionStorage.removeItem('pgAdminAuth'); localStorage.removeItem('pgAdminAuth'); } catch (_) {} $('loginCard').hidden = false; $('btnLogout').hidden = true; $('connStatus').textContent = '● Не выполнен вход'; $('connStatus').style.color = 'var(--muted)'; }
 $('btnLogout').onclick = () => { signOut(); log('Вы вышли'); };
 $('btnLogin').onclick = async () => {
   const email = $('loginMail').value.trim(), pass = $('loginPass').value;
@@ -655,7 +675,7 @@ $('btnSavePin').onclick = async () => {
 };
 async function loadPin() { const r = await fetch(`${DB}/config/testerPin.json`); const p = r.ok ? await r.json() : null; if (p) $('inputTesterPin').value = p; }
 $('btnCopyInvite').onclick = () => {
-  const msg = '🏰 Приглашение на закрытый тест Tiletopia:\n• Тестовая веб-версия: https://crownfall90-dot.github.io/play/staging/\n• PIN-код: ' + $('inputTesterPin').value +
+  const msg = '🏰 Приглашение на закрытый тест Tiletopia:\n• Тестовая веб-версия: https://crownfall90-dot.github.io/TileTopia/staging/\n• PIN-код: ' + $('inputTesterPin').value +
     '\n• Тестовый APK (Android, без интернета): https://github.com/' + REPO + '/releases/download/staging-latest/Tiletopia-Staging.apk';
   navigator.clipboard.writeText(msg).then(() => log('Приглашение скопировано')).catch(() => prompt('Скопируйте вручную:', msg));
 };
@@ -794,7 +814,7 @@ $('btnSendPush').onclick = () => openWorkflow('news.yml', 'разослать н
 
 async function loadReleaseNotes() {
   try {
-    const res = await fetch(`https://raw.githubusercontent.com/${REPO}/dev/stage2-account-network-20261029/release-notes.md?t=` + Date.now()).catch(() => null);
+    const res = await fetch(`https://raw.githubusercontent.com/${REPO}/dev/test-features/release-notes.md?t=` + Date.now()).catch(() => null);
     if (res && res.ok) {
       const text = await res.text();
       if ($('releaseNotesContent')) $('releaseNotesContent').textContent = text.trim() || 'Список изменений пуст';

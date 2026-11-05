@@ -2,7 +2,7 @@
 """Configures the Telegram Bot to launch Tiletopia as a Telegram Mini App.
 
 Sets:
-1. Default chat Menu Button -> WebApp (https://crownfall90-dot.github.io/play/)
+1. Default chat Menu Button -> WebApp (https://crownfall90-dot.github.io/TileTopia/)
 2. Bot commands (/play, /help)
 3. Bot description & short description
 
@@ -11,7 +11,7 @@ Usage:
 """
 import json, os, sys, urllib.request
 
-DEFAULT_WEB_URL = 'https://crownfall90-dot.github.io/play/'
+DEFAULT_WEB_URL = 'https://crownfall90-dot.github.io/TileTopia/'
 
 def api_call(token: str, method: str, data: dict = None) -> dict:
     url = f'https://api.telegram.org/bot{token}/{method}'
