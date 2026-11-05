@@ -231,7 +231,7 @@
             <div class="seg" id="setupBotLvl"><button data-blvl="easy">Лёгкие</button><button data-blvl="normal">Обычные</button><button data-blvl="hard">Сложные</button></div>
             <p class="shint" id="setupBotLvlHint">Обычные — взвешенные ходы и захват подходящих объектов.</p>
           </div>
-          <div class="col" id="setupLocBox" hidden>
+          <div class="col" id="setupLocBox">
             <div class="h3">Локация стола</div>
             <div class="seg" id="setupLoc"><button data-loc="village" class="on">🌳 Деревня</button><button data-loc="city">🏙️ Мегаполис</button><button data-loc="siberia">❄️ Сибирь</button><button data-loc="jungle">🌴 Джунгли</button></div>
           </div>
@@ -421,6 +421,7 @@
           <div class="netbad" id="netBad" hidden role="status"><i></i>Нет связи — переподключаемся…</div>
           <div class="edgeglow" id="edgeglow"></div>
           <div class="fabs">
+            <button class="fab scoutb" id="scoutBtn" aria-label="Разведка дозорного" title="Разведка дозорного"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
             <button class="fab tipb" id="tip" aria-label="Подсказка: лучший ход" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 00-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0012 3z"/></svg></button>
             <button class="fab helpb" id="helpBtn" aria-label="Очки и правила" title="Очки и правила"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.5h10a3 3 0 013 3V20H8a3 3 0 01-3-3z"/><path d="M5 17a3 3 0 013-3h10M9 8.5h5"/></svg></button>
             <button class="fab" id="zin" aria-label="Приблизить"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
@@ -1248,7 +1249,7 @@ async function dropAt(t) {
   ghost.classList.remove('ghost');
   if (!(RM || fast())) await ghost.animate([{transform: 'translateZ(26px)'}, {transform: 'translateZ(0)'}], {duration: 260, easing: 'cubic-bezier(.5,0,.8,.4)'}).finished;
   ghost.remove(); ghost = null; lastPlaced = t;
-  t.el = tileEl(t, true, fast() ? null : .02); world.append(t.el); tiles.set(key(t.x, t.y), t); wallsAround(t); refreshRoadEnds(); markOwn(); updateFog();
+  t.el = tileEl(t, true, fast() ? null : .02); world.append(t.el); tiles.set(key(t.x, t.y), t); wallsAround(t); refreshRoadEnds(); markOwn(); updateFog(); checkRelicsAround(t.x, t.y);
   if (!fast()) beep('place');
   if (!fast()) { const pf = document.createElement('i'); pf.className = 'puff'; t.el.append(pf); setTimeout(() => pf.remove(), 600); }
   if (!fast()) { t.el.classList.add('puzzle-lock'); setTimeout(() => { if (t.el) t.el.classList.remove('puzzle-lock'); }, 350); }
@@ -1602,43 +1603,163 @@ const ranked = () => players.map((p, i) => ({...p, i})).sort((a, b) => (a.resign
 
 /* ---------------- setup ---------------- */
 
-/* ==================== Fog of War (Uncharted Lands) ==================== */
+/* ==================== 4 Game Evolution Features: Fog, Cartography, Biomes, Relics & Scout ==================== */
+
+let FOG_RELICS = new Map();
+
+const RELIC_POOL = [
+  {id: 'chest', name: 'Сундук золота', icon: '🎁', gold: 40, pts: 2},
+  {id: 'obelisk', name: 'Древний обелиск', icon: '🏛️', gold: 25, pts: 4},
+  {id: 'gem', name: 'Кристалл мудрости', icon: '💎', gold: 50, pts: 3},
+  {id: 'scroll', name: 'Свиток картографа', icon: '📜', gold: 30, pts: 5},
+];
+
+function spawnFogRelics() {
+  document.querySelectorAll('.fog-relic').forEach(el => el.remove());
+  FOG_RELICS = new Map();
+  const coords = [
+    {x: 2, y: 1}, {x: -2, y: 2}, {x: 1, y: -2}, {x: -2, y: -2}, {x: 3, y: -1}
+  ];
+  coords.forEach((c, idx) => {
+    const k = key(c.x, c.y);
+    const item = RELIC_POOL[idx % RELIC_POOL.length];
+    const r = {...item, x: c.x, y: c.y, key: k, collected: false};
+    FOG_RELICS.set(k, r);
+    
+    const el = document.createElement('div');
+    el.className = 'fog-relic';
+    el.id = 'relic-' + k.replace(',', '_');
+    el.style.left = (c.x * T) + 'px';
+    el.style.top = (c.y * T) + 'px';
+    el.innerHTML = `
+      <div class="relic-pulse"></div>
+      <div class="relic-ico">${r.icon}</div>
+      <div class="relic-name">${r.name}</div>
+    `;
+    world.append(el);
+  });
+}
+
+function checkRelicsAround(tx, ty) {
+  if (!FOG_RELICS || !players || !players[turn]) return;
+  for (const [k, r] of FOG_RELICS.entries()) {
+    if (r.collected) continue;
+    const dist = Math.abs(r.x - tx) + Math.abs(r.y - ty);
+    if (dist <= 1) {
+      r.collected = true;
+      const el = document.getElementById('relic-' + k.replace(',', '_'));
+      if (el) {
+        el.classList.add('collected');
+        setTimeout(() => el.remove(), 700);
+      }
+      
+      // Award bonuses
+      if (players[turn]) {
+        players[turn].score += r.pts;
+        if (typeof paintScores === 'function') paintScores();
+      }
+      wallet.gold = (wallet.gold || 0) + r.gold;
+      saveWallet();
+      if (typeof updateGold === 'function') updateGold();
+      if (typeof beep === 'function') beep('fanfare');
+      
+      toastAny(`${r.name}: +${r.gold} 🪙 и +${r.pts} очков!`, 'relic', 'Тайник в тумане');
+    }
+  }
+}
+
 function initFog() {
   const old = $('#fogOfWar');
   if (old) old.remove();
+  document.querySelectorAll('.fog-particle').forEach(p => p.remove());
+
+  const curLoc = (typeof G !== 'undefined' && G.cfg && G.cfg.loc) || wallet.loc || 'village';
+  const BIOME_FOG = {
+    village: {
+      c0: '#89ad78', c1: '#3a573e', c2: '#142419',
+      label: 'НЕИЗВЕДАННЫЕ ЗЕМЛИ', particle: '✨', pClass: 'p-firefly'
+    },
+    siberia: {
+      c0: '#c6def5', c1: '#5479a2', c2: '#132136',
+      label: 'МОРОЗНАЯ ТАЙГА', particle: '❄️', pClass: 'p-snow'
+    },
+    city: {
+      c0: '#75549c', c1: '#312056', c2: '#0e0a22',
+      label: 'ЗАБРОШЕННЫЕ СЕКТОРА', particle: '💠', pClass: 'p-neon'
+    },
+    jungle: {
+      c0: '#468051', c1: '#1b4528', c2: '#0b1d11',
+      label: 'ТАИНСТВЕННЫЕ ДЖУНГЛИ', particle: '🌿', pClass: 'p-spore'
+    }
+  };
+  const b = BIOME_FOG[curLoc] || BIOME_FOG.village;
+
   const NS = 'http://www.w3.org/2000/svg';
   const svg = document.createElementNS(NS, 'svg');
   svg.id = 'fogOfWar';
-  svg.setAttribute('class', 'fog-svg');
-  svg.setAttribute('viewBox', '-1600 -1600 3200 3200');
+  svg.setAttribute('class', 'fog-svg biome-' + curLoc);
+  svg.setAttribute('viewBox', '-1800 -1800 3600 3600');
 
   svg.innerHTML = `
     <defs>
       <filter id="fogBlur" x="-30%" y="-30%" width="160%" height="160%">
-        <feGaussianBlur stdDeviation="22"/>
+        <feGaussianBlur stdDeviation="24"/>
       </filter>
       <radialGradient id="fogMistGrad" cx="50%" cy="50%" r="55%">
-        <stop offset="0%" stop-color="#95a9cc" stop-opacity="0.82"/>
-        <stop offset="60%" stop-color="#556c94" stop-opacity="0.75"/>
-        <stop offset="100%" stop-color="#1e2942" stop-opacity="0.92"/>
+        <stop offset="0%" stop-color="${b.c0}" stop-opacity="0.82"/>
+        <stop offset="60%" stop-color="${b.c1}" stop-opacity="0.78"/>
+        <stop offset="100%" stop-color="${b.c2}" stop-opacity="0.94"/>
       </radialGradient>
-      <pattern id="fogTopo" width="80" height="80" patternUnits="userSpaceOnUse">
-        <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.2"/>
-        <circle cx="40" cy="40" r="16" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+      <pattern id="fogTopo" width="90" height="90" patternUnits="userSpaceOnUse">
+        <circle cx="45" cy="45" r="36" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1.2"/>
+        <circle cx="45" cy="45" r="18" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
       </pattern>
       <mask id="fogClearMask">
-        <rect x="-1600" y="-1600" width="3200" height="3200" fill="white"/>
+        <rect x="-1800" y="-1800" width="3600" height="3600" fill="white"/>
         <g id="fogClearHoles" filter="url(#fogBlur)"></g>
       </mask>
     </defs>
-    <rect x="-1600" y="-1600" width="3200" height="3200" fill="url(#fogMistGrad)" mask="url(#fogClearMask)" pointer-events="none"/>
-    <rect x="-1600" y="-1600" width="3200" height="3200" fill="url(#fogTopo)" mask="url(#fogClearMask)" pointer-events="none"/>
-    <g class="fog-labels" mask="url(#fogClearMask)" pointer-events="none" opacity="0.35">
-      <text x="350" y="-280" font-family="'Unbounded', sans-serif" font-size="16" font-weight="900" fill="#fff" letter-spacing="4px">TERRA INCOGNITA</text>
-      <text x="-480" y="360" font-family="'Unbounded', sans-serif" font-size="14" font-weight="900" fill="#fff" letter-spacing="3px">НЕИЗВЕДАННЫЕ ЗЕМЛИ</text>
+    <rect x="-1800" y="-1800" width="3600" height="3600" fill="url(#fogMistGrad)" mask="url(#fogClearMask)" pointer-events="none"/>
+    <rect x="-1800" y="-1800" width="3600" height="3600" fill="url(#fogTopo)" mask="url(#fogClearMask)" pointer-events="none"/>
+
+    <!-- Antique Cartography & Nautical Wind Rose -->
+    <g class="fog-antique-cartography" mask="url(#fogClearMask)" pointer-events="none">
+      <!-- Ornate Compass Rose at top right -->
+      <g transform="translate(680, -680)" opacity="0.45">
+        <circle r="120" fill="none" stroke="#ffd875" stroke-width="2" stroke-dasharray="6,4"/>
+        <circle r="90" fill="none" stroke="#ffd875" stroke-width="1.2"/>
+        <path d="M0 -120 L16 -30 L70 -70 L30 -16 L120 0 L30 16 L70 70 L16 30 L0 120 L-16 30 L-70 70 L-30 16 L-120 0 L-30 -16 L-70 -70 L-16 -30 Z" fill="#ffd875" fill-opacity="0.3" stroke="#ffd875" stroke-width="1.5"/>
+        <text y="-130" text-anchor="middle" font-family="'Unbounded', sans-serif" font-size="18" font-weight="900" fill="#ffd875">N</text>
+        <text x="145" y="6" text-anchor="middle" font-family="'Unbounded', sans-serif" font-size="16" font-weight="900" fill="#ffd875">E</text>
+        <text y="145" text-anchor="middle" font-family="'Unbounded', sans-serif" font-size="16" font-weight="900" fill="#ffd875">S</text>
+        <text x="-145" y="6" text-anchor="middle" font-family="'Unbounded', sans-serif" font-size="16" font-weight="900" fill="#ffd875">W</text>
+      </g>
+
+      <!-- Cartography Labels -->
+      <g opacity="0.38">
+        <text x="420" y="-340" font-family="'Unbounded', sans-serif" font-size="17" font-weight="900" fill="#fff" letter-spacing="4px">TERRA INCOGNITA</text>
+        <text x="-560" y="440" font-family="'Unbounded', sans-serif" font-size="15" font-weight="900" fill="#fff" letter-spacing="3px">${b.label}</text>
+        <text x="-520" y="-480" font-family="'Onest', sans-serif" font-size="13" font-style="italic" fill="#e2c690" letter-spacing="2px">HIC SVNT DRACONES 🐉</text>
+      </g>
     </g>
   `;
   world.append(svg);
+
+  // Spawn gentle ambient biome particles
+  const boardEl = $('#board');
+  if (boardEl) {
+    for (let i = 0; i < 9; i++) {
+      const p = document.createElement('div');
+      p.className = `fog-particle ${b.pClass}`;
+      p.textContent = b.particle;
+      p.style.left = (15 + Math.random() * 70) + '%';
+      p.style.top = (15 + Math.random() * 70) + '%';
+      p.style.animationDelay = (Math.random() * 4) + 's';
+      p.style.animationDuration = (4 + Math.random() * 4) + 's';
+      boardEl.append(p);
+    }
+  }
+
   updateFog();
 }
 
@@ -1658,6 +1779,42 @@ function updateFog() {
     g.append(c);
   }
 }
+
+// 4. Scout action (Дозорный)
+function doScout() {
+  if (!deck) return;
+  if (typeof beep === 'function') beep('place');
+  
+  // Wave animation
+  const boardEl = $('#board');
+  if (boardEl) {
+    const wave = document.createElement('div');
+    wave.className = 'scout-radar-wave';
+    boardEl.append(wave);
+    setTimeout(() => wave.remove(), 1200);
+  }
+
+  // Peek deck tile
+  const nxt = deck && deck[0];
+  const tileName = nxt && TYPES[nxt] ? TYPES[nxt].name : 'Таинственная плитка';
+  toastAny(`Следующая плитка в колоде: «${tileName}»`, 'ok', 'Дозорный');
+
+  // Pulse nearest relic
+  let nearest = null, minDist = 999;
+  for (const r of FOG_RELICS.values()) {
+    if (r.collected) continue;
+    const d = Math.abs(r.x) + Math.abs(r.y);
+    if (d < minDist) { minDist = d; nearest = r; }
+  }
+  if (nearest) {
+    const relEl = document.getElementById('relic-' + nearest.key.replace(',', '_'));
+    if (relEl) {
+      relEl.classList.add('scout-beacon');
+      setTimeout(() => relEl.classList.remove('scout-beacon'), 3500);
+    }
+  }
+}
+
 
 function buildBoard() {
   const R = rng(20261023);
@@ -1723,7 +1880,7 @@ function startGame(cfg, replay = []) {
   if (meepleResolve) { meepleResolve = null; mrow.hidden = true; prow.hidden = false; }
   // The menu shows a small built-up kingdom; the game itself starts from an empty table.
   buildBoard(); buildMini();
-  world.innerHTML = '<div class="ground"></div>'; try { initFog(); } catch(_) {}
+  world.innerHTML = '<div class="ground"></div>'; try { initFog(); spawnFogRelics(); } catch(_) {}
   ghost = null; slotEls = []; meeples = []; doneFeats = []; turn = 0; phase = 'idle';
   const rules = gameRules = cfg.rules;
   players = cfg.seats.map((s, i) => { const name = clean(s.name) || 'Игрок ' + (i + 1); return {name, init: name[0].toUpperCase(), col: validCol(s.col) ? s.col : PL0[i].col, human: s.human, ghost: !!s.ghost, st: PG.state.status.shownStatus(s.st), owner: s.owner, uid: s.uid || null, fig: FIGS[s.fig] ? s.fig : 'classic', botlvl: s.botlvl || (s.human ? null : (wallet.botlvl || 'normal')), score: 0, stats: {c: 0, r: 0, f: 0, t: 0, m: 0}, meeples: rules.meeples, missed: 0}; });
@@ -2633,13 +2790,35 @@ renderRules();
 // Results and warnings: one card in the middle of the screen (above the bottom bar and any dialog), in the game's own
 // style, with a sign for success, a problem or plain news. Tap it to close; long texts stay longer.
 const NOTE_BAD = /^(Не |Нет |Неверн|Ошибка|Сначала|Это ваш)|уже был|не удалось|не хватает|не найден|недоступ/i, NOTE_OK = /^🎉|^✅|активирован|добавлен|сохранён|отправлен|ваша|ваш!|Привет|С возвращением|скопирован/i;
-function toastAny(t, kind) {
+function toastAny(t, kind, title) {
   const old = document.getElementById('note'); if (old) old.remove();
-  const text = String(t || ''), k = kind || (NOTE_BAD.test(text) ? 'bad' : NOTE_OK.test(text) ? 'ok' : 'info');
-  const d = document.createElement('div'); d.id = 'note'; d.className = 'note ' + k; d.setAttribute('role', k === 'bad' ? 'alert' : 'status');
-  d.innerHTML = `<i>${k === 'bad' ? '!' : k === 'ok' ? '✓' : 'i'}</i><span></span>`; d.querySelector('span').textContent = text.replace(/^(🎉|✅)\s*/, '');
-  document.body.append(d); d.onclick = () => d.remove();
-  setTimeout(() => { d.classList.add('out'); setTimeout(() => d.remove(), 260); }, Math.min(5000, 1800 + text.length * 35));
+  const text = String(t || '').replace(/^(🎉|✅|❌|ℹ️)\s*/, '');
+  const k = kind || (NOTE_BAD.test(text) ? 'bad' : NOTE_OK.test(text) ? 'ok' : 'info');
+  const d = document.createElement('div');
+  d.id = 'note';
+  d.className = 'tile-toast ' + k;
+  d.setAttribute('role', k === 'bad' ? 'alert' : 'status');
+
+  const icon = k === 'bad' ? '!' : k === 'ok' ? '✓' : (k === 'relic' ? '🎁' : 'ℹ');
+  const heading = title || (k === 'bad' ? 'Внимание' : k === 'ok' ? 'Успешно' : (k === 'relic' ? 'Находка' : ''));
+
+  d.innerHTML = `
+    <div class="tt-icon">${icon}</div>
+    <div class="tt-body">
+      ${heading ? `<div class="tt-title">${heading}</div>` : ''}
+      <div class="tt-msg"></div>
+    </div>
+    <button class="tt-close" aria-label="Закрыть">✕</button>
+  `;
+  d.querySelector('.tt-msg').textContent = text;
+  document.body.append(d);
+
+  const close = () => {
+    d.classList.add('out');
+    setTimeout(() => d.remove(), 280);
+  };
+  d.onclick = close;
+  setTimeout(close, Math.min(4200, 2000 + text.length * 25));
 }
 const copyText = async (txt, done) => { try { await navigator.clipboard.writeText(txt); toastAny(done); } catch (_) { toastAny(txt); } };
 // Invites: the phone's own share sheet (pick the messenger); copying is the fallback. On Android in the browser the
@@ -3794,7 +3973,7 @@ function earnedCheck() {
   if (!got.length && !fr.length) return;
   saveWallet();
   const names = got.map(k => `«${S.statusText(k)}»`).concat(fr.map(k => `рамка «${FRAMES[k].name}»`));
-  setTimeout(() => toastAny('Новая награда: ' + names.join(', ')), 1500);
+  // Quietly grant earned items without intrusive toast on boot (visible in profile/shop)
 }
 // The status shown to others: the worn one, checked again (a text from another phone is never trusted).
 const myStatus = () => PG.state.status.shownStatus(wallet.status || '');
