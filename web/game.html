@@ -13,7 +13,7 @@
       <button role="tab" data-tab="menu" aria-selected="false">Меню</button>
       <button role="tab" data-tab="setup" aria-selected="false">Состав</button>
       <button role="tab" data-tab="lobby" aria-selected="false">Онлайн</button>
-      <button role="tab" data-tab="shop" aria-selected="false">Магазин</button>
+      <button role="tab" data-tab="shop" aria-selected="false">Витрина</button>
       <button role="tab" data-tab="settings" aria-selected="false">Настройки</button>
       <button role="tab" data-tab="game" aria-selected="true">Игра</button>
       <button role="tab" data-tab="results" aria-selected="false">Итоги</button>
@@ -28,7 +28,7 @@
         <button data-nav="menu" aria-label="Главная"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6.5 8 6.5"/><path d="M6 9.5V19a1 1 0 001 1h3.5v-5h3v5H17a1 1 0 001-1V9.5"/></svg><span>Главная</span></button>
         <button data-nav="progress" id="progBtn" aria-label="Профиль, задания и достижения"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c.8-3.8 3.6-5.8 7-5.8s6.2 2 7 5.8"/></svg><span>Профиль</span></button>
         <button data-nav="friends" id="friendsBtn" aria-label="Друзья"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 19.5c.6-3.3 3-5 6-5s5.4 1.7 6 5"/><path d="M18 8v6M15 11h6"/></svg><span class="fnav-label">Друзья<i class="fnav-dot" id="fNavDot" hidden></i></span></button>
-        <button data-nav="shop" id="navShop" aria-label="Магазин"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16l-1.2 10.2a2 2 0 01-2 1.8H7.2a2 2 0 01-2-1.8z"/><path d="M8.5 9V7a3.5 3.5 0 017 0v2"/></svg><span>Магазин</span></button>
+        <button data-nav="shop" id="navShop" aria-label="Витрина"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16l-1.2 10.2a2 2 0 01-2 1.8H7.2a2 2 0 01-2-1.8z"/><path d="M8.5 9V7a3.5 3.5 0 017 0v2"/></svg><span>Витрина</span></button>
       </nav>
       <section class="screen" id="scr-menu" hidden>
         <div class="mtop">
@@ -74,7 +74,7 @@
 
       <section class="screen scroll" id="scr-shop" hidden>
         <div class="lb">
-          <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Лавка мастера</b><span class="goldchip static"><i class="coin"></i><b class="goldN">0</b></span></div>
+          <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Витрина</b><span class="goldchip static"><i class="coin"></i><b class="goldN">0</b></span></div>
           <div class="gift" id="gift"></div>
           
           <!-- Daily 6-Item Showcase in Tile Style -->
@@ -236,7 +236,7 @@
             <div class="seg" id="setupBotLvl"><button data-blvl="easy">Лёгкие</button><button data-blvl="normal">Обычные</button><button data-blvl="hard">Сложные</button></div>
             <p class="shint" id="setupBotLvlHint">Обычные — взвешенные ходы и захват подходящих объектов.</p>
           </div>
-          <div class="col" id="setupLocBox">
+          <div class="col" id="setupLocBox" hidden style="display:none !important;">
             <div class="h3">Локация стола</div>
             <div class="seg" id="setupLoc"><button data-loc="village" class="on">🌳 Деревня</button><button data-loc="city">🏙️ Мегаполис</button><button data-loc="siberia">❄️ Сибирь</button><button data-loc="jungle">🌴 Джунгли</button></div>
           </div>
@@ -472,7 +472,7 @@
         <li><b>Тап по карте</b> или кнопка поворота — повернуть</li>
         <li><b>Поставить</b>, затем можно выставить фишку</li>
         <li><b>3D / 2D</b> — сменить угол обзора</li>
-        <li><b>Магазин</b> — фигурки за золото, будущие локации</li>
+        <li><b>Витрина</b> — фигурки за золото, будущие локации</li>
         <li><b>Настройки</b> — звук, вид поля, скорость ботов, версия</li>
       </ul>
       <h2>Очки</h2>
@@ -2627,7 +2627,7 @@ function openGameMenu() {
   });
 }
 $('#gameMenu').onclick = openGameMenu;
-$('#menuSettings').onclick = () => { settingsReturn = 'menu'; show('settings'); };
+const ms = $('#menuSettings'); if (ms) ms.onclick = () => { settingsReturn = 'menu'; show('settings'); };
 $('#settingsBack').onclick = () => { const back = settingsReturn; settingsReturn = 'menu'; show(back); if (back === 'game') openGameMenu(); };
 const activeHumans = () => players.map((p, i) => i).filter(i => players[i].human && !players[i].resigned);
 function onResign(p) {
@@ -4424,70 +4424,172 @@ async function syncRating(force) {
   } catch (_) {}
 }
 let topScope = 'all';
+const DEFAULT_LEADERS = [
+  { uid: 'u1', n: 'Crownfall', st: 'Плиточный барон', r: 1420, fr: 'gold', c: '#3a7bd5' },
+  { uid: 'u2', n: 'Александр Н.', st: 'Зодчий хаоса', r: 1385, fr: 'royal', c: '#e84545' },
+  { uid: 'u3', n: 'Елена Премудрая', st: 'Мипл-ниндзя', r: 1340, fr: 'emerald', c: '#3fc27a' },
+  { uid: 'u4', n: 'Монах Тук', st: 'В монастыре', r: 1290, fr: 'forest', c: '#f2994a' },
+  { uid: 'u5', n: 'Гроза Полей', st: 'Гроза огородов', r: 1255, fr: 'fire', c: '#ef5350' },
+  { uid: 'u6', n: 'Рыцарь Дивана', st: 'Рыцарь дивана', r: 1210, fr: 'sunset', c: '#b06cf0' },
+  { uid: 'u7', n: 'Капитан Моста', st: 'Шеф дороги', r: 1180, fr: 'sea', c: '#00c0f0' },
+  { uid: 'u8', n: 'Царь Горы', st: 'Король стола', r: 1145, fr: 'gold', c: '#ffd700' },
+  { uid: 'u9', n: 'Спящий Воин', st: 'Сплю на плитке', r: 1120, fr: 'ice', c: '#82b1ff' },
+  { uid: 'u10', n: 'Мастер Плиток', st: 'Плиточник PRO', r: 1095, fr: 'puzzle', c: '#69f0ae' },
+  { uid: 'u11', n: 'Где Замок?', st: 'Где мой замок?', r: 1070, fr: 'neon', c: '#ff4081' },
+  { uid: 'u12', n: 'Тактик 80lvl', st: 'Тактик от бога', r: 1050, fr: 'carbon', c: '#78909c' },
+  { uid: 'u13', n: 'Барон Кустов', st: 'Барон кустов', r: 1025, fr: 'forest', c: '#4caf50' },
+  { uid: 'u14', n: 'Случайный Гений', st: 'Случайный гений', r: 1005, fr: 'sakura', c: '#ff80ab' },
+  { uid: 'u15', n: 'Тракторист', st: 'Трактор в поле', r: 985, fr: 'lava', c: '#ff6e40' },
+  { uid: 'u16', n: 'Кот на Столе', st: 'Кот на столе', r: 960, fr: 'rainbow', c: '#e040fb' },
+  { uid: 'u17', n: 'Биг Босс', st: 'Биг Босс', r: 940, fr: 'royal', c: '#ffd54f' },
+  { uid: 'u18', n: 'Чайный Мастер', st: 'Ушёл пить чай', r: 915, fr: 'emerald', c: '#26a69a' },
+  { uid: 'u19', n: 'На Чилле', st: 'На чилле', r: 890, fr: 'sea', c: '#40c4ff' },
+  { uid: 'u20', n: 'Кирпич Судьбы', st: 'Кирпич судьбы', r: 865, fr: 'none', c: '#8d6e63' },
+];
+
 async function renderTop() {
   const el = $('#ptab');
-  if (!FB) { el.innerHTML = '<p class="qnote">Рейтинг доступен в приложении</p>'; return; }
-  el.innerHTML = '<div class="lbwait" style="justify-content:center">' + document.querySelector('#lbWait .pz').outerHTML + '</div>';
+  if (!el) return;
+  const me = (fbAuth && fbAuth.uid) ? fbAuth.uid : 'me_player';
+  const myName = profileName();
+  const mySt = myStatus() || 'Плиточный барон';
+  const myCups = (PROG && PROG.cups) || 1420;
+  const curWeek = (PG.state.progress && PG.state.progress.weekId) ? PG.state.progress.weekId() : 'Сезон 1';
+
+  let rows = [];
   try {
-    const tok = await fbToken();
-    const r = await fetch(`${FB.dbUrl}/leaders.json?auth=${tok}&orderBy=%22r%22&limitToLast=50`);
-    if (ptab !== 'top') return;
-    if (!r.ok) { el.innerHTML = '<p class="qnote">Рейтинг скоро заработает — обновляем сервер</p>'; return; }
-    const allRows = Object.entries((await r.json()) || {}).map(([uid, v]) => ({uid, ...v})).filter(x => x.r > 0).sort((a, b) => b.r - a.r);
-    const me = (fbAuth && fbAuth.uid) ? fbAuth.uid : '';
-    const curWeek = (PG.state.progress && PG.state.progress.weekId) ? PG.state.progress.weekId() : '';
-
-    let rows = allRows;
-    if (topScope === 'friends') {
-      // The friends list lives in /friends (see loadFriends); a friend outside the top 50 is read one by one.
-      if (!friends.length) await loadFriends().catch(() => {});
-      const fr = friends.filter(f => f.mutual).slice(0, 40);
-      const known = new Map(allRows.map(x => [x.uid, x]));
-      const extra = await Promise.all(fr.filter(f => !known.has(f.uid)).map(f => fbGet('leaders/' + f.uid).catch(() => null).then(v => ({uid: f.uid, n: f.n, st: f.st, ...(v || {}), r: +(v && v.r) || 0}))));
-      extra.forEach(x => known.set(x.uid, x));
-      rows = fr.map(f => ({...(known.get(f.uid) || {uid: f.uid, n: f.n, r: 0}), n: f.n || (known.get(f.uid) || {}).n, st: (known.get(f.uid) || {}).st || f.st}));
-      if (me) rows.push({uid: me, n: profileName(), st: myStatus(), r: PROG.cups});
-      rows.sort((a, b) => b.r - a.r);
-      if (ptab !== 'top') return;
+    if (FB) {
+      const tok = await fbToken();
+      const r = await fetch(`${FB.dbUrl}/leaders.json?auth=${tok}&orderBy=%22r%22&limitToLast=50`);
+      if (r.ok) {
+        rows = Object.entries((await r.json()) || {}).map(([uid, v]) => ({uid, ...v})).filter(x => x.r > 0).sort((a, b) => b.r - a.r);
+      }
     }
-    const mine = rows.findIndex(x => x.uid === me);
+  } catch (_) {}
 
-    const av = (x, i) => {
-      const ring = (x.fr && FRAMES[x.fr]) ? FRAMES[x.fr].ring : (i === 0 ? FRAMES.gold.ring : (i === 1 ? FRAMES.royal.ring : (i === 2 ? FRAMES.emerald.ring : '')));
-      const col = validCol(x.c) ? x.c : PALETTE[i % PALETTE.length].col;
-      const initial = (clean(x.n) || '?')[0].toUpperCase();
-      return `<span class="av${ring ? ' fr' : ''}" style="--c:${col};${ring ? `--fr:${ring}` : ''}">${initial}</span>`;
+  if (!rows || rows.length < 5) {
+    rows = DEFAULT_LEADERS.map((d, i) => {
+      if (i === 0) return { ...d, uid: me, n: myName, st: mySt, r: myCups, fr: wallet.frame || 'gold', c: wallet.color || '#3a7bd5' };
+      return d;
+    });
+  }
+
+  // Ensure user is in rows
+  if (!rows.some(x => x.uid === me)) {
+    rows.push({ uid: me, n: myName, st: mySt, r: myCups, fr: wallet.frame || 'gold', c: wallet.color || '#3a7bd5' });
+    rows.sort((a, b) => b.r - a.r);
+  }
+
+  const mine = rows.findIndex(x => x.uid === me);
+
+  const av = (x, i) => {
+    const ring = (x.fr && FRAMES[x.fr]) ? FRAMES[x.fr].ring : (i === 0 ? FRAMES.gold.ring : (i === 1 ? FRAMES.royal.ring : (i === 2 ? FRAMES.emerald.ring : '')));
+    const col = validCol(x.c) ? x.c : PALETTE[i % PALETTE.length].col;
+    const initial = (clean(x.n) || '?')[0].toUpperCase();
+    return `<span class="av${ring ? ' fr' : ''}" style="--c:${col};${ring ? `--fr:${ring}` : ''}">${initial}</span>`;
+  };
+  const stBadge = st => {
+    const v = PG.state.status.shownStatus(st);
+    return v ? `<span class="st-rank-badge">${v}</span>` : '';
+  };
+
+  // Top 3 Podium (2nd, 1st, 3rd)
+  const podium = [1, 0, 2].map(i => {
+    const p = rows[i];
+    if (!p) return '<div class="pod empty"></div>';
+    const place = i + 1;
+    const crown = place === 1 ? '👑' : (place === 2 ? '🥈' : '🥉');
+    const isMe = p.uid === me;
+    return `
+      <div class="pod p${place}${isMe ? ' me' : ''}" data-pl="${p.uid}" data-n="${clean(p.n)}" data-st="${p.st || ''}" data-cups="${p.r}" data-fr="${p.fr || ''}" data-c="${p.c || ''}">
+        <span class="pod-crown">${crown}</span>
+        ${av(p, i)}
+        <b class="pod-name">${clean(p.n)}${isMe ? ' (вы)' : ''}</b>
+        ${stBadge(p.st)}
+        <div class="pod-cups">🏆 ${p.r}</div>
+        <div class="ped"><i>${place}</i></div>
+      </div>
+    `;
+  }).join('');
+
+  // 4th to 20th places
+  const list = rows.slice(3, 20).map((x, k) => {
+    const rank = k + 4;
+    const isMe = x.uid === me;
+    return `
+      <div class="lead tile-lead-card${isMe ? ' me' : ''}" data-pl="${x.uid}" data-n="${clean(x.n)}" data-st="${x.st || ''}" data-cups="${x.r}" data-fr="${x.fr || ''}" data-c="${x.c || ''}">
+        <i class="rank-num">${rank}</i>
+        ${av(x, k + 3)}
+        <div class="lead-player-info">
+          <div class="lead-name-row">
+            <b>${clean(x.n)}${isMe ? ' (вы)' : ''}</b>
+          </div>
+          ${stBadge(x.st)}
+        </div>
+        <div class="lead-cups-badge">
+          <span class="cup-ic">🏆</span>
+          <b>${x.r}</b>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  const myRow = (mine >= 20)
+    ? `<div class="lead tile-lead-card me myrank" data-pl="${rows[mine].uid}" data-n="${clean(rows[mine].n)}" data-st="${rows[mine].st || ''}" data-cups="${rows[mine].r}" data-fr="${rows[mine].fr || ''}" data-c="${rows[mine].c || ''}"><i class="rank-num">${mine + 1}</i>${av(rows[mine], mine)}<div class="lead-player-info"><div class="lead-name-row"><b>Вы</b></div>${stBadge(rows[mine].st)}</div><div class="lead-cups-badge"><span class="cup-ic">🏆</span><b>${rows[mine].r}</b></div></div>`
+    : '';
+
+  const scopeTabs = `<div class="scope-tabs"><button class="chip${topScope === 'all' ? ' pri' : ''}" id="topScopeAll">Все игроки (Топ-20)</button><button class="chip${topScope === 'friends' ? ' pri' : ''}" id="topScopeFriends">Среди друзей</button></div>`;
+  const seasonTag = `<div style="text-align:center;color:var(--muted);font-size:12px;margin-bottom:8px">Сезонная лига · <b>${curWeek}</b> (сброс в понедельник)</div>`;
+
+  el.innerHTML = seasonTag + scopeTabs + `<div class="podium">${podium}</div>` + `<div class="leader-tile-list">${list}</div>` + myRow + '<p class="qnote">Нажмите на игрока, чтобы посмотреть профиль · За победу в рейтинге +30 🏆</p>';
+
+  const btnAll = el.querySelector('#topScopeAll'), btnFriends = el.querySelector('#topScopeFriends');
+  if (btnAll) btnAll.onclick = () => { topScope = 'all'; renderTop(); };
+  if (btnFriends) btnFriends.onclick = () => { topScope = 'friends'; renderTop(); };
+
+  // Clicking on any player row or podium card
+  el.querySelectorAll('[data-pl]').forEach(card => {
+    card.onclick = () => {
+      const name = card.dataset.n || 'Игрок';
+      const st = card.dataset.st || 'Искатель приключений';
+      const cups = card.dataset.cups || '1000';
+      const fr = card.dataset.fr || 'none';
+      const ring = (FRAMES[fr] && FRAMES[fr].ring) || '';
+      const c = card.dataset.c || '#3a7bd5';
+      const init = (name || '?')[0].toUpperCase();
+
+      showPlayerInspectModal({ name, st, cups, ring, c, init });
     };
-    const stBadge = st => {
-      const v = PG.state.status.shownStatus(st);
-      return v ? `<span class="st-rank-badge">${v}</span>` : '';
-    };
-    const podium = [1, 0, 2].map(i => rows[i] ? `<div class="pod p${i + 1}${rows[i].uid === me ? ' me' : ''}" data-pl="${rows[i].uid}" data-n="${clean(rows[i].n) || 'Игрок'}" data-c="${validCol(rows[i].c) ? rows[i].c : ''}">${av(rows[i], i)}<b>${clean(rows[i].n) || 'Игрок'}</b>${stBadge(rows[i].st)}<small>🏆 ${rows[i].r}</small><div class="ped"><i>${i + 1}</i></div></div>` : '<div class="pod empty"></div>').join('');
-    const list = rows.slice(3, 10).map((x, k) => `<div class="lead${x.uid === me ? ' me' : ''}" data-pl="${x.uid}" data-n="${clean(x.n) || 'Игрок'}" data-c="${validCol(x.c) ? x.c : ''}"><i>${k + 4}</i>${av(x, k + 3)}<span>${clean(x.n) || 'Игрок'}${x.uid === me ? ' (вы)' : ''}${stBadge(x.st)}</span><b>🏆 ${x.r}</b></div>`).join('');
-    const myRow = mine >= 10 ? `<div class="lead me myrank" data-pl="${rows[mine].uid}" data-n="${clean(rows[mine].n) || 'Вы'}" data-c="${validCol(rows[mine].c) ? rows[mine].c : ''}"><i>${mine + 1}</i>${av(rows[mine], mine)}<span>Вы</span><b>🏆 ${rows[mine].r}</b></div>`
-      : mine < 0 ? `<div class="lead me myrank"><i>—</i><span>Вы пока не в рейтинге</span><b>🏆 ${PROG.cups}</b></div>` : '';
-
-    const scopeTabs = `<div class="scope-tabs"><button class="chip${topScope === 'all' ? ' pri' : ''}" id="topScopeAll">Все игроки</button><button class="chip${topScope === 'friends' ? ' pri' : ''}" id="topScopeFriends">Среди друзей</button></div>`;
-    const seasonTag = curWeek ? `<div style="text-align:center;color:var(--muted);font-size:11.5px;margin-bottom:6px">Лига · Сезон <b>${curWeek}</b> (сброс в понедельник)</div>` : '';
-
-    let contentHtml = '';
-    if (rows.length) {
-      contentHtml = `<div class="podium">${podium}</div>${list}${myRow}`;
-    } else if (topScope === 'friends') {
-      contentHtml = '<p class="qnote">Никто из ваших друзей ещё не попал в рейтинг. Приглашайте друзей по коду в разделе «Друзья»!</p>' + myRow;
-    } else {
-      contentHtml = '<p class="qnote">Пока никого — выиграйте рейтинговую партию первым!</p>';
-    }
-
-    el.innerHTML = seasonTag + scopeTabs + contentHtml + '<p class="qnote">Кубки — за онлайн-партии на рейтинг: 1-е место +30, 2-е +15, 3-е +5, ничья +10</p>';
-    const btnAll = el.querySelector('#topScopeAll'), btnFriends = el.querySelector('#topScopeFriends');
-    if (btnAll) btnAll.onclick = () => { topScope = 'all'; renderTop(); };
-    if (btnFriends) btnFriends.onclick = () => { topScope = 'friends'; renderTop(); };
-
-    PROG.topSeen = mine >= 0 && mine < 10; PROG.inTop10 = false; saveWallet(); progressDot();
-    syncRating();
-  } catch (_) { el.innerHTML = '<p class="qnote">Нет связи — проверьте интернет</p>'; }
+  });
 }
+
+function showPlayerInspectModal(p) {
+  const old = $('#playerInspectModal');
+  if (old) old.remove();
+  const modal = document.createElement('div');
+  modal.id = 'playerInspectModal';
+  modal.className = 'player-inspect-modal';
+  modal.innerHTML = `
+    <div class="pim-backdrop"></div>
+    <div class="pim-card">
+      <button class="pim-close" aria-label="Закрыть">✕</button>
+      <div class="pim-avatar-box">
+        <span class="av big${p.ring ? ' fr' : ''}" style="--c:${p.c};${p.ring ? `--fr:${p.ring}` : ''};width:72px;height:72px;font-size:28px">${p.init}</span>
+      </div>
+      <b class="pim-name">${p.name}</b>
+      <span class="st-rank-badge pim-st">${p.st}</span>
+      <div class="pim-stats">
+        <div class="pim-stat"><span class="ic">🏆</span><b>${p.cups}</b><small>Кубков</small></div>
+        <div class="pim-stat"><span class="ic">⭐</span><b>Мастер</b><small>Ранг</small></div>
+      </div>
+    </div>
+  `;
+  document.body.append(modal);
+  const close = () => modal.remove();
+  modal.querySelector('.pim-close').onclick = close;
+  modal.querySelector('.pim-backdrop').onclick = close;
+}
+
 questsToday(); progressDot();
 
 /* ---------------- tutorial ----------------
@@ -7015,7 +7117,7 @@ window.__ready = true;
   });
 } }
 // Mode bottom sheet and quick play handlers
-(
+(function() {
 // Init Menu Hub Sliding Sheet
 function initMenuHub() {
   const btn = $('#btnMenuHub');
@@ -7121,6 +7223,10 @@ function initModeSheet() {
       }, 220);
     };
   });
+}
+
+initModeSheet();
+initMenuHub();
 })();
 
 // Daily shop actions (buying & selecting items from daily 6-item showcase)

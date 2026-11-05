@@ -1,8 +1,13 @@
 /**
  * Render Perfect Store Assets:
- * - 6 Raw Phone Screenshots (1080x1920): 1-menu, 2-modes, 3-game, 4-setup, 5-results, 6-shop
- * - 6 Marketing Showcase Cards (1080x1920) with floating strategy tiles and seamless header transition
- * - Verified clean: NO splash screens, NO "Новая награда" popups!
+ * - 6 Raw Phone Screenshots (1080x1920):
+ *   1-menu: Clean Main Page (normal scale, 3D diorama, compact action row, single top menu button)
+ *   2-modes: Opened Game Modes Bottom Sheet over main screen
+ *   3-game: Harmonious active gameplay (16+ tiles, fog with wind rose, relics, scout HUD)
+ *   4-setup: Match Setup (bot levels, seats, rules, NO table location button)
+ *   5-results: Season League Leaderboard (Top 3 podium + 20 places, frames, statuses, cups)
+ *   6-shop: «Витрина» (Daily 6-item showcase in tile banners, 09:00 countdown timer, gift banner)
+ * - 6 Marketing Showcase Cards (1080x1920) with seamless header transitions and floating tiles
  */
 
 const fs = require('fs');
@@ -37,7 +42,7 @@ const FONTS = `
 `;
 
 (async () => {
-  console.log('🚀 Launching headless Chrome to render store assets...');
+  console.log('🚀 Launching Chrome to render store graphics in standard scale...');
   const browser = await puppeteer.launch({
     executablePath: chromePath,
     headless: true,
@@ -62,9 +67,11 @@ const FONTS = `
         owned: ['classic', 'knight', 'king'],
         fig: 'knight',
         ring: 'gold',
-        frames: ['gold', 'forest', 'puzzle'],
+        frame: 'gold',
+        frames: ['gold', 'royal', 'emerald', 'forest', 'puzzle'],
         status: 'Плиточный барон',
-        statuses: ['baron', 'chaos', 'tilemaster'],
+        statusKey: 'sh:baron',
+        statuses: ['sh:baron', 'sh:chaos', 'sh:tilemaster', 'sh:king'],
         loc: 'village',
         firstSeen: '2026-11-01'
       }));
@@ -94,12 +101,14 @@ const FONTS = `
 
     await page.goto(gameUrl, { waitUntil: 'networkidle0' });
 
-    // Instantly remove splash screen and any toast
+    // Instantly remove splash screen, debug watermarks and any toasts
     await page.evaluate(() => {
       const boot = document.querySelector('#boot');
       if (boot) boot.remove();
       const note = document.querySelector('#note');
       if (note) note.remove();
+      const staging = document.querySelector('#stagingWatermark');
+      if (staging) staging.remove();
     });
 
     await new Promise(r => setTimeout(r, 600));
@@ -110,46 +119,68 @@ const FONTS = `
   // 1. RAW PHONE SCREENSHOTS (1080x1920)
   // -------------------------------------------------------------------------
 
-  // 1-menu.png
-  console.log('Rendering 1-menu.png...');
+  // 1-menu.png: Clean Main Screen
+  console.log('Rendering 1-menu.png (Главная страница)...');
   const pMenu = await createCleanGamePage();
   await pMenu.evaluate(() => {
     if (typeof show === 'function') show('menu');
     const boot = document.querySelector('#boot'); if (boot) boot.remove();
     const note = document.querySelector('#note'); if (note) note.remove();
   });
-  await new Promise(r => setTimeout(r, 700));
+  await new Promise(r => setTimeout(r, 800));
   await pMenu.screenshot({ path: outScreens('1-menu.png') });
   console.log('✓ 1-menu.png rendered');
-
-  // 2-modes.png
-  console.log('Rendering 2-modes.png...');
-  await pMenu.evaluate(() => {
-    const modeBtn = document.querySelector('#btnMenuMode');
-    if (modeBtn) modeBtn.click();
-    const note = document.querySelector('#note'); if (note) note.remove();
-  });
-  await new Promise(r => setTimeout(r, 600));
-  await pMenu.screenshot({ path: outScreens('2-modes.png') });
-  console.log('✓ 2-modes.png rendered');
   await pMenu.close();
 
-  // 4-setup.png
-  console.log('Rendering 4-setup.png...');
+  // 2-modes.png: Opened Game Modes Bottom Sheet
+  console.log('Rendering 2-modes.png (Открытая вкладка режимов игры)...');
+  const pModes = await createCleanGamePage();
+  await pModes.evaluate(() => {
+    if (typeof show === 'function') show('menu');
+    const modeBtn = document.querySelector('#btnOpenModes');
+    if (modeBtn) modeBtn.click();
+    const boot = document.querySelector('#boot'); if (boot) boot.remove();
+    const note = document.querySelector('#note'); if (note) note.remove();
+  });
+  await new Promise(r => setTimeout(r, 800));
+  await pModes.screenshot({ path: outScreens('2-modes.png') });
+  console.log('✓ 2-modes.png rendered');
+  await pModes.close();
+
+  // 4-setup.png: Match Setup (Without location button)
+  console.log('Rendering 4-setup.png (Настройка партии)...');
   const pSetup = await createCleanGamePage();
   await pSetup.evaluate(() => {
     if (typeof openSetup === 'function') openSetup('bots');
     const locBox = document.querySelector('#setupLocBox');
-    if (locBox) locBox.hidden = false;
+    if (locBox) { locBox.hidden = true; locBox.style.display = 'none'; }
+    const boot = document.querySelector('#boot'); if (boot) boot.remove();
     const note = document.querySelector('#note'); if (note) note.remove();
   });
-  await new Promise(r => setTimeout(r, 600));
+  await new Promise(r => setTimeout(r, 700));
   await pSetup.screenshot({ path: outScreens('4-setup.png') });
   console.log('✓ 4-setup.png rendered');
   await pSetup.close();
 
-  // 6-shop.png (WAIT FOR REAL SHOP RENDER)
-  console.log('Rendering 6-shop.png (Real daily shop showcase)...');
+  // 5-results.png: Season League Leaderboard (Top 3 Podium + Top 20)
+  console.log('Rendering 5-results.png (Вкладка рейтинга лиги Топ-20)...');
+  const pLead = await createCleanGamePage();
+  await pLead.evaluate(() => {
+    ptab = 'top';
+    if (typeof show === 'function') show('progress');
+    const topTabBtn = document.querySelector('#ptabs button[data-pt="top"]');
+    if (topTabBtn) topTabBtn.click();
+    if (typeof renderTop === 'function') renderTop();
+    const boot = document.querySelector('#boot'); if (boot) boot.remove();
+    const note = document.querySelector('#note'); if (note) note.remove();
+  });
+  await new Promise(r => setTimeout(r, 900));
+  await pLead.screenshot({ path: outScreens('5-results.png') });
+  console.log('✓ 5-results.png (Leaderboard) rendered');
+  await pLead.close();
+
+  // 6-shop.png: «Витрина» with tile banners
+  console.log('Rendering 6-shop.png (Витрина мастера)...');
   const pShop = await createCleanGamePage();
   await pShop.evaluate(() => {
     if (typeof show === 'function') show('shop');
@@ -162,20 +193,8 @@ const FONTS = `
   console.log('✓ 6-shop.png rendered');
   await pShop.close();
 
-  // 5-results.png
-  console.log('Rendering 5-results.png...');
-  const pRes = await createCleanGamePage();
-  await pRes.evaluate(() => {
-    if (typeof show === 'function') show('results');
-    const note = document.querySelector('#note'); if (note) note.remove();
-  });
-  await new Promise(r => setTimeout(r, 600));
-  await pRes.screenshot({ path: outScreens('5-results.png') });
-  console.log('✓ 5-results.png rendered');
-  await pRes.close();
-
-  // 3-game.png (Active mid-game with tiles and fog)
-  console.log('Rendering 3-game.png (Mid-game board)...');
+  // 3-game.png: Active Gameplay with tiles, fog, meeples
+  console.log('Rendering 3-game.png (Геймплей и стол)...');
   const pGame = await createCleanGamePage();
   await pGame.evaluate(() => {
     if (typeof openSetup === 'function') openSetup('bots');
@@ -187,7 +206,7 @@ const FONTS = `
   });
   await new Promise(r => setTimeout(r, 1600));
 
-  // Play several turns to populate the board with 16+ tiles
+  // Play several turns to populate board with 16+ tiles
   for (let i = 0; i < 35; i++) {
     const tileCount = (await pGame.$$('#world .tile:not(.ghost)')).length;
     if (tileCount >= 16) break;
@@ -263,14 +282,15 @@ const FONTS = `
   });
   await new Promise(r => setTimeout(r, 600));
   await pGame.screenshot({ path: outScreens('3-game.png') });
+  // Duplicate for 2-game.png alias
+  fs.copyFileSync(outScreens('3-game.png'), outScreens('2-game.png'));
   console.log('✓ 3-game.png rendered');
   await pGame.close();
 
   // -------------------------------------------------------------------------
   // 2. MARKETING SHOWCASE CARDS (1080x1920)
-  // With seamless glowing transition, titanium phone mockup, and floating strategy tiles!
   // -------------------------------------------------------------------------
-  console.log('\n🎨 Generating Marketing Showcase Cards with seamless header transitions...');
+  console.log('\n🎨 Rendering Marketing Showcase Cards...');
 
   const showcases = [
     {
@@ -299,20 +319,20 @@ const FONTS = `
       raw: 'screenshots/4-setup.png',
       tag: 'ПРАВИЛА ПОД ВАС',
       title: 'НАСТРОЙКА ПАРТИИ',
-      desc: 'Выбирайте размер колоды, таймер ходов, биомы и уровень ботов'
+      desc: 'Выбирайте размер колоды, таймер ходов и уровень сложности ботов'
     },
     {
       id: '5-results-showcase',
       raw: 'screenshots/5-results.png',
       tag: 'СЕЗОННЫЕ ТРОФЕИ',
       title: 'ПОБЕЖДАЙТЕ В ЛИГЕ',
-      desc: 'Зарабатывайте кубки и поднимайтесь в таблице лидеров'
+      desc: 'Соревнуйтесь в сезонном рейтинге и открывайте эксклюзивные ранги'
     },
     {
       id: '6-shop-showcase',
       raw: 'screenshots/6-shop.png',
       tag: 'ВИТРИНА ДНЯ · БЕЗ ДОНАТА',
-      title: 'МАГАЗИН СТИЛЯ',
+      title: 'ВИТРИНА СТИЛЯ',
       desc: 'Каждый день 6 уникальных фигурок, рамок и юморных статусов за золото'
     }
   ];
@@ -338,7 +358,6 @@ const FONTS = `
     position: relative;
   }
 
-  /* Seamless ambient glow */
   .ambient-glow {
     position: absolute;
     top: 140px; left: 50%;
@@ -349,7 +368,6 @@ const FONTS = `
     z-index: 1;
   }
 
-  /* Header Card with soft organic fade */
   .header-card {
     height: 380px;
     padding: 64px 60px 20px;
@@ -378,7 +396,6 @@ const FONTS = `
     text-shadow: 0 2px 10px rgba(0,0,0,0.5);
   }
 
-  /* Decorative Floating Strategy Tiles on the shoulders */
   .floating-tile-left {
     position: absolute;
     top: 330px; left: 16px;
@@ -405,7 +422,6 @@ const FONTS = `
   }
   .ft-icon { font-size: 40px; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.4)); }
 
-  /* Premium Phone Mockup Frame */
   .screen-frame {
     flex: 1; padding: 0 45px;
     display: flex; align-items: flex-start; justify-content: center;
@@ -418,8 +434,6 @@ const FONTS = `
     overflow: hidden; background: #0b1122;
     position: relative;
   }
-
-  /* Camera notch / Dynamic pill */
   .notch-pill {
     position: absolute;
     top: 14px; left: 50%;
@@ -430,8 +444,6 @@ const FONTS = `
     z-index: 20;
     box-shadow: 0 2px 6px rgba(0,0,0,0.6);
   }
-
-  /* Screen image */
   .phone-mockup img {
     width: 100%; height: auto; display: block;
   }
@@ -440,7 +452,7 @@ const FONTS = `
 <body>
   <div class="ambient-glow"></div>
   <div class="floating-tile-left"><span class="ft-icon">🏰</span></div>
-  <div class="floating-tile-right"><span class="ft-icon">🗺️</span></div>
+  <div class="floating-tile-right"><span class="ft-icon">🏆</span></div>
 
   <div class="header-card">
     <div class="marketing-tag"><span>${s.tag}</span></div>

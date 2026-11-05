@@ -3754,3 +3754,254 @@ html.app .screen.scroll{--sp:var(--it,0px);padding-top:0}/* the status-bar gap i
   border-color: rgba(176, 108, 240, 0.4);
   color: #d8b4fe;
 }
+
+/* ==================== Top 20 Slanted Leaderboard Tiles ==================== */
+.leader-tile-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin: 10px 0;
+}
+
+.tile-lead-card {
+  transform: skewX(-8deg);
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 10px 14px;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(24, 34, 58, 0.92) 0%, rgba(14, 20, 36, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.35);
+  cursor: pointer;
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+  user-select: none;
+}
+
+.tile-lead-card:hover {
+  transform: skewX(-8deg) translateY(-2px);
+  border-color: rgba(245, 192, 78, 0.45);
+  box-shadow: 0 8px 20px rgba(0, 0, 0, 0.45), 0 0 12px rgba(245, 192, 78, 0.2);
+}
+
+.tile-lead-card:active {
+  transform: skewX(-8deg) scale(0.98);
+}
+
+.tile-lead-card.me {
+  background: linear-gradient(135deg, rgba(245, 192, 78, 0.18) 0%, rgba(20, 30, 52, 0.95) 100%);
+  border: 1.5px solid rgba(245, 192, 78, 0.55);
+  box-shadow: 0 6px 16px rgba(245, 192, 78, 0.15);
+}
+
+.tile-lead-card .rank-num {
+  transform: skewX(8deg);
+  font-family: var(--f-display, 'Unbounded', sans-serif);
+  font-size: 13px;
+  font-weight: 800;
+  width: 24px;
+  text-align: center;
+  color: #9bb0dc;
+  font-style: normal;
+}
+
+.tile-lead-card .av {
+  transform: skewX(8deg);
+  flex: 0 0 34px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  font-size: 14px;
+}
+
+.tile-lead-card .lead-player-info {
+  transform: skewX(8deg);
+  flex: 1;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.tile-lead-card .lead-name-row b {
+  font-size: 14px;
+  font-weight: 800;
+  color: #fff;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+}
+
+.tile-lead-card .st-rank-badge {
+  transform: skewX(0);
+  font-size: 10px;
+  padding: 1px 7px;
+  align-self: flex-start;
+}
+
+.tile-lead-card .lead-cups-badge {
+  transform: skewX(8deg);
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  font-family: var(--f-display, 'Unbounded', sans-serif);
+  font-size: 13.5px;
+  font-weight: 800;
+  color: #ffd875;
+  background: rgba(245, 192, 78, 0.12);
+  border: 1px solid rgba(245, 192, 78, 0.35);
+  padding: 4px 10px;
+  border-radius: 10px;
+}
+
+/* Podium enhancements */
+.pod {
+  position: relative;
+  transform: skewX(-4deg);
+  border-radius: 18px 18px 0 0;
+  cursor: pointer;
+  transition: transform .18s ease;
+}
+.pod:hover {
+  transform: skewX(-4deg) translateY(-3px);
+}
+.pod > * {
+  transform: skewX(4deg);
+}
+.pod-crown {
+  font-size: 22px;
+  display: block;
+  margin-bottom: 2px;
+  filter: drop-shadow(0 4px 6px rgba(0,0,0,0.5));
+}
+.pod-name {
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  margin: 4px 0 2px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  display: block;
+  max-width: 90px;
+}
+.pod-cups {
+  font-family: var(--f-display, 'Unbounded', sans-serif);
+  font-size: 12px;
+  font-weight: 800;
+  color: #ffd875;
+  margin-top: 2px;
+}
+
+/* Player Inspector Modal */
+.player-inspect-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 150;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.pim-backdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(6, 10, 20, 0.78);
+  backdrop-filter: blur(8px);
+}
+.pim-card {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  max-width: 340px;
+  transform: skewX(-8deg);
+  background: linear-gradient(160deg, #1f2c4c 0%, #10172e 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  border-radius: 24px;
+  padding: 28px 24px 24px;
+  box-shadow: 0 20px 50px rgba(0, 0, 0, 0.75);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.pim-card > * {
+  transform: skewX(8deg);
+}
+.pim-close {
+  position: absolute;
+  top: 14px;
+  right: 16px;
+  background: none;
+  border: none;
+  color: rgba(255, 255, 255, 0.45);
+  font-size: 18px;
+  cursor: pointer;
+  padding: 4px;
+}
+.pim-close:hover { color: #fff; }
+.pim-name {
+  font-family: var(--f-display, 'Unbounded', sans-serif);
+  font-size: 19px;
+  font-weight: 900;
+  color: #fff;
+  margin: 12px 0 6px;
+}
+.pim-st {
+  font-size: 12px;
+  padding: 3px 12px;
+  margin-bottom: 18px;
+}
+.pim-stats {
+  display: flex;
+  gap: 14px;
+  width: 100%;
+}
+.pim-stat {
+  flex: 1;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-radius: 14px;
+  padding: 10px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+}
+.pim-stat .ic { font-size: 20px; margin-bottom: 2px; }
+.pim-stat b { font-family: var(--f-display); font-size: 15px; color: #ffd875; }
+.pim-stat small { font-size: 11px; color: #9bb0dc; }
+
+/* Витрина: Плиточные баннеры */
+#scr-shop .gift {
+  transform: skewX(-8deg);
+  border-radius: 18px;
+  border: 1.5px solid rgba(245, 192, 78, 0.35);
+  background: linear-gradient(135deg, rgba(245, 192, 78, 0.15) 0%, rgba(20, 28, 48, 0.95) 100%);
+  box-shadow: 0 8px 24px rgba(0,0,0,0.4);
+}
+#scr-shop .gift > * {
+  transform: skewX(8deg);
+}
+
+#scr-shop .stcustom {
+  transform: skewX(-8deg);
+  border-radius: 16px;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  background: linear-gradient(135deg, rgba(25, 36, 62, 0.9) 0%, rgba(14, 20, 36, 0.95) 100%);
+  padding: 12px 14px;
+}
+#scr-shop .stcustom > * {
+  transform: skewX(8deg);
+}
+
+#scr-shop .loc {
+  transform: skewX(-8deg);
+  border-radius: 18px;
+  border: 1.5px solid rgba(255, 255, 255, 0.15);
+  box-shadow: 0 8px 22px rgba(0,0,0,0.4);
+  overflow: hidden;
+}
+#scr-shop .loc > * {
+  transform: skewX(8deg);
+}
