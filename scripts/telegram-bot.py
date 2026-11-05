@@ -3,7 +3,7 @@
 
 Handles:
 - /start, /play, /game: Sends game banner photo + rich strategy description + inline button [🎮 Открыть игру]
-- /rules: Sends quick overview of rules & button to open rules
+- /rules: Sends overview of rules & button to open rules
 - /help: Community and support links
 
 Supports:
@@ -19,10 +19,11 @@ BANNER_URL = 'https://crownfall90-dot.github.io/TileTopia/store/feature-1024x500
 CHANNEL_URL = 'https://t.me/diarydevelopment'
 
 START_CAPTION = (
-    "🏰 <b>Tiletopia — Средневековая плиточная стратегия</b>\n\n"
-    "Выкладывайте плитки земель, возводите неприступные города, прокладывайте тракты и основывайте монастыри. "
-    "Выставляйте своих подданных (миплов) и захватывайте контроль над средневековыми владениями!\n\n"
-    "⚔️ <b>Рейтинговые онлайн-битвы и дуэли</b>\n"
+    "🧩 <b>Tiletopia — Плиточная стратегия</b>\n\n"
+    "Выкладывайте квадратные плитки из общего запаса, развивайте города, прокладывайте тракты и возводите ключевые объекты. "
+    "Выставляйте своих миплов и соревнуйтесь за контроль над территориями на игровом столе!\n\n"
+    "🌍 <b>Разные локации стола:</b> меняют мир плиток и добавляют уникальные особенности\n"
+    "⚔️ <b>Рейтинговые онлайн-битвы и дуэли 1×1</b>\n"
     "🏆 <b>До +10 кубков за победу</b> — ничьих нет, побеждает сильнейший тактик!\n"
     "🤖 <b>Умные боты</b> 3 уровней сложности для тренировок\n"
     "👑 <b>Коллекции фигурок, рамки и статусы</b>\n\n"
@@ -31,13 +32,13 @@ START_CAPTION = (
 
 RULES_CAPTION = (
     "📖 <b>Правила плиточной стратегии Tiletopia</b>\n\n"
-    "1️⃣ <b>Плитка за ход:</b> берите плитку из запаса и стыкуйте с соседними (город к городу, дорога к дороге, река к реке).\n"
-    "2️⃣ <b>Миплы:</b> выставляйте рыцаря в город, разбойника на дорогу, монаха в монастырь.\n"
+    "1️⃣ <b>Плитка за ход:</b> берите плитку из запаса и стыкуйте её с соседними на столе (город к городу, дорога к дороге, река к реке).\n"
+    "2️⃣ <b>Миплы:</b> выставляйте подданных на только что выложенную плитку (в город, на дорогу или особый объект).\n"
     "3️⃣ <b>Очки:</b>\n"
     "• Дорога: 1 очко за плитку (с мостом ×2)\n"
     "• Город: 2 очка за плитку\n"
-    "• Монастырь: 9 очков при окружении 8 плитками\n"
-    "4️⃣ <b>Никаких ничьих:</b> при равенстве очков побеждает тот, кто завершил больше объектов или сберёг больше миплов!"
+    "• Монастырь/крепость: 9 очков при окружении 8 плитками\n"
+    "4️⃣ <b>Никаких ничьих:</b> при равенстве очков побеждает тот, кто завершил больше объектов или сохранил больше миплов!"
 )
 
 def build_start_keyboard(web_url: str = DEFAULT_WEB_URL) -> dict:
@@ -102,7 +103,6 @@ def handle_update(token: str, update: dict, web_url: str = DEFAULT_WEB_URL):
         }
         res = api_call(token, 'sendPhoto', payload)
         if not res.get('ok'):
-            # Fallback to sendMessage if photo URL cannot be loaded by Telegram servers
             api_call(token, 'sendMessage', {
                 'chat_id': chat_id,
                 'text': START_CAPTION,
@@ -120,7 +120,7 @@ def handle_update(token: str, update: dict, web_url: str = DEFAULT_WEB_URL):
 
     elif cmd == '/help':
         help_text = (
-            "🏰 <b>Tiletopia — Средневековая плиточная стратегия</b>\n\n"
+            "🧩 <b>Tiletopia — Плиточная стратегия</b>\n\n"
             "• Нажмите «🎮 Открыть игру», чтобы начать играть онлайн или против ботов.\n"
             "• Правила игры: /rules\n"
             f"• Новости и анонсы обновлений: {CHANNEL_URL}"
@@ -142,7 +142,6 @@ def run_polling(token: str, web_url: str = DEFAULT_WEB_URL):
     bot_user = me['result'].get('username', 'bot')
     print(f"Bot connected: @{bot_user}")
 
-    # Remove any lingering webhook so polling works
     api_call(token, 'deleteWebhook', {'drop_pending_updates': False})
 
     offset = 0

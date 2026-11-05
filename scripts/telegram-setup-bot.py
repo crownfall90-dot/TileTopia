@@ -4,7 +4,7 @@
 Sets:
 1. Default chat Menu Button -> WebApp (https://crownfall90-dot.github.io/TileTopia/) with text «🎮 Открыть игру»
 2. Bot commands (/start, /play, /rules, /help)
-3. Bot description & short description positioning as a medieval Tile Strategy
+3. Bot description & short description positioning as a Tile Strategy with customizable locations
 
 Usage:
   TELEGRAM_BOT_TOKEN=... python3 scripts/telegram-setup-bot.py [WEB_APP_URL]
@@ -51,19 +51,20 @@ def setup_bot(token: str, web_url: str = DEFAULT_WEB_URL) -> bool:
         'commands': [
             {'command': 'start', 'description': 'Запустить плиточную стратегию Tiletopia'},
             {'command': 'play', 'description': 'Открыть игру (Tiletopia Mini App)'},
-            {'command': 'rules', 'description': 'Правила игры, миплы и подсчёт очков'},
+            {'command': 'rules', 'description': 'Правила плиточной стратегии, миплы и подсчёт очков'},
             {'command': 'help', 'description': 'Как играть, сообщество и поддержка'}
         ]
     }
     r_cmds = api_call(token, 'setMyCommands', commands)
     print(f"Set bot commands: {'OK' if r_cmds.get('ok') else 'Failed'}")
 
-    # 4. Set bot descriptions (positioned as Tile Strategy)
+    # 4. Set bot descriptions (Tile Strategy with table locations)
     desc = {
         'description': (
-            '🏰 Tiletopia — средневековая плиточная стратегия прямо в Telegram!\n\n'
-            '• Выкладывайте плитки земель, возводите города, дороги и монастыри\n'
-            '• Управляйте миплами (подданными) и боритесь за господство над владениями\n'
+            '🧩 Tiletopia — увлекательная плиточная стратегия прямо в Telegram!\n\n'
+            '• Выкладывайте плитки на стол, развивайте города, дороги и особые объекты\n'
+            '• Управляйте миплами и боритесь за контроль над владениями\n'
+            '• Разные локации стола меняют мир плиток и открывают уникальные особенности\n'
             '• Рейтинговые онлайн-партии и умные боты для тренировок\n'
             '• До +10 кубков за победу. Никаких ничьих — побеждает сильнейший тактик!\n\n'
             'Нажмите «🎮 Открыть игру» внизу экрана, чтобы начать!'
@@ -75,7 +76,7 @@ def setup_bot(token: str, web_url: str = DEFAULT_WEB_URL) -> bool:
         pass
 
     short_desc = {
-        'short_description': '🏰 Tiletopia — средневековая плиточная стратегия онлайн прямо в Telegram!'
+        'short_description': '🧩 Tiletopia — плиточная стратегия онлайн прямо в Telegram!'
     }
     try:
         api_call(token, 'setMyShortDescription', short_desc)
