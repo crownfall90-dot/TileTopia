@@ -1,5 +1,3 @@
-// Telegram Mini App instant bootstrap
-if (typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp) { try { window.Telegram.WebApp.ready(); window.Telegram.WebApp.expand(); } catch(_) {} }
 <title>Tiletopia</title>
 <meta name="claude:viewport-fit-sides" content="cover">
 <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -649,6 +647,9 @@ if (typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp) 
 <script>
 (() => {
 'use strict';
+if (typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp) {
+  try { window.Telegram.WebApp.ready(); window.Telegram.WebApp.expand(); } catch(_) {}
+}
 const T = 88, S = 192;
 const DX = [0,1,0,-1], DY = [-1,0,1,0], V = [[0,-1],[1,0],[0,1],[-1,0]];
 const ARROW = ['↑','→','↓','←'];

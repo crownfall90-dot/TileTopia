@@ -102,6 +102,7 @@ build_page() {
       cat <<'HEAD'
 <meta name="theme-color" content="#101729">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>try{if(window.Telegram&&window.Telegram.WebApp){window.Telegram.WebApp.ready();window.Telegram.WebApp.expand();}}catch(_){}</script>
 <script>
 // iPhone: the same physical size as in the Android app (which zooms by the screen diagonal). Safari has no
 // diagonal, so the narrow side in points stands in for it: a wider layout, scaled down to fit the screen.
