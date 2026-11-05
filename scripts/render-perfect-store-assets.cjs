@@ -180,12 +180,12 @@ const FONTS = `
   await pGame.evaluate(() => {
     if (typeof openSetup === 'function') openSetup('bots');
   });
-  await new Promise(r => setTimeout(r, 300));
+  await new Promise(r => setTimeout(r, 600));
   await pGame.evaluate(() => {
     const s = document.querySelector('#start');
     if (s) s.click();
   });
-  await new Promise(r => setTimeout(r, 1200));
+  await new Promise(r => setTimeout(r, 1600));
 
   // Play several turns to populate the board with 16+ tiles
   for (let i = 0; i < 35; i++) {
@@ -207,7 +207,9 @@ const FONTS = `
     }
 
     const spot = await pGame.evaluate(() => {
-      const br = document.querySelector('#board').getBoundingClientRect();
+      const board = document.querySelector('#board');
+      if (!board) return null;
+      const br = board.getBoundingClientRect();
       const slots = [...document.querySelectorAll('.slot')].map(s => s.getBoundingClientRect())
         .map(r => ({ x: r.x + r.width / 2, y: r.y + r.height / 2 }))
         .filter(c => c.x > br.left + 35 && c.x < br.right - 60 && c.y > br.top + 45 && c.y < br.bottom - 40)

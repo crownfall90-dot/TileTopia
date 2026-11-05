@@ -33,34 +33,39 @@
       <section class="screen" id="scr-menu" hidden>
         <div class="mtop">
           <button class="mprof" id="mprof" data-go="progress" aria-label="Профиль, кубки, уровень и золото"></button>
-          <button class="rank-top-btn" id="btnMenuLeaderboard" aria-label="Рейтинг" title="Рейтинг игроков">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0011 15.9V19H7v2h10v-2h-4v-3.1c1.9-.31 3.49-1.63 4.1-3.41 2.47-.31 4.39-2.39 4.39-4.94V7c0-1.1-.9-2-2-2z"/></svg>
-            <span>Рейтинг</span>
+          <button class="menu-hub-btn" id="btnMenuHub" aria-label="Меню" title="Меню">
+            <span class="mhub-tilt">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>
+              <span>Меню</span>
+            </span>
           </button>
-          <div class="mtools"><button class="mtool" data-go="history" aria-label="История партий" title="История партий"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg></button><button class="mtool" data-go="rules" aria-label="Как играть"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 014.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17.2h.01"/></svg></button><button class="mtool" id="menuSettings" aria-label="Настройки"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg></button></div>
         </div>
         <div class="hero"><div class="mini" id="mini"></div></div>
         <div class="mbody">
           <h2 class="logo">Tile<span>topia</span></h2>
           <p class="tag">Стройте города, дороги и крепости</p>
           <button class="resume" id="resume" hidden><span class="ric"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l10.5-6.5z"/></svg></span><span class="rtx"><b>Продолжить партию</b><small id="resumeInfo"></small></span></button>
-          <button class="mquest-banner" id="menuQuestBanner" aria-label="Ежедневные задания">
-            <span class="mq-ic">🎯</span>
-            <span class="mq-tx"><b id="mqTitle">Задания: 0/3</b><small id="mqSub">Загрузка заданий…</small></span>
-            <span class="mq-arr"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></span>
-          </button>
-          <div class="menu-action-row">
+          <div class="menu-action-row compact-action-row">
+            <button class="tile-btn tile-quest" id="menuQuestBanner" aria-label="Ежедневные задания">
+              <span class="btn-tilt-inner">
+                <span class="mq-ic">🎯</span>
+                <span class="mq-col">
+                  <b id="mqTitle">0/3</b>
+                  <small id="mqSub">Задания</small>
+                </span>
+              </span>
+            </button>
             <button class="tile-btn tile-play" id="btnMainPlay" aria-label="Играть">
               <span class="btn-tilt-inner">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                 <b class="t-title">Играть</b>
               </span>
             </button>
             <button class="tile-btn tile-mode" id="btnOpenModes" aria-label="Режимы">
               <span class="btn-tilt-inner">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
                 <b class="t-title">Режим</b>
-                <svg class="t-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                <svg class="t-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
               </span>
             </button>
           </div>
@@ -479,6 +484,78 @@
       </dl>
       <p>Соперники ходят сами — так будет выглядеть онлайн-партия. Фишка бронирует город, дорогу или крепость за хозяином. Если соперник достроит ваш объект, он поможет вам: очки получите вы.</p>
     </aside>
+      
+      <!-- Menu Hub Sliding Sheet / Drawer -->
+      <div class="menu-hub-backdrop" id="menuHubBackdrop" hidden>
+        <div class="menu-hub-drawer" id="menuHubDrawer" role="dialog" aria-modal="true" aria-label="Меню">
+          <div class="sheet-handle"></div>
+          <div class="sheet-header">
+            <div class="sheet-title-row">
+              <span class="sheet-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg></span>
+              <h3>Меню</h3>
+            </div>
+            <button class="sheet-close" id="btnCloseMenuHub" aria-label="Закрыть">✕</button>
+          </div>
+          <div class="sheet-modes-grid">
+            <button class="sheet-mode-card" data-hub-action="rating">
+              <div class="sm-badge sm-gold">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0011 15.9V19H7v2h10v-2h-4v-3.1c1.9-.31 3.49-1.63 4.1-3.41 2.47-.31 4.39-2.39 4.39-4.94V7c0-1.1-.9-2-2-2z"/></svg>
+              </div>
+              <div class="sm-info">
+                <div class="sm-top">
+                  <b>Рейтинг игроков</b>
+                  <span class="sm-tag gold">Лига</span>
+                </div>
+                <small>Таблица рекордов, кубки и ранги сезона</small>
+              </div>
+              <span class="sm-arrow">›</span>
+            </button>
+
+            <button class="sheet-mode-card" data-hub-action="rules">
+              <div class="sm-badge sm-blue">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 014.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17.2h.01"/></svg>
+              </div>
+              <div class="sm-info">
+                <div class="sm-top">
+                  <b>Как играть</b>
+                  <span class="sm-tag blue">Обучение</span>
+                </div>
+                <small>Правила соединения плиток и подсчет очков</small>
+              </div>
+              <span class="sm-arrow">›</span>
+            </button>
+
+            <button class="sheet-mode-card" data-hub-action="history">
+              <div class="sm-badge sm-green">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+              </div>
+              <div class="sm-info">
+                <div class="sm-top">
+                  <b>История партий</b>
+                  <span class="sm-tag green">Статистика</span>
+                </div>
+                <small>Результаты прошедших матчей и детальный счет</small>
+              </div>
+              <span class="sm-arrow">›</span>
+            </button>
+
+            <button class="sheet-mode-card" data-hub-action="settings">
+              <div class="sm-badge sm-purple">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg>
+              </div>
+              <div class="sm-info">
+                <div class="sm-top">
+                  <b>Настройки</b>
+                  <span class="sm-tag purple">Опции</span>
+                </div>
+                <small>Звук, графика, имя игрока и аккаунт</small>
+              </div>
+              <span class="sm-arrow">›</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Smooth Game Modes Bottom Sheet -->
       <div class="mode-sheet-backdrop" id="modeSheetBackdrop" hidden>
         <div class="mode-sheet" id="modeSheet" role="dialog" aria-modal="true" aria-label="Режимы игры">
@@ -4093,11 +4170,11 @@ function renderMenuQuestBanner() {
   const remGold = qList.filter(q => !q.got).reduce((sum, q) => sum + ((QUESTS || []).find(x => x.id === q.id) || {g: 0}).g, 0);
 
   const tEl = $('#mqTitle'), sEl = $('#mqSub');
-  if (tEl) tEl.textContent = `Задания: ${doneCount}/${qList.length}`;
+  if (tEl) tEl.textContent = `${doneCount}/${qList.length}`;
   if (sEl) {
-    if (readyGold > 0) sEl.textContent = `${readyGold} золота ждёт!`;
-    else if (doneCount === qList.length && qList.length > 0) sEl.textContent = 'Все выполнены 🎉';
-    else sEl.textContent = `ещё ${remGold} золота`;
+    if (readyGold > 0) sEl.textContent = `+${readyGold} 🪙`;
+    else if (doneCount === qList.length && qList.length > 0) sEl.textContent = 'Готово 🎉';
+    else sEl.textContent = 'Задания';
   }
 }
 function renderMenuProfile() {
@@ -6938,7 +7015,53 @@ window.__ready = true;
   });
 } }
 // Mode bottom sheet and quick play handlers
-(function initModeSheet() {
+(
+// Init Menu Hub Sliding Sheet
+function initMenuHub() {
+  const btn = $('#btnMenuHub');
+  const backdrop = $('#menuHubBackdrop');
+  const drawer = $('#menuHubDrawer');
+  const closeBtn = $('#btnCloseMenuHub');
+  if (!btn || !backdrop || !drawer) return;
+
+  const openDrawer = () => {
+    backdrop.hidden = false;
+    requestAnimationFrame(() => { backdrop.classList.add('open'); });
+  };
+
+  const closeDrawer = () => {
+    backdrop.classList.remove('open');
+    setTimeout(() => { backdrop.hidden = true; }, 360);
+  };
+
+  btn.onclick = openDrawer;
+  if (closeBtn) closeBtn.onclick = closeDrawer;
+  backdrop.onclick = e => { if (e.target === backdrop) closeDrawer(); };
+
+  drawer.onclick = e => {
+    const card = e.target.closest('[data-hub-action]');
+    if (!card) return;
+    const act = card.dataset.hubAction;
+    closeDrawer();
+    setTimeout(() => {
+      if (act === 'rating') {
+        ptab = 'top';
+        show('progress');
+        const topBtn = document.querySelector('#ptabs button[data-pt="top"]');
+        if (topBtn) topBtn.click();
+      } else if (act === 'rules') {
+        show('rules');
+      } else if (act === 'history') {
+        show('history');
+      } else if (act === 'settings') {
+        settingsReturn = 'menu';
+        show('settings');
+      }
+    }, 180);
+  };
+}
+
+function initModeSheet() {
   let activeMode = 'bots';
   const backdrop = $('#modeSheetBackdrop');
 

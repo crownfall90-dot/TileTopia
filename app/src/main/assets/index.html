@@ -396,169 +396,147 @@ html.app input,html.app textarea,html.app a,html.app [contenteditable],html.app 
 
 .resume .rtx{display:flex;flex-direction:column;min-width:0}.resume b{font:700 14px var(--f-display)}.resume small{color:var(--muted);font-size:12px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 
-/* --- Slanted Strategy Tile Buttons (Main Menu) --- */
-
+/* --- Compact Slanted Strategy Tile Buttons (Main Menu) --- */
 .menu-action-row {
-
   display: flex;
-
-  gap: 12px;
-
+  gap: 10px;
   align-items: stretch;
-
   width: 100%;
-
-  margin-top: 4px;
-
+  margin-top: 6px;
 }
 
 .tile-btn {
-
   position: relative;
-
   border: 0;
-
   outline: none;
-
   cursor: pointer;
-
   transform: skewX(-12deg);
-
-  border-radius: 14px;
-
+  border-radius: 12px;
   font-family: var(--f-display);
-
   transition: transform .18s cubic-bezier(0.16, 1, 0.3, 1), box-shadow .18s ease, filter .18s ease;
-
   user-select: none;
-
   -webkit-tap-highlight-color: transparent;
-
 }
 
 .tile-btn .btn-tilt-inner {
-
   transform: skewX(12deg);
-
   display: flex;
-
   align-items: center;
-
   justify-content: center;
-
-  gap: 8px;
-
+  gap: 6px;
   width: 100%;
-
   height: 100%;
-
   position: relative;
-
   z-index: 2;
-
 }
 
-.tile-btn.tile-play {
-
-  flex: 1.5;
-
-  min-height: 52px;
-
-  padding: 0 16px;
-
-  color: #241502;
-
-  background: linear-gradient(165deg, #ffe58f 0%, #f7be4d 46%, #d88e22 100%);
-
-  border-top: 1.5px solid rgba(255, 255, 255, 0.85);
-
-  border-left: 1px solid rgba(255, 255, 255, 0.5);
-
-  border-bottom: 2px solid rgba(110, 60, 4, 0.45);
-
-  box-shadow: 0 5px 0 #8f5807, 0 10px 22px rgba(216, 142, 34, 0.38);
-
-}
-
-.tile-btn.tile-play .t-title {
-
-  font: 800 17px var(--f-display);
-
-  letter-spacing: -0.2px;
-
-}
-
-.tile-btn.tile-play:hover {
-
-  transform: skewX(-12deg) translateY(-2px);
-
-  box-shadow: 0 7px 0 #8f5807, 0 14px 26px rgba(216, 142, 34, 0.48);
-
-}
-
-.tile-btn.tile-play:active {
-
-  transform: skewX(-12deg) translateY(3px);
-
-  box-shadow: 0 2px 0 #8f5807, 0 4px 10px rgba(0, 0, 0, 0.3);
-
-}
-
-.tile-btn.tile-mode {
-
-  flex: 1;
-
-  min-height: 52px;
-
-  padding: 0 12px;
-
-  color: #eef2ff;
-
-  background: linear-gradient(165deg, #2c3e6d 0%, #172140 100%);
-
-  border-top: 1.5px solid rgba(255, 255, 255, 0.28);
-
-  border-left: 1px solid rgba(255, 255, 255, 0.18);
-
-  border-bottom: 2px solid rgba(8, 12, 24, 0.5);
-
-  box-shadow: 0 5px 0 #0d1428, 0 10px 22px rgba(0, 0, 0, 0.45);
-
-}
-
-.tile-btn.tile-mode .t-title {
-
-  font: 700 14px var(--f-display);
-
+/* Compact Quest Tile */
+.tile-btn.tile-quest {
+  flex: 0.95;
+  min-height: 44px;
+  padding: 0 8px;
   color: #fff;
-
+  background: linear-gradient(165deg, rgba(235, 87, 87, 0.25) 0%, rgba(18, 26, 48, 0.92) 100%);
+  border-top: 1.5px solid rgba(255, 120, 120, 0.5);
+  border-left: 1px solid rgba(255, 120, 120, 0.3);
+  border-bottom: 2px solid rgba(0, 0, 0, 0.6);
+  box-shadow: 0 4px 0 #12182c, 0 8px 18px rgba(0, 0, 0, 0.4);
 }
-
-.tile-btn.tile-mode .t-arrow {
-
-  opacity: 0.7;
-
-  transition: transform .2s ease;
-
+.tile-btn.tile-quest .mq-ic {
+  font-size: 18px;
+  line-height: 1;
 }
-
-.tile-btn.tile-mode:hover {
-
+.tile-btn.tile-quest .mq-col {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  line-height: 1.1;
+}
+.tile-btn.tile-quest #mqTitle {
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  font-family: var(--f-display);
+}
+.tile-btn.tile-quest #mqSub {
+  font-size: 9.5px;
+  font-weight: 700;
+  color: #ffd877;
+  text-transform: uppercase;
+  letter-spacing: 0.4px;
+}
+.tile-btn.tile-quest:hover {
   transform: skewX(-12deg) translateY(-2px);
+  border-top-color: rgba(255, 150, 150, 0.7);
+}
+.tile-btn.tile-quest:active {
+  transform: skewX(-12deg) translateY(2px);
+  box-shadow: 0 2px 0 #12182c;
+}
 
+/* Compact Play Tile */
+.tile-btn.tile-play {
+  flex: 1.35;
+  min-height: 44px;
+  padding: 0 12px;
+  color: #241502;
+  background: linear-gradient(165deg, #ffe58f 0%, #f7be4d 46%, #d88e22 100%);
+  border-top: 1.5px solid rgba(255, 255, 255, 0.85);
+  border-left: 1px solid rgba(255, 255, 255, 0.5);
+  border-bottom: 2px solid rgba(110, 60, 4, 0.45);
+  box-shadow: 0 4px 0 #8f5807, 0 8px 18px rgba(216, 142, 34, 0.35);
+}
+.tile-btn.tile-play .t-title {
+  font: 800 15px var(--f-display);
+  letter-spacing: -0.2px;
+}
+.tile-btn.tile-play svg {
+  width: 17px;
+  height: 17px;
+}
+.tile-btn.tile-play:hover {
+  transform: skewX(-12deg) translateY(-2px);
+  box-shadow: 0 6px 0 #8f5807, 0 12px 22px rgba(216, 142, 34, 0.45);
+}
+.tile-btn.tile-play:active {
+  transform: skewX(-12deg) translateY(2px);
+  box-shadow: 0 2px 0 #8f5807;
+}
+
+/* Compact Mode Tile */
+.tile-btn.tile-mode {
+  flex: 0.95;
+  min-height: 44px;
+  padding: 0 10px;
+  color: #eef2ff;
+  background: linear-gradient(165deg, #2c3e6d 0%, #172140 100%);
+  border-top: 1.5px solid rgba(255, 255, 255, 0.28);
+  border-left: 1px solid rgba(255, 255, 255, 0.18);
+  border-bottom: 2px solid rgba(8, 12, 24, 0.5);
+  box-shadow: 0 4px 0 #0d1428, 0 8px 18px rgba(0, 0, 0, 0.4);
+}
+.tile-btn.tile-mode .t-title {
+  font: 700 13px var(--f-display);
+  color: #fff;
+}
+.tile-btn.tile-mode svg {
+  width: 15px;
+  height: 15px;
+}
+.tile-btn.tile-mode .t-arrow {
+  opacity: 0.7;
+  width: 11px;
+  height: 11px;
+}
+.tile-btn.tile-mode:hover {
+  transform: skewX(-12deg) translateY(-2px);
   border-top-color: rgba(255, 255, 255, 0.4);
-
-  box-shadow: 0 7px 0 #0d1428, 0 14px 26px rgba(0, 0, 0, 0.55);
-
 }
-
 .tile-btn.tile-mode:active {
-
-  transform: skewX(-12deg) translateY(3px);
-
-  box-shadow: 0 2px 0 #0d1428, 0 4px 10px rgba(0, 0, 0, 0.3);
-
+  transform: skewX(-12deg) translateY(2px);
+  box-shadow: 0 2px 0 #0d1428;
 }
+
 
 
 
@@ -3801,6 +3779,91 @@ html.app .screen.scroll{--sp:var(--it,0px);padding-top:0}/* the status-bar gap i
   border-color: #5eead4;
   box-shadow: 0 0 16px rgba(94, 234, 212, 0.4);
 }
+
+/* ==================== Menu Hub Button & Sliding Drawer ==================== */
+.menu-hub-btn {
+  transform: skewX(-12deg);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 38px;
+  padding: 0 15px;
+  border-radius: 12px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.12) 0%, rgba(255, 255, 255, 0.04) 100%);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font-family: var(--f-display, 'Unbounded', sans-serif);
+  font-size: 13px;
+  font-weight: 800;
+  letter-spacing: 0.5px;
+  cursor: pointer;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+  transition: all 0.2s cubic-bezier(0.16, 1, 0.3, 1);
+  user-select: none;
+}
+.menu-hub-btn .mhub-tilt {
+  transform: skewX(12deg);
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+}
+.menu-hub-btn:hover {
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.18) 0%, rgba(255, 255, 255, 0.08) 100%);
+  border-color: rgba(255, 216, 117, 0.5);
+  box-shadow: 0 8px 22px rgba(0, 0, 0, 0.45), 0 0 14px rgba(255, 216, 117, 0.2);
+}
+.menu-hub-btn:active {
+  transform: skewX(-12deg) scale(0.96);
+}
+
+.menu-hub-backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 120;
+  background: rgba(8, 12, 24, 0.72);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  align-items: flex-end;
+  justify-content: center;
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity .3s ease;
+}
+.menu-hub-backdrop.open {
+  opacity: 1;
+  pointer-events: auto;
+}
+.menu-hub-drawer {
+  width: 100%;
+  max-width: 440px;
+  max-height: 85vh;
+  background: linear-gradient(180deg, #1d2a52 0%, #101730 100%);
+  border-radius: 26px 26px 0 0;
+  border: 1px solid rgba(255, 255, 255, 0.15);
+  border-bottom: 0;
+  box-shadow: 0 -14px 40px rgba(0, 0, 0, 0.65);
+  padding: 12px 18px calc(24px + var(--ib, 0px));
+  transform: translateY(100%);
+  transition: transform .36s cubic-bezier(0.16, 1, 0.3, 1);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.menu-hub-backdrop.open .menu-hub-drawer {
+  transform: translateY(0);
+}
+
+.sm-purple {
+  background: linear-gradient(135deg, #b06cf0 0%, #7928ca 100%);
+  color: #fff;
+  border-color: rgba(176, 108, 240, 0.4);
+}
+.sm-tag.purple {
+  background: rgba(176, 108, 240, 0.15);
+  border-color: rgba(176, 108, 240, 0.4);
+  color: #d8b4fe;
+}
 </style>
 
 <div class="page">
@@ -3830,34 +3893,39 @@ html.app .screen.scroll{--sp:var(--it,0px);padding-top:0}/* the status-bar gap i
       <section class="screen" id="scr-menu" hidden>
         <div class="mtop">
           <button class="mprof" id="mprof" data-go="progress" aria-label="Профиль, кубки, уровень и золото"></button>
-          <button class="rank-top-btn" id="btnMenuLeaderboard" aria-label="Рейтинг" title="Рейтинг игроков">
-            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0011 15.9V19H7v2h10v-2h-4v-3.1c1.9-.31 3.49-1.63 4.1-3.41 2.47-.31 4.39-2.39 4.39-4.94V7c0-1.1-.9-2-2-2z"/></svg>
-            <span>Рейтинг</span>
+          <button class="menu-hub-btn" id="btnMenuHub" aria-label="Меню" title="Меню">
+            <span class="mhub-tilt">
+              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>
+              <span>Меню</span>
+            </span>
           </button>
-          <div class="mtools"><button class="mtool" data-go="history" aria-label="История партий" title="История партий"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg></button><button class="mtool" data-go="rules" aria-label="Как играть"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 014.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17.2h.01"/></svg></button><button class="mtool" id="menuSettings" aria-label="Настройки"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg></button></div>
         </div>
         <div class="hero"><div class="mini" id="mini"></div></div>
         <div class="mbody">
           <h2 class="logo">Tile<span>topia</span></h2>
           <p class="tag">Стройте города, дороги и крепости</p>
           <button class="resume" id="resume" hidden><span class="ric"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l10.5-6.5z"/></svg></span><span class="rtx"><b>Продолжить партию</b><small id="resumeInfo"></small></span></button>
-          <button class="mquest-banner" id="menuQuestBanner" aria-label="Ежедневные задания">
-            <span class="mq-ic">🎯</span>
-            <span class="mq-tx"><b id="mqTitle">Задания: 0/3</b><small id="mqSub">Загрузка заданий…</small></span>
-            <span class="mq-arr"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M9 18l6-6-6-6"/></svg></span>
-          </button>
-          <div class="menu-action-row">
+          <div class="menu-action-row compact-action-row">
+            <button class="tile-btn tile-quest" id="menuQuestBanner" aria-label="Ежедневные задания">
+              <span class="btn-tilt-inner">
+                <span class="mq-ic">🎯</span>
+                <span class="mq-col">
+                  <b id="mqTitle">0/3</b>
+                  <small id="mqSub">Задания</small>
+                </span>
+              </span>
+            </button>
             <button class="tile-btn tile-play" id="btnMainPlay" aria-label="Играть">
               <span class="btn-tilt-inner">
-                <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5v14l11-7z"/></svg>
                 <b class="t-title">Играть</b>
               </span>
             </button>
             <button class="tile-btn tile-mode" id="btnOpenModes" aria-label="Режимы">
               <span class="btn-tilt-inner">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
+                <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/></svg>
                 <b class="t-title">Режим</b>
-                <svg class="t-arrow" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
+                <svg class="t-arrow" width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M6 9l6 6 6-6"/></svg>
               </span>
             </button>
           </div>
@@ -4276,6 +4344,78 @@ html.app .screen.scroll{--sp:var(--it,0px);padding-top:0}/* the status-bar gap i
       </dl>
       <p>Соперники ходят сами — так будет выглядеть онлайн-партия. Фишка бронирует город, дорогу или крепость за хозяином. Если соперник достроит ваш объект, он поможет вам: очки получите вы.</p>
     </aside>
+      
+      <!-- Menu Hub Sliding Sheet / Drawer -->
+      <div class="menu-hub-backdrop" id="menuHubBackdrop" hidden>
+        <div class="menu-hub-drawer" id="menuHubDrawer" role="dialog" aria-modal="true" aria-label="Меню">
+          <div class="sheet-handle"></div>
+          <div class="sheet-header">
+            <div class="sheet-title-row">
+              <span class="sheet-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg></span>
+              <h3>Меню</h3>
+            </div>
+            <button class="sheet-close" id="btnCloseMenuHub" aria-label="Закрыть">✕</button>
+          </div>
+          <div class="sheet-modes-grid">
+            <button class="sheet-mode-card" data-hub-action="rating">
+              <div class="sm-badge sm-gold">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0011 15.9V19H7v2h10v-2h-4v-3.1c1.9-.31 3.49-1.63 4.1-3.41 2.47-.31 4.39-2.39 4.39-4.94V7c0-1.1-.9-2-2-2z"/></svg>
+              </div>
+              <div class="sm-info">
+                <div class="sm-top">
+                  <b>Рейтинг игроков</b>
+                  <span class="sm-tag gold">Лига</span>
+                </div>
+                <small>Таблица рекордов, кубки и ранги сезона</small>
+              </div>
+              <span class="sm-arrow">›</span>
+            </button>
+
+            <button class="sheet-mode-card" data-hub-action="rules">
+              <div class="sm-badge sm-blue">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 014.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17.2h.01"/></svg>
+              </div>
+              <div class="sm-info">
+                <div class="sm-top">
+                  <b>Как играть</b>
+                  <span class="sm-tag blue">Обучение</span>
+                </div>
+                <small>Правила соединения плиток и подсчет очков</small>
+              </div>
+              <span class="sm-arrow">›</span>
+            </button>
+
+            <button class="sheet-mode-card" data-hub-action="history">
+              <div class="sm-badge sm-green">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
+              </div>
+              <div class="sm-info">
+                <div class="sm-top">
+                  <b>История партий</b>
+                  <span class="sm-tag green">Статистика</span>
+                </div>
+                <small>Результаты прошедших матчей и детальный счет</small>
+              </div>
+              <span class="sm-arrow">›</span>
+            </button>
+
+            <button class="sheet-mode-card" data-hub-action="settings">
+              <div class="sm-badge sm-purple">
+                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg>
+              </div>
+              <div class="sm-info">
+                <div class="sm-top">
+                  <b>Настройки</b>
+                  <span class="sm-tag purple">Опции</span>
+                </div>
+                <small>Звук, графика, имя игрока и аккаунт</small>
+              </div>
+              <span class="sm-arrow">›</span>
+            </button>
+          </div>
+        </div>
+      </div>
+
       <!-- Smooth Game Modes Bottom Sheet -->
       <div class="mode-sheet-backdrop" id="modeSheetBackdrop" hidden>
         <div class="mode-sheet" id="modeSheet" role="dialog" aria-modal="true" aria-label="Режимы игры">
@@ -7890,11 +8030,11 @@ function renderMenuQuestBanner() {
   const remGold = qList.filter(q => !q.got).reduce((sum, q) => sum + ((QUESTS || []).find(x => x.id === q.id) || {g: 0}).g, 0);
 
   const tEl = $('#mqTitle'), sEl = $('#mqSub');
-  if (tEl) tEl.textContent = `Задания: ${doneCount}/${qList.length}`;
+  if (tEl) tEl.textContent = `${doneCount}/${qList.length}`;
   if (sEl) {
-    if (readyGold > 0) sEl.textContent = `${readyGold} золота ждёт!`;
-    else if (doneCount === qList.length && qList.length > 0) sEl.textContent = 'Все выполнены 🎉';
-    else sEl.textContent = `ещё ${remGold} золота`;
+    if (readyGold > 0) sEl.textContent = `+${readyGold} 🪙`;
+    else if (doneCount === qList.length && qList.length > 0) sEl.textContent = 'Готово 🎉';
+    else sEl.textContent = 'Задания';
   }
 }
 function renderMenuProfile() {
@@ -10735,7 +10875,53 @@ window.__ready = true;
   });
 } }
 // Mode bottom sheet and quick play handlers
-(function initModeSheet() {
+(
+// Init Menu Hub Sliding Sheet
+function initMenuHub() {
+  const btn = $('#btnMenuHub');
+  const backdrop = $('#menuHubBackdrop');
+  const drawer = $('#menuHubDrawer');
+  const closeBtn = $('#btnCloseMenuHub');
+  if (!btn || !backdrop || !drawer) return;
+
+  const openDrawer = () => {
+    backdrop.hidden = false;
+    requestAnimationFrame(() => { backdrop.classList.add('open'); });
+  };
+
+  const closeDrawer = () => {
+    backdrop.classList.remove('open');
+    setTimeout(() => { backdrop.hidden = true; }, 360);
+  };
+
+  btn.onclick = openDrawer;
+  if (closeBtn) closeBtn.onclick = closeDrawer;
+  backdrop.onclick = e => { if (e.target === backdrop) closeDrawer(); };
+
+  drawer.onclick = e => {
+    const card = e.target.closest('[data-hub-action]');
+    if (!card) return;
+    const act = card.dataset.hubAction;
+    closeDrawer();
+    setTimeout(() => {
+      if (act === 'rating') {
+        ptab = 'top';
+        show('progress');
+        const topBtn = document.querySelector('#ptabs button[data-pt="top"]');
+        if (topBtn) topBtn.click();
+      } else if (act === 'rules') {
+        show('rules');
+      } else if (act === 'history') {
+        show('history');
+      } else if (act === 'settings') {
+        settingsReturn = 'menu';
+        show('settings');
+      }
+    }, 180);
+  };
+}
+
+function initModeSheet() {
   let activeMode = 'bots';
   const backdrop = $('#modeSheetBackdrop');
 
