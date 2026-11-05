@@ -7117,28 +7117,24 @@ window.__ready = true;
 // In the app the loader stays a moment as a splash, long enough to see a few tiles land.
 // On app start the splash lays one full fitting 3x3 (restarted once the real pieces are in).
 { const el = $('#boot'); if (el) {
-  if (!isAndroid) {
-    boot.min = boot.checked = true;
-    el.classList.add('gone');
-    setTimeout(() => { try { el.remove(); } catch(e){} }, 200);
-    if (typeof bootDone === 'function') bootDone();
-  } else {
-    loaderReady.then(() => {
-      const pieces = el.querySelectorAll('.pz i');
-      pieces.forEach(i => { i.style.animation = 'none'; void i.offsetWidth; i.style.animation = ''; });
-      setTimeout(() => {
-        boot.min = true; bootHide();
-        if (!boot.gone && !boot.update) { const s = el.querySelector('small'); if (s) s.textContent = 'Проверяем обновления…'; }
-      }, 1500);
-      setTimeout(() => { boot.checked = true; bootHide(); }, 3000);
-    });
-  }
+  let done = false;
+  const finishBoot = () => {
+    if (done) return;
+    done = true;
+    boot.min = true;
+    boot.checked = true;
+    bootHide();
+  };
+  // Play loading screen animation to the very end before transitioning to the game:
+  // tiles fly in and assemble -> title appears -> golden glow -> sheen sweeps -> meeple drops and lands
+  el.addEventListener('animationend', e => {
+    if (e.animationName === 'bootmeeple' || e.animationName === 'bootsheen') {
+      setTimeout(finishBoot, 350);
+    }
+  });
+  // Fallback in case animations are disabled or cancelled
+  setTimeout(finishBoot, 6000);
 } }
-setTimeout(() => {
-  const b = document.getElementById('boot');
-  if (b) { b.classList.add('gone'); setTimeout(() => { try { b.remove(); } catch(_) {} }, 200); }
-  if (typeof bootDone === 'function') bootDone();
-}, 2000);
 // Mode bottom sheet and quick play handlers
 (function() {
 // Init Menu Hub Sliding Sheet
