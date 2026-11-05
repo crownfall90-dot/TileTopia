@@ -3,6 +3,8 @@ name: Web version
 # Publishes the web version (iPhone, Android browsers, computers) to GitHub Pages when run by hand.
 # One-time setup: Settings → Pages → Source: "GitHub Actions".
 on:
+  push:
+    branches: [main]
   # Releases are cut only on request (workflow_dispatch): changes accumulate in release-notes.md
   # and go out together when the owner says so. Merging to main does not release.
   # rollback: build an earlier version (a tag such as v170) again as a NEW release with a higher
