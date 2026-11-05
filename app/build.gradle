@@ -42,7 +42,7 @@ android {
         }
         github {
             dimension 'store'
-            buildConfigField 'String', 'UPDATE_REPO', '"crownfall90-dot/play"'
+            buildConfigField 'String', 'UPDATE_REPO', '"crownfall90-dot/TileTopia"'
             buildConfigField 'String', 'PUSH_TOPIC', '"updates-github"'
         }
     }

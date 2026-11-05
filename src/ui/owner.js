@@ -1,6 +1,6 @@
 // Owner panel constants, GitHub workflow status formatting, and admin panel UI helpers
 
-export const DEV_REPO = 'crownfall90-dot/play';
+export const DEV_REPO = 'crownfall90-dot/TileTopia';
 export const DEV_WF = 'news.yml';
 export const DEV_NATIVE = ['devToken', 'devPanel'];
 

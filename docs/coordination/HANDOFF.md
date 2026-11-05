@@ -67,8 +67,8 @@
 - **Обновление вкладки «Локации»**:
   - Переработана сетка и оформление карточек: красивый предпросмотр SVG-арта, бейджи (`✓ Активна` / `В разработке`), названия и описания ландшафта, золотой акцент активной локации.
 - **Тестовый APK (Staging)**:
-  - Ссылка на актуальный релиз: `https://github.com/crownfall90-dot/play/releases/tag/staging-latest`
-  - Прямая ссылка на APK с интернетом: `https://github.com/crownfall90-dot/play/releases/download/staging-latest/Tiletopia-Staging.apk`
+  - Ссылка на актуальный релиз: `https://github.com/crownfall90-dot/TileTopia/releases/tag/staging-latest`
+  - Прямая ссылка на APK с интернетом: `https://github.com/crownfall90-dot/TileTopia/releases/download/staging-latest/Tiletopia-Staging.apk`
 
 ### 02.11.2026, ночь — Редизайн лобби, переключатель кубков, устранение лагов приглашений и форма обратной связи (Antigravity)
 - **Форма обратной связи («Написать разработчику»)**:
@@ -108,7 +108,7 @@
   - **CI Workflows & Скрипты**:
     - В `.github/workflows/staging.yml` и `.github/workflows/account-verify.yml` удалено удаление `app/google-services.json`. Тестовая сборка собирается с полной конфигурацией Firebase.
     - В `scripts/verify-staging.py` проверка изменена на обязательное наличие `android.permission.INTERNET` (`internet_permission_missing`).
-    - В `scripts/staging.init.gradle` добавлен `UPDATE_REPO = "crownfall90-dot/play"` в productFlavor `staging`.
+    - В `scripts/staging.init.gradle` добавлен `UPDATE_REPO = "crownfall90-dot/TileTopia"` в productFlavor `staging`.
     - Обновлена документация [docs/TESTING.md](file:///E:/play/docs/TESTING.md) и [docs/STAGING-SIGNING.md](file:///E:/play/docs/STAGING-SIGNING.md).
   - **Тесты**: все 188 тестов пройдены успешно (0 ошибок, 23 пропущено по playwright).
 
@@ -184,7 +184,7 @@
 
 ### 01.11.2026, день — Релиз 1.0.248 (Promote to Production) (Antigravity)
 - **Выпуск 1.0.248 (тег `v245`) успешно опубликован в Production**:
-  - Run: [Run #41301818782](https://github.com/crownfall90-dot/play/actions/runs/41301818782) на ветке `main` (exit code 0, 2m26s).
+  - Run: [Run #41301818782](https://github.com/crownfall90-dot/TileTopia/actions/runs/41301818782) на ветке `main` (exit code 0, 2m26s).
   - Сборка боевого APK и AAB: успешно собраны и подписаны (`Tiletopia-1.0.248.apk`, `Tiletopia-1.0.248-google-play.aab`).
   - GitHub Release: опубликован релиз `1.0.248` с обновлением `latest.json` и заметками для игроков.
   - Деплой GitHub Pages: обновлена веб-версия по адресу `https://crownfall90-dot.github.io/play/`.
@@ -200,7 +200,7 @@
 
 ### 01.11.2026, утро — Релиз 1.0.244 (Promote to Production) (Antigravity)
 - **Выпуск 1.0.244 (тег `v244`) успешно опубликован в Production**:
-  - Run: [Run #41269034234](https://github.com/crownfall90-dot/play/actions/runs/41269034234) на ветке `main` (exit code 0, 2m02s).
+  - Run: [Run #41269034234](https://github.com/crownfall90-dot/TileTopia/actions/runs/41269034234) на ветке `main` (exit code 0, 2m02s).
   - Сборка боевого APK и AAB: успешно собраны и подписаны (`Tiletopia-1.0.244.apk`, `Tiletopia-1.0.244.aab`).
   - GitHub Release: опубликован релиз `1.0.244` со ссылками на скачивание и заметками для игроков.
   - Деплой GitHub Pages: обновлена веб-версия по адресу `https://crownfall90-dot.github.io/play/`.

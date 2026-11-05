@@ -46,7 +46,7 @@ Antigravity (Gemini/Opus/Sonnet)     Claude Opus 5.5 (ты)
    * Добавлен классификатор ошибок `googleErrorCode(GetCredentialException e)` (`canceled` vs `no_credentials` vs `failed`).
    * В `web/game.html` вызовы защищены через `finally { onFail(c); }` для разблокировки UI при сбоях и отменах.
    * Добавлен тест-сьют `tests/google-native.test.cjs`.
-   * **Подтверждено в GitHub Actions CI ([Run #41029927573](https://github.com/crownfall90-dot/play/actions/runs/41029927573)):** тесты `exit code 0`, оффлайн сборка `assembleStagingDebug` `exit code 0`.
+   * **Подтверждено в GitHub Actions CI ([Run #41029927573](https://github.com/crownfall90-dot/TileTopia/actions/runs/41029927573)):** тесты `exit code 0`, оффлайн сборка `assembleStagingDebug` `exit code 0`.
 2. **TASK-002 (Надёжность сессий и защита токенов):**
    * В `web/game.html` добавлен генератор `startGoogle.reqId` — отбрасывает устаревшие и вытесненные ответы от ОС.
    * Добавлена очистка `window.onGoogleToken` и `window.onGoogleError` после завершения или закрытия диалога (`#accNo`).
@@ -54,7 +54,7 @@ Antigravity (Gemini/Opus/Sonnet)     Claude Opus 5.5 (ты)
    * Кнопка `accGoogle` блокируется при клике (`disabled = true`) и разблокируется через `onFail`.
    * Добавлен тестовый сьют `tests/account-reliability.test.cjs`.
    * **Всего в проекте 46 тестов — все 100% зелёные!**
-   * **Подтверждено в GitHub Actions CI ([Run #41031352448](https://github.com/crownfall90-dot/play/actions/runs/41031352448)):** `verify in 1m35s`, exit code 0.
+   * **Подтверждено в GitHub Actions CI ([Run #41031352448](https://github.com/crownfall90-dot/TileTopia/actions/runs/41031352448)):** `verify in 1m35s`, exit code 0.
 3. **Исправлен синтаксис YAML в `.github/workflows/google-click-fix.yml`** (устранены ошибки отступов heredoc).
 
 ---

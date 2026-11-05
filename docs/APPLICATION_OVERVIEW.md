@@ -4,7 +4,7 @@
 > **Платформы:** Android (APK / AAB), Web (PWA / GitHub Pages), Telegram Mini App  
 > **Приватный сайт для дизайнера (Staging):** [https://crownfall90-dot.github.io/play/staging/](https://crownfall90-dot.github.io/play/staging/) *(PIN-код для входа: `2026`)*  
 > **Интерактивная веб-галерея плиток:** [https://crownfall90-dot.github.io/play/tiles/](https://crownfall90-dot.github.io/play/tiles/)  
-> **Архив со всеми плитками 512×512 (ZIP):** [Скачать архивом (1.7 MB)](https://github.com/crownfall90-dot/play/raw/main/assets/tiles/tiletopia-all-tiles-512x512.zip)
+> **Архив со всеми плитками 512×512 (ZIP):** [Скачать архивом (1.7 MB)](https://github.com/crownfall90-dot/TileTopia/raw/main/assets/tiles/tiletopia-all-tiles-512x512.zip)
 
 ---
 

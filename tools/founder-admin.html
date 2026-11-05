@@ -232,7 +232,7 @@ body:not(.authed) main > .card:not(#loginCard) { display: none; }
         <div style="font-size:13px;color:var(--muted)">Статус сборки: <b id="stagingStatus" style="color:var(--fg)">…</b></div>
         <p class="stat-sub" style="font-size:11.5px;line-height:1.35">Обновляется автоматически при коммитах в dev-ветки. <b>Без пуш-уведомлений и без постов в канал.</b></p>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
-          <a class="btn btn-sm" id="btnDownloadStaging" href="https://github.com/crownfall90-dot/play/releases/tag/staging-latest" target="_blank" rel="noopener" style="font-size:12px;padding:6px 10px;text-decoration:none">📥 Скачать APK</a>
+          <a class="btn btn-sm" id="btnDownloadStaging" href="https://github.com/crownfall90-dot/TileTopia/releases/tag/staging-latest" target="_blank" rel="noopener" style="font-size:12px;padding:6px 10px;text-decoration:none">📥 Скачать APK</a>
           <a class="btn btn-sm" id="btnOpenStaging" href="https://crownfall90-dot.github.io/play/staging/" target="_blank" rel="noopener" style="font-size:12px;padding:6px 10px;text-decoration:none">🌐 Тестовый веб</a>
         </div>
       </div>
@@ -246,7 +246,7 @@ body:not(.authed) main > .card:not(#loginCard) { display: none; }
         <div style="font-size:13px;color:var(--muted)">Текущая версия: <b id="prodStatus" style="color:var(--fg)">…</b></div>
         <p class="stat-sub" style="font-size:11.5px;line-height:1.35">Доступна всем игрокам. При выкатке <b>рассылает FCM-пуш игрокам</b> и <b>публикует пост в Telegram-канал</b>.</p>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
-          <a class="btn btn-sm" id="btnDownloadProd" href="https://github.com/crownfall90-dot/play/releases/latest" target="_blank" rel="noopener" style="font-size:12px;padding:6px 10px;text-decoration:none">📥 Боевой APK</a>
+          <a class="btn btn-sm" id="btnDownloadProd" href="https://github.com/crownfall90-dot/TileTopia/releases/latest" target="_blank" rel="noopener" style="font-size:12px;padding:6px 10px;text-decoration:none">📥 Боевой APK</a>
           <a class="btn btn-sm" id="btnOpenProd" href="https://crownfall90-dot.github.io/play/" target="_blank" rel="noopener" style="font-size:12px;padding:6px 10px;text-decoration:none">🌐 Боевой сайт</a>
           <a class="btn btn-sm" id="btnOpenTelegram" href="https://t.me/diarydevelopment" target="_blank" rel="noopener" style="font-size:12px;padding:6px 10px;text-decoration:none">📢 Канал</a>
         </div>
@@ -268,7 +268,7 @@ body:not(.authed) main > .card:not(#loginCard) { display: none; }
         <span id="ciStatusDot" style="font-size:14px">⚪</span>
         <span id="ciStatusText" style="color:var(--muted)">Статус автосборки GitHub: проверяем…</span>
       </div>
-      <a id="ciStatusLink" href="https://github.com/crownfall90-dot/play/actions" target="_blank" rel="noopener" style="font-size:12px;color:var(--accent);text-decoration:none">Смотреть запуски ↗</a>
+      <a id="ciStatusLink" href="https://github.com/crownfall90-dot/TileTopia/actions" target="_blank" rel="noopener" style="font-size:12px;color:var(--accent);text-decoration:none">Смотреть запуски ↗</a>
     </div>
 
     <div style="display:flex;flex-direction:column;gap:8px">
@@ -392,7 +392,7 @@ body:not(.authed) main > .card:not(#loginCard) { display: none; }
     </div>
     <div style="display:flex;flex-direction:column;gap:8px">
       <a class="btn" href="https://crownfall90-dot.github.io/play/staging/" target="_blank" style="text-decoration:none;text-align:center">🌐 Открыть Staging Web (тест)</a>
-      <a class="btn" href="https://github.com/crownfall90-dot/play/releases/download/staging-latest/Tiletopia-Staging.apk" target="_blank" style="text-decoration:none;text-align:center">📲 Скачать Staging APK (для Android)</a>
+      <a class="btn" href="https://github.com/crownfall90-dot/TileTopia/releases/download/staging-latest/Tiletopia-Staging.apk" target="_blank" style="text-decoration:none;text-align:center">📲 Скачать Staging APK (для Android)</a>
       <button class="btn" id="btnCopyInvite">📋 Скопировать ссылку и PIN для тестера</button>
     </div>
     <div class="stat-sub">Тестовый APK собирается без интернета. Тестовая веб-версия работает на общем сервере, PIN хранится в базе (<code>config/testerPin</code>).</div>
@@ -496,7 +496,7 @@ body:not(.authed) main > .card:not(#loginCard) { display: none; }
 const API_KEY = 'AIzaSyAZJ-TccHzYfaAlXTFdaWRWH6vzxC0yIGw';
 const DB = 'https://puzzlegrad-default-rtdb.europe-west1.firebasedatabase.app';
 const GOOGLE_CLIENT = '467929090444-ne3f4lniesmca4q4v08vg3eg2ff5o5m1.apps.googleusercontent.com';
-const REPO = 'crownfall90-dot/play';
+const REPO = 'crownfall90-dot/TileTopia';
 const $ = id => document.getElementById(id);
 const log = (msg) => { if (!document.body.classList.contains('authed')) $('loginMsg').textContent = msg; const el = $('logConsole'); el.textContent += '\n[' + new Date().toLocaleTimeString() + '] ' + msg; el.scrollTop = el.scrollHeight; };
 

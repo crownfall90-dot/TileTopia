@@ -1,7 +1,7 @@
 // Web/PWA helpers: site URLs, standalone mode, platform detection and link parsing.
 
 export const SITE_URL = 'https://crownfall90-dot.github.io/play/';
-export const APK_URL = 'https://github.com/crownfall90-dot/play/releases/latest/download/Tiletopia.apk';
+export const APK_URL = 'https://github.com/crownfall90-dot/TileTopia/releases/latest/download/Tiletopia.apk';
 
 export function isStandalone(nav = typeof navigator !== 'undefined' ? navigator : {}, mm = typeof matchMedia !== 'undefined' ? matchMedia : null) {
   return (mm && mm('(display-mode: standalone)').matches) || nav.standalone === true;

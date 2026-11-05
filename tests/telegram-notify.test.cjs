@@ -39,7 +39,7 @@ test('telegram: formats new items with quotes, separates changes and removals, f
     '- Как вам обновленный профиль с кубками и статус друзей в сети?',
   ].join('\\n');
 
-  const r = py(`import importlib.util as u;s=u.spec_from_file_location('t','scripts/telegram-notify.py');m=u.module_from_spec(s);s.loader.exec_module(m);print(m.build('1.0.260',"""${notes}""",'https://crownfall90-dot.github.io/play/','https://github.com/crownfall90-dot/play/releases/download/v260/Tiletopia-1.0.260.apk','https://t.me/TiletopiaBot'))`);
+  const r = py(`import importlib.util as u;s=u.spec_from_file_location('t','scripts/telegram-notify.py');m=u.module_from_spec(s);s.loader.exec_module(m);print(m.build('1.0.260',"""${notes}""",'https://crownfall90-dot.github.io/play/','https://github.com/crownfall90-dot/TileTopia/releases/download/v260/Tiletopia-1.0.260.apk','https://t.me/TiletopiaBot'))`);
   assert.equal(r.status, 0, r.stderr);
 
   // 1. New items in blockquote

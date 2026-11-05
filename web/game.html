@@ -4693,7 +4693,7 @@ $('#scr-friends').addEventListener('click', e => {
    Hidden: 7 taps on "Версия" in Settings. Sending starts .github/workflows/news.yml through the
    GitHub API with the owner's own token (fine-grained, this repository, Actions: read and write),
    kept only on this phone. Nobody without that token can send; the Firebase key stays in GitHub. */
-const DEV_REPO = 'crownfall90-dot/play', DEV_WF = 'news.yml';
+const DEV_REPO = 'crownfall90-dot/TileTopia', DEV_WF = 'news.yml';
 // The owner's token and panel switch are also kept natively in the Android app (private preferences,
 // part of the phone's backup), so clearing the page's storage or signing out does not lose them.
 const DEV_NATIVE = ['devToken', 'devPanel'];
@@ -6225,7 +6225,7 @@ function installDialog() {
       ? `<li><b class="n">1</b><span>Откройте эту страницу в <b>Safari</b></span></li><li><b class="n">2</b><span>Нажмите «Поделиться» ${SHARE_ICON}</span></li><li><b class="n">3</b><span>Выберите <b>«На экран «Домой»»</b></span></li>`
       : `<li><b class="n">1</b><span>Нажмите «Поделиться» ${SHARE_ICON} внизу экрана</span></li><li><b class="n">2</b><span>Прокрутите и выберите <b>«На экран «Домой»»</b></span></li><li><b class="n">3</b><span>Нажмите <b>«Добавить»</b> — иконка появится на экране</span></li>`)
     : `<li><b class="n">1</b><span>Откройте меню браузера <b>⋮</b></span></li><li><b class="n">2</b><span>Выберите <b>«Добавить на главный экран»</b> или <b>«Установить приложение»</b></span></li>`;
-  box.innerHTML = `<div class="ocard"><div style="font-size:40px">📲</div><h3>Установить Tiletopia</h3><p>Быстрый запуск на весь экран и работа без интернета</p><ol class="inststeps">${steps}</ol>${isIOS ? '' : '<a class="ghostbtn manual" href="https://github.com/crownfall90-dot/play/releases/latest/download/Tiletopia.apk" rel="noopener">Скачать приложение для Android</a>'}<button class="cta wide" data-x>Понятно</button></div>`;
+  box.innerHTML = `<div class="ocard"><div style="font-size:40px">📲</div><h3>Установить Tiletopia</h3><p>Быстрый запуск на весь экран и работа без интернета</p><ol class="inststeps">${steps}</ol>${isIOS ? '' : '<a class="ghostbtn manual" href="https://github.com/crownfall90-dot/TileTopia/releases/latest/download/Tiletopia.apk" rel="noopener">Скачать приложение для Android</a>'}<button class="cta wide" data-x>Понятно</button></div>`;
   document.body.append(box);
   box.onclick = e => { if (e.target === box || e.target.closest('[data-x]')) box.remove(); };
 }
@@ -6354,7 +6354,7 @@ window.onUpdateAvailable = (info, manual) => {
   const box = updBox = document.createElement('div'); box.className = 'over'; box.style.position = 'fixed';
   const titleText = isMandatory ? `Вышло обязательное обновление ${info.version}` : `Вышло обновление ${info.version}`;
   const subText = isMandatory ? 'Для продолжения сетевой игры требуется обновление. Что нового:' : (info && info.mandatory === false ? 'Необязательный патч (мелкие фиксы). Что нового:' : 'Что нового:');
-  box.innerHTML = `<div class="ocard"><h3>${titleText}</h3><p>${subText}</p><div class="notes-list"></div><div class="prog" hidden><i></i></div><button class="cta wide" id="upd">Обновить</button>${!isMandatory ? '<button class="ghostbtn" id="updLater" style="margin-top:6px">Позже</button>' : ''}<a class="ghostbtn manual" id="manual" hidden href="https://github.com/crownfall90-dot/play/releases/latest">Скачать вручную</a></div>`;
+  box.innerHTML = `<div class="ocard"><h3>${titleText}</h3><p>${subText}</p><div class="notes-list"></div><div class="prog" hidden><i></i></div><button class="cta wide" id="upd">Обновить</button>${!isMandatory ? '<button class="ghostbtn" id="updLater" style="margin-top:6px">Позже</button>' : ''}<a class="ghostbtn manual" id="manual" hidden href="https://github.com/crownfall90-dot/TileTopia/releases/latest">Скачать вручную</a></div>`;
   box.querySelector('.notes-list').textContent = info.notes || 'Исправления и улучшения';
   if (players.length && phase !== 'end' && phase !== 'idle') box.querySelector('p').textContent = (net ? 'Партия на паузе: после обновления вернитесь в комнату — игра продолжится, когда обновятся все. ' : 'Партия сохранится. ') + 'Что нового:';
   document.body.append(box);
