@@ -122,3 +122,151 @@ export function renderItemsLocsHtml(locs = []) {
         </div>
       </div>`).join('')}</div>`;
 }
+
+
+/** Returns YYYY-MM-DD for the daily shop, where a new day starts at 09:00 AM. */
+export function getDailyShopKey(date = new Date()) {
+  const d = new Date(date);
+  if (d.getHours() < 9) {
+    d.setDate(d.getDate() - 1);
+  }
+  const year = d.getFullYear();
+  const month = String(d.getMonth() + 1).padStart(2, '0');
+  const day = String(d.getDate()).padStart(2, '0');
+  return `${year}-${month}-${day}`;
+}
+
+/** Formatted time string until next 09:00 AM. */
+export function getTimeUntilNext9AM(now = new Date()) {
+  const next = new Date(now);
+  if (now.getHours() >= 9) {
+    next.setDate(next.getDate() + 1);
+  }
+  next.setHours(9, 0, 0, 0);
+  const diffMs = Math.max(0, next - now);
+  const hours = Math.floor(diffMs / 3600000);
+  const mins = Math.floor((diffMs % 3600000) / 60000);
+  return `${hours} ч. ${mins} мин.`;
+}
+
+/** Deterministically selects 6 gold-only items for the day: 2 figures, 2 frames, 2 statuses. */
+export function getDailyShopItems(figs = {}, frames = {}, statuses = [], date = new Date()) {
+  const key = getDailyShopKey(date);
+  let seed = 0;
+  for (let i = 0; i < key.length; i++) {
+    seed = (seed * 31 + key.charCodeAt(i)) >>> 0;
+  }
+  const rng = () => {
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    return seed / 4294967296;
+  };
+  const shuffle = arr => {
+    const a = [...arr];
+    for (let i = a.length - 1; i > 0; i--) {
+      const j = Math.floor(rng() * (i + 1));
+      [a[i], a[j]] = [a[j], a[i]];
+    }
+    return a;
+  };
+
+  const figList = Object.entries(figs)
+    .filter(([k, v]) => v.price > 0)
+    .map(([k, v]) => ({ kind: 'fig', key: k, name: v.name, price: v.price }));
+
+  const frameList = Object.entries(frames)
+    .filter(([k, v]) => v.price > 0 && !v.earn)
+    .map(([k, v]) => ({ kind: 'frame', key: k, name: v.name, price: v.price, ring: v.ring }));
+
+  const statusList = statuses
+    .filter(s => s.price > 0)
+    .map(s => ({ kind: 'status', key: 'sh:' + s.id, id: s.id, name: s.text, price: s.price }));
+
+  const pickedFigs = shuffle(figList).slice(0, 2);
+  const pickedFrames = shuffle(frameList).slice(0, 2);
+  const pickedStatuses = shuffle(statusList).slice(0, 2);
+
+  return [...pickedFigs, ...pickedFrames, ...pickedStatuses];
+}
+
+/** Generates HTML markup for the 6-item daily shop showcase. */
+export function renderDailyShopShowcase({ items = [], wallet = {}, figPreview = () => '', initial = '?', frames = {}, now = new Date() }) {
+  const fname = (initial || '?').toUpperCase();
+  const timeStr = getTimeUntilNext9AM(now);
+  const gold = wallet.gold || 0;
+
+  const cardsHtml = items.map(item => {
+    let previewHtml = '';
+    let isOwned = false;
+    let isEquipped = false;
+    let kindLabel = '';
+    let kindClass = '';
+
+    if (item.kind === 'fig') {
+      kindLabel = 'Фигурка';
+      kindClass = 'k-fig';
+      isOwned = (wallet.owned || []).includes(item.key);
+      isEquipped = wallet.fig === item.key;
+      previewHtml = `<div class="dsh-visual"><img src="${figPreview(item.key)}" alt="" style="width:48px;height:62px;display:block;margin:0 auto"></div>`;
+    } else if (item.kind === 'frame') {
+      kindLabel = 'Рамка';
+      kindClass = 'k-frame';
+      isOwned = (!item.price) || (wallet.frames || []).includes(item.key);
+      isEquipped = (wallet.frame || 'none') === item.key;
+      const ring = item.ring || (frames[item.key] && frames[item.key].ring) || '';
+      previewHtml = `<div class="dsh-visual"><span class="av${ring ? ' fr' : ''}" style="--c:${wallet.color || '#3a7bd5'};${ring ? `--fr:${ring}` : ''};width:48px;height:48px;font-size:20px">${fname}</span></div>`;
+    } else if (item.kind === 'status') {
+      kindLabel = 'Статус';
+      kindClass = 'k-status';
+      const k = item.key;
+      isOwned = (wallet.statuses || []).includes(k);
+      isEquipped = (wallet.statusKey === k) || (wallet.status && wallet.status === item.name);
+      previewHtml = `<div class="dsh-visual"><span class="stchip dsh-chip">${item.name}</span></div>`;
+    }
+
+    const canAfford = gold >= item.price;
+    let btnHtml = '';
+    if (isEquipped) {
+      btnHtml = `<button class="dsh-btn equipped" disabled>Надето</button>`;
+    } else if (isOwned) {
+      btnHtml = `<button class="dsh-btn select" data-daily-pick="${item.kind}:${item.key}">Выбрать</button>`;
+    } else {
+      btnHtml = `<button class="dsh-btn buy${!canAfford ? ' poor' : ''}" data-daily-buy="${item.kind}:${item.key}:${item.price}"><i class="coin"></i><b>${item.price}</b></button>`;
+    }
+
+    return `
+      <div class="dsh-tile-card ${kindClass}">
+        <div class="dsh-tile-inner">
+          <div class="dsh-top-row">
+            <span class="dsh-tag ${kindClass}">${kindLabel}</span>
+          </div>
+          ${previewHtml}
+          <div class="dsh-info">
+            <b class="dsh-name">${item.name}</b>
+          </div>
+          <div class="dsh-action">
+            ${btnHtml}
+          </div>
+        </div>
+      </div>
+    `;
+  }).join('');
+
+  return `
+    <div class="daily-shop-card">
+      <div class="dsh-header">
+        <div class="dsh-title-box">
+          <div class="dsh-badge"><span>⭐ Ежедневная витрина</span></div>
+          <h3>Товары дня</h3>
+          <p>6 товаров · Обновление в 09:00</p>
+        </div>
+        <div class="dsh-timer-box">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><polyline points="12 6 12 12 15 15"/></svg>
+          <span>До смены: <b>${timeStr}</b></span>
+        </div>
+      </div>
+      <div class="daily-shop-grid">
+        ${cardsHtml}
+      </div>
+    </div>
+  `;
+}

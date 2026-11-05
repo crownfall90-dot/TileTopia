@@ -33,6 +33,10 @@
       <section class="screen" id="scr-menu" hidden>
         <div class="mtop">
           <button class="mprof" id="mprof" data-go="progress" aria-label="Профиль, кубки, уровень и золото"></button>
+          <button class="rank-top-btn" id="btnMenuLeaderboard" aria-label="Рейтинг" title="Рейтинг игроков">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0011 15.9V19H7v2h10v-2h-4v-3.1c1.9-.31 3.49-1.63 4.1-3.41 2.47-.31 4.39-2.39 4.39-4.94V7c0-1.1-.9-2-2-2z"/></svg>
+            <span>Рейтинг</span>
+          </button>
           <div class="mtools"><button class="mtool" data-go="history" aria-label="История партий" title="История партий"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg></button><button class="mtool" data-go="rules" aria-label="Как играть"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 014.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17.2h.01"/></svg></button><button class="mtool" id="menuSettings" aria-label="Настройки"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg></button></div>
         </div>
         <div class="hero"><div class="mini" id="mini"></div></div>
@@ -65,23 +69,18 @@
 
       <section class="screen scroll" id="scr-shop" hidden>
         <div class="lb">
-          <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Магазин</b><span class="goldchip static"><i class="coin"></i><b class="goldN">0</b></span></div>
+          <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Лавка мастера</b><span class="goldchip static"><i class="coin"></i><b class="goldN">0</b></span></div>
           <div class="gift" id="gift"></div>
-          <div class="h3">Фигурки</div>
-          <div class="figgrid" id="figgrid"></div>
-          <div class="h3">Премиум <span class="soon">скоро</span></div>
-          <div class="prem">
-            <div class="pitem"><i>💰</i><b>Мешок золота</b><small>1 000 золота</small><span class="soon">Скоро</span></div>
-            <div class="pitem"><i>🧰</i><b>Сундук казначея</b><small>5 000 золота + рамка</small><span class="soon">Скоро</span></div>
-            <div class="pitem wide"><i>👑</i><b>Королевский пропуск</b><small>30 дней: ×2 золота, фигурка и рамка, кубки без ограничений</small><span class="soon">Скоро</span></div>
-          </div>
-          <div class="h3">Статусы</div>
-          <div class="stgrid" id="stgrid"></div>
+          
+          <!-- Daily 6-Item Showcase in Tile Style -->
+          <div id="dailyShopWrap"></div>
+
+          <div class="h3">Свой статус</div>
           <div class="stcustom"><input class="field" id="stInput" maxlength="15" placeholder="Свой статус (до 15)" autocomplete="off"><button class="cta" id="stBuy">3000 <i class="coin"></i></button></div>
-          <div class="h3">Рамки аватара</div>
-          <div class="frgrid" id="frgrid"></div>
-          <div class="h3">Локации</div>
+          
+          <div class="h3">Сезонные локации</div>
           <div class="locgrid" id="locgrid"></div>
+
           <div class="h3">Промокод</div>
           <div style="display:flex;gap:8px;margin-bottom:16px">
             <input class="field" id="promoInput" placeholder="Введите промокод" style="flex:1;text-transform:uppercase;font-weight:700;letter-spacing:1px">
@@ -408,6 +407,14 @@
         <div class="saybox" id="sayBox" hidden></div>
         <div class="coach" id="coach" hidden></div>
         <div class="board" id="board">
+          <!-- Thematic Village Location Backdrop -->
+          <div class="village-backdrop" aria-hidden="true">
+            <div class="vb-sky"></div>
+            <div class="vb-sun"></div>
+            <div class="vb-hills-far"></div>
+            <div class="vb-hills-near"></div>
+            <div class="vb-trees-silhouette"></div>
+          </div>
           <div class="vp"><div class="world" id="world"></div></div>
           <div class="fog"></div>
           <div class="toast" id="toast"></div>
@@ -680,7 +687,8 @@ const label = g => g.kind === 'r' && g.edges.length === 1 ? 'Дорога ' + AR
 /* ---------------- dom: world ---------------- */
 const world = $('#world'), board = $('#board');
 function addSprite(parent, kind, x, y, cls, delay, scale = 1) {
-  const d = SPR[kind], L = (0.5 + x) * T, Tp = (0.5 + y) * T;
+  const d = SPR && SPR[kind]; if (!d) return null;
+  const L = (0.5 + x) * T, Tp = (0.5 + y) * T;
   const b = document.createElement('i'); b.className = 'bb s-' + kind + (cls ? ' ' + cls : '');
   b.style.cssText = `left:${L}px;top:${Tp}px;width:${d.w * scale}px;height:${d.h * scale}px`;
   if (delay != null) { b.classList.add('pop'); b.style.setProperty('--d', delay + 's'); }
@@ -1240,7 +1248,7 @@ async function dropAt(t) {
   ghost.classList.remove('ghost');
   if (!(RM || fast())) await ghost.animate([{transform: 'translateZ(26px)'}, {transform: 'translateZ(0)'}], {duration: 260, easing: 'cubic-bezier(.5,0,.8,.4)'}).finished;
   ghost.remove(); ghost = null; lastPlaced = t;
-  t.el = tileEl(t, true, fast() ? null : .02); world.append(t.el); tiles.set(key(t.x, t.y), t); wallsAround(t); refreshRoadEnds(); markOwn();
+  t.el = tileEl(t, true, fast() ? null : .02); world.append(t.el); tiles.set(key(t.x, t.y), t); wallsAround(t); refreshRoadEnds(); markOwn(); updateFog();
   if (!fast()) beep('place');
   if (!fast()) { const pf = document.createElement('i'); pf.className = 'puff'; t.el.append(pf); setTimeout(() => pf.remove(), 600); }
   if (!fast()) { t.el.classList.add('puzzle-lock'); setTimeout(() => { if (t.el) t.el.classList.remove('puzzle-lock'); }, 350); }
@@ -1593,6 +1601,64 @@ const winTitle = (p, final) => isMe(p) ? (final ? 'Вы победили!' : 'В
 const ranked = () => players.map((p, i) => ({...p, i})).sort((a, b) => (a.resigned ? 1 : 0) - (b.resigned ? 1 : 0) || b.score - a.score);
 
 /* ---------------- setup ---------------- */
+
+/* ==================== Fog of War (Uncharted Lands) ==================== */
+function initFog() {
+  const old = $('#fogOfWar');
+  if (old) old.remove();
+  const NS = 'http://www.w3.org/2000/svg';
+  const svg = document.createElementNS(NS, 'svg');
+  svg.id = 'fogOfWar';
+  svg.setAttribute('class', 'fog-svg');
+  svg.setAttribute('viewBox', '-1600 -1600 3200 3200');
+
+  svg.innerHTML = `
+    <defs>
+      <filter id="fogBlur" x="-30%" y="-30%" width="160%" height="160%">
+        <feGaussianBlur stdDeviation="22"/>
+      </filter>
+      <radialGradient id="fogMistGrad" cx="50%" cy="50%" r="55%">
+        <stop offset="0%" stop-color="#95a9cc" stop-opacity="0.82"/>
+        <stop offset="60%" stop-color="#556c94" stop-opacity="0.75"/>
+        <stop offset="100%" stop-color="#1e2942" stop-opacity="0.92"/>
+      </radialGradient>
+      <pattern id="fogTopo" width="80" height="80" patternUnits="userSpaceOnUse">
+        <circle cx="40" cy="40" r="32" fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="1.2"/>
+        <circle cx="40" cy="40" r="16" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
+      </pattern>
+      <mask id="fogClearMask">
+        <rect x="-1600" y="-1600" width="3200" height="3200" fill="white"/>
+        <g id="fogClearHoles" filter="url(#fogBlur)"></g>
+      </mask>
+    </defs>
+    <rect x="-1600" y="-1600" width="3200" height="3200" fill="url(#fogMistGrad)" mask="url(#fogClearMask)" pointer-events="none"/>
+    <rect x="-1600" y="-1600" width="3200" height="3200" fill="url(#fogTopo)" mask="url(#fogClearMask)" pointer-events="none"/>
+    <g class="fog-labels" mask="url(#fogClearMask)" pointer-events="none" opacity="0.35">
+      <text x="350" y="-280" font-family="'Unbounded', sans-serif" font-size="16" font-weight="900" fill="#fff" letter-spacing="4px">TERRA INCOGNITA</text>
+      <text x="-480" y="360" font-family="'Unbounded', sans-serif" font-size="14" font-weight="900" fill="#fff" letter-spacing="3px">НЕИЗВЕДАННЫЕ ЗЕМЛИ</text>
+    </g>
+  `;
+  world.append(svg);
+  updateFog();
+}
+
+function updateFog() {
+  const g = $('#fogClearHoles');
+  if (!g) return;
+  const NS = 'http://www.w3.org/2000/svg';
+  g.innerHTML = '';
+  if (!tiles) return;
+  for (const t of tiles.values()) {
+    const c = document.createElementNS(NS, 'circle');
+    c.setAttribute('cx', String(t.x * T));
+    c.setAttribute('cy', String(t.y * T));
+    c.setAttribute('r', '96');
+    c.setAttribute('fill', 'black');
+    c.setAttribute('class', 'fog-clear-circle');
+    g.append(c);
+  }
+}
+
 function buildBoard() {
   const R = rng(20261023);
   const pool = [];
@@ -1657,7 +1723,7 @@ function startGame(cfg, replay = []) {
   if (meepleResolve) { meepleResolve = null; mrow.hidden = true; prow.hidden = false; }
   // The menu shows a small built-up kingdom; the game itself starts from an empty table.
   buildBoard(); buildMini();
-  world.innerHTML = '<div class="ground"></div>';
+  world.innerHTML = '<div class="ground"></div>'; try { initFog(); } catch(_) {}
   ghost = null; slotEls = []; meeples = []; doneFeats = []; turn = 0; phase = 'idle';
   const rules = gameRules = cfg.rules;
   players = cfg.seats.map((s, i) => { const name = clean(s.name) || 'Игрок ' + (i + 1); return {name, init: name[0].toUpperCase(), col: validCol(s.col) ? s.col : PL0[i].col, human: s.human, ghost: !!s.ghost, st: PG.state.status.shownStatus(s.st), owner: s.owner, uid: s.uid || null, fig: FIGS[s.fig] ? s.fig : 'classic', botlvl: s.botlvl || (s.human ? null : (wallet.botlvl || 'normal')), score: 0, stats: {c: 0, r: 0, f: 0, t: 0, m: 0}, meeples: rules.meeples, missed: 0}; });
@@ -1680,7 +1746,7 @@ function startGame(cfg, replay = []) {
   // Tutorial: the first piece counts as the player's own, so the town they close on move one can take a figure at once.
   if (cfg.tut) first.by = 0;
   tiles = new Map([[key(0, 0), first]]); G.tiles = tiles;
-  first.el = tileEl(first, true, fast() ? null : .05); world.append(first.el); refreshRoadEnds();
+  initFog(); first.el = tileEl(first, true, fast() ? null : .05); world.append(first.el); refreshRoadEnds(); updateFog();
   $('#over').hidden = true;
   // The first card's neighbours sit about 136 px per unit of zoom from the centre; keep them clear of the zoom buttons
   // on the right edge (48 px) on narrow phones, never above the usual 1.05.
@@ -2057,12 +2123,23 @@ function renderShop() {
   };
   $('#gift').innerHTML = PG.ui.shop.renderGiftCard({giftReady: giftReady(), chestSvg: CHEST_SVG, boosts: wallet.boosts});
   if (giftReady()) $('#openGift').onclick = openGift;
-  $('#figgrid').innerHTML = PG.ui.shop.renderFiguresGrid({figs: FIGS, wallet, figPreview});
-  $('#frgrid').innerHTML = PG.ui.shop.renderFramesGrid({frames: FRAMES, wallet, initial: profileName()[0]});
-  renderStatusShop();
+
+  // Render Daily 6-Item Showcase in tile format
+  const dailyWrap = $('#dailyShopWrap');
+  if (dailyWrap && PG.ui.shop.renderDailyShopShowcase) {
+    const dailyItems = PG.ui.shop.getDailyShopItems(FIGS, FRAMES, PG.state.status.SHOP_STATUSES);
+    dailyWrap.innerHTML = PG.ui.shop.renderDailyShopShowcase({
+      items: dailyItems,
+      wallet,
+      figPreview,
+      initial: profileName()[0],
+      frames: FRAMES
+    });
+  }
+
   $('#locgrid').innerHTML = PG.ui.shop.renderLocationsGrid(LOCS);
 }
-$('#frgrid').addEventListener('click', e => {
+const _frg = $('#frgrid'); if (_frg) _frg.addEventListener('click', e => {
   const b = e.target.closest('[data-fr]'); if (!b) return;
   const k = b.dataset.fr, f = FRAMES[k], owned = wallet.frames || [];
   const pick = () => { wallet.frame = k; saveWallet(); renderShop(); renderMenuProfile(); };
@@ -2076,7 +2153,7 @@ $('#frgrid').addEventListener('click', e => {
     pick(); toastAny(`Рамка «${f.name}» — ваша!`);
   });
 });
-$('#figgrid').addEventListener('click', e => {
+const _fgg = $('#figgrid'); if (_fgg) _fgg.addEventListener('click', e => {
   const b = e.target.closest('[data-fig]'); if (!b) return;
   const k = b.dataset.fig, f = FIGS[k];
   if (!wallet.owned.includes(k)) {
@@ -4119,9 +4196,18 @@ async function renderTop() {
     }
     const mine = rows.findIndex(x => x.uid === me);
 
-    const av = (x, i) => `<span class="av" style="--c:${validCol(x.c) ? x.c : PALETTE[i % PALETTE.length].col}">${(clean(x.n) || '?')[0].toUpperCase()}</span>`;
-    const podium = [1, 0, 2].map(i => rows[i] ? `<div class="pod p${i + 1}${rows[i].uid === me ? ' me' : ''}" data-pl="${rows[i].uid}" data-n="${clean(rows[i].n) || 'Игрок'}" data-c="${validCol(rows[i].c) ? rows[i].c : ''}">${av(rows[i], i)}<b>${clean(rows[i].n) || 'Игрок'}</b>${stTag(rows[i].st)}<small>🏆 ${rows[i].r}</small><div class="ped"><i>${i + 1}</i></div></div>` : '<div class="pod empty"></div>').join('');
-    const list = rows.slice(3, 10).map((x, k) => `<div class="lead${x.uid === me ? ' me' : ''}" data-pl="${x.uid}" data-n="${clean(x.n) || 'Игрок'}" data-c="${validCol(x.c) ? x.c : ''}"><i>${k + 4}</i>${av(x, k + 3)}<span>${clean(x.n) || 'Игрок'}${x.uid === me ? ' (вы)' : ''}${stTag(x.st)}</span><b>🏆 ${x.r}</b></div>`).join('');
+    const av = (x, i) => {
+      const ring = (x.fr && FRAMES[x.fr]) ? FRAMES[x.fr].ring : (i === 0 ? FRAMES.gold.ring : (i === 1 ? FRAMES.royal.ring : (i === 2 ? FRAMES.emerald.ring : '')));
+      const col = validCol(x.c) ? x.c : PALETTE[i % PALETTE.length].col;
+      const initial = (clean(x.n) || '?')[0].toUpperCase();
+      return `<span class="av${ring ? ' fr' : ''}" style="--c:${col};${ring ? `--fr:${ring}` : ''}">${initial}</span>`;
+    };
+    const stBadge = st => {
+      const v = PG.state.status.shownStatus(st);
+      return v ? `<span class="st-rank-badge">${v}</span>` : '';
+    };
+    const podium = [1, 0, 2].map(i => rows[i] ? `<div class="pod p${i + 1}${rows[i].uid === me ? ' me' : ''}" data-pl="${rows[i].uid}" data-n="${clean(rows[i].n) || 'Игрок'}" data-c="${validCol(rows[i].c) ? rows[i].c : ''}">${av(rows[i], i)}<b>${clean(rows[i].n) || 'Игрок'}</b>${stBadge(rows[i].st)}<small>🏆 ${rows[i].r}</small><div class="ped"><i>${i + 1}</i></div></div>` : '<div class="pod empty"></div>').join('');
+    const list = rows.slice(3, 10).map((x, k) => `<div class="lead${x.uid === me ? ' me' : ''}" data-pl="${x.uid}" data-n="${clean(x.n) || 'Игрок'}" data-c="${validCol(x.c) ? x.c : ''}"><i>${k + 4}</i>${av(x, k + 3)}<span>${clean(x.n) || 'Игрок'}${x.uid === me ? ' (вы)' : ''}${stBadge(x.st)}</span><b>🏆 ${x.r}</b></div>`).join('');
     const myRow = mine >= 10 ? `<div class="lead me myrank" data-pl="${rows[mine].uid}" data-n="${clean(rows[mine].n) || 'Вы'}" data-c="${validCol(rows[mine].c) ? rows[mine].c : ''}"><i>${mine + 1}</i>${av(rows[mine], mine)}<span>Вы</span><b>🏆 ${rows[mine].r}</b></div>`
       : mine < 0 ? `<div class="lead me myrank"><i>—</i><span>Вы пока не в рейтинге</span><b>🏆 ${PROG.cups}</b></div>` : '';
 
@@ -4555,7 +4641,7 @@ function renderStatusShop() {
 }
 const STATUS_ERR = {short: 'Слишком короткий статус', long: 'Не больше 15 символов', bad: 'Такой текст нельзя: выберите другой', owned: 'Такой статус у вас уже есть', gold: 'Не хватает золота'};
 function afterStatusChange() { saveWallet(); renderStatusShop(); renderMenuProfile(); if (!$('#scr-items').hidden) renderItems(); presenceMark(true); syncRating(true); }
-$('#stgrid').addEventListener('click', e => {
+const _stg = $('#stgrid'); if (_stg) _stg.addEventListener('click', e => {
   const b = e.target.closest('[data-stb]'); if (!b) return;
   const x = ST().SHOP_STATUSES.find(q => q.id === b.dataset.stb), k = 'sh:' + x.id;
   if (ST().ownedStatuses(wallet).includes(k)) { ST().wearStatus(wallet, wallet.statusKey === k ? null : k); return afterStatusChange(); }
@@ -5790,7 +5876,7 @@ const LOCAL_ONLY = ['notifAt', 'notifThanked', 'installHinted', 'gfx', 'tutAsked
 const syncable = w => { const o = JSON.parse(JSON.stringify(w)); LOCAL_ONLY.forEach(k => delete o[k]); return o; };
 const same = (a, b) => JSON.stringify(a) === JSON.stringify(b);
 // Signed in with an e-mail (the saved sign-in is read from storage if nothing used it yet).
-const linkedNow = () => { if (FBC) FBC.load(); return !!(FB && fbAuth && fbAuth.email); };
+function linkedNow() { if (typeof FBC !== 'undefined' && FBC) FBC.load(); return !!(typeof FB !== 'undefined' && FB && typeof fbAuth !== 'undefined' && fbAuth && fbAuth.email); }
 const loadBase = () => { try { return JSON.parse(localStorage.getItem('walletBase')); } catch (_) { return null; } };
 const saveBase = (w, t) => { try { localStorage.setItem('walletBase', JSON.stringify({w: syncable(w), t, uid: fbAuth && fbAuth.uid})); } catch (_) {} };
 function mergeVal(k, l, c, b) {
@@ -6734,6 +6820,78 @@ window.__ready = true;
     };
   });
 })();
+
+// Daily shop actions (buying & selecting items from daily 6-item showcase)
+(function initDailyShop() {
+  document.addEventListener('click', e => {
+    const buyBtn = e.target.closest('[data-daily-buy]');
+    if (buyBtn) {
+      const parts = buyBtn.dataset.dailyBuy.split(':');
+      const kind = parts[0], key = parts[1], price = +parts[2];
+      if (wallet.gold < price) return toastAny(`Не хватает ${price - wallet.gold} золота`);
+
+      if (kind === 'fig') {
+        const f = FIGS[key];
+        confirmBox(`Купить фигурку «${f ? f.name : key}» за ${price} золота?`, 'Купить', () => {
+          if (wallet.gold < price || wallet.owned.includes(key)) return;
+          wallet.gold -= price; wallet.owned.push(key);
+          beep('coin'); pickFig(key);
+          toastAny(`Фигурка «${f ? f.name : key}» — ваша!`);
+        });
+      } else if (kind === 'frame') {
+        const f = FRAMES[key];
+        confirmBox(`Купить рамку «${f ? f.name : key}» за ${price} золота?`, 'Купить', () => {
+          if (wallet.gold < price || (wallet.frames || []).includes(key)) return;
+          wallet.gold -= price; wallet.frames = [...(wallet.frames || []), key];
+          wallet.frame = key; beep('coin');
+          saveWallet(); renderShop(); renderMenuProfile();
+          toastAny(`Рамка «${f ? f.name : key}» — ваша!`);
+        });
+      } else if (kind === 'status') {
+        const st = PG.state.status.SHOP_STATUSES.find(s => s.id === key);
+        const name = st ? st.text : key;
+        confirmBox(`Купить статус «${name}» за ${price} золота?`, 'Купить', () => {
+          const fullKey = 'sh:' + key;
+          if (wallet.gold < price || (wallet.statuses || []).includes(fullKey)) return;
+          wallet.gold -= price; wallet.statuses = [...(wallet.statuses || []), fullKey];
+          wallet.statusKey = fullKey; wallet.status = name; beep('coin');
+          saveWallet(); renderShop(); renderMenuProfile();
+          toastAny(`Статус «${name}» надет!`);
+        });
+      }
+      return;
+    }
+
+    const pickBtn = e.target.closest('[data-daily-pick]');
+    if (pickBtn) {
+      const [kind, key] = pickBtn.dataset.dailyPick.split(':');
+      if (kind === 'fig') {
+        pickFig(key);
+      } else if (kind === 'frame') {
+        wallet.frame = key; saveWallet(); renderShop(); renderMenuProfile();
+        toastAny('Рамка надета!');
+      } else if (kind === 'status') {
+        const fullKey = key.startsWith('sh:') ? key : 'sh:' + key;
+        const st = PG.state.status.SHOP_STATUSES.find(s => s.id === key.replace('sh:', ''));
+        wallet.statusKey = fullKey;
+        if (st) wallet.status = st.text;
+        saveWallet(); renderShop(); renderMenuProfile();
+        toastAny('Статус надет!');
+      }
+      return;
+    }
+
+    // Top menu leaderboard button
+    const rankBtn = e.target.closest('#btnMenuLeaderboard');
+    if (rankBtn) {
+      ptab = 'top';
+      show('progress');
+      const topBtn = document.querySelector('#ptabs button[data-pt="top"]');
+      if (topBtn) topBtn.click();
+    }
+  });
+})();
+
 window.show = show;
 window.openSetup = openSetup;
 show(isApp ? 'menu' : 'game');

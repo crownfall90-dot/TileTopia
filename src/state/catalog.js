@@ -28,7 +28,7 @@ export const FRAMES = {
   rainbow: {name: 'Радуга', price: 1600, ring: 'conic-gradient(#ff5d5d,#ffb84d,#fff35c,#5ee07a,#4dc3ff,#8a6bff,#ff5dc8,#ff5d5d)'},
   carbon: {name: 'Карбон', price: 1800, ring: 'conic-gradient(#0d0f14,#4b5568,#0d0f14,#4b5568,#0d0f14)'},
   // Earned only (not sold): `earn` is the condition shown to the player.
-  puzzle: {name: 'Пазл', price: 0, earn: 'Достигните 10 уровня', ring: 'conic-gradient(#4c8dff 0 25%,#3fc27a 0 50%,#b06cf0 0 75%,#f2994a 0)'},
+  puzzle: {name: 'Плитка', price: 0, earn: 'Достигните 10 уровня', ring: 'conic-gradient(#4c8dff 0 25%,#3fc27a 0 50%,#b06cf0 0 75%,#f2994a 0)'},
   galaxy: {name: 'Галактика', price: 0, earn: 'Получите все достижения', ring: 'conic-gradient(from 200deg,#0b0f33,#5b3fd1,#c06cff,#2a1b7a,#0b0f33,#7ad7ff,#0b0f33)'},
 };
 /** Frames given for an achievement: {frame key: check(prog, achCount)}. */
