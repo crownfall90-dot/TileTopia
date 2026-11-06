@@ -83,6 +83,7 @@ public class MainActivity extends Activity {
         hideSystemBars();
         createWebView();
         grabLink(getIntent());
+        registerBack();
     }
 
     @Override
@@ -297,9 +298,23 @@ public class MainActivity extends Activity {
         handler.postDelayed(recheck, RECHECK_MS);
     }
 
+    /* Android 13+ (and always from targetSdk 36): back comes through OnBackInvokedCallback, onBackPressed is no longer
+       called (manifest: enableOnBackInvokedCallback). Older phones still use onBackPressed. */
+    private void registerBack() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
+                    android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT, this::handleBack);
+        }
+    }
+
     @Override
+    @SuppressWarnings("deprecation")
     public void onBackPressed() {
-        if (web == null || !pageReady) { super.onBackPressed(); return; }
+        handleBack();
+    }
+
+    private void handleBack() {
+        if (web == null || !pageReady) { finish(); return; }
         // The game decides: close a dialog, open the game menu, go back a screen, or let the app close.
         web.evaluateJavascript("window.onBack ? window.onBack() : false", handled -> {
             if (!"true".equals(handled)) finish();
@@ -484,6 +499,17 @@ public class MainActivity extends Activity {
                     else b.putString(k, String.valueOf(v));
                 }
                 com.google.firebase.analytics.FirebaseAnalytics.getInstance(MainActivity.this).logEvent(name, b);
+            } catch (Exception e) {
+                report(e);
+            }
+        }
+
+        /** Statistics consent: Firebase Analytics collects only after the player agreed (off by default, see the manifest). */
+        @JavascriptInterface
+        public void setAnalytics(boolean on) {
+            try {
+                if (FirebaseApp.getApps(MainActivity.this).isEmpty()) return;
+                com.google.firebase.analytics.FirebaseAnalytics.getInstance(MainActivity.this).setAnalyticsCollectionEnabled(on);
             } catch (Exception e) {
                 report(e);
             }

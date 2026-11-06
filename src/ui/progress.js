@@ -17,7 +17,7 @@ export function renderMasteryGrid(byMode = {}) {
     const body = g ? `<small>${rate}% (${w}/${g}) · рек. ${m.best || 0}</small>` : '<small class="mnone">Сыграйте первую партию</small>';
     return `<div class="mcard${g ? '' : ' empty'}"><span class="mic">${ic}</span><div><b>${name}</b>${body}</div></div>`;
   };
-  return `<div class="mgrid">${tile('bots', '🤖', 'Боты')}${tile('duel', '⚔️', 'Дуэль')}${tile('friends', '👥', 'Друзья')}${tile('online', '🌐', 'Онлайн')}</div>`;
+  return `<div class="mgrid">${tile('bots', '🤖', 'Боты')}${tile('friends', '👥', 'Друзья')}${tile('online', '🌐', 'Онлайн')}</div>`;
 }
 
 /** Generates HTML markup for completed features summary (cities, roads, forts). */
@@ -26,7 +26,7 @@ export function renderBuildingStats(st = {}) {
   return `<div class="sbuild">` +
     `<span>🏰 <b>${st.c || 0}</b> городов${maxCityText}</span>` +
     `<span>🛤 <b>${st.r || 0}</b> дорог</span>` +
-    `<span>🏯 <b>${st.f || 0}</b> крепостей</span>` +
+    `<span>⛪ <b>${st.f || 0}</b> монастырей</span>` +
     `</div>`;
 }
 
@@ -63,6 +63,7 @@ export function renderCollectionCard(col, prog, figs, frames, wallet, figPreview
 export function renderRewardsTabHtml({
   progQuests = [],
   questDefs = [],
+  canReroll = false,
   progWeekly = [],
   weeklyDefs = [],
   weeklyChestGold = 100,
@@ -78,12 +79,13 @@ export function renderRewardsTabHtml({
   const qRows = [...progQuests].sort((a, b) => rank(qDone(a), a.got) - rank(qDone(b), b.got)).map(q => {
     const Q = questDefs.find(x => x.id === q.id) || {ic: '🎯', t: 'Задание', n: 1, g: 10};
     const done = q.n >= Q.n;
-    return `<div class="quest${q.got ? ' got' : done ? ' done' : ''}"><span class="qi">${Q.ic}</span><span class="qt"><b>${Q.t}</b><div class="xpbar"><i style="width:${100 * q.n / Q.n}%"></i></div><small>${q.n} / ${Q.n} · <i class="coin"></i> ${Q.g}</small></span>${q.got ? '<span class="pill">Получено</span>' : done ? `<button class="chip pri" data-claimq="${q.id}">Забрать</button>` : ''}</div>`;
+    const swap = canReroll && !q.got && !done ? `<button class="qre" data-reroll="${q.id}" title="Заменить задание (раз в день)" aria-label="Заменить задание">↻</button>` : '';
+    return `<div class="quest${q.got ? ' got' : done ? ' done' : ''}"><span class="qi">${Q.ic}</span><span class="qt"><b>${Q.t}</b><div class="xpbar"><i style="width:${100 * q.n / Q.n}%"></i></div><small>${q.n} / ${Q.n} · <i class="coin"></i> ${Q.g}</small></span>${swap}${q.got ? '<span class="pill">Получено</span>' : done ? `<button class="chip pri" data-claimq="${q.id}">Забрать</button>` : ''}</div>`;
   }).join('');
 
   const aRows = [...achDefs].sort((a, b) => rank(a.ok(progStats, progLvl), progAch[a.id] === 'got') - rank(b.ok(progStats, progLvl), progAch[b.id] === 'got')).map(a => {
     const ok = a.ok(progStats, progLvl), got = progAch[a.id] === 'got';
-    return `<div class="quest${got ? ' got' : ok ? ' done' : ' lock'}"><span class="qi">${a.ic}</span><span class="qt"><b>${a.t}</b><small>${a.d} · <i class="coin"></i> ${a.g}</small></span>${got ? '<span class="pill">Получено</span>' : ok ? `<button class="chip pri" data-claima="${a.id}">Забрать</button>` : ''}</div>`;
+    return `<div class="quest${got ? ' got' : ok ? ' done' : ' lock'}${a.tier ? ' tier-' + a.tier : ''}"><span class="qi">${a.ic}</span><span class="qt"><b>${a.t}</b><small>${a.d} · <i class="coin"></i> ${a.g}</small></span>${got ? '<span class="pill">Получено</span>' : ok ? `<button class="chip pri" data-claima="${a.id}">Забрать</button>` : ''}</div>`;
   }).join('');
 
   const wqDone = q => { const WQ = weeklyDefs.find(x => x.id === q.id); return WQ && q.n >= WQ.n; };
@@ -94,7 +96,7 @@ export function renderRewardsTabHtml({
   }).join('');
 
   const allWqGot = progWeekly.length > 0 && progWeekly.every(q => q.got);
-  const chestRow = `<div class="quest weekly-chest${weeklyChestClaimed ? ' got' : allWqGot ? ' done' : ''}"><span class="qi">🎁</span><span class="qt"><b>Большой сундук недели</b><small>${weeklyChestClaimed ? 'Сундук недели открыт' : allWqGot ? 'Все цели недели достигнуты!' : 'Выполните все 3 цели недели'} · <i class="coin"></i> ${weeklyChestGold}</small></span>${weeklyChestClaimed ? '<span class="pill">Получено</span>' : allWqGot ? '<button class="chip pri" data-claimwchest="1">Забрать +100</button>' : '<span class="pill lock">Заперт</span>'}</div>`;
+  const chestRow = `<div class="quest weekly-chest${weeklyChestClaimed ? ' got' : allWqGot ? ' done' : ''}"><span class="qi">🎁</span><span class="qt"><b>Большой сундук недели</b><small>${weeklyChestClaimed ? 'Сундук недели открыт' : allWqGot ? 'Все цели недели достигнуты!' : 'Выполните все ${progWeekly.length} цели недели'} · <i class="coin"></i> ${weeklyChestGold}</small></span>${weeklyChestClaimed ? '<span class="pill">Получено</span>' : allWqGot ? '<button class="chip pri" data-claimwchest="1">Забрать +100</button>' : '<span class="pill lock">Заперт</span>'}</div>`;
   const wqGot = progWeekly.filter(q => q.got).length;
 
   const qGot = progQuests.filter(q => q.got).length, aGot = achDefs.filter(a => progAch[a.id] === 'got').length;

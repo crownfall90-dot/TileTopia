@@ -84,9 +84,9 @@ test('net/rooms: netAuth validates authorized authors', async () => {
 test('net/matchmaking: createMatchState and filterOpenRooms', async () => {
   const mm = await import('../src/net/matchmaking.js');
 
-  const state = mm.createMatchState({want: 4, mode: 'duel', create: true});
+  const state = mm.createMatchState({want: 4, mode: 'fast', create: true});
   assert.equal(state.want, 4);
-  assert.equal(state.mode, 'duel');
+  assert.equal(state.mode, 'fast');
   assert.equal(state.create, true);
   assert.equal(state.ready, false);
 

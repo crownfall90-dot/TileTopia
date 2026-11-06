@@ -87,8 +87,9 @@ test('ui/shop: renderGiftCard, renderFiguresGrid, renderFramesGrid, renderLocati
 
   // Emotes tab markup
   const {renderItemsEmotesHtml, ALL_EMOTES, ALL_PHRASES, DEFAULT_EMOTES, DEFAULT_PHRASES} = await import('../src/ui/shop.js');
-  assert.equal(DEFAULT_EMOTES.length, 5);
-  assert.equal(DEFAULT_PHRASES.length, 5);
+  // three free of each; the rest are bought in the shop or earned (tests/reactions-shop.test.cjs)
+  assert.equal(DEFAULT_EMOTES.length, 3);
+  assert.equal(DEFAULT_PHRASES.length, 3);
   assert.ok(ALL_EMOTES.length >= 20);
   assert.ok(ALL_PHRASES.length >= 20);
 
@@ -117,15 +118,13 @@ test('ui/progress: ringSvg, renderMasteryGrid, renderBuildingStats, renderCollec
   // Mastery grid
   const byMode = {
     bots: {games: 10, wins: 8, best: 70},
-    duel: {games: 5, wins: 4, best: 55},
     friends: {games: 2, wins: 1, best: 40},
     online: {games: 0, wins: 0, best: 0}
   };
   const masteryHtml = renderMasteryGrid(byMode);
   assert.ok(masteryHtml.includes('Боты'));
   assert.ok(masteryHtml.includes('80% (8/10) · рек. 70'));
-  assert.ok(masteryHtml.includes('Дуэль'));
-  assert.ok(masteryHtml.includes('80% (4/5) · рек. 55'));
+  assert.ok(!masteryHtml.includes('Дуэль'), 'no duel tile');
   assert.ok(masteryHtml.includes('Друзья'));
   assert.ok(masteryHtml.includes('Онлайн'));
 
@@ -134,7 +133,7 @@ test('ui/progress: ringSvg, renderMasteryGrid, renderBuildingStats, renderCollec
   assert.ok(buildHtml.includes('12</b> городов'));
   assert.ok(buildHtml.includes('рекорд: 14 карт'));
   assert.ok(buildHtml.includes('25</b> дорог'));
-  assert.ok(buildHtml.includes('4</b> крепостей'));
+  assert.ok(buildHtml.includes('4</b> монастырей'));
 
   // Collection card
   const col = {

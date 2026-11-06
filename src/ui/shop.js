@@ -177,8 +177,15 @@ export function getTimeUntilNext9AM(now = new Date()) {
   return `${hours} ч. ${mins} мин.`;
 }
 
-/** Deterministically selects 6 gold-only items for the day: 2 figures, 2 frames, 2 statuses. */
-export function getDailyShopItems(figs = {}, frames = {}, statuses = [], date = new Date()) {
+/** How many of each kind the daily showcase offers. */
+export const DAILY_COUNTS = {fig: 2, frame: 2, status: 4, emote: 4};
+
+/**
+ * The daily showcase: 2 figures, 2 frames, 4 statuses and 4 emoji for gold, a new set at 09:00. The order is the same
+ * for everyone that day; a player sees only what they do not own yet (wallet), so what they bought gives its place
+ * to the next item of the day's order.
+ */
+export function getDailyShopItems(figs = {}, frames = {}, statuses = [], date = new Date(), wallet = null) {
   const key = getDailyShopKey(date);
   let seed = 0;
   for (let i = 0; i < key.length; i++) {
@@ -209,11 +216,20 @@ export function getDailyShopItems(figs = {}, frames = {}, statuses = [], date = 
     .filter(s => s.price > 0)
     .map(s => ({ kind: 'status', key: 'sh:' + s.id, id: s.id, name: s.text, price: s.price }));
 
-  const pickedFigs = shuffle(figList).slice(0, 2);
-  const pickedFrames = shuffle(frameList).slice(0, 2);
-  const pickedStatuses = shuffle(statusList).slice(0, 2);
+  const emoteList = R.ALL_EMOTES
+    .filter(e => R.price('emote', e) > 0)
+    .map(e => ({ kind: 'emote', key: e, name: R.RARITY[R.rarity('emote', e)].name, price: R.price('emote', e), rarity: R.rarity('emote', e) }));
 
-  return [...pickedFigs, ...pickedFrames, ...pickedStatuses];
+  const w = wallet || {};
+  const owned = {
+    fig: it => (w.owned || []).includes(it.key),
+    frame: it => (w.frames || []).includes(it.key),
+    status: it => (w.statuses || []).includes(it.key),
+    emote: it => R.isOwned(w, 'emote', it.key),
+  };
+  // shuffled first (the same order for everyone that day), then what this player owns is skipped
+  const pick = (list, kind) => shuffle(list).filter(it => !wallet || !owned[kind](it)).slice(0, DAILY_COUNTS[kind]);
+  return [...pick(figList, 'fig'), ...pick(frameList, 'frame'), ...pick(statusList, 'status'), ...pick(emoteList, 'emote')];
 }
 
 /** Generates HTML markup for the 6-item daily shop showcase. */
@@ -249,6 +265,11 @@ export function renderDailyShopShowcase({ items = [], wallet = {}, figPreview = 
       isOwned = (wallet.statuses || []).includes(k);
       isEquipped = (wallet.statusKey === k) || (wallet.status && wallet.status === item.name);
       previewHtml = `<div class="dsh-visual"><span class="stchip dsh-chip">${item.name}</span></div>`;
+    } else if (item.kind === 'emote') {
+      kindLabel = 'Эмодзи';
+      kindClass = 'k-emote' + (item.rarity ? ' r-' + item.rarity : '');
+      isOwned = R.isOwned(wallet, 'emote', item.key);
+      previewHtml = `<div class="dsh-visual"><span class="dsh-emote">${item.key}</span></div>`;
     }
 
     const canAfford = gold >= item.price;
@@ -256,9 +277,10 @@ export function renderDailyShopShowcase({ items = [], wallet = {}, figPreview = 
     if (isEquipped) {
       btnHtml = `<button class="dsh-btn equipped" disabled>Надето</button>`;
     } else if (isOwned) {
-      btnHtml = `<button class="dsh-btn select" data-daily-pick="${item.kind}:${item.key}">Выбрать</button>`;
+      btnHtml = `<button class="dsh-btn select" data-daily-pick="${item.kind}|${item.key}">Выбрать</button>`;
     } else {
-      btnHtml = `<button class="dsh-btn buy${!canAfford ? ' poor' : ''}" data-daily-buy="${item.kind}:${item.key}:${item.price}"><i class="coin"></i><b>${item.price}</b></button>`;
+      // '|' between the parts: a status key has a ':' of its own (sh:id)
+      btnHtml = `<button class="dsh-btn buy${!canAfford ? ' poor' : ''}" data-daily-buy="${item.kind}|${item.key}|${item.price}"><i class="coin"></i><b>${item.price}</b></button>`;
     }
 
     return `
@@ -285,64 +307,44 @@ export function renderDailyShopShowcase({ items = [], wallet = {}, figPreview = 
         <div class="dsh-title-box">
           <div class="dsh-badge"><span>⭐ Ежедневная витрина</span></div>
           <h3>Товары дня</h3>
-          <p>6 товаров · Обновление в 09:00</p>
+          <p>${items.length ? `${items.length} ${items.length % 10 === 1 && items.length % 100 !== 11 ? 'товар' : items.length % 10 >= 2 && items.length % 10 <= 4 && (items.length % 100 < 12 || items.length % 100 > 14) ? 'товара' : 'товаров'} · ` : ''}Обновление в 09:00</p>
         </div>
         <div class="dsh-timer-box">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><polyline points="12 6 12 12 15 15"/></svg>
           <span>До смены: <b>${timeStr}</b></span>
         </div>
       </div>
-      <div class="daily-shop-grid">
-        ${cardsHtml}
-      </div>
+      ${cardsHtml ? `<div class="daily-shop-grid">${cardsHtml}</div>` : '<div class="dsh-empty">Всё из сегодняшней витрины уже ваше. Новые товары — в 09:00</div>'}
     </div>
   `;
 }
 
-export const DEFAULT_EMOTES = ['👑', '🧩', '🏰', '⚔️', '🤝'];
-export const DEFAULT_PHRASES = [
-  'Отличный ход!',
-  'Мой замок!',
-  'Так и планировал 😎',
-  'Удачи за столом! 🤝',
-  'Спасибо за игру! ❤️'
-];
+// Emoji and phrases live in state/reactions.js (prices, ownership); re-exported here for game.html.
+import * as R from '../state/reactions.js';
+export const {DEFAULT_EMOTES, DEFAULT_PHRASES, ALL_EMOTES, ALL_PHRASES, SAYS} = R;
 
-export const ALL_EMOTES = [
-  '👑', '🧩', '🏰', '⚔️', '🛡️', '🌊',
-  '🌉', '🌲', '🎲', '🏆', '💡', '🧐',
-  '🍵', '🔥', '🤝', '🎯', '⏳', '😱',
-  '🧱', '🥳', '😎', '😅', '👏', '❤️'
-];
+const RARITY_CLASS = {base: '', common: ' r-common', rare: ' r-rare', epic: ' r-epic'};
+const coin = '<i class="coin" style="display:inline-block;vertical-align:-3px"></i>';
 
-export const ALL_PHRASES = [
-  'Отличный ход!',
-  'Мой замок!',
-  'Так и планировал 😎',
-  'Вот это поворот!',
-  'Красивая карта!',
-  'Удачи за столом! 🤝',
-  'Секунду, считаю очки... ⏳',
-  'Дзен превыше всего 🍵',
-  'Неожиданный стык! 🧩',
-  'Защищай границы! ⚔️',
-  'Река к победе 🌊',
-  'Почти получилось!',
-  'Ну ты гроссмейстер! 👑',
-  'Тут моя дорога 🛤️',
-  'Ловушка захлопнулась 🏰',
-  'Ещё партию? 🎮',
-  'Рискнём на удачу! 🎲',
-  'Красиво строишь!',
-  'Я думал иначе... 🤔',
-  'Всё под контролем!',
-  'Спасибо за игру! ❤️',
-  'Каждый тайл на счету 🎯',
-  'Партия века! 🔥',
-  'Приветствую в TileTopia! 👋'
-];
-
-export const SAYS = [...ALL_EMOTES, ...ALL_PHRASES];
+/** The shop section «Эмодзи и фразы»: what is not bought yet, by rarity, with a price; a counter of the collection. */
+export function renderReactionShopHtml({wallet = {}}) {
+  const pr = R.progress(wallet), gold = wallet.gold || 0;
+  const card = (kind, id) => {
+    const p = R.price(kind, id), rar = R.rarity(kind, id), poor = gold < p;
+    const body = kind === 'emote' ? `<span class="rs-em">${id}</span>` : `<span class="rs-ph">${id}</span>`;
+    const earn = R.EARN[kind][id];
+    return `<button class="rs-item ${kind}${RARITY_CLASS[rar]}${poor ? ' poor' : ''}" data-rbuy="${kind}" data-rid="${id}">${body}<small class="rs-rar">${R.RARITY[rar].name}</small><b class="rs-price">${coin} ${p}</b>${earn ? `<small class="rs-earn">или: ${earn}</small>` : ''}</button>`;
+  };
+  const left = kind => (kind === 'emote' ? R.ALL_EMOTES : R.ALL_PHRASES).filter(id => !R.isOwned(wallet, kind, id));
+  const block = (kind, title) => {
+    const ids = left(kind), c = pr[kind];
+    const head = `<div class="rs-head"><span>${title}</span><span class="rs-cnt${c.have === c.total ? ' full' : ''}">Собрано ${c.have} / ${c.total}</span></div>`;
+    if (!ids.length) return head + `<div class="rs-done">Коллекция собрана ✨</div>`;
+    return head + `<div class="rs-grid ${kind}">${ids.map(id => card(kind, id)).join('')}</div>`
+      + `<small class="rs-note">Соберите все — +${R.COLLECTION_REWARD[kind]} золота</small>`;
+  };
+  return `<div class="rshop">${block('emote', 'Эмодзи')}${block('phrase', 'Фразы')}</div>`;
+}
 
 /** Generates HTML markup for Emotes and Phrases customization tab in "My items". */
 export function renderItemsEmotesHtml({
@@ -351,8 +353,11 @@ export function renderItemsEmotesHtml({
   selectedEmotes = DEFAULT_EMOTES,
   selectedPhrases = DEFAULT_PHRASES,
   maxEmotes = 5,
-  maxPhrases = 5
+  maxPhrases = 5,
+  wallet = null
 }) {
+  const own = (kind, id) => !wallet || R.isOwned(wallet, kind, id);
+  const pr = wallet ? R.progress(wallet) : null;
   const curEm = selectedEmotes && selectedEmotes.length ? selectedEmotes : DEFAULT_EMOTES;
   const curPh = selectedPhrases && selectedPhrases.length ? selectedPhrases : DEFAULT_PHRASES;
 
@@ -363,7 +368,7 @@ export function renderItemsEmotesHtml({
           <span class="deck-icon">⚡</span>
           <div>
             <b>Колода реакций для партий</b>
-            <small>Выберите до ${maxEmotes} эмоций и ${maxPhrases} фраз для быстрых реплик в игре</small>
+            <small>Ставьте в колоду до ${maxEmotes} своих эмоций и ${maxPhrases} фраз — они под рукой в партии. Новые — в Витрине и за награды</small>
           </div>
         </div>
         <button class="ghostbtn sm" data-reset-deck>Сброс</button>
@@ -397,12 +402,19 @@ export function renderItemsEmotesHtml({
 
   const emotesGridHtml = `
     <div class="h3 sec" style="display:flex;justify-content:space-between;align-items:center">
-      <span>Все эмоции (${allEmotes.length})</span>
-      <small style="color:var(--muted);font-weight:normal">нажмите для добавления в колоду</small>
+      <span>${pr ? `Эмоции · собрано ${pr.emote.have} из ${pr.emote.total}` : `Все эмоции (${allEmotes.length})`}</span>
+      <small style="color:var(--muted);font-weight:normal">🔒 — купить в Витрине</small>
     </div>
     <div class="emotes-catalog-grid">
       ${allEmotes.map(em => {
         const isSel = curEm.includes(em);
+        if (!own('emote', em)) return `
+          <button class="em-cat-btn lockd" data-rbuy="emote" data-rid="${em}" title="Купить за ${R.price('emote', em)} золота">
+            <span class="em-icon">${em}</span>
+            <span class="em-badge lock">🔒</span>
+            <span class="em-price">${R.price('emote', em)}</span>
+          </button>
+        `;
         return `
           <button class="em-cat-btn${isSel ? ' sel' : ''}" data-toggle-emote="${em}" title="${em}">
             <span class="em-icon">${em}</span>
@@ -415,12 +427,18 @@ export function renderItemsEmotesHtml({
 
   const phrasesGridHtml = `
     <div class="h3 sec" style="margin-top:20px;display:flex;justify-content:space-between;align-items:center">
-      <span>Все реплики (${allPhrases.length})</span>
-      <small style="color:var(--muted);font-weight:normal">нажмите для выбора</small>
+      <span>${pr ? `Фразы · собрано ${pr.phrase.have} из ${pr.phrase.total}` : `Все реплики (${allPhrases.length})`}</span>
+      <small style="color:var(--muted);font-weight:normal">🔒 — купить в Витрине</small>
     </div>
     <div class="phrases-catalog-list">
       ${allPhrases.map(ph => {
         const isSel = curPh.includes(ph);
+        if (!own('phrase', ph)) return `
+          <button class="ph-cat-btn lockd" data-rbuy="phrase" data-rid="${ph}">
+            <span class="ph-text">${ph}</span>
+            <span class="ph-badge lock">🔒 ${R.price('phrase', ph)} ${coin}</span>
+          </button>
+        `;
         return `
           <button class="ph-cat-btn${isSel ? ' sel' : ''}" data-toggle-phrase="${ph}">
             <span class="ph-text">${ph}</span>

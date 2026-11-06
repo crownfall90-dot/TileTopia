@@ -18,7 +18,8 @@ export const MODES = {
   fast: {label: 'Быстрая', desc: '30 плиток · ~8 мин · 4 мипла', set: {deck: 30, meeples: 4}},
   classic: {label: 'Классика', desc: '50 плиток · ~15 мин · 6 миплов', set: {deck: 50, meeples: 6}},
   epic: {label: 'Большая', desc: '100 плиток · ~30 мин · 8 миплов', set: {deck: 100, meeples: 8}},
-  duel: {label: 'Дуэль 1×1', desc: '30 плиток · 20 с на ход · 2 игрока · 5 миплов', set: {deck: 30, meeples: 5, timer: 20}},
+  // Classic 2.0: the same rules on six-sided tiles (src/engine/hex.js)
+  hex: {label: 'Классика 2.0', desc: 'Шестиугольные плитки · 50 плиток · 6 миплов', set: {deck: 50, meeples: 6}},
 };
 
 export const RULES = [
@@ -42,9 +43,10 @@ export const PREFS = [
   {k: 'zones', ic: '🎨', label: 'Цвет владельца', hint: 'Подсветка своих городов и дорог', opts: [[true, 'Вкл'], [false, 'Выкл']]},
   {k: 'gfx', ic: '✨', label: 'Графика', hint: 'Оптимизация производительности', opts: [['high', 'Красивая'], ['low', 'Экономная']]},
   {k: 'notify', ic: '🔔', label: 'Уведомления', hint: 'Новости и обновления игры', opts: [[true, 'Вкл'], [false, 'Выкл']], app: true},
+  {k: 'stats', ic: '📊', label: 'Статистика', hint: 'Анонимные числа о том, чем пользуются в игре. Без текстов и имён', opts: [[true, 'Вкл'], [false, 'Выкл']]},
 ];
 
-export const PREF_GROUPS = [['Звук', ['sound', 'music']], ['Игра', ['coach', 'view', 'botlvl', 'speed', 'alert', 'zones']], ['Экран', ['gfx']], ['Уведомления', ['notify']]];
+export const PREF_GROUPS = [['Звук', ['sound', 'music']], ['Игра', ['coach', 'view', 'botlvl', 'speed', 'alert', 'zones']], ['Экран', ['gfx']], ['Уведомления', ['notify']], ['Данные', ['stats']]];
 
 export const STREAK_GOLD = [10, 15, 20, 25, 35, 50, 100];
 

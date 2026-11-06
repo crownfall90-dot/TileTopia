@@ -465,6 +465,18 @@ body:not(.authed) main > .card:not(#loginCard) { display: none; }
   </div>
 
   <!-- 6.5 ОТЗЫВЫ ИГРОКОВ -->
+  <div class="card" id="usageCard" style="grid-column: 1 / -1">
+    <div class="card-title">
+      <span>📊 Что используют игроки</span>
+      <span style="display:flex;gap:6px">
+        <button class="btn" data-usage-days="1">Сегодня</button>
+        <button class="btn" data-usage-days="7">7 дней</button>
+        <button class="btn" data-usage-days="30">30 дней</button>
+      </span>
+    </div>
+    <div id="usageBox" style="color:var(--muted);font-size:13px">Загрузка…</div>
+  </div>
+
   <div class="card" id="feedback" style="grid-column: 1 / -1">
     <div class="card-title">
       <span>💬 Отзывы игроков</span>
@@ -1387,7 +1399,59 @@ $('btnErrors').onclick = loadErrors;
 if ($('btnFilterEmpty')) $('btnFilterEmpty').onclick = () => { hideEmptyGuests = !hideEmptyGuests; renderPlayers(); };
 if ($('btnPurgeEmpty')) $('btnPurgeEmpty').onclick = purgeEmptyGuests;
 
-function refreshAll() { loadVersions(); loadMaint(); loadUpdatePolicy(); loadPin(); loadStats(); loadFeedback(); loadNameSuggestions(); loadPlayers(); }
+
+// ---------- usage: what players tap and open (the game writes /usage/{day}/{uid}, counts only) ----------
+// Names mirror FEATURES in src/state/usage.js; a button that is not listed there still shows up, by its id.
+const USAGE_NAMES = {
+  'screen:menu': 'Экран: главная', 'screen:progress': 'Экран: задания и прогресс', 'screen:shop': 'Экран: витрина',
+  'screen:friends': 'Экран: друзья', 'screen:profile': 'Экран: профиль', 'screen:rating': 'Экран: рейтинг',
+  'screen:history': 'Экран: история партий', 'screen:settings': 'Экран: настройки', 'screen:items': 'Экран: мои предметы',
+  'screen:inbox': 'Экран: уведомления и награды', 'screen:rules': 'Экран: правила', 'screen:setup': 'Экран: настройка партии',
+  'screen:game': 'Экран: партия', 'screen:results': 'Экран: итоги партии', 'screen:lobby': 'Экран: комната', 'screen:match': 'Экран: поиск соперников',
+  'btn:btnMainPlay': 'Кнопка «Играть»', 'btn:btnOpenModes': 'Кнопка «Режим»', 'btn:menuQuestBanner': 'Задания на главной',
+  'btn:btnMenuHub': 'Меню справа вверху', 'btn:btnMenuNotif': 'Колокольчик', 'btn:mprof': 'Плашка профиля', 'btn:cupsBtn': 'Кубки под плашкой',
+  'btn:menuGiftPill': 'Подарок на главной', 'hub:rating': 'Меню → Рейтинг', 'hub:rules': 'Меню → Как играть', 'hub:history': 'Меню → История', 'hub:settings': 'Меню → Настройки',
+  'nav:menu': 'Нижняя панель: главная', 'nav:progress': 'Нижняя панель: задания', 'nav:friends': 'Нижняя панель: друзья', 'nav:shop': 'Нижняя панель: витрина',
+  'ptab:road': 'Прогресс: путь', 'ptab:rewards': 'Прогресс: задания', 'ptab:cols': 'Прогресс: коллекции',
+  'btn:ok': 'Поставить плитку', 'btn:rot': 'Повернуть плитку', 'btn:tip': 'Подсказка', 'btn:helpBtn': 'Очки и правила в партии', 'btn:sayBtn': 'Реакции в партии',
+  'btn:zin': 'Приблизить поле', 'btn:zout': 'Отдалить поле', 'btn:ctr': 'К центру поля', 'btn:turnL': 'Повернуть поле', 'btn:view': 'Наклон камеры 2D/3D', 'btn:gameMenu': 'Меню партии',
+  'btn:openGift': 'Ежедневный подарок', 'btn:itemsBtn': 'Мои предметы', 'btn:installBtn': 'Установка игры',
+  'say:emote': 'Реакция: эмодзи', 'say:phrase': 'Реакция: фраза',
+  'claim:quest': 'Награда за задание', 'claim:achievement': 'Награда за достижение', 'claim:weekly': 'Награда за недельную цель', 'claim:chest': 'Сундук недели',
+  'claim:collection': 'Награда за коллекцию', 'claim:road': 'Награда с пути прогресса', 'claim:reroll': 'Замена задания',
+  'buy:emote': 'Покупка: эмодзи', 'buy:phrase': 'Покупка: фраза', 'buy:daily': 'Покупка в дневной витрине', 'pick:daily': 'Выбор купленного в витрине',
+  'deck:emote': 'Колода: эмодзи', 'deck:phrase': 'Колода: фраза',
+  'mode:bots': 'Режим: с ботами', 'mode:local': 'Режим: на одном телефоне', 'mode:lobby': 'Режим: с друзьями (комната)', 'mode:online': 'Режим: онлайн',
+  'rules:fast': 'Правила: быстрая', 'rules:classic': 'Правила: классика', 'rules:big': 'Правила: большая', 'rules:epic': 'Правила: эпическая',
+};
+let usageDays = 7;
+async function loadUsage() {
+  const box = $('usageBox'); box.textContent = 'Загрузка…';
+  try {
+    const days = [], now = new Date();
+    for (let i = 0; i < usageDays; i++) { const d = new Date(now - i * 864e5).toISOString().slice(0, 10); days.push(d); }
+    const got = await Promise.all(days.map(d => db('usage/' + d).then(u => ({day: d, users: u || {}})).catch(() => ({day: d, users: {}}))));
+    const act = new Set(); got.forEach(g => Object.keys(g.users).forEach(u => act.add(u)));
+    const per = new Map();
+    got.forEach(g => Object.entries(g.users).forEach(([uid, c]) => Object.entries(c || {}).forEach(([id, n]) => {
+      if (typeof n !== 'number') return; const r = per.get(id) || {users: new Set(), taps: 0}; r.users.add(uid); r.taps += n; per.set(id, r);
+    })));
+    const rows = [...per.entries()].map(([id, r]) => ({id, name: USAGE_NAMES[id] || id, users: r.users.size, taps: r.taps})).sort((a, b) => b.users - a.users || b.taps - a.taps);
+    const unused = Object.keys(USAGE_NAMES).filter(id => !per.has(id));
+    const total = act.size;
+    if (!total) { box.innerHTML = 'За этот период данных нет. Игроки отправляют их раз в несколько минут и при закрытии игры; если пусто совсем, проверьте, что правила базы из docs/firebase-rules.json опубликованы (раздел usage).'; return; }
+    const bar = (v, max) => `<span style="display:inline-block;height:6px;width:${Math.max(3, 120 * v / max)}px;background:var(--accent);border-radius:3px;vertical-align:middle"></span>`;
+    const table = list => `<table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="text-align:left;color:var(--muted)"><th>Что</th><th>Игроков</th><th>Доля</th><th>Нажатий</th></tr>${list.map(r => `<tr style="border-top:1px solid var(--border)"><td style="padding:5px 4px">${r.name}${USAGE_NAMES[r.id] ? '' : ' <small style="color:var(--muted)">(не в списке)</small>'}</td><td>${r.users}</td><td>${bar(r.users, total)} ${Math.round(100 * r.users / total)}%</td><td>${r.taps}</td></tr>`).join('')}</table>`;
+    const screens = rows.filter(r => r.id.startsWith('screen:')), buttons = rows.filter(r => !r.id.startsWith('screen:'));
+    box.innerHTML = `<p style="margin-bottom:10px">Активных игроков за период: <b style="color:var(--fg)">${total}</b>. «Доля» — какая часть из них хоть раз этим пользовалась.</p>`
+      + `<h4 style="margin:10px 0 4px">Экраны</h4>${table(screens)}`
+      + `<h4 style="margin:14px 0 4px">Кнопки и функции — от самых нужных</h4>${table(buttons.slice(0, 40))}`
+      + `<h4 style="margin:14px 0 4px">Реже всего (кандидаты на упрощение)</h4>${table(buttons.slice(-10).reverse())}`
+      + `<h4 style="margin:14px 0 4px">Не нажимал никто за период (${unused.length})</h4><div>${unused.map(id => `<span class="chip" style="display:inline-block;margin:2px;padding:2px 8px;border:1px solid var(--border);border-radius:8px">${USAGE_NAMES[id]}</span>`).join('') || '—'}</div>`;
+  } catch (e) { box.textContent = 'Не удалось загрузить: ' + e.message; }
+}
+document.querySelectorAll('[data-usage-days]').forEach(b => { b.onclick = () => { usageDays = +b.dataset.usageDays; loadUsage(); }; });
+function refreshAll() { loadUsage(); loadVersions(); loadMaint(); loadUpdatePolicy(); loadPin(); loadStats(); loadFeedback(); loadNameSuggestions(); loadPlayers(); }
 if (auth) afterSignIn();
 </script>
 </body>

@@ -1201,7 +1201,7 @@ html.tutoring #mrow .skip{display:none}
 
 .goldrow{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.goldrow span{display:flex;flex-direction:column;align-items:center;padding:8px 2px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--line);font-size:16px}.goldrow b{font:800 13px var(--f-display);color:var(--brass)}
 
-.modecards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.modecards{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 
 .mcard{display:flex;flex-direction:column;align-items:center;gap:3px;padding:12px 6px;border-radius:16px;border:1.5px solid var(--line);background:rgba(255,255,255,.04);color:var(--ink);cursor:pointer;text-align:center}
 
@@ -5067,3 +5067,266 @@ html.app .screen.scroll{--sp:var(--it,0px);padding-top:0}/* the status-bar gap i
   50% { transform: scale(1.18); }
   100% { transform: scale(1.05); }
 }
+
+/* Emoji and phrases for sale (shop «Эмодзи и фразы») and locked ones in «Мои предметы» */
+.rshop{display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
+.rs-head{display:flex;justify-content:space-between;align-items:center;font:700 13px var(--f-body);color:var(--ink)}
+.rs-cnt{font-size:11px;font-weight:700;padding:3px 9px;border-radius:9px;background:rgba(255,255,255,.07);color:var(--muted)}
+.rs-cnt.full{background:linear-gradient(135deg,#f2b84b,#f2994a);color:#1d2233}
+.rs-grid{display:grid;gap:7px}
+.rs-grid.emote{grid-template-columns:repeat(auto-fill,minmax(64px,1fr))}
+.rs-grid.phrase{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.rs-item{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:9px 6px 7px;border-radius:14px;background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.025));border:1.2px solid rgba(255,255,255,.1);color:var(--ink);cursor:pointer;transition:transform .15s,border-color .15s;min-width:0}
+.rs-item:active{transform:scale(.95)}
+.rs-item .rs-em{font-size:28px;line-height:1.1}
+.rs-item .rs-ph{font:600 12px var(--f-body);line-height:1.25;text-align:center;min-height:30px;display:flex;align-items:center}
+.rs-item .rs-rar{font:700 9px var(--f-body);letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
+.rs-item .rs-price{font:800 12px var(--f-body);color:#f2b84b;display:flex;align-items:center;gap:3px}
+.rs-item.r-rare{border-color:rgba(76,141,255,.55);box-shadow:inset 0 0 18px rgba(76,141,255,.12)}
+.rs-item.r-rare .rs-rar{color:#8fb6ff}
+.rs-item.r-epic{border-color:rgba(176,108,240,.65);box-shadow:inset 0 0 20px rgba(176,108,240,.16)}
+.rs-item.r-epic .rs-rar{color:#cfa3ff}
+.rs-item.poor{opacity:.55}
+.rs-note{color:var(--muted);font-size:11px}
+.rs-done{padding:12px;border-radius:14px;text-align:center;background:rgba(242,184,75,.1);border:1px solid rgba(242,184,75,.35);color:#f2b84b;font:700 13px var(--f-body)}
+.em-cat-btn.lockd{opacity:.62;filter:saturate(.55)}
+.em-cat-btn.lockd .em-icon{filter:grayscale(.5)}
+.em-cat-btn .em-badge.lock{background:rgba(0,0,0,.45);font-size:8px}
+.em-cat-btn .em-price{position:absolute;bottom:2px;left:0;right:0;text-align:center;font:800 9px var(--f-body);color:#f2b84b}
+.ph-cat-btn.lockd{opacity:.65}
+.ph-cat-btn .ph-badge.lock{color:#f2b84b;display:flex;align-items:center;gap:3px}
+.rs-item .rs-earn{font:600 9px var(--f-body);color:#8fd18a;text-align:center;line-height:1.2}
+
+/* =====================================================================================================
+   Minimal pass («тихий стол»): one surface, one hairline, one gold call to action per screen. No skew, no double
+   shadows, no glows; the board is the brightest thing on the game screen. Everything here only overrides looks
+   (colour, border, shadow, transform), never layout or behaviour. Tokens: */
+:root{--m-surface:rgba(255,255,255,.045);--m-surface-2:rgba(255,255,255,.075);--m-line:rgba(226,232,255,.09);--m-r:16px;--m-gold:#f2b84b}
+
+/* main menu: flat action row, quiet cards, a calm bottom bar */
+html body .tile-btn,html body .tile-btn .btn-tilt-inner{transform:none}
+html body .tile-btn{border-radius:var(--m-r);transition:transform .15s ease,background .15s ease}
+html body .tile-btn:hover{transform:none;filter:none}
+html body .tile-btn:active{transform:scale(.97)}
+html body .tile-btn.tile-quest,html body .tile-btn.tile-mode{background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none;color:var(--ink)}
+html body .tile-btn.tile-quest:hover,html body .tile-btn.tile-mode:hover{background:var(--m-surface-2);box-shadow:none}
+html body .tile-btn.tile-play{background:linear-gradient(180deg,#f6c565,#eeae3c);border:0;box-shadow:0 8px 22px rgba(242,184,75,.22);color:var(--brass-ink)}
+html body .tile-btn.tile-play:hover{box-shadow:0 8px 22px rgba(242,184,75,.28)}
+html body .menu-rating-card,html body .menu-gift-pill,html body .resume{background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none;backdrop-filter:none}
+html body .menu-gift-pill{border-color:rgba(242,184,75,.32)}
+html body .menu-gift-pill *,html body .menu-rating-card *{text-shadow:none}
+html body .mtop-rank-btn,html body .menu-hub-btn,html body #mprof{background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none}
+html body .mhub-tilt{transform:none}
+html body .logo{text-shadow:none;filter:none}
+html body .bnav{filter:none;gap:2px;padding:5px;border-radius:20px;background:rgba(12,17,32,.9);border:1px solid var(--m-line);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+html body .bnav button{transform:none;background:transparent;border:0;box-shadow:none;border-radius:15px;color:var(--muted)}
+html body .bnav button svg,html body .bnav button span{transform:none}
+html body .bnav button:hover{transform:none;box-shadow:none;background:var(--m-surface);color:var(--ink)}
+html body .bnav button:active{transform:scale(.96);box-shadow:none}
+html body .bnav button.on{background:rgba(242,184,75,.14);border:0;box-shadow:none;color:var(--m-gold)}
+html body .bnav button.on svg{color:var(--m-gold)}
+
+/* cards and headers on the other screens */
+html body .ocard{box-shadow:0 18px 48px rgba(0,0,0,.5)}
+html body .ltop .iconbtn,html body .gtop .iconbtn{background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none}
+
+/* game screen: the board first — a calm night table, the tools in one quiet column, flat player chips */
+html body #scr-game{background-image:none;background-color:#0f1626}
+html body .board{background:radial-gradient(75% 60% at 50% 46%,#1c2944 0%,#121b2f 62%,#0e1524 100%)}
+html body .village-backdrop{display:none}
+html body .relic-name{display:none}
+html body .fabs{gap:2px;padding:4px;border-radius:18px;background:rgba(12,17,32,.72);border:1px solid var(--m-line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+html body .fabs .fab{background:transparent;border:0;box-shadow:none;color:var(--muted);border-radius:13px}
+html body .fabs .fab:hover{background:var(--m-surface-2);color:var(--ink)}
+html body .fabs .fab:active{transform:scale(.94)}
+html body .pl{background:var(--m-surface);border:1px solid transparent;box-shadow:none}
+html body .pl.active{background:rgba(242,184,75,.1);border:1.5px solid var(--m-gold);box-shadow:none}
+html body .deck{background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none}
+html body .tray{background:linear-gradient(180deg,rgba(15,22,38,0),#0f1626 32%);border-top:0}
+html body #status{background:transparent;border-color:transparent;color:var(--muted)}
+html body #rot{background:var(--m-surface);border:1px solid var(--m-line)}
+/* the free spots for a move: a light outline in the player's colour, a faint tint, a small plus */
+html body .slot{border-width:1.5px;background:rgba(255,255,255,.03)}
+html body .slot::before{opacity:.1}
+html body .slot::after{width:16px;height:16px;opacity:.75}
+/* the stack counter: a quiet chip like the rest of the top bar */
+html body .deck{background:var(--m-surface)}
+/* no parallelograms: cards, badges and buttons stand straight (and their contents need no counter-skew) */
+html body .dsh-badge,html body .dsh-badge span,html body .dsh-tile-card,html body .dsh-tile-inner,
+html body .rank-top-btn,html body .rank-top-btn svg,html body .menu-hub-btn,html body .menu-hub-btn .mhub-tilt,
+html body .tile-lead-card,html body .tile-lead-card .av,html body .tile-lead-card .lead-cups-badge,html body .tile-lead-card .lead-player-info,
+html body .tile-lead-card .rank-num,html body .tile-lead-card .st-rank-badge,html body .pod,html body .pod > *,
+html body .pim-card,html body .pim-card > *,html body #scr-shop .gift,html body #scr-shop .gift > *,
+html body #scr-shop .stcustom,html body #scr-shop .stcustom > *,html body #scr-shop .loc,html body #scr-shop .loc > *{transform:none}
+html body .dsh-tile-card:hover,html body .tile-lead-card:hover,html body .pod:hover,html body .pim-card:hover,html body .menu-hub-btn:hover,html body .rank-top-btn:hover{transform:translateY(-1px)}
+html body .dsh-tile-card:active,html body .tile-lead-card:active,html body .pim-card:active,html body .rank-top-btn:active{transform:scale(.98)}
+html body .dsh-tile-card,html body .pim-card,html body #scr-shop .gift{box-shadow:none;border:1px solid var(--m-line);background:var(--m-surface)}
+html body .dsh-tile-card .dsh-price,html body .dsh-tile-card button{box-shadow:none}
+html body .dsh-btn{box-shadow:none;border:0;border-radius:12px}
+html body .dsh-btn.buy{background:rgba(242,184,75,.16);color:var(--m-gold)}
+html body .dsh-btn.buy.poor{background:var(--m-surface);color:var(--muted)}
+/* main menu header: the nickname gets the room — the menu is a ⋯ icon, cups and gold sit on the level line */
+html body .mtop{gap:8px}
+html body .mtop-right-group{gap:6px;flex:0 0 auto}
+html body #btnMenuHub{width:40px;min-width:40px;height:40px;padding:0;justify-content:center}
+html body #btnMenuHub .mhub-tilt{display:flex;align-items:center;justify-content:center;gap:0}
+html body #btnMenuHub .mhub-tilt > span{display:none}
+html body .mprof{flex:1 1 auto;max-width:none;min-width:0;padding-right:16px}
+html body .mprof .mpi{flex:1 1 auto;min-width:0}
+html body .mprof .mpi b{font-size:clamp(12px,3.6vw,15px);overflow:visible;text-overflow:clip}
+html body .mprof .mpl{gap:8px;flex-wrap:nowrap}
+html body .mprof .mxp{width:28px;flex:0 0 28px}
+html body .mprof .mpl .mpc,html body .mprof .mpl .mpg{font-size:11.5px}
+html body .mprof .mpi b{overflow:hidden;white-space:nowrap}
+
+/* quests: the daily swap button; achievements: the medal of their tier */
+html body .quest .qre{flex:0 0 auto;width:30px;height:30px;border-radius:10px;border:1px solid var(--m-line);background:var(--m-surface);color:var(--muted);font:700 15px var(--f-body);cursor:pointer}
+html body .quest .qre:hover{color:var(--ink);background:var(--m-surface-2)}
+html body .quest[class*="tier-"] .qi{position:relative}
+html body .quest[class*="tier-"] .qi::after{content:"";position:absolute;right:-3px;bottom:-3px;width:11px;height:11px;border-radius:50%;border:1.5px solid #0f1626}
+html body .quest.tier-bronze .qi::after{background:linear-gradient(135deg,#f0b48a,#b06a3b)}
+html body .quest.tier-silver .qi::after{background:linear-gradient(135deg,#ffffff,#a9b4c6)}
+html body .quest.tier-gold .qi::after{background:linear-gradient(135deg,#fff1b8,#e0a52f)}
+
+/* daily showcase: emoji cards and the «all bought» note */
+html body .dsh-emote{display:block;font-size:40px;line-height:1.15;text-align:center}
+html body .dsh-tag.k-emote{background:rgba(242,184,75,.16);color:var(--m-gold)}
+html body .dsh-tile-card.k-emote.r-rare{border-color:rgba(76,141,255,.5)}
+html body .dsh-tile-card.k-emote.r-epic{border-color:rgba(176,108,240,.6)}
+html body .dsh-empty{padding:18px 14px;border-radius:14px;text-align:center;color:var(--muted);background:var(--m-surface);border:1px dashed var(--m-line)}
+
+/* profile: the card stacks (who → level → chips → account), wherever it is shown; quiet entry cards */
+html body #profile{display:flex;flex-direction:column;align-items:stretch;gap:12px;text-align:left;background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none}
+html body #profile .pctop{min-width:0}
+html body #profile .pwho small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;word-break:normal}
+html body #profile .pclvl .pi{min-width:0}
+html body #profile .pclvl small{display:block;white-space:normal}
+html body #scr-profile .tutcard.itemsentry,html body #scr-profile .tutcard.historyentry{background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none;color:var(--ink)}
+html body #scr-profile .tutcard.historyentry b,html body #scr-profile .tutcard.historyentry small,html body #scr-profile .tutcard.historyentry .tgo{color:inherit}
+html body #scr-profile .tutcard.historyentry small{color:var(--muted)}
+html body #scr-profile .pstats{background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none}
+
+/* no relics, bonuses or scout on the map */
+html body .fog-relic,html body .scout-radar-wave{display:none!important}
+
+/* ===== main screen header: plate (who, level, experience), trophies and gold under it, the menu pops out under its button ===== */
+html body .mtop{align-items:flex-start;gap:10px}
+html body .mleft{display:flex;flex-direction:column;gap:8px;min-width:0;flex:1 1 auto}
+html body .mprof{display:flex;align-items:center;gap:11px;width:100%;max-width:none;height:auto;min-height:56px;padding:7px 14px 7px 7px;border-radius:18px;text-align:left}
+html body .mprof .av{flex:0 0 auto;width:42px;height:42px;font-size:18px}
+html body .mprof .mpi{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:3px}
+html body .mprof .mpi b{font:800 clamp(13px,3.8vw,16px)/1.1 var(--f-display);color:#fff}
+html body .mprof .mpl{display:flex;align-items:baseline;justify-content:space-between;gap:8px;white-space:nowrap}
+html body .mprof .mpl em{font:700 11.5px var(--f-body);font-style:normal;color:var(--m-gold)}
+html body .mprof .mpl small{font:600 11px var(--f-body);color:var(--muted);font-variant-numeric:tabular-nums}
+html body .mprof .mxp{display:block;width:100%;height:6px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden}
+html body .mprof .mxp i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#f6c565,#f2b84b)}
+html body .mstat{display:flex;gap:6px;padding-left:2px}
+html body .mstat button{display:flex;align-items:center;gap:5px;height:30px;padding:0 11px;border-radius:999px;background:var(--m-surface);border:1px solid var(--m-line);color:var(--ink);font:700 13px var(--f-body);cursor:pointer;font-variant-numeric:tabular-nums}
+html body .mstat button small{color:var(--muted);font:600 11px var(--f-body)}
+html body .mstat button i{color:var(--muted);font-style:normal;margin-left:1px}
+html body .mstat button .coin{width:14px;height:14px;margin:0}
+html body .mstat button:hover{background:var(--m-surface-2)}
+html body .mstat button:active{transform:scale(.97)}
+html body .mhub-wrap{position:relative}
+html body .mhub-pop{position:absolute;right:0;top:calc(100% + 8px);z-index:30;min-width:210px;padding:6px;border-radius:16px;background:rgba(14,20,38,.97);border:1px solid var(--m-line);box-shadow:0 14px 36px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:2px;opacity:0;transform:translateY(-6px) scale(.98);transform-origin:top right;transition:opacity .15s ease,transform .15s ease;pointer-events:none}
+html body .mhub-pop.open{opacity:1;transform:none;pointer-events:auto}
+html body .mhub-pop[hidden]{display:none}
+html body .mhub-pop button{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-radius:11px;background:transparent;border:0;color:var(--ink);font:600 14px var(--f-body);text-align:left;cursor:pointer}
+html body .mhub-pop button:hover,html body .mhub-pop button:focus-visible{background:var(--m-surface-2);outline:none}
+html body .mhub-pop button span{width:22px;text-align:center}
+html body .mhub-pop button b{flex:1;font-weight:600}
+html body .mhub-pop button i{font-style:normal;color:var(--muted);font-size:12.5px;font-variant-numeric:tabular-nums}
+
+/* ===== progress road: its own tab, vertical ===== */
+html body .rd-head{display:flex;align-items:center;gap:14px;padding:14px;border-radius:18px;background:var(--m-surface);border:1px solid var(--m-line)}
+html body .rd-lvl{flex:0 0 auto;width:62px;height:62px;border-radius:50%;display:grid;place-content:center;text-align:center;border:3px solid var(--m-gold)}
+html body .rd-lvl b{font:800 24px/1 var(--f-display)}
+html body .rd-lvl small{font:600 9.5px var(--f-body);color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+html body .rd-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+html body .rd-info > b{font:800 15px var(--f-display)}
+html body .rd-info small{color:var(--muted);font-size:12px}
+html body .rd-next{margin:12px 2px 6px;color:var(--muted);font-size:13px}
+html body .rd-next b{color:var(--ink)}
+/* the map */
+html body .rd-map{position:relative;margin:6px -2px 0;border-radius:20px;overflow:hidden;border:1px solid var(--m-line);
+  background:radial-gradient(60px 50px at 20% 12%,rgba(40,90,25,.2),transparent 70%),radial-gradient(80px 60px at 78% 38%,rgba(200,230,120,.16),transparent 70%),radial-gradient(70px 60px at 30% 70%,rgba(40,90,25,.18),transparent 70%),radial-gradient(90px 70px at 74% 88%,rgba(200,230,120,.14),transparent 70%),linear-gradient(160deg,#80be56,#62a242)}
+html body .rd-svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+html body .rd-spr{position:absolute;background-size:100% 100%;background-repeat:no-repeat;transform:translate(-50%,-100%);pointer-events:none}
+html body .rd-bridge{position:absolute;width:54px;height:30px;transform:translate(-50%,-50%) rotate(calc(var(--a,0deg) + 90deg));border-radius:4px;background:repeating-linear-gradient(90deg,#a06a3a 0 5px,#7d4f28 5px 6px);border:2px solid #4b2f18;box-shadow:0 3px 6px rgba(0,0,0,.35);pointer-events:none}
+html body .rd-bridge::before,html body .rd-bridge::after{content:"";position:absolute;left:-2px;right:-2px;height:4px;background:#5a3a20;border-radius:2px}
+html body .rd-bridge::before{top:-5px}
+html body .rd-bridge::after{bottom:-5px}
+html body .rd-n{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:4px;width:160px;pointer-events:none}
+html body .rd-n > *{pointer-events:auto}
+html body .rd-sign{position:absolute;bottom:calc(100% - 6px);left:50%;transform:translateX(-50%);width:max-content;max-width:158px;padding:5px 9px;border-radius:10px;text-align:center;background:rgba(14,20,38,.9);border:1px solid var(--m-line);box-shadow:0 4px 10px rgba(0,0,0,.3);pointer-events:none}
+html body .rd-sign b{display:block;font:700 12.5px/1.2 var(--f-body);color:var(--ink)}
+html body .rd-sign small{display:block;font:500 10.5px/1.25 var(--f-body);color:var(--muted)}
+html body .rd-med{position:relative;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;font-size:25px;background:radial-gradient(circle at 35% 30%,#fff6d8,#e7d3a0 60%,#bda673);border:4px solid #7a5c32;box-shadow:0 5px 10px rgba(0,0,0,.4),inset 0 -3px 0 rgba(0,0,0,.12)}
+html body .rd-med em{position:absolute;top:-8px;left:-8px;min-width:22px;height:22px;padding:0 5px;border-radius:11px;display:grid;place-items:center;font:800 12px var(--f-display);font-style:normal;background:#0f1626;color:#fff;border:2px solid #f2b84b}
+html body .rd-n.locked .rd-med{filter:grayscale(.85) brightness(.85);opacity:.9}
+html body .rd-n.claimed .rd-med{background:radial-gradient(circle at 35% 30%,#fff1b8,#f2c14e 60%,#c8901f);border-color:#8f5807;font-size:23px;font-weight:800;color:#3a2403}
+html body .rd-n.unlocked .rd-med{border-color:#f2b84b;box-shadow:0 0 0 5px rgba(242,184,75,.35),0 5px 10px rgba(0,0,0,.4)}
+html body .rd-n .rd-tag{padding:2px 9px;border-radius:999px;background:rgba(14,20,38,.82);color:var(--muted);font:600 11px var(--f-body);white-space:nowrap}
+html body .rd-n.claimed .rd-tag{color:#9fe3b4}
+html body .rd-n .chip{box-shadow:0 3px 8px rgba(0,0,0,.35)}
+@media (prefers-reduced-motion:no-preference){html body .rd-n.unlocked .rd-med{animation:rdpulse 1.8s ease-in-out infinite}@keyframes rdpulse{50%{box-shadow:0 0 0 9px rgba(242,184,75,.16),0 5px 10px rgba(0,0,0,.4)}}}
+
+/* header fixes: the experience bar is a thin line, the menu list does not wrap */
+html body .mprof .mxp{flex:0 0 auto;height:5px}
+html body .mhub-pop{min-width:232px}
+html body .mhub-pop button b{white-space:nowrap}
+
+/* ===== notifications and rewards: smaller, quieter ===== */
+/* toasts: a small straight chip under the top bar, one line of text, no skew or heavy shadow */
+html body .tile-toast,html body .note{transform:none;transform-origin:top right;top:max(58px,calc(env(safe-area-inset-top,0px) + 52px));right:12px;min-width:0;max-width:min(260px,calc(100vw - 24px));padding:6px 10px;gap:7px;border-radius:12px;background:rgba(14,20,38,.94);border:1px solid var(--m-line);box-shadow:0 6px 18px rgba(0,0,0,.35);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+html body .tile-toast .tt-body,html body .tile-toast .tt-icon,html body .tile-toast .tt-title,html body .tile-toast .tt-msg,html body .tile-toast .tt-close,html body .note i,html body .note span{transform:none}
+html body .tile-toast .tt-title{font-size:10px;letter-spacing:.06em;opacity:.7}
+html body .tile-toast .tt-msg,html body .note span{font:600 12.5px/1.25 var(--f-body)}
+html body .tile-toast .tt-icon,html body .note i{width:22px;height:22px;font-size:12px;border-radius:7px;box-shadow:none}
+html body .tile-toast.ok .tt-icon,html body .note.ok i{background:rgba(63,194,122,.2);color:#6fe0a2}
+/* the inbox: compact rows instead of big cards */
+html body .notif-card{padding:10px 12px 10px 14px;border-radius:14px;gap:6px;background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none}
+html body .notif-card::before{width:3px}
+html body .nc-icon{font-size:18px;width:30px;height:30px}
+html body .nc-title{font-size:13.5px;line-height:1.25}
+html body .nc-badge{font-size:9.5px;padding:1px 6px}
+html body .nc-date{font-size:10.5px}
+html body .nc-desc{font-size:12px;line-height:1.35;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+html body .nc-reward-pill{font-size:11.5px;padding:2px 8px}
+html body .nc-claim-btn{padding:7px 12px;font-size:12.5px;border-radius:11px;box-shadow:none}
+html body .nc-claim-btn.pri{background:var(--m-gold);color:var(--brass-ink)}
+html body .nc-actions{gap:6px}
+/* toasts sit above the bottom bar, out of the way of the header */
+html body .tile-toast,html body .note{top:auto;bottom:calc(86px + var(--ib,0px));right:12px}
+
+/* the consent line under the sign-up buttons */
+html body .legal{display:block;margin:2px 0 10px;color:var(--muted);font:500 11px/1.4 var(--f-body);text-align:center}
+html body .legal a{color:#8db4ff;text-decoration:underline;word-break:normal}
+.mgrid .mcard:last-child:nth-child(odd){grid-column:1/-1}
+
+/* the consent window: the short reason first, the exact list one tap away */
+html body .ocard details.more{margin:2px 0 12px;text-align:left}
+html body .ocard details.more summary{cursor:pointer;color:#8db4ff;font:600 13px var(--f-body);text-align:center;list-style:none}
+html body .ocard details.more p{margin:8px 0 0;font-size:12.5px;line-height:1.45;color:var(--muted)}
+html body .ocard details.more a{color:#8db4ff}
+
+/* ---- Classic 2.0: six-sided tiles (rules.mode 'hex', html.hexg while such a game is on). A tile is 101.6 x 88 px
+   (corner to corner x side to side, T = 88); the face is clipped to the hexagon, six walls hang from its sides. ---- */
+.tile.hex{width:101.61px;height:88px}
+.tile.hex .face{inset:0;border-radius:0;box-shadow:none;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)}
+.tile.hex .sd{position:absolute;height:14px;transform-origin:0 0;background:linear-gradient(#5f9a3e 0,#5f9a3e 2.5px,#8a6a40 3px,#6f5232 55%,#4a3520 100%)}
+.tile.hex .sd.h0,.tile.hex .sd.h1,.tile.hex .sd.h5{filter:brightness(1.12)}
+.tile.hex .sd.h2,.tile.hex .sd.h4{filter:brightness(.9)}
+.tile.hex .sd.fall::before{left:calc(50% - 6.5px);width:13px;top:0;bottom:0;right:auto;height:auto}
+.tile.hex .sd.fall::after{left:calc(50% - 11px);width:22px;bottom:-4px;height:8px;top:auto;right:auto}
+html.lowgfx .tile.hex .sd.h0,html.lowgfx .tile.hex .sd.h1,html.lowgfx .tile.hex .sd.h5{display:none}
+.tile.hex.ghost .face,.tile.hex.peek .face{box-shadow:none}
+.tile.hex.ghost::before,.tile.hex.peek::before{content:"";position:absolute;inset:-4px -4.6px;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);background:var(--pc,var(--brass));opacity:.85}
+.tile.hex.glow .face{box-shadow:none;filter:brightness(1.3) saturate(1.15) drop-shadow(0 0 6px #ffe08a)}
+.slot.hex{width:101.61px;border:none;border-radius:0;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);background:color-mix(in srgb,var(--pc,#f2b84b) 22%,rgba(0,0,0,.2))}
+.slot.hex::before{inset:4px;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);border-radius:0;opacity:.18}
+.slot.hex.tip{border:none;background:rgba(255,215,94,.4)}
+html.hexg .ct{width:84px;height:73px;border-radius:0;box-shadow:none;filter:drop-shadow(0 0 2px var(--c,transparent)) drop-shadow(0 10px 8px rgba(0,0,0,.5))}
+html.hexg .ct .face{border-radius:0;box-shadow:none;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)}
+html.hexg .ct::after{display:none}

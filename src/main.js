@@ -4,6 +4,7 @@ import {TYPES, normEdge, rareName, deckList, isRareTile} from './engine/tiles.js
 import * as board from './engine/board.js';
 import * as scoring from './engine/scoring.js';
 import * as bots from './engine/bots.js';
+import * as hex from './engine/hex.js';
 import {createSound} from './audio/sound.js';
 import {walletSig, loadWallet, storeWallet} from './state/wallet.js';
 import * as progress from './state/progress.js';
@@ -11,6 +12,8 @@ import * as catalog from './state/catalog.js';
 import * as status from './state/status.js';
 import * as config from './state/config.js';
 import * as save from './state/save.js';
+import * as reactions from './state/reactions.js';
+import * as usage from './state/usage.js';
 import {createArt} from './render/art.js';
 import {createFirebase} from './net/firebase.js';
 import * as friends from './net/friends.js';
@@ -39,10 +42,10 @@ import * as turns from './game/turns.js';
 import * as timers from './game/timers.js';
 import * as tutorial from './game/tutorial.js';
 
-export const engine = {rng, hash, TYPES, normEdge, rareName, deckList, isRareTile, board, scoring, bots};
+export const engine = {rng, hash, TYPES, normEdge, rareName, deckList, isRareTile, board, scoring, bots, hex};
 
 export const audio = {createSound};
-export const state = {walletSig, loadWallet, storeWallet, progress, catalog, config, status, save};
+export const state = {walletSig, loadWallet, storeWallet, progress, catalog, config, status, save, reactions, usage};
 export const render = {createArt};
 export const net = {createFirebase, friends, presence, rooms, matchmaking};
 export const app = {web, update, telegram};

@@ -21,11 +21,12 @@ if (gsFile.exists()) {
 
 android {
     namespace 'com.crownfall.mosaic'
-    compileSdk 35
+    // Google Play requires targetSdk 36 (Android 16) for new apps and updates since 31.08.2026.
+    compileSdk 36
     defaultConfig {
         applicationId 'app.crownfall.tiletopia'
         minSdk 24
-        targetSdk 35
+        targetSdk 36
         versionCode vc
         versionName "1.0.${vc}"
         buildConfigField 'String', 'GOOGLE_CLIENT_ID', '"' + googleClientId + '"'

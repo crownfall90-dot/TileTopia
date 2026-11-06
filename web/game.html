@@ -33,7 +33,10 @@
       <section class="screen" id="scr-menu" hidden>
         <div class="mtop">
           <button class="iconbtn" data-go="history" aria-label="История партий" hidden style="display:none"></button>
-          <button class="mprof" id="mprof" data-go="profile" aria-label="Профиль, уровень и золото"></button>
+          <div class="mleft">
+            <button class="mprof" id="mprof" data-go="profile" aria-label="Профиль, уровень и опыт"></button>
+            <div class="mstat" id="mstat"></div>
+          </div>
           <div class="mtop-right-group">
             <button class="mtop-rank-btn notif-bell-btn" id="btnMenuNotif" data-go="inbox" aria-label="Уведомления и награды" title="Уведомления">
               <span class="nb-icon">
@@ -44,37 +47,30 @@
                 <i class="notif-badge-dot" id="notifDot" hidden></i>
               </span>
             </button>
-            <button class="mtop-rank-btn" id="btnMenuRating" data-go="rating" aria-label="Рейтинг игроков" title="Рейтинг игроков"><span style="font-size:18px">🏆</span></button>
-            <button class="menu-hub-btn" id="btnMenuHub" aria-label="Меню" title="Меню">
-              <span class="mhub-tilt">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>
-                <span>Меню</span>
-              </span>
-            </button>
+            <div class="mhub-wrap">
+              <button class="menu-hub-btn" id="btnMenuHub" aria-label="Меню" aria-haspopup="menu" aria-expanded="false" title="Меню">
+                <span class="mhub-tilt">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>
+                  <span>Меню</span>
+                </span>
+              </button>
+              <div class="mhub-pop" id="mhubPop" role="menu" hidden>
+                <button role="menuitem" data-hub-action="rating"><span>🏆</span><b>Рейтинг игроков</b><i id="mhubCups"></i></button>
+                <button role="menuitem" data-hub-action="rules"><span>📖</span><b>Как играть</b></button>
+                <button role="menuitem" data-hub-action="history"><span>📜</span><b>История партий</b></button>
+                <button role="menuitem" data-hub-action="settings"><span>⚙️</span><b>Настройки</b></button>
+              </div>
+            </div>
           </div>
         </div>
         <div class="hero"><div class="mini" id="mini"></div></div>
         <div class="mbody">
           <h2 class="logo">Tile<span>topia</span></h2>
-          <p class="tag">Стройте города, дороги и крепости</p>
-          <button class="menu-rating-card" id="btnMenuRatingCard" data-go="rating" aria-label="Рейтинг игроков">
-            <div class="mrc-left">
-              <span class="mrc-icon">🏆</span>
-              <div class="mrc-info">
-                <b class="mrc-title">Рейтинг игроков</b>
-                <small class="mrc-sub" id="menuRatingSub">Лига · Сезон 1 · Топ-20</small>
-              </div>
-            </div>
-            <div class="mrc-right">
-              <span class="mrc-badge" id="menuRatingBadge">🏆 <b class="cupsN">0</b></span>
-              <i class="tgo">›</i>
-            </div>
-          </button>
+          <p class="tag">Стройте города, дороги и монастыри</p>
           <button class="menu-gift-pill" id="menuGiftPill" aria-label="Открыть ежедневный подарок" hidden>
             <span class="mgp-ic">🎁</span>
             <span class="mgp-tx"><b>Подарок готов!</b><small>Три сундука удачи</small></span>
           </button>
-          <button class="resume" id="resume" hidden><span class="ric"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l10.5-6.5z"/></svg></span><span class="rtx"><b>Продолжить партию</b><small id="resumeInfo"></small></span></button>
           <div class="menu-action-row compact-action-row">
             <button class="tile-btn tile-quest" id="menuQuestBanner" aria-label="Ежедневные задания">
               <span class="btn-tilt-inner">
@@ -110,6 +106,9 @@
           <!-- Daily 6-Item Showcase in Tile Style -->
           <div id="dailyShopWrap"></div>
 
+          <div class="h3">Эмодзи и фразы</div>
+          <div id="reactShop"></div>
+
           <div class="h3">Свой статус</div>
           <div class="stcustom"><input class="field" id="stInput" maxlength="15" placeholder="Свой статус (до 15)" autocomplete="off"><button class="cta" id="stBuy">3000 <i class="coin"></i></button></div>
           
@@ -141,6 +140,8 @@
             <button class="srow btn" id="checkUpd"><span class="sic">🔄</span><span class="stx"><b>Проверить обновления</b></span><span class="sgo">›</span></button>
             <button class="srow btn" id="delAccBtn"><span class="sic">🗂️</span><span class="stx"><b>Аккаунт и данные</b><small>Управление данными и удаление аккаунта</small></span><span class="sgo">›</span></button>
             <a class="srow btn" href="https://crownfall90-dot.github.io/TileTopia/privacy.html" target="_blank" rel="noopener"><span class="sic">🔒</span><span class="stx"><b>Политика конфиденциальности</b></span><span class="sgo">›</span></a>
+            <a class="srow btn" href="https://crownfall90-dot.github.io/TileTopia/terms.html" target="_blank" rel="noopener"><span class="sic">📄</span><span class="stx"><b>Пользовательское соглашение</b><small>English: Terms of Use, Privacy Policy — на сайте игры</small></span><span class="sgo">›</span></a>
+            <a class="srow btn" href="https://crownfall90-dot.github.io/TileTopia/licenses.html" target="_blank" rel="noopener"><span class="sic">©</span><span class="stx"><b>Сторонние материалы</b></span><span class="sgo">›</span></a>
             <button class="srow btn" id="devBtn" hidden><span class="sic">📣</span><span class="stx"><b>Панель владельца</b></span><span class="sgo">›</span></button>
           </div>
           <p class="shint scenter">Tiletopia</p>
@@ -181,25 +182,7 @@
         <div class="lb">
           <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Задания и Прогресс</b></div>
 
-          <div class="road-container" id="progressRoadWrap">
-            <div class="road-header">
-              <div class="road-title-row">
-                <span class="road-badge-ic">⭐</span>
-                <div>
-                  <b class="road-title">Дорога прогресса</b>
-                  <small class="road-sub" id="roadSub">Побеждайте и забирайте награды</small>
-                </div>
-              </div>
-              <div class="road-stat-chip">
-                <span id="roadCurrentRank">🏆 0</span>
-              </div>
-            </div>
-            <div class="road-track-scroll">
-              <div class="road-track" id="roadTrack"></div>
-            </div>
-          </div>
-
-          <div class="seg ptabs" id="ptabs"><button data-pt="rewards" aria-pressed="true">Награды</button><button data-pt="cols" aria-pressed="false">Коллекции</button><button data-pt="top" aria-pressed="false">Рейтинг</button></div>
+          <div class="seg ptabs" id="ptabs"><button data-pt="road" aria-pressed="true">Прогресс</button><button data-pt="rewards" aria-pressed="false">Задания</button><button data-pt="cols" aria-pressed="false">Коллекции</button></div>
           <div class="col" id="ptab"></div>
         </div>
       </section>
@@ -267,7 +250,7 @@
             <div class="h3">Подсчёт очков за завершённые объекты</div>
             <div class="hitem"><span class="rimg t-rS"></span><div><b>🛤 Дорога (Тракт)</b><p>Завершается, когда с обоих концов упирается в перекрёсток, город, монастырь или замыкается в кольцо.</p><em>1 очко за каждую плитку дороги</em></div></div>
             <div class="hitem"><span class="rimg t-c2"></span><div><b>🏰 Город</b><p>Завершается, когда крепостные стены полностью сомкнуты со всех сторон без единой бреши.</p><em>2 очка за каждую плитку города</em></div></div>
-            <div class="hitem"><span class="rimg t-fort"></span><div><b>🏯 Монастырь (Крепость)</b><p>Завершается, когда монастырь полностью окружён 8 соседними плитками (включая диагонали).</p><em>9 очков (1 очко за плитку монастыря + по 1 за каждого соседа)</em></div></div>
+            <div class="hitem"><span class="rimg t-fort"></span><div><b>⛪ Монастырь</b><p>Завершается, когда монастырь полностью окружён 8 соседними плитками (включая диагонали).</p><em>9 очков (1 очко за плитку монастыря + по 1 за каждого соседа)</em></div></div>
             <div class="hitem"><span class="rimg t-brHalf"></span><div><b>🌉 Большой каменный мост</b><p>Соедините две половины моста — дорога через него становится вдвое прибыльнее!</p><em>очки за весь тракт удваиваются (×2)</em></div></div>
             <div class="hitem"><span class="hic">⏳</span><div><b>Недостроенные объекты в финале</b><p>Когда запас плиток исчерпан, все недостроенные владения приносят половинную ценность.</p><em>по 1 очку за каждую плитку города, дороги или монастыря</em></div></div>
             <div class="h3">Награды за победу</div>
@@ -505,7 +488,6 @@
           <div class="netbad" id="netBad" hidden role="status"><i></i>Нет связи — переподключаемся…</div>
           <div class="edgeglow" id="edgeglow"></div>
           <div class="fabs">
-            <button class="fab scoutb" id="scoutBtn" aria-label="Разведка дозорного" title="Разведка дозорного"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
             <button class="fab tipb" id="tip" aria-label="Подсказка: лучший ход" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 00-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0012 3z"/></svg></button>
             <button class="fab helpb" id="helpBtn" aria-label="Очки и правила" title="Очки и правила"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.5h10a3 3 0 013 3V20H8a3 3 0 01-3-3z"/><path d="M5 17a3 3 0 013-3h10M9 8.5h5"/></svg></button>
             <button class="fab" id="zin" aria-label="Приблизить"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
@@ -535,7 +517,7 @@
           <div class="podium" id="podium"></div>
           <div class="goldres" id="goldres" hidden></div>
           <div id="rres" hidden></div>
-          <table class="bd"><thead><tr><th>Игрок</th><th>Города</th><th>Дороги</th><th>Крепости</th><th>Ходов</th><th>Всего</th></tr></thead><tbody id="bd"></tbody></table>
+          <table class="bd"><thead><tr><th>Игрок</th><th>Города</th><th>Дороги</th><th>Монастыри</th><th>Ходов</th><th>Всего</th></tr></thead><tbody id="bd"></tbody></table>
           <div class="sumline" id="sumline"></div>
           <div class="ract"><button class="cta wide" id="again">Ещё партию</button><button class="ghostbtn" data-go="menu">В меню</button></div>
         </div>
@@ -558,83 +540,13 @@
       <dl>
         <dt>Дорога</dt><dd>1 очко за карту</dd>
         <dt>Город</dt><dd>2 за карту, 1 если не достроен</dd>
-        <dt>Крепость</dt><dd>9, когда окружена 8 картами</dd>
+        <dt>Монастырь</dt><dd>9, когда окружён 8 картами</dd>
         <dt>Река</dt><dd>украшает поле, очков не даёт</dd>
       </dl>
-      <p>Соперники ходят сами — так будет выглядеть онлайн-партия. Фишка бронирует город, дорогу или крепость за хозяином. Если соперник достроит ваш объект, он поможет вам: очки получите вы.</p>
+      <p>Соперники ходят сами — так будет выглядеть онлайн-партия. Фишка бронирует город, дорогу или монастырь за хозяином. Если соперник достроит ваш объект, он поможет вам: очки получите вы.</p>
     </aside>
       
       <!-- Menu Hub Sliding Sheet / Drawer -->
-      <div class="menu-hub-backdrop" id="menuHubBackdrop" hidden>
-        <div class="menu-hub-drawer" id="menuHubDrawer" role="dialog" aria-modal="true" aria-label="Меню">
-          <div class="sheet-handle"></div>
-          <div class="sheet-header">
-            <div class="sheet-title-row">
-              <span class="sheet-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg></span>
-              <h3>Меню</h3>
-            </div>
-            <button class="sheet-close" id="btnCloseMenuHub" aria-label="Закрыть">✕</button>
-          </div>
-          <div class="sheet-modes-grid">
-            <button class="sheet-mode-card" data-hub-action="rating">
-              <div class="sm-badge sm-gold">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0011 15.9V19H7v2h10v-2h-4v-3.1c1.9-.31 3.49-1.63 4.1-3.41 2.47-.31 4.39-2.39 4.39-4.94V7c0-1.1-.9-2-2-2z"/></svg>
-              </div>
-              <div class="sm-info">
-                <div class="sm-top">
-                  <b>Рейтинг игроков</b>
-                  <span class="sm-tag gold">Лига</span>
-                </div>
-                <small>Таблица рекордов, кубки и ранги сезона</small>
-              </div>
-              <span class="sm-arrow">›</span>
-            </button>
-
-            <button class="sheet-mode-card" data-hub-action="rules">
-              <div class="sm-badge sm-blue">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 014.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17.2h.01"/></svg>
-              </div>
-              <div class="sm-info">
-                <div class="sm-top">
-                  <b>Как играть</b>
-                  <span class="sm-tag blue">Обучение</span>
-                </div>
-                <small>Правила соединения плиток и подсчет очков</small>
-              </div>
-              <span class="sm-arrow">›</span>
-            </button>
-
-            <button class="sheet-mode-card" data-hub-action="history">
-              <div class="sm-badge sm-green">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
-              </div>
-              <div class="sm-info">
-                <div class="sm-top">
-                  <b>История партий</b>
-                  <span class="sm-tag green">Статистика</span>
-                </div>
-                <small>Результаты прошедших матчей и детальный счет</small>
-              </div>
-              <span class="sm-arrow">›</span>
-            </button>
-
-            <button class="sheet-mode-card" data-hub-action="settings">
-              <div class="sm-badge sm-purple">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg>
-              </div>
-              <div class="sm-info">
-                <div class="sm-top">
-                  <b>Настройки</b>
-                  <span class="sm-tag purple">Опции</span>
-                </div>
-                <small>Звук, графика, имя игрока и аккаунт</small>
-              </div>
-              <span class="sm-arrow">›</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
       <!-- Smooth Game Modes Bottom Sheet -->
       <div class="mode-sheet-backdrop" id="modeSheetBackdrop" hidden>
         <div class="mode-sheet" id="modeSheet" role="dialog" aria-modal="true" aria-label="Режимы игры">
@@ -699,20 +611,6 @@
                   <span class="sm-tag purple">Хот-сит</span>
                 </div>
                 <small>Партия для 2–5 человек на одном экране по очереди</small>
-              </div>
-              <span class="sm-arrow">›</span>
-            </button>
-
-            <button class="sheet-mode-card" data-mode-action="duel">
-              <div class="sm-badge sm-orange">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              </div>
-              <div class="sm-info">
-                <div class="sm-top">
-                  <b>Быстрая дуэль</b>
-                  <span class="sm-tag orange">20 сек</span>
-                </div>
-                <small>Динамичная схватка 1×1 на 30 плитках с таймером</small>
               </div>
               <span class="sm-arrow">›</span>
             </button>
@@ -789,7 +687,7 @@ let gameRules = setup.rules, turnTok = 0;
 const humanCount = () => players.filter(p => p.human).length;
 // Card types (edges N E S W) live in src/engine/tiles.js.
 const {TYPES, normEdge, rareName, deckList} = PG.engine;
-const KIND = {c:'Город',r:'Дорога',f:'Крепость'};
+const KIND = {c:'Город',r:'Дорога',f:'Монастырь'};
 
 // Seeded randomness lives in src/engine/rng.js (bundled into window.PG by scripts/wrap-web.sh).
 const {rng, hash} = PG.engine;
@@ -809,7 +707,7 @@ const meepleSvg = col => `<svg viewBox="0 0 100 110"><path d="${MEEPLE_D}" fill=
 
 /* ---------------- art ---------------- */
 // Tile and sprite art live in src/render/art.js.
-const {cv, SPR, sprite, TILE_URL, injectArt} = PG.render.createArt({S, V, PL0, MEEPLE_D});
+const {cv, SPR, sprite, TILE_URL, injectArt, injectHexArt} = PG.render.createArt({S, V, PL0, MEEPLE_D});
 /* ---------------- rules ---------------- */
 const G = (PG.game && PG.game.createGameState) ? PG.game.createGameState() : {
   tiles: new Map(), deck: [], meeples: [], players: [], turn: 0, phase: 'idle', current: null, sel: null
@@ -817,7 +715,23 @@ const G = (PG.game && PG.game.createGameState) ? PG.game.createGameState() : {
 let tiles = G.tiles, deck = G.deck, meeples = G.meeples, players = G.players, turn = G.turn, phase = G.phase, current = G.current, sel = G.sel;
 let ghost = G.ghost, ghostDeg = G.ghostDeg, trayDeg = G.trayDeg, slotEls = G.slotEls, token = G.token, gameVisible = G.gameVisible, pendingStart = G.pendingStart;
 // Board rules live in src/engine/board.js; these wrappers pass it the current game state.
-const B = PG.engine.board, key = B.key, edgeAt = B.edgeAt, groupsOf = B.groupsOf, gid = B.gid;
+// Classic 2.0 (rules.mode 'hex') plays on six-sided tiles: src/engine/hex.js has the same API as board.js and
+// scoring.js, so useGeo() switches the rules, the bots and the drawing for one game; the square game is untouched.
+const HX = PG.engine.hex, HW = T * HX.WIDTH;   // HW: a six-sided tile's width on the table (its height is T)
+let HEX = false, B = PG.engine.board, SC = PG.engine.scoring, BOTS = PG.engine.bots, edgeAt = B.edgeAt, groupsOf = B.groupsOf, gid = B.gid;
+const key = B.key;
+function useGeo(hex) {
+  HEX = !!hex; B = HEX ? HX : PG.engine.board; SC = HEX ? HX : PG.engine.scoring; BOTS = HEX ? PG.engine.bots.hex : PG.engine.bots;
+  edgeAt = B.edgeAt; groupsOf = B.groupsOf; gid = B.gid; boundsCache = null;
+  document.documentElement.classList.toggle('hexg', HEX);
+  if (HEX) injectHexArt();
+}
+const TY = id => TYPES[id] || HX.TYPES[id];
+const NDIR = () => HEX ? 6 : 4, ROT = () => HEX ? 60 : 90, VV = () => HEX ? HX.V : V;
+const nbXY = (x, y, d) => HEX ? [x + HX.DX[d], y + HX.DY[d]] : [x + DX[d], y + DY[d]];
+/** Centre of a cell on the table, in tile heights; and the left/top of a tile or slot there, in px. */
+const cellXY = (x, y) => HEX ? HX.cellXY(x, y) : [x, y];
+const cellLT = (x, y) => { const [X, Y] = cellXY(x, y); return [X * T - (HEX ? HW : T) / 2, Y * T - T / 2]; };
 const at = (x, y) => tiles.get(key(x, y));
 const fits = (type, r, x, y) => B.fits(tiles, type, r, x, y);
 const emptyCells = () => B.emptyCells(tiles);
@@ -827,6 +741,7 @@ const hasPlacement = type => B.hasPlacement(tiles, type);
 const fortComp = t => B.fortComp(tiles, meeples, t);
 const component = (t, g) => B.component(tiles, meeples, t, g);
 function groupPos(t, g) {
+  if (HEX) return hexGroupPos(g);
   if (PG.game && PG.game.world) return PG.game.world.groupPos(t, g);
   if (g.kind === 'f') return [0.24, 0.18];
   if (g.kind === 'c') {
@@ -838,17 +753,26 @@ function groupPos(t, g) {
   if (g.edges.length === 2) { const b = V[g.edges[1]]; return [(a[0]*.4225 + b[0]*.1225) * .5, (a[1]*.4225 + b[1]*.1225) * .5]; }
   return [a[0] * .3, a[1] * .3];
 }
+// Where a figure stands on a six-sided tile: in its town, on its road, by the monastery.
+function hexGroupPos(g) {
+  const v = HX.V;
+  if (g.kind === 'f') return [.2, .16];
+  if (g.kind === 'c') { let sx = 0, sy = 0; g.edges.forEach(d => { sx += v[d][0]; sy += v[d][1]; }); const L = Math.hypot(sx, sy); return L < .01 ? [.14, .12] : [sx / L * .27, sy / L * .27]; }
+  const a = v[g.edges[0]];
+  if (g.edges.length === 2) { const b = v[g.edges[1]]; return [(a[0] + b[0]) * .18 + a[0] * .14, (a[1] + b[1]) * .18 + a[1] * .14]; }
+  return [a[0] * .3, a[1] * .3];
+}
 // Rules v2 (rv = 2): a player may add figures to an object held only by their own figures; equal figures are decided by cards laid.
 const rules2 = () => !!(gameRules && gameRules.rv === 2);
 const claimable = (t, p) => B.claimable(tiles, meeples, t, p, rules2());
 const claimableAll = p => B.claimableAll(tiles, meeples, p, rules2());
-const label = g => g.kind === 'r' && g.edges.length === 1 ? 'Дорога ' + ARROW[g.edges[0]] : KIND[g.kind];
+const label = g => g.kind === 'r' && g.edges.length === 1 ? 'Дорога ' + (HEX ? HX.ARROW : ARROW)[g.edges[0]] : KIND[g.kind];
 
 /* ---------------- dom: world ---------------- */
 const world = $('#world'), board = $('#board');
 function addSprite(parent, kind, x, y, cls, delay, scale = 1) {
   const d = SPR && SPR[kind]; if (!d) return null;
-  const L = (0.5 + x) * T, Tp = (0.5 + y) * T;
+  const L = (HEX ? HW / 2 : T / 2) + x * T, Tp = (0.5 + y) * T;
   const b = document.createElement('i'); b.className = 'bb s-' + kind + (cls ? ' ' + cls : '');
   b.style.cssText = `left:${L}px;top:${Tp}px;width:${d.w * scale}px;height:${d.h * scale}px`;
   if (delay != null) { b.classList.add('pop'); b.style.setProperty('--d', delay + 's'); }
@@ -859,7 +783,8 @@ const lowGfx = () => document.documentElement.classList.contains('lowgfx');
 const HOUSES = ['house', 'house2', 'house3', 'house4'];
 function addDecor(el, t, delay) {
   let items, cityCount;
-  if (typeof PG !== 'undefined' && PG.game && PG.game.world && PG.game.world.generateDecorItems) {
+  if (HEX) ({items, cityCount} = hexDecor(t));
+  else if (typeof PG !== 'undefined' && PG.game && PG.game.world && PG.game.world.generateDecorItems) {
     const res = PG.game.world.generateDecorItems(t, edgeAt, rng, lowGfx(), TYPES);
     items = res.items;
     cityCount = res.cityCount;
@@ -894,11 +819,42 @@ function addDecor(el, t, delay) {
   items.forEach((it, i) => addSprite(box, it[0], it[1], it[2], 'dc', delay == null ? null : delay + i * .05, (it[0] === 'tower' && cityCount ? .8 : 1) * (it[3] && /^house|^tower/.test(it[0]) ? .85 : 1)));
   el.querySelector('.face').after(box);
 }
+// Houses by the town, the monastery's tower, boulders at a dead end and trees in the free corners of a six-sided tile.
+function hexDecor(t) {
+  const E = [0, 1, 2, 3, 4, 5].map(d => edgeAt(t, d)), R = rng(t.seed), v = HX.V, def = TY(t.type), items = [];
+  const city = [0, 1, 2, 3, 4, 5].filter(d => E[d] === 'c');
+  if (city.length) {
+    let sx = 0, sy = 0; city.forEach(d => { sx += v[d][0]; sy += v[d][1]; });
+    const L = Math.hypot(sx, sy), ux = L < .01 ? 0 : sx / L, uy = L < .01 ? -1 : sy / L, px = -uy, py = ux, f = city.length === 1 ? .34 : .2;
+    const n = city.length >= 4 ? 4 : city.length >= 2 ? 3 : 2;
+    for (let i = 0; i < n; i++) { const o = (i - (n - 1) / 2) * .17; items.push([i === 0 && city.length >= 3 ? 'tower' : HOUSES[(R() * 4) | 0], ux * f + px * o + (R() - .5) * .04, uy * f + py * o + (i % 2 ? .07 : -.03)]); }
+  }
+  if (def.fort) items.push(['tower', 0, .18]);
+  if (def.end) { const d = E.indexOf('r'); items.push([def.end, -v[d][0] * .1, -v[d][1] * .1 + .06]); }
+  if (def.rocks) items.push(['boulders', -.05, .05], ['rock', .22, -.12], ['rock', -.24, .2]);
+  if (!lowGfx()) for (let k = 0; k < 6; k++) {   // corner k lies between sides k - 1 and k
+    if (E[k] === 'c' || E[(k + 5) % 6] === 'c' || R() >= .55) continue;
+    const a = (-120 + 60 * k) * Math.PI / 180, kk = R();
+    items.push([kk < .36 ? 'pine' : kk < .62 ? 'oak' : kk < .71 ? 'birch' : kk < .78 ? 'poplar' : kk < .9 ? 'bush' : 'rock', Math.cos(a) * (.38 + R() * .05), Math.sin(a) * (.33 + R() * .04)]);
+  }
+  items.forEach(it => { if (it[2] < -.2 && !['rock', 'boulders', 'hay', 'bush'].includes(it[0])) { it[2] = -.2 + (it[2] + .2) * .35; it[3] = 1; } });
+  items.sort((p, q) => p[2] - q[2]);
+  return {items, cityCount: city.length};
+}
 // Switching graphics redraws the decor of the cards already on the table; the game itself stays as it is.
 function redecorate() {
   for (const t of tiles.values()) if (t.el) { t.el.querySelectorAll('.bb.dc').forEach(b => b.remove()); addDecor(t.el, t, null); }
 }
+// The six walls of a six-sided tile: side k runs from corner k to corner k + 1 and hangs down from it.
+const HEX_SIDES = [0, 1, 2, 3, 4, 5].map(k => { const a = (-120 + 60 * k) * Math.PI / 180; return `<i class="sd h${k}" style="left:${(HW / 2 + Math.cos(a) * HW / 2).toFixed(2)}px;top:${(T / 2 + Math.sin(a) * HW / 2).toFixed(2)}px;width:${(HW / 2 + .6).toFixed(2)}px;transform:rotateZ(${60 * k}deg) rotateX(-90deg)"></i>`; }).join('');
 function tileEl(t, decor, delay) {
+  if (HEX) {
+    const el = document.createElement('div'); el.className = 'tile hex';
+    const [l, tp] = cellLT(t.x, t.y); el.style.left = l + 'px'; el.style.top = tp + 'px';
+    el.innerHTML = HEX_SIDES + `<div class="face t-${t.type}" style="--r:${t.r * 60}deg"></div>`;
+    if (decor) addDecor(el, t, delay);
+    return el;
+  }
   const el = document.createElement('div'); el.className = 'tile';
   el.style.left = (t.x * T - T / 2) + 'px'; el.style.top = (t.y * T - T / 2) + 'px';
   el.innerHTML = `<i class="sd n"></i><i class="sd e"></i><i class="sd s"></i><i class="sd w"></i><div class="face t-${t.type}" style="--r:${t.r * 90}deg"></div>`;
@@ -922,6 +878,10 @@ function tileEl(t, decor, delay) {
 function walls(t, has = (x, y) => tiles.has(key(x, y))) {
   if (!t.el) return;
   const sd = t.el.querySelectorAll('.sd');
+  if (HEX) {
+    for (let d = 0; d < 6; d++) { const [x, y] = nbXY(t.x, t.y, d); sd[d].hidden = has(x, y); sd[d].classList.toggle('fall', !sd[d].hidden && edgeAt(t, d) === 'w'); }
+    return;
+  }
   if (typeof PG !== 'undefined' && PG.game && PG.game.world) {
     const list = PG.game.world.calcWallVisibility(t, has, edgeAt);
     list.forEach(({d, hidden, fall}) => {
@@ -941,19 +901,20 @@ function refreshRoadEnds() {
   for (const t of tiles.values()) {
     if (!t.el) continue;
     t.rw = t.rw || {};
-    for (let d = 0; d < 4; d++) {
-      const open = edgeAt(t, d) === 'r' && !at(t.x + DX[d], t.y + DY[d]);
-      if (open && !t.rw[d]) t.rw[d] = addSprite(t.el, 'gravel', V[d][0] * .4, V[d][1] * .4, '', fast() ? null : .05);
+    for (let d = 0; d < NDIR(); d++) {
+      const open = edgeAt(t, d) === 'r' && !at(...nbXY(t.x, t.y, d));
+      if (open && !t.rw[d]) t.rw[d] = addSprite(t.el, 'gravel', VV()[d][0] * .4, VV()[d][1] * .4, '', fast() ? null : .05);
       else if (!open && t.rw[d]) { t.rw[d].remove(); delete t.rw[d]; }
     }
   }
 }
-function wallsAround(t) { walls(t); for (let d = 0; d < 4; d++) { const n = at(t.x + DX[d], t.y + DY[d]); if (n) walls(n); } }
+function wallsAround(t) { walls(t); for (let d = 0; d < NDIR(); d++) { const n = at(...nbXY(t.x, t.y, d)); if (n) walls(n); } }
 function placeMeeple(t, g, p, anim) {
   const [x, y] = groupPos(t, g);
   const el = addSprite(t.el, 'm' + p, x, y, '', anim && !fast() ? 0 : null);
   meeples.push({gid: gid(t, g), p, el, t, g}); markOwn();
   players[p].meeples--;
+  if (anim && !fast() && !tut && meCounted() && isMe(players[p])) progress({figs: 1});
 }
 function removeMeeple(m) {
   meeples.splice(meeples.indexOf(m), 1); players[m.p].meeples++; markOwn();
@@ -963,7 +924,7 @@ function removeMeeple(m) {
 function floatText(t, [x, y], txt, col) {
   if (fast()) return;
   const f = document.createElement('i'); f.className = 'fl'; f.textContent = txt;
-  f.style.cssText = `left:${(0.5 + x) * T}px;top:${(0.5 + y) * T - 20}px;--c:${col}`;
+  f.style.cssText = `left:${(HEX ? HW / 2 : T / 2) + x * T}px;top:${(0.5 + y) * T - 20}px;--c:${col}`;
   t.el.append(f); setTimeout(() => f.remove(), 1600);
 }
 
@@ -987,6 +948,11 @@ function applyCam() {
 let boundsCache = null;
 function bounds() { if (boundsCache && boundsCache.n === tiles.size) return boundsCache; boundsCache = calcBounds(); boundsCache.n = tiles.size; return boundsCache; }
 function calcBounds() {
+  if (HEX) {
+    let x0 = 0, x1 = 0, y0 = 0, y1 = 0;
+    for (const t of tiles.values()) { const [X, Y] = HX.cellXY(t.x, t.y); x0 = Math.min(x0, X); x1 = Math.max(x1, X); y0 = Math.min(y0, Y); y1 = Math.max(y1, Y); }
+    return {x0, x1, y0, y1};
+  }
   if (PG.game && PG.game.camera) return PG.game.camera.calcBounds(tiles);
   let x0 = 0, x1 = 0, y0 = 0, y1 = 0;
   for (const t of tiles.values()) { x0 = Math.min(x0, t.x); x1 = Math.max(x1, t.x); y0 = Math.min(y0, t.y); y1 = Math.max(y1, t.y); }
@@ -1023,6 +989,7 @@ function centerCam(anim) {
   Object.assign(cam, to); applyCam();
 }
 function ensureVisible(x, y) {
+  [x, y] = cellXY(x, y);
   const vw = board.clientWidth, vh = board.clientHeight;
   if (!vw) return;
   const to = (typeof PG !== 'undefined' && PG.game && PG.game.camera)
@@ -1111,7 +1078,7 @@ $('#view').onclick = e => {
   e.currentTarget.textContent = TILTS[i][1];
   tweenCam({tilt: TILTS[i][0]}, 500);
 };
-$('#turnL').onclick = () => tweenCam({rot: Math.round((cam.rot - 90) / 90) * 90}, 450);
+$('#turnL').onclick = () => tweenCam({rot: Math.round((cam.rot - ROT()) / ROT()) * ROT()}, 450);
 
 /* ---------------- hud ---------------- */
 const playersEl = $('#players'), statusEl = $('#status'), toastEl = $('#toast'), okBtn = $('#ok'), rotBtn = $('#rot');
@@ -1145,6 +1112,7 @@ function cityD(E, S) {
   return {fill: fill + 'Z', wall};
 }
 function ownSvg(t, list) {
+  if (HEX) return hexOwnSvg(t, list);
   if (PG.ui && PG.ui.hud) return PG.ui.hud.ownSvg(t, list, TYPES[t.type] ? TYPES[t.type].e : null);
   const mid = [[50,0],[100,50],[50,100],[0,50]];
   let out = '';
@@ -1167,6 +1135,50 @@ function ownSvg(t, list) {
     }
   }
   return 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${out}</svg>`);
+}
+// The owner colours on a six-sided tile, drawn in the tile type's own frame (the picture turns with the face), on the
+// same paths as its art (src/render/art.js drawHexTile): roads through the middle, the town's wall curves, the monastery.
+function hexOwnSvg(t, list) {
+  const W = 100 * HX.WIDTH, C = [W / 2, 50], HV = HX.V, mid = HV.map(([x, y]) => [C[0] + x * 50, C[1] + y * 50]);
+  const corner = k => { const a = (-120 + 60 * k) * Math.PI / 180; return [C[0] + Math.cos(a) * W / 2, C[1] + Math.sin(a) * W / 2]; };
+  const P = p => p[0].toFixed(1) + ' ' + p[1].toFixed(1);
+  const strokes = (d, cols, w) => cols.map((c, i) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="${cols.length > 1 ? 'butt' : 'round'}"${cols.length > 1 ? ` stroke-dasharray="7 ${7 * (cols.length - 1)}" stroke-dashoffset="${-7 * i}"` : ''}/>`).join('');
+  const E = HX.TYPES[t.type].e;
+  let out = '';
+  for (const it of list) {
+    const base = it.edges.map(d => (d - t.r + 6) % 6);
+    if (it.kind === 'r') {
+      let d;
+      if (base.length === 2) {
+        const [a, b] = base, turn = Math.min((b - a + 6) % 6, (a - b + 6) % 6), m = [(mid[a][0] + mid[b][0]) / 2, (mid[a][1] + mid[b][1]) / 2], k = [0, .62, .3, 0][turn];
+        d = `M${P(mid[a])}Q${P([C[0] + (m[0] - C[0]) * k, C[1] + (m[1] - C[1]) * k])} ${P(mid[b])}`;
+      } else d = `M${P(mid[base[0]])}L${P(C)}`;
+      out += `<path d="${d}" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="10" stroke-linecap="round"/>` + strokes(d, it.cols, 6.5);
+    } else if (it.kind === 'c') {
+      const city = [0, 1, 2, 3, 4, 5].filter(d => E[d] === 'c');
+      let fill = '', wall = '';
+      if (city.length === 6) fill = `M${[0, 1, 2, 3, 4, 5].map(k => P(corner(k))).join('L')}Z`;
+      else {
+        const s0 = city.find(d => E[(d + 5) % 6] !== 'c');
+        fill = `M${P(corner(s0))}`;
+        for (let i = s0, n = 0; n < 6;) {
+          if (E[i % 6] === 'c') { fill += `L${P(corner((i + 1) % 6))}`; i++; n++; continue; }
+          let L = 0; while (E[(i + L) % 6] !== 'c') L++;
+          let ux = 0, uy = 0; for (let k = 0; k < L; k++) { ux += HV[(i + k) % 6][0]; uy += HV[(i + k) % 6][1]; }
+          const ul = Math.hypot(ux, uy) || 1, dep = [0, .06, .1, .13, .16, .2][L] * 100, K = [C[0] + ux / ul * dep, C[1] + uy / ul * dep];
+          fill += `Q${P(K)} ${P(corner((i + L) % 6))}`; wall += `M${P(corner(i % 6))}Q${P(K)} ${P(corner((i + L) % 6))}`;
+          i += L; n += L;
+        }
+        fill += 'Z';
+      }
+      out += `<path d="${fill}" fill="${it.cols[0]}" fill-opacity="${it.cols.length > 1 ? .12 : .22}"/>`;
+      out += wall ? `<path d="${wall}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="7" stroke-linecap="round"/>` + strokes(wall, it.cols, 4.5) : strokes(fill, it.cols, 4.5);
+    } else if (it.kind === 'f') {
+      const d = `M${C[0]} 22A28 28 0 1 1 ${C[0] - .1} 22Z`;
+      out += `<path d="${d}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="7"/>` + strokes(d, it.cols, 4.5);
+    }
+  }
+  return 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W.toFixed(2)} 100" preserveAspectRatio="none">${out}</svg>`);
 }
 /* Finished and scored features stay in their owners' colours and get little banners of
    those colours on a few of their pieces (around the keep for a fortress). */
@@ -1191,7 +1203,7 @@ function markDone(c, cols) {
   let spots = [];
   if (c.kind === 'f') {
     const center = c.tiles.find(t => c.ids.has(key(t.x, t.y) + '|f'));
-    if (center) spots = [[-.36, -.36], [.36, -.36], [.36, .36], [-.36, .36]].map(p => [center, p]);
+    if (center) spots = (HEX ? [[-.3, -.26], [.3, -.26], [.3, .26], [-.3, .26]] : [[-.36, -.36], [.36, -.36], [.36, .36], [-.36, .36]]).map(p => [center, p]);
   } else {
     const ts = c.tiles, step = Math.max(1, Math.ceil(ts.length / 6));
     for (let i = 0; i < ts.length; i += step) {
@@ -1277,18 +1289,18 @@ let deckMax = 0;
 function renderDeck() { if (deck.length > deckMax || !phase || phase === 'idle') deckMax = Math.max(deck.length, deckMax); $('#deckN').textContent = deck.length; const bar = $('#deckBar'); if (bar) bar.style.width = (deckMax ? 100 * deck.length / deckMax : 0) + '%'; }
 function renderTray() {
   if (!current) { tface.className = 'face'; cname.innerHTML = ''; return; }
-  tface.style.transition = 'none'; trayDeg = current.r * 90; tface.style.setProperty('--r', (trayDeg + cam.rot) + 'deg');
+  tface.style.transition = 'none'; trayDeg = current.r * ROT(); tface.style.setProperty('--r', (trayDeg + cam.rot) + 'deg');
   tface.className = 'face t-' + current.type; void tface.offsetWidth; tface.style.transition = '';
   const solo = isLocal(turn) && localHumans() === 1;
   ct.style.setProperty('--c', solo ? 'transparent' : players[turn].col);
-  cname.innerHTML = `<b>${TYPES[current.type].name}</b><small>${solo ? 'Ваша карта' : 'Карта: ' + players[turn].name}</small>`;
+  cname.innerHTML = `<b>${TY(current.type).name}</b><small>${solo ? 'Ваша карта' : 'Карта: ' + players[turn].name}</small>`;
   // whose turn it is, big on the left: that player's own figure in their colour
   const tf = $('#turnFig'); tf.style.setProperty('--c', players[turn].col); tf.innerHTML = `${meepleImg(turn)}<small>${players[turn].name}</small>`;
   if (!RM) ct.animate([{transform: 'rotateX(26deg) translateY(26px) scale(.7)', opacity: 0}, {transform: 'rotateX(26deg)', opacity: 1}], {duration: 320, easing: 'cubic-bezier(.3,1.4,.5,1)'});
 }
 function setRot(nr) {
-  const delta = ((nr - current.r) + 4) % 4;
-  trayDeg += delta * 90; ghostDeg += delta * 90; current.r = nr;
+  const delta = ((nr - current.r) + NDIR()) % NDIR();
+  trayDeg += delta * ROT(); ghostDeg += delta * ROT(); current.r = nr;
   tface.style.setProperty('--r', (trayDeg + cam.rot) + 'deg');
   if (ghost) ghost.querySelector('.face').style.setProperty('--r', ghostDeg + 'deg');
   peekSend();
@@ -1301,16 +1313,16 @@ function renderSlots() {
   clearSlots();
   for (const c of emptyCells()) {
     if (!legalRots(current.type, c.x, c.y).length || (tut && !tutAllows(c.x, c.y))) continue;
-    const el = document.createElement('div'); el.className = 'slot' + (tut ? ' tutpulse' : ''); el.dataset.x = c.x; el.dataset.y = c.y;
+    const el = document.createElement('div'); el.className = 'slot' + (HEX ? ' hex' : '') + (tut ? ' tutpulse' : ''); el.dataset.x = c.x; el.dataset.y = c.y;
     if (players[turn]) el.style.setProperty('--pc', players[turn].col);
-    el.style.left = (c.x * T - T / 2) + 'px'; el.style.top = (c.y * T - T / 2) + 'px';
+    const [l, tp] = cellLT(c.x, c.y); el.style.left = l + 'px'; el.style.top = tp + 'px';
     world.append(el); slotEls.push(el);
   }
 }
 function placeGhost() {
-  if (!ghost) { ghostDeg = current.r * 90; ghost = tileEl({x: sel.x, y: sel.y, type: current.type, r: current.r}, false); ghost.classList.add('ghost'); world.append(ghost); }
+  if (!ghost) { ghostDeg = current.r * ROT(); ghost = tileEl({x: sel.x, y: sel.y, type: current.type, r: current.r}, false); ghost.classList.add('ghost'); world.append(ghost); }
   ghost.style.setProperty('--pc', players[turn].col);
-  ghost.style.left = (sel.x * T - T / 2) + 'px'; ghost.style.top = (sel.y * T - T / 2) + 'px';
+  const [gl, gt] = cellLT(sel.x, sel.y); ghost.style.left = gl + 'px'; ghost.style.top = gt + 'px';
 }
 function selectSlot(x, y) {
   if (tut && !tutAllows(x, y)) return;
@@ -1325,7 +1337,7 @@ function selectSlot(x, y) {
 function rotate() {
   if (phase !== 'place' || !current) return;
   beep('rotate'); tutEvent('rotate');
-  if (!sel) return setRot((current.r + 1) % 4);
+  if (!sel) return setRot((current.r + 1) % NDIR());
   const rots = legalRots(current.type, sel.x, sel.y);
   if (rots.length < 2) { toast('Другие повороты не сходятся с соседями'); if (ghost) { ghost.classList.remove('shake'); void ghost.offsetWidth; ghost.classList.add('shake'); setTimeout(() => ghost && ghost.classList.remove('shake'), 360); } return; }
   setRot(rots[(rots.indexOf(current.r) + 1) % rots.length]);
@@ -1338,16 +1350,16 @@ function helpWindow(tab = 'pts') {
   const r = gameRules, mode = (MODES[r.mode] || MODES.classic).label, tie = r.tie === 'split' ? 'очки делятся поровну' : 'очки получает каждый из них';
   const item = (cls, ttl, todo, pts) => `<div class="hitem"><span class="rimg ${cls}"></span><div><b>${ttl}</b><p>${todo}</p><em>${pts}</em></div></div>`;
   const pts = `<div class="hnow">В этой партии: <b>${mode}</b> · фишек у игрока: <b>${r.meeples}</b> · если фишек поровну — ${tie}${net && !players.some(p => !p.human) && (net.quick || r.cups) ? ' · <b>игра на кубки</b>' : ''}</div>
-    ${item('t-c2', '🏰 Город', 'Закройте картами все края города — чтобы со всех сторон он был окружён.', '2 очка за каждую карту города · недостроенный в конце игры — 1 за карту')}
-    ${item('t-rS', '🛤 Дорога', 'Доведите дорогу до конца с обеих сторон: до города, перекрёстка, тупика или замкните её в кольцо.', '1 очко за каждую карту дороги · с целым большим мостом ×2')}
-    ${item('t-fort', '🏯 Крепость', 'Окружите крепость картами со всех 8 сторон, включая углы.', '9 очков · недостроенная в конце — 1 за каждую карту рядом')}
-    ${item('t-brHalf', '🌉 Большой мост', 'Соедините две половины моста друг с другом — дорога через него становится ценнее.', 'каждая карта дороги вокруг — вдвое, сами половины — по 1')}
-    <div class="hitem"><span class="hic">🧍</span><div><b>Фишка</b><p>Поставьте её на город, дорогу или крепость на только что положенной карте, пока объект ещё ничей или на нём стоят только ваши фишки: так можно усилить свой объект. Очки получает тот, у кого на объекте больше фишек; если фишек поровну — у кого больше своих карт на объекте; если и так поровну — очки каждому лидеру. После очков фишка возвращается.</p><em>Одна фишка за ход, по желанию</em></div></div>
+    ${item(HEX ? 't-hC2' : 't-c2', '🏰 Город', 'Закройте картами все края города — чтобы со всех сторон он был окружён.', '2 очка за каждую карту города · недостроенный в конце игры — 1 за карту')}
+    ${item(HEX ? 't-hRB' : 't-rS', '🛤 Дорога', 'Доведите дорогу до конца с обеих сторон: до города, перекрёстка, тупика или замкните её в кольцо.', '1 очко за каждую карту дороги · с целым большим мостом ×2')}
+    ${item(HEX ? 't-hF' : 't-fort', '⛪ Монастырь', HEX ? 'Окружите монастырь шестью плитками — со всех его сторон.' : 'Окружите монастырь картами со всех 8 сторон, включая углы.', '9 очков · недостроенный в конце — 1 за каждую карту рядом')}
+    ${HEX ? '' : item('t-brHalf', '🌉 Большой мост', 'Соедините две половины моста друг с другом — дорога через него становится ценнее.', 'каждая карта дороги вокруг — вдвое, сами половины — по 1')}
+    <div class="hitem"><span class="hic">🧍</span><div><b>Фишка</b><p>Поставьте её на город, дорогу или монастырь на только что положенной карте, пока объект ещё ничей или на нём стоят только ваши фишки: так можно усилить свой объект. Очки получает тот, у кого на объекте больше фишек; если фишек поровну — у кого больше своих карт на объекте; если и так поровну — очки каждому лидеру. После очков фишка возвращается.</p><em>Одна фишка за ход, по желанию</em></div></div>
     <div class="hitem"><span class="hic">🤝</span><div><b>Респект</b><p>Достроили объект, на котором стоят только чужие фишки.</p><em>+1 очко вам</em></div></div>`;
   const rules = `<div class="hitem"><span class="hic">🎯</span><div><b>Цель</b><p>Стройте королевство из общей стопки. Когда стопка кончилась — больше очков значит победа.</p></div></div>
     <div class="hitem"><span class="hic">🃏</span><div><b>Ваш ход</b><p>Возьмите карту, приложите её к полю так, чтобы края совпали (город с городом, дорога с дорогой, река с рекой), поверните при необходимости и по желанию поставьте фишку.</p></div></div>
-    <div class="hitem"><span class="hic">🌊</span><div><b>Реки и озёра</b><p>Река должна продолжаться рекой. Озеро занимает всю карту и впадает во все стороны реки. Исток — начало реки.</p></div></div>
-    <div class="hitem"><span class="hic">🚧</span><div><b>Обрыв и мосты</b><p>У обрыва дорога обрывается: за ним можно ставить только обрыв. Половина большого моста стыкуется только с другой половиной.</p></div></div>
+    ${HEX ? '<div class="hitem"><span class="hic">🌊</span><div><b>Реки</b><p>Река должна продолжаться рекой. Исток — начало реки, по мосту дорога пересекает реку.</p></div></div>' : `<div class="hitem"><span class="hic">🌊</span><div><b>Реки и озёра</b><p>Река должна продолжаться рекой. Озеро занимает всю карту и впадает во все стороны реки. Исток — начало реки.</p></div></div>
+    <div class="hitem"><span class="hic">🚧</span><div><b>Обрыв и мосты</b><p>У обрыва дорога обрывается: за ним можно ставить только обрыв. Половина большого моста стыкуется только с другой половиной.</p></div></div>`}
     <div class="hitem"><span class="hic">⏱</span><div><b>Время хода</b><p>${r.timer || net ? `На ход — ${r.timer || 60} секунд. Когда время выходит, ход делает бот.` : 'В этой партии время хода не ограничено.'}</p></div></div>
     <div class="hitem"><span class="hic">🏁</span><div><b>Конец игры</b><p>Недостроенные объекты приносят по 1 очку за карту. Побеждает набравший больше всех очков.</p></div></div>`;
   const box = document.createElement('div'); box.className = 'over'; box.id = 'helpBox'; box.style.position = 'fixed';
@@ -1365,7 +1377,7 @@ $('#helpBtn').onclick = () => helpWindow();
 const tipBtn = $('#tip');
 const coachOn = () => !net && !tut && gameRules.hints !== false && wallet.coach !== 'off';
 const tipOk = () => phase === 'place' && !!current && coachOn() && isLocal(turn) && !(players[turn].missed >= 1);
-const tipFor = () => PG.engine.bots.hintPick(tiles, meeples, current.type, turn, players.length, players[turn].meeples > 0);
+const tipFor = () => BOTS.hintPick(tiles, meeples, current.type, turn, players.length, players[turn].meeples > 0);
 // "Always" coach: at the start of your turn the best spot glows and the reason is written above the card;
 // nothing is chosen for you.
 function coachTurn() {
@@ -1392,6 +1404,7 @@ okBtn.onclick = async () => {
   phase = 'busy'; okBtn.disabled = rotBtn.disabled = true; clearSlots(); showTip();
   tutEvent('placed');
   const t = {x: sel.x, y: sel.y, type: current.type, r: current.r, seed: (Math.random() * 1e9) | 0};
+  if (meCounted() && isMe(players[turn]) && !tut) progress({tiles: 1});
   const my = token; await dropAt(t); if (my !== token) return; afterPlace(t, turn);
 };
 function tap(x, y) {
@@ -1408,11 +1421,11 @@ async function dropAt(t) {
   ghost.classList.remove('ghost');
   if (!(RM || fast())) await ghost.animate([{transform: 'translateZ(26px)'}, {transform: 'translateZ(0)'}], {duration: 260, easing: 'cubic-bezier(.5,0,.8,.4)'}).finished;
   ghost.remove(); ghost = null; lastPlaced = t;
-  t.el = tileEl(t, true, fast() ? null : .02); world.append(t.el); tiles.set(key(t.x, t.y), t); wallsAround(t); refreshRoadEnds(); markOwn(); updateFog(); checkRelicsAround(t.x, t.y);
+  t.el = tileEl(t, true, fast() ? null : .02); world.append(t.el); tiles.set(key(t.x, t.y), t); wallsAround(t); refreshRoadEnds(); markOwn(); updateFog();
   if (!fast()) beep('place');
   if (!fast()) { const pf = document.createElement('i'); pf.className = 'puff'; t.el.append(pf); setTimeout(() => pf.remove(), 600); }
   if (!fast()) { t.el.classList.add('puzzle-lock'); setTimeout(() => { if (t.el) t.el.classList.remove('puzzle-lock'); }, 350); }
-  if (!fast() && gameRules && gameRules.mode === 'epic' && TYPES[t.type] && TYPES[t.type].rare) toastAny(`✨ Редкая карта на поле: ${TYPES[t.type].name}!`);
+  if (!fast() && gameRules && gameRules.mode === 'epic' && TY(t.type) && TY(t.type).rare) toastAny(`✨ Редкая карта на поле: ${TY(t.type).name}!`);
   current = null; sel = null; renderDeck();
 }
 let meepleResolve = null, meepleOpts = [];
@@ -1424,7 +1437,7 @@ function askMeeple(mainTile, opts, p) {
     mrow.innerHTML = '<button class="chip skip" data-i="-1">Без фишки</button>';
     setStatus(`Фишка вернулась! Нажмите на место на поле или «Без фишки». Осталось <b>${players[p].meeples}</b>`);
   } else {
-    const note = o => coachOn() && isLocal(p) ? PG.engine.bots.featureNote(tiles, meeples, o.t, o.g) : '';
+    const note = o => coachOn() && isLocal(p) ? BOTS.featureNote(tiles, meeples, o.t, o.g) : '';
     mrow.innerHTML = opts.map((o, i) => `<button class="chip" data-i="${i}">${meepleImg(p)}${label(o.g)}${o.done ? ' · очки сразу' : ''}${note(o) && !o.done ? `<small class="cnote">${note(o)}</small>` : ''}</button>`).join('') + '<button class="chip skip" data-i="-1">Без фишки</button>';
     setStatus(`Поставить фишку? Осталось <b>${players[p].meeples}</b>. Очки придут, когда объект достроят`);
   }
@@ -1482,7 +1495,7 @@ async function afterPlace(t, p, forced) {
       // Bot: always use placed tile only, even in anyMode.
       // Bots never reinforce their own object (only free ones), so their play stays as it was.
       const botOpts = (anyMode ? claimable(t, p).map(g => ({t, g})) : opts).filter(o => o.done || !o.g || B.component(tiles, meeples, o.t, o.g).meeples.length === 0);
-      choice = PG.engine.bots.figurePick(tiles, meeples, botOpts, players[p].meeples, Math.random, playerBotLevel(p), players[p] && players[p].persona);
+      choice = BOTS.figurePick(tiles, meeples, botOpts, players[p].meeples, Math.random, playerBotLevel(p), players[p] && players[p].persona);
     }
   }
   if (my !== token) return;
@@ -1523,7 +1536,6 @@ async function afterPlace(t, p, forced) {
 // Objects this move completed with no figures on them and built only by this player: a free figure
 // may still be put on them, and then they score for that player at once.
 // Scoring rules live in src/engine/scoring.js.
-const SC = PG.engine.scoring;
 const doneMine = (t, p) => SC.doneMine(tiles, meeples, t, p);
 const roadPoints = c => SC.roadPoints(tiles, c);
 async function scoreAfter(t, p, skip) {
@@ -1550,9 +1562,10 @@ async function resolveFeature(c, final, placer) {
   win.forEach(i => { players[i].score += each; players[i].stats[c.kind] += each; });
   if (!final) markDone(c, win.map(i => players[i].col));
   if (!final && !fast()) {
-    win.forEach(i => { if (meCounted() && isMe(players[i])) progress({[c.kind]: 1, pts: each, cityTiles: c.kind === 'c' ? c.tiles.length : 0}); });
+    const n = c.tiles.length;
+    win.forEach(i => { if (meCounted() && isMe(players[i])) progress({[c.kind]: 1, pts: each, cityTiles: c.kind === 'c' ? n : 0, roadTiles: c.kind === 'r' ? n : 0, bigc: c.kind === 'c' && n >= 5 ? 1 : 0, longr: c.kind === 'r' && n >= 4 ? 1 : 0}); });
     if (win.length && c.tiles && c.tiles[0]) featureConfetti(c.tiles[0], players[win[0]].col);
-    if (gameRules && gameRules.mode === 'epic' && (c.tiles.length >= 5 || c.tiles.some(x => TYPES[x.type] && TYPES[x.type].rare))) {
+    if (gameRules && gameRules.mode === 'epic' && (c.tiles.length >= 5 || c.tiles.some(x => TY(x.type) && TY(x.type).rare))) {
       setTimeout(() => toastAny(`🌟 Событие в Большой игре: ${KIND[c.kind]} завершён! (${c.tiles.length} карт)`), 500);
     }
   }
@@ -1691,8 +1704,8 @@ function handOver() { $('#over').hidden = true; beginHumanTurn(); }
 const softStart = () => (PG.game && PG.game.turns) ? PG.game.turns.isSoftStart(wallet.botlvl, PROG.st.games) : (wallet.botlvl === 'normal' && PROG.st.games < 3);
 const botLevel = () => (PG.game && PG.game.turns) ? PG.game.turns.resolveBotLevel(wallet.botlvl, PROG.st.games, PG.engine.bots.BOT_LEVELS) : (softStart() ? 'easy' : PG.engine.bots.BOT_LEVELS.includes(wallet.botlvl) ? wallet.botlvl : 'normal');
 const playerBotLevel = p => (players[p] && players[p].botlvl) || botLevel();
-const botPick = (type, p) => PG.engine.bots.levelPick(tiles, meeples, type, p, players.length, Math.random, playerBotLevel(p), players[p] && players[p].persona);
-const helperPick = (type, p) => PG.engine.bots.helperPick(tiles, meeples, type, p, players.length, Math.random);
+const botPick = (type, p) => BOTS.levelPick(tiles, meeples, type, p, players.length, Math.random, playerBotLevel(p), players[p] && players[p].persona);
+const helperPick = (type, p) => BOTS.helperPick(tiles, meeples, type, p, players.length, Math.random);
 async function aiTurn() {
   const p = turn, my = token, tt = turnTok;
   setStatus(`Ходит <b>${players[p].name}</b>…`);
@@ -1772,68 +1785,6 @@ const ranked = () => players.map((p, i) => ({...p, i})).sort((a, b) => {
 
 /* ==================== 4 Game Evolution Features: Fog, Cartography, Biomes, Relics & Scout ==================== */
 
-let FOG_RELICS = new Map();
-
-const RELIC_POOL = [
-  {id: 'chest', name: 'Сундук золота', icon: '🎁', gold: 40, pts: 2},
-  {id: 'obelisk', name: 'Древний обелиск', icon: '🏛️', gold: 25, pts: 4},
-  {id: 'gem', name: 'Кристалл мудрости', icon: '💎', gold: 50, pts: 3},
-  {id: 'scroll', name: 'Свиток картографа', icon: '📜', gold: 30, pts: 5},
-];
-
-function spawnFogRelics() {
-  document.querySelectorAll('.fog-relic').forEach(el => el.remove());
-  FOG_RELICS = new Map();
-  const coords = [
-    {x: 2, y: 1}, {x: -2, y: 2}, {x: 1, y: -2}, {x: -2, y: -2}, {x: 3, y: -1}
-  ];
-  coords.forEach((c, idx) => {
-    const k = key(c.x, c.y);
-    const item = RELIC_POOL[idx % RELIC_POOL.length];
-    const r = {...item, x: c.x, y: c.y, key: k, collected: false};
-    FOG_RELICS.set(k, r);
-    
-    const el = document.createElement('div');
-    el.className = 'fog-relic';
-    el.id = 'relic-' + k.replace(',', '_');
-    el.style.left = (c.x * T) + 'px';
-    el.style.top = (c.y * T) + 'px';
-    el.innerHTML = `
-      <div class="relic-pulse"></div>
-      <div class="relic-ico">${r.icon}</div>
-      <div class="relic-name">${r.name}</div>
-    `;
-    world.append(el);
-  });
-}
-
-function checkRelicsAround(tx, ty) {
-  if (!FOG_RELICS || !players || !players[turn]) return;
-  for (const [k, r] of FOG_RELICS.entries()) {
-    if (r.collected) continue;
-    const dist = Math.abs(r.x - tx) + Math.abs(r.y - ty);
-    if (dist <= 1) {
-      r.collected = true;
-      const el = document.getElementById('relic-' + k.replace(',', '_'));
-      if (el) {
-        el.classList.add('collected');
-        setTimeout(() => el.remove(), 700);
-      }
-      
-      // Award bonuses
-      if (players[turn]) {
-        players[turn].score += r.pts;
-        if (typeof paintScores === 'function') paintScores();
-      }
-      wallet.gold = (wallet.gold || 0) + r.gold;
-      saveWallet();
-      if (typeof updateGold === 'function') updateGold();
-      if (typeof beep === 'function') beep('fanfare');
-      
-      toastAny(`${r.name}: +${r.gold} 🪙 и +${r.pts} очков!`, 'relic', 'Тайник в тумане');
-    }
-  }
-}
 
 function initFog() {
   const old = $('#fogOfWar');
@@ -1948,42 +1899,6 @@ function updateFog() {
   }
 }
 
-// 4. Scout action (Дозорный)
-function doScout() {
-  if (!deck) return;
-  if (typeof beep === 'function') beep('place');
-  
-  // Wave animation
-  const boardEl = $('#board');
-  if (boardEl) {
-    const wave = document.createElement('div');
-    wave.className = 'scout-radar-wave';
-    boardEl.append(wave);
-    setTimeout(() => wave.remove(), 1200);
-  }
-
-  // Peek deck tile
-  const nxt = deck && deck[0];
-  const tileName = nxt && TYPES[nxt] ? TYPES[nxt].name : 'Таинственная плитка';
-  toastAny(`Следующая плитка в колоде: «${tileName}»`, 'ok', 'Дозорный');
-
-  // Pulse nearest relic
-  let nearest = null, minDist = 999;
-  for (const r of FOG_RELICS.values()) {
-    if (r.collected) continue;
-    const d = Math.abs(r.x) + Math.abs(r.y);
-    if (d < minDist) { minDist = d; nearest = r; }
-  }
-  if (nearest) {
-    const relEl = document.getElementById('relic-' + nearest.key.replace(',', '_'));
-    if (relEl) {
-      relEl.classList.add('scout-beacon');
-      setTimeout(() => relEl.classList.remove('scout-beacon'), 3500);
-    }
-  }
-}
-
-
 function buildBoard() {
   const R = rng(20261023);
   const pool = [];
@@ -2006,7 +1921,7 @@ function buildBoard() {
   return R;
 }
 function makeDeck(rules) {
-  const d = deckList(rules);
+  const d = rules.mode === 'hex' ? HX.deckList(rules) : deckList(rules);
   for (let i = d.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [d[i], d[j]] = [d[j], d[i]]; }
   return rules.deck ? d.slice(0, rules.deck) : d;
 }
@@ -2014,7 +1929,7 @@ function makeDeck(rules) {
 function newGame() {
   if (net) leaveRoom();
   let firstHuman = true;
-  const numSeats = setup.rules && setup.rules.mode === 'duel' ? 2 : setup.n;
+  const numSeats = setup.n;
   const seats = setup.seats.slice(0, numSeats).map((s, i) => {
     const fig = s.human ? (firstHuman ? wallet.fig : 'classic') : randomFig();
     if (s.human) firstHuman = false;
@@ -2047,8 +1962,8 @@ function startGame(cfg, replay = []) {
   gameLog = {cfg, moves: replay.slice()};
   if (meepleResolve) { meepleResolve = null; mrow.hidden = true; prow.hidden = false; }
   // The menu shows a small built-up kingdom; the game itself starts from an empty table.
-  buildBoard(); buildMini();
-  world.innerHTML = '<div class="ground"></div>'; try { initFog(); spawnFogRelics(); } catch(_) {}
+  useGeo(false); buildBoard(); buildMini(); useGeo(cfg.rules && cfg.rules.mode === 'hex');
+  world.innerHTML = '<div class="ground"></div>'; try { initFog(); } catch(_) {}
   ghost = null; slotEls = []; meeples = []; doneFeats = []; turn = 0; phase = 'idle';
   const rules = gameRules = cfg.rules;
   players = cfg.seats.map((s, i) => { const name = clean(s.name) || 'Игрок ' + (i + 1); return {name, init: name[0].toUpperCase(), col: validCol(s.col) ? s.col : PL0[i].col, human: s.human, ghost: !!s.ghost, st: PG.state.status.shownStatus(s.st), owner: s.owner, uid: s.uid || null, fig: FIGS[s.fig] ? s.fig : 'classic', botlvl: s.botlvl || (s.human ? null : (wallet.botlvl || 'normal')), score: 0, stats: {c: 0, r: 0, f: 0, t: 0, m: 0}, meeples: rules.meeples, missed: 0}; });
@@ -2078,9 +1993,9 @@ function startGame(cfg, replay = []) {
   Object.assign(cam, {px: 0, py: 0, z: Math.max(.7, Math.min(1.05, (document.documentElement.clientWidth / 2 - 54) / 136)), tilt: wallet.view === 'top' ? 22 : 55}); applyCam();
   $('#view').textContent = wallet.view === 'top' ? '2D' : '3D';
   renderPlayers(); renderResults(false);
-  if (replay.length || cfg.noIntro) { toast(`Первая карта из стопки: ${TYPES[first.type].name}`); return startTurn(); }
+  if (replay.length || cfg.noIntro) { toast(`Первая карта из стопки: ${TY(first.type).name}`); return startTurn(); }
   const my = token;
-  introThen(first, () => { if (my !== token) return; toast(`Первая карта из стопки: ${TYPES[first.type].name}`); startTurn(); });
+  introThen(first, () => { if (my !== token) return; toast(`Первая карта из стопки: ${TY(first.type).name}`); startTurn(); });
 }
 /* Opening of a new game: the stack is shuffled in the middle of the table, then its top card
    flies to the centre and becomes the first piece. Purely visual: the order is in cfg.deck. */
@@ -2182,11 +2097,17 @@ const today = () => new Date().toISOString().slice(0, 10);
 // The wallet's storage lives in src/state/wallet.js.
 // A checksum mismatch is reported, never punished (see walletSig): the gold stays.
 const wallet = PG.state.loadWallet(localStorage, validCol, PALETTE[0].col, info => track('wallet_sig_mismatch', info));
+// Emoji and phrases are bought in the shop now: what an older version let the player pick stays theirs.
+PG.state.reactions.migrate(wallet); PG.state.reactions.sanitizeDeck(wallet);
 // Analytics (Firebase Analytics in the Android app; elsewhere a no-op). Params: flat strings / numbers.
 function track(name, params) {
+  // Statistics only with the player's consent (Settings → Statistics); errors and security events need none.
+  if (!PG.state.usage.mayRecord(name, wallet.stats)) return;
   try { if (window.AndroidApp && AndroidApp.logEvent) AndroidApp.logEvent(name, JSON.stringify(params || {})); } catch (_) {}
   if (LOG_KINDS.has(name)) plog(name, params);
 }
+// Firebase Analytics collection in the Android app follows the same consent (off until the player agrees).
+function applyStatsConsent() { try { if (window.AndroidApp && AndroidApp.setAnalytics) AndroidApp.setAnalytics(wallet.stats === true); } catch (_) {} }
 /* Event log for the owner's panel: the few events that explain what happened to a player (sign-in, games, drops, errors,
    purchases) go to /logs/{uid}, in batches, at most 80 a day per phone. No e-mails and no texts typed by the player. */
 const LOG_KINDS = new Set([
@@ -2200,6 +2121,7 @@ const logBuf = [];
 let logTimer = 0;
 function plog(kind, detail) {
   try {
+    if (!PG.state.usage.mayRecord(String(kind), wallet.stats)) return;
     const day = new Date().toISOString().slice(0, 10), cap = JSON.parse(localStorage.getItem('logCap') || '{}');
     if (cap.d !== day) { cap.d = day; cap.n = 0; }
     if (cap.n >= 80) return;
@@ -2680,7 +2602,7 @@ function renderShop() {
   // Render Daily 6-Item Showcase in tile format
   const dailyWrap = $('#dailyShopWrap');
   if (dailyWrap && PG.ui.shop.renderDailyShopShowcase) {
-    const dailyItems = PG.ui.shop.getDailyShopItems(FIGS, FRAMES, PG.state.status.SHOP_STATUSES);
+    const dailyItems = PG.ui.shop.getDailyShopItems(FIGS, FRAMES, PG.state.status.SHOP_STATUSES, new Date(), wallet);
     dailyWrap.innerHTML = PG.ui.shop.renderDailyShopShowcase({
       items: dailyItems,
       wallet,
@@ -2691,6 +2613,29 @@ function renderShop() {
   }
 
   $('#locgrid').innerHTML = PG.ui.shop.renderLocationsGrid(LOCS);
+  const rs = $('#reactShop'); if (rs) rs.innerHTML = PG.ui.shop.renderReactionShopHtml({wallet});
+}
+const _rs = $('#reactShop'); if (_rs) _rs.addEventListener('click', e => {
+  const b = e.target.closest('[data-rbuy]'); if (b) buyReaction(b.dataset.rbuy, b.dataset.rid);
+});
+/* Emoji and phrases: bought one by one for gold (asks first, like figures), then they can go into the deck. */
+function buyReaction(kind, id) {
+  const R = PG.state.reactions, p = R.price(kind, id), what = kind === 'emote' ? `эмодзи ${id}` : `фразу «${id}»`;
+  if (R.isOwned(wallet, kind, id)) return;
+  if (wallet.gold < p) return toastAny(`Не хватает ${p - wallet.gold} золота`);
+  confirmBox(`Купить ${what} за ${p} золота? Останется ${wallet.gold - p}.`, 'Купить', () => {
+    const res = R.buy(wallet, kind, id); if (!res.ok) return;
+    beep('coin'); track('spend_virtual_currency', {item_name: kind + '_' + R.ALL_EMOTES.concat(R.ALL_PHRASES).indexOf(id), virtual_currency_name: 'gold', value: res.price});
+    // a bought line goes straight into the deck while there is room
+    const key = kind === 'emote' ? 'emotes' : 'phrases', cur = R.deck(wallet, kind);
+    if (cur.length < 5 && !cur.includes(id)) wallet[key] = [...cur, id];
+    for (const r of R.claimCollections(wallet)) toastAny(`Коллекция ${r.kind === 'emote' ? 'эмодзи' : 'фраз'} собрана! +${r.gold} золота`);
+    saveWallet(); document.querySelectorAll('.goldN').forEach(e => e.textContent = wallet.gold);
+    toastAny(kind === 'emote' ? `Эмодзи ${id} — ваше!` : 'Фраза — ваша!');
+    if (!$('#scr-shop').hidden) renderShop();
+    if (typeof renderItems === 'function' && $('#itemsBody')) renderItems();
+    renderSayBox();
+  });
 }
 const _frg = $('#frgrid'); if (_frg) _frg.addEventListener('click', e => {
   const b = e.target.closest('[data-fr]'); if (!b) return;
@@ -2762,7 +2707,6 @@ function saveGame() {
 function clearSave() {
   if (typeof PG !== 'undefined' && PG.state && PG.state.save) PG.state.save.clearActiveGame(localStorage);
   else try { localStorage.removeItem('savedGame'); } catch (_) {}
-  renderResume();
 }
 function loadSave() {
   if (typeof PG !== 'undefined' && PG.state && PG.state.save) return PG.state.save.loadActiveGame(localStorage);
@@ -2780,44 +2724,47 @@ function lastOnline() {
   if (typeof PG !== 'undefined' && PG.state && PG.state.save) return PG.state.save.getLastOnline(localStorage);
   try { const g = JSON.parse(localStorage.getItem('lastGame')); return g && Date.now() - g.at < 3 * 3600e3 ? g : null; } catch (_) { return null; }
 }
-function renderResume() {
-  const sv = loadSave(), b = $('#resume'), lg = lastOnline() && (!net || !gameVisible); // also when a dead room object is left behind after a drop
-  const off = sv && sv.moves && sv.cfg;
-  b.hidden = !off && !lg;
-  b.querySelector('.rtx b').textContent = off ? 'Продолжить партию' : 'Вернуться в онлайн-партию';
-  if (off) $('#resumeInfo').textContent = `${sv.cfg.seats.length} ${sv.cfg.seats.length < 5 ? 'игрока' : 'игроков'} · сделано ходов: ${sv.moves.length}`;
-  else if (lg) $('#resumeInfo').textContent = 'Пока вас не было, за вас играл бот';
+/* A game that is still going is never lost and needs no button: coming back to the game (a new start, or back from the
+   background after the phone dropped the player out) puts the player straight into it — the saved game of this phone,
+   or the online room they were in. Leaving by «Выйти в главное меню» on purpose pauses that until the next start. */
+let resumeHold = false;
+function pendingGame() {
+  const sv = loadSave(), lg = lastOnline() && (!net || !gameVisible); // also when a dead room object is left behind after a drop
+  if (sv && sv.moves && sv.cfg) return {kind: 'saved', sv};
+  return lg ? {kind: 'online', lg: lastOnline()} : null;
 }
-$('#resume').onclick = () => {
-  const sv = loadSave();
-  if (sv && sv.moves && sv.cfg) { if (net) leaveRoom(); startGame(sv.cfg, sv.moves); return show('game'); }
-  const lg = lastOnline(); if (!lg) return renderResume();
-  if (net) leaveRoom();
-  connect(lg.code, false); show('lobby');
-};
+function autoResume() {
+  if (tut || resumeHold || gameVisible || document.hidden || mm) return false;
+  // only what must be answered first holds it back: an update offer, the maintenance screen, the reinstall card
+  if ((updBox && document.body.contains(updBox)) || document.getElementById('maintBox') || document.getElementById('reinst')) return false;
+  const g = pendingGame(); if (!g) return false;
+  if (g.kind === 'saved') { if (net) leaveRoom(); startGame(g.sv.cfg, g.sv.moves); show('game'); return true; }
+  connect(g.lg.code, false); show('lobby');
+  return true;
+}
 
 /* ---------------- minimised for over a minute: out of the online game ----------------
    In the background the phone does not play, so after AFK_MS the player is taken out of the room; on coming back a
    card says so and offers to rejoin (the game goes on from the room's log, a bot plays for the player meanwhile). */
 const AFK_MS = 60000;
 let hiddenAt = 0, afkTimer = 0;
+let afkRejoin = null;
 function afkKick() {
-  if (tut || document.getElementById('afkBox') || (!net && !mm)) return;
+  if (tut || (!net && !mm)) return;
   let kind = 'room', code = null;
   token++; turnTok++; stopTimer(); clearInterval(watchId);
   if (mm) { kind = 'search'; stopMatch(false); }
   else { code = net.code; leaveRoom(); }
   closeGameMenu(); const sb = document.getElementById('sayBox'); if (sb) sb.hidden = true;
   show('menu');
-  const b = document.createElement('div'); b.className = 'over'; b.id = 'afkBox'; b.style.position = 'fixed';
-  b.innerHTML = `<div class="ocard"><div style="font-size:46px">💤</div><h3>Из-за бездействия вы отключились</h3><p>${kind === 'search' ? 'Игра была свёрнута больше минуты, поиск остановлен' : 'Игра была свёрнута больше минуты. Пока вас нет, за вас играет бот'}</p><button class="cta wide" id="afkBack">${kind === 'search' ? 'Искать снова' : 'Перезайти'}</button><button class="ghostbtn" id="afkMenu">В меню</button></div>`;
-  document.body.append(b);
-  b.querySelector('#afkMenu').onclick = () => b.remove();
-  b.querySelector('#afkBack').onclick = () => { b.remove(); if (kind === 'search') quickMatch(); else { connect(code, false); show('lobby'); } };
+  if (kind === 'search') { toastAny('Поиск игры остановлен, пока игра была свёрнута'); return; }
+  // back into the game at once if the player is looking at the phone; otherwise on the first look
+  if (document.hidden) afkRejoin = {code}; else { connect(code, false); show('lobby'); }
 }
 document.addEventListener('visibilitychange', () => {
   clearTimeout(afkTimer);
   if (document.hidden) { hiddenAt = Date.now(); afkTimer = setTimeout(afkKick, AFK_MS); return; }
+  if (afkRejoin) { const r = afkRejoin; afkRejoin = null; hiddenAt = 0; resumeHold = false; connect(r.code, false); show('lobby'); return; }
   // Only a finished game left on screen goes home: the lobby, results or friends screens stay where the player was.
   if (phase === 'end' && !mm && gameVisible) { closeGameMenu(); show('menu'); }
   else if (hiddenAt && Date.now() - hiddenAt >= AFK_MS) afkKick();
@@ -2865,6 +2812,7 @@ $('#prefs').addEventListener('click', e => {
   if (r.k === 'music') { try { audio(); musicUpdate(); } catch (_) {} }
   if (r.k === 'sound') beep('turn');
   if (r.k === 'notify' && window.AndroidApp && AndroidApp.setUpdateNotifications) AndroidApp.setUpdateNotifications(wallet.notify);
+  if (r.k === 'stats') { wallet.statsAsked = true; saveWallet(); applyStatsConsent(); if (!wallet.stats) { usageState = null; try { localStorage.removeItem('usage'); } catch (_) {} } }
   if (r.k === 'view') setView(wallet.view);
   if (r.k === 'zones') { markOwn(); updateOwnership(); }
   if (r.k === 'gfx') { applyGfx(); redecorate(); }
@@ -2916,7 +2864,7 @@ function openGameMenu() {
     const a = b.dataset.a;
     if (a === 'resume') return closeGameMenu();
     if (a === 'settings') { box.remove(); settingsReturn = 'game'; return show('settings'); }
-    if (a === 'menu') { box.remove(); return show('menu'); }
+    if (a === 'menu') { box.remove(); resumeHold = true; return show('menu'); }
     if (a === 'cancel') {
       if (!confirmOnce(b, 'Точно отменить? Нажмите ещё раз')) return;
       if (online) { netSend({t: 'resign', g: net.gameId, p: seat}); leaveRoom(); }
@@ -3034,6 +2982,8 @@ function setProfileName(n) {
   n = clean(n); if (!n) return false;
   wallet.name = n; wallet.nameAt = Date.now(); setup.seats[0].name = n; saveWallet(); saveSetup();
   if (typeof presenceMark === 'function') presenceMark(true);
+  // the new nickname shows at once wherever it is on screen: the main menu header and the profile
+  try { renderMenuProfile(); if (!$('#scr-profile').hidden) renderProfile(); } catch (_) {}
   return true;
 }
 function saveSetup() { try { localStorage.setItem('setup', JSON.stringify(setup)); } catch (_) {} }
@@ -3155,7 +3105,7 @@ function renderRules() {
   const cards = (locked) => (typeof PG !== 'undefined' && PG.ui && PG.ui.setup)
     ? PG.ui.setup.renderModeCardsHtml(MODES, setup.rules.mode, locked)
     : (() => {
-      const ICON = {fast: '⚡', classic: '⚖️', epic: '🏰', duel: '⚔️'};
+      const ICON = {fast: '⚡', classic: '⚖️', epic: '🏰'};
       return `<div class="modecards">${Object.entries(MODES).map(([k, m]) => `<button class="mcard" data-setmode="${k}" aria-pressed="${setup.rules.mode === k}"${locked ? ' disabled' : ''}><i>${ICON[k]}</i><b>${m.label}</b><small>${m.desc.split(' · ').slice(0, 2).join(' · ')}</small></button>`).join('')}</div>`;
     })();
   const rows = (on, room) => (typeof PG !== 'undefined' && PG.ui && PG.ui.setup)
@@ -3430,7 +3380,7 @@ function netDown(me) {
   clearTimeout(me.downT);
   me.downT = setTimeout(() => {
     if (net !== me || !me.down) return;
-    confirmBox('Связь с игрой потеряна<br><small>Партия сохранена на сервере. Проверьте интернет и попробуйте снова — ходы подтянутся сами</small>', 'Повторить', () => netRetry(me), 'В меню', () => { show('menu'); renderResume(); });
+    confirmBox('Связь с игрой потеряна<br><small>Партия сохранена на сервере. Проверьте интернет и попробуйте снова — ходы подтянутся сами</small>', 'Повторить', () => netRetry(me), 'В меню', () => { show('menu'); });
   }, NET_DIALOG_AFTER);
 }
 function netUp(me) {
@@ -3605,12 +3555,12 @@ function peekSend() {
 }
 function peekClear() { if (peekEl) { peekEl.remove(); peekEl = null; } clearTimeout(peekT); peekT = 0; peekLast = ''; }
 function showPeek(m) {
-  if (phase !== 'remote' || !current || m.n !== applied || m.p !== turn || isLocal(m.p) || !Number.isInteger(m.x) || !Number.isInteger(m.y) || !(m.r >= 0 && m.r < 4)) return;
+  if (phase !== 'remote' || !current || m.n !== applied || m.p !== turn || isLocal(m.p) || !Number.isInteger(m.x) || !Number.isInteger(m.y) || !(m.r >= 0 && m.r < NDIR())) return;
   if (tiles.has(key(m.x, m.y)) || Math.abs(m.x) > 80 || Math.abs(m.y) > 80) return;
-  if (!peekEl) { peekDeg = m.r * 90; peekEl = tileEl({x: m.x, y: m.y, type: current.type, r: m.r}, false); peekEl.classList.add('ghost', 'peek'); world.append(peekEl); }
-  else peekDeg += (((m.r * 90 - peekDeg) % 360) + 540) % 360 - 180; // turn the short way
+  if (!peekEl) { peekDeg = m.r * ROT(); peekEl = tileEl({x: m.x, y: m.y, type: current.type, r: m.r}, false); peekEl.classList.add('ghost', 'peek'); world.append(peekEl); }
+  else peekDeg += (((m.r * ROT() - peekDeg) % 360) + 540) % 360 - 180; // turn the short way
   peekEl.style.setProperty('--pc', players[m.p].col);
-  peekEl.style.left = (m.x * T - T / 2) + 'px'; peekEl.style.top = (m.y * T - T / 2) + 'px';
+  const [pl, pt] = cellLT(m.x, m.y); peekEl.style.left = pl + 'px'; peekEl.style.top = pt + 'px';
   const f = peekEl.querySelector('.face'); if (f) f.style.setProperty('--r', peekDeg + 'deg');
 }
 function onMove(m) {
@@ -4275,14 +4225,7 @@ $('#mBots').onclick = () => {
 
 /* Quick phrases online: a fixed set of emoji and short lines (no free text, so nothing to
    moderate). They appear as a bubble under the sender's card for a few seconds. */
-const DEFAULT_EMOTES = ['👑', '🧩', '🏰', '⚔️', '🤝'];
-const DEFAULT_PHRASES = [
-  'Отличный ход!',
-  'Мой замок!',
-  'Так и планировал 😎',
-  'Удачи за столом! 🤝',
-  'Спасибо за игру! ❤️'
-];
+const {DEFAULT_EMOTES, DEFAULT_PHRASES} = PG.state.reactions;
 
 const ALL_EMOTES = [
   '👑', '🧩', '🏰', '⚔️', '🛡️', '🌊',
@@ -4324,8 +4267,7 @@ const SAY_MS = 3200, sayUntil = {};
 let sayAt = 0;
 const isText = x => /[а-яёА-ЯЁ]/i.test(x);
 function renderSayBox() {
-  const chosenEm = (wallet.emotes && wallet.emotes.length) ? wallet.emotes.slice(0, 5) : DEFAULT_EMOTES;
-  const chosenTx = (wallet.phrases && wallet.phrases.length) ? wallet.phrases.slice(0, 5) : DEFAULT_PHRASES;
+  const chosenEm = PG.state.reactions.deck(wallet, 'emote'), chosenTx = PG.state.reactions.deck(wallet, 'phrase');
   $('#sayBox').innerHTML = `<div class="sy-lock">Подождите: прошлое сообщение ещё на экране</div>` +
     `<div class="sy-top"><span class="sy-h">Эмоции</span><span class="sy-cnt">${chosenEm.length}/5</span></div>` +
     `<div class="sy-e sy-deck">${chosenEm.map(x => `<button class="e" data-say="${SAYS.indexOf(x)}" title="${x}">${x}</button>`).join('')}</div>` +
@@ -4348,6 +4290,7 @@ $('#sayBox').addEventListener('click', e => {
   const me = players.findIndex(isMe); if (me < 0) return;
   $('#sayBox').hidden = true;
   sayAt = Date.now() + SAY_MS; sayLockUi(); setTimeout(() => { $('#sayBox').classList.remove('lock'); $('#sayBtn').classList.remove('cool'); }, SAY_MS);
+  if (meCounted()) progress({say: 1});
   if (net) {
     netSend({t: 'say', g: net.gameId, p: me, i: +b.dataset.say});
   } else {
@@ -4381,6 +4324,8 @@ function showSay(p, i) {
    Counted games are the ones that pay gold: you alone against bots, or online. */
 const meCounted = () => { const me = players.findIndex(isMe); return me >= 0 && (!!net || (localHumans() === 1 && !players.every(p => p.human))); };
 const {xpNeed, QUESTS, ACH, WEEKLY_QUESTS, WEEKLY_CHEST_GOLD, weekId, normalizeStats, recordGameMode} = PG.state.progress;
+// every weekly goal there can be (three core ones and the extra of each week), to look a goal up by its id
+const WEEKLY_ALL = [...WEEKLY_QUESTS, ...(PG.state.progress.WEEKLY_EXTRA || [])];
 const PROG = Object.assign({xp: 0, lvl: 1, st: {}, day: '', q: [], ach: {}, cups: 0, up: 0, cupsSeen: 0, inTop10: false, topSeen: false}, wallet.prog);
 PROG.st = normalizeStats(PROG.st);
 wallet.prog = PROG;
@@ -4388,12 +4333,12 @@ function questsWeekly() {
   const curWeek = (PG.state.progress && PG.state.progress.weekId) ? PG.state.progress.weekId() : 'w1';
   if (PROG.week === curWeek && PROG.wq && PROG.wq.length) return;
   PROG.week = curWeek;
-  PROG.wq = (WEEKLY_QUESTS || []).map(q => ({id: q.id, n: 0, got: false}));
+  PROG.wq = PG.state.progress.weeklyQuests(curWeek).map(q => ({id: q.id, n: 0, got: false}));
   PROG.wchest = false;
 }
 // Three quests a day, the same for the whole day.
 function questsToday() {
-  if (PROG.day === today()) return;
+  if (PROG.day === today() && (PROG.q || []).every(q => QUESTS.some(x => x.id === q.id))) return;   // a quest that no longer exists: pick the day again
   PROG.day = today(); PROG.q = PG.state.progress.dailyQuests(PROG.day).map(id => ({id, n: 0, got: false}));
 }
 // Earned statuses and frames: a day counts when every daily task is done; the month is checked in grantEarned.
@@ -4422,11 +4367,12 @@ function progress(d) {
   questsToday();
   questsWeekly();
   if (d.cityTiles) PROG.st.maxCity = Math.max(PROG.st.maxCity || 0, d.cityTiles);
+  if (d.roadTiles) PROG.st.maxRoad = Math.max(PROG.st.maxRoad || 0, d.roadTiles);
   for (const [k, v] of Object.entries(d)) {
-    if (k in PROG.st && k !== 'best' && k !== 'maxCity' && k !== 'byMode') PROG.st[k] += v;
+    if (k in PROG.st && !['best', 'maxCity', 'maxRoad', 'byMode', 'streak', 'bestStreak'].includes(k)) PROG.st[k] += v;
     PROG.q.forEach(q => { const Q = QUESTS.find(x => x.id === q.id); if (Q && Q.k === k && !q.got) q.n = Math.min(Q.n, q.n + v); });
     if (PROG.wq) {
-      PROG.wq.forEach(q => { const WQ = (WEEKLY_QUESTS || []).find(x => x.id === q.id); if (WQ && WQ.k === k && !q.got) q.n = Math.min(WQ.n, q.n + v); });
+      PROG.wq.forEach(q => { const WQ = WEEKLY_ALL.find(x => x.id === q.id); if (WQ && WQ.k === k && !q.got) q.n = Math.min(WQ.n, q.n + v); });
     }
   }
   markQuestDay(); earnedCheck();
@@ -4436,8 +4382,7 @@ function progress(d) {
 function gameDone(place, score) {
   const win = place === 0;
   PROG.st.best = Math.max(PROG.st.best, score);
-  const isDuel = gameRules && gameRules.mode === 'duel';
-  const mode = isDuel ? 'duel' : (net ? (net.quick ? 'online' : 'friends') : 'bots');
+  const mode = net ? (net.quick ? 'online' : 'friends') : 'bots';
   recordGameMode(PROG.st, mode, win, score);
   if (!net && mode === 'bots') {
     const curLevel = botLevel();
@@ -4472,12 +4417,21 @@ function gameDone(place, score) {
   }
   // Funnel markers: the owner's panel and Analytics show where newcomers stop.
   { const n = PROG.st.games + 1; if (n <= 3) track(['first_game_done', 'second_game_done', 'third_game_done'][n - 1], {win: win ? 1 : 0, score}); }
-  progress({games: 1, win: win ? 1 : 0, wins: win ? 1 : 0, s30: score >= ((deckMax <= 30) ? 20 : 30) ? 1 : 0, online: net ? 1 : 0, ogames: net ? 1 : 0, owins: net && win ? 1 : 0});
+  PROG.st.streak = win ? (PROG.st.streak || 0) + 1 : 0;
+  PROG.st.bestStreak = Math.max(PROG.st.bestStreak || 0, PROG.st.streak);
+  const hard = !net && win && typeof botLevel === 'function' && botLevel() === 'hard';
+  progress({games: 1, win: win ? 1 : 0, wins: win ? 1 : 0, s30: score >= ((deckMax <= 30) ? 20 : 30) ? 1 : 0, s40: score >= 40 ? 1 : 0, online: net ? 1 : 0, ogames: net ? 1 : 0, owins: net && win ? 1 : 0, hardwin: hard ? 1 : 0});
   // Experience: a share for taking part, more for the place and for the points, half again online. A game where this
   // player laid fewer than 6 cards gives nothing (quitting early is not farming).
   const me = players.find(isMe), laid = me && me.stats ? me.stats.t || 0 : 6;
   const xp = laid < 6 ? 0 : Math.round((10 + (place < 0 ? 15 : [30, 20, 10, 5, 5][place] || 5) + Math.min(40, score >> 1)) * (net ? 1.5 : 1));
   const up = PG.state.progress.addXp(PROG, xp); wallet.gold += 20 * up;
+  // first win of the day and wins in a row pay a little extra gold
+  const wb = PG.state.progress.winBonus({win, streak: PROG.st.streak, laid, today: today(), fw: wallet.fwDay});
+  if (wb.gold) {
+    wallet.gold += wb.gold; if (wb.first) wallet.fwDay = today();
+    setTimeout(() => toastAny(`${wb.first ? 'Первая победа дня' : 'Серия побед'}: +${wb.gold} золота${wb.first && wb.streakGold ? ` (серия ×${PROG.st.streak})` : wb.streakGold ? ` · ${PROG.st.streak} подряд` : ''}`), 2600);
+  }
   // Cups: quick online games, and a private room whose creator turned "for cups" on (at most 5 such games a day:
   // nobody can farm cups with a friend). No cups if any bot is in the game.
   const hasBots = players.some(p => !p.human);
@@ -4496,7 +4450,7 @@ const rewardReady = () => {
   questsToday();
   questsWeekly();
   const qDot = PROG.q.some(q => !q.got && q.n >= QUESTS.find(x => x.id === q.id).n);
-  const wqDot = PROG.wq && (PROG.wq.some(q => !q.got && q.n >= (WEEKLY_QUESTS.find(x => x.id === q.id) || {}).n) || (!PROG.wchest && PROG.wq.every(q => q.got)));
+  const wqDot = PROG.wq && (PROG.wq.some(q => !q.got && q.n >= (WEEKLY_ALL.find(x => x.id === q.id) || {}).n) || (!PROG.wchest && PROG.wq.every(q => q.got)));
   const aDot = ACH.some(a => a.ok(PROG.st, PROG.lvl) && PROG.ach[a.id] !== 'got');
   const cDot = typeof COLLECTIONS !== 'undefined' && Array.isArray(COLLECTIONS) && typeof collectionProgress === 'function' ? COLLECTIONS.some(c => { const p = collectionProgress(c, wallet); return p.isComplete && !p.isClaimed; }) : false;
   return qDot || wqDot || aDot || cDot || !!PROG.inTop10;
@@ -4505,7 +4459,7 @@ function ptabsDot() {
   questsToday();
   questsWeekly();
   const qDot = PROG.q.some(q => !q.got && q.n >= QUESTS.find(x => x.id === q.id).n);
-  const wqDot = PROG.wq && (PROG.wq.some(q => !q.got && q.n >= (WEEKLY_QUESTS.find(x => x.id === q.id) || {}).n) || (!PROG.wchest && PROG.wq.every(q => q.got)));
+  const wqDot = PROG.wq && (PROG.wq.some(q => !q.got && q.n >= (WEEKLY_ALL.find(x => x.id === q.id) || {}).n) || (!PROG.wchest && PROG.wq.every(q => q.got)));
   const aDot = ACH.some(a => a.ok(PROG.st, PROG.lvl) && PROG.ach[a.id] !== 'got');
   const cDot = typeof COLLECTIONS !== 'undefined' && Array.isArray(COLLECTIONS) && typeof collectionProgress === 'function' ? COLLECTIONS.some(c => { const p = collectionProgress(c, wallet); return p.isComplete && !p.isClaimed; }) : false;
   const tDot = !!PROG.inTop10;
@@ -4526,7 +4480,7 @@ function progressDot() {
   ptabsDot();
   if (typeof updateNotifBadge === 'function') updateNotifBadge();
 }
-let ptab = 'rewards';
+let ptab = 'road';
 function ring(frac) { return PG.ui.progress.ringSvg(frac); }
 // The profile plate on the menu: avatar, nickname, level with its bar, gold. Taps open the profile.
 function renderMenuQuestBanner() {
@@ -4553,45 +4507,107 @@ function renderMenuQuestBanner() {
 }
 const PROGRESS_ROAD_MILESTONES = [
   { id: 'm1', lvl: 1, cups: 0, title: 'Старт пути', desc: 'Первые шаги', reward: { gold: 30 }, ic: '🌱' },
-  { id: 'm2', lvl: 2, cups: 30, title: 'Новичок', desc: '+50 золота', reward: { gold: 50 }, ic: '💰' },
+  { id: 'm2', lvl: 2, cups: 30, title: 'Новичок', desc: '+50 золота и эмодзи 😎', reward: { gold: 50, emote: '😎' }, ic: '💰' },
   { id: 'm3', lvl: 3, cups: 70, title: 'Следопыт', desc: 'Статус «Следопыт»', reward: { status: 'Следопыт', gold: 50 }, ic: '🧭' },
-  { id: 'm4', lvl: 4, cups: 120, title: 'Зодчий', desc: '+100 золота', reward: { gold: 100 }, ic: '🏰' },
+  { id: 'm4', lvl: 4, cups: 120, title: 'Зодчий', desc: '+100 золота и эмодзи 🏰', reward: { gold: 100, emote: '🏰' }, ic: '🏰' },
   { id: 'm5', lvl: 5, cups: 180, title: 'Изумруд', desc: 'Рамка «Изумруд»', reward: { frame: 'emerald', gold: 50 }, ic: '💎' },
-  { id: 'm6', lvl: 6, cups: 250, title: 'Мастер', desc: '+150 золота', reward: { gold: 150 }, ic: '⭐' },
+  { id: 'm6', lvl: 6, cups: 250, title: 'Мастер', desc: '+150 золота и фраза «Красиво строишь!»', reward: { gold: 150, phrase: 'Красиво строишь!' }, ic: '⭐' },
   { id: 'm7', lvl: 7, cups: 350, title: 'Магистр', desc: 'Фигурка «Магистр»', reward: { fig: 'classic', gold: 100 }, ic: '🧙‍♂️' },
   { id: 'm8', lvl: 8, cups: 500, title: 'Золотой сундук', desc: '+250 золота', reward: { gold: 250 }, ic: '🎁' },
-  { id: 'm9', lvl: 9, cups: 750, title: 'Гроссмейстер', desc: 'Статус «Гроссмейстер»', reward: { status: 'Гроссмейстер', gold: 150 }, ic: '👑' },
-  { id: 'm10', lvl: 10, cups: 1000, title: 'Чемпион', desc: 'Кубок Чемпиона +500 золота', reward: { frame: 'gold', gold: 500 }, ic: '🏆' },
+  { id: 'm9', lvl: 9, cups: 750, title: 'Гроссмейстер', desc: 'Статус «Гроссмейстер» и фраза', reward: { status: 'Гроссмейстер', gold: 150, phrase: 'Ну ты гроссмейстер! 👑' }, ic: '👑' },
+  { id: 'm10', lvl: 10, cups: 1000, title: 'Чемпион', desc: 'Кубок Чемпиона +500 золота и эмодзи 🏆', reward: { frame: 'gold', gold: 500, emote: '🏆' }, ic: '🏆' },
 ];
 
-function renderProgressRoad() {
-  const track = $('#roadTrack');
-  if (!track) return;
-  const rankEl = $('#roadCurrentRank');
-  if (rankEl) rankEl.textContent = `🏆 ${PROG.cups || 0}`;
-  const myLvl = PROG.lvl || 1, myCups = PROG.cups || 0;
-  const claimed = wallet.roadClaimed || [];
-
-  track.innerHTML = PROGRESS_ROAD_MILESTONES.map(m => {
-    const isUnlocked = myLvl >= m.lvl || myCups >= m.cups;
-    const isClaimed = claimed.includes(m.id);
-    const cls = isClaimed ? 'claimed' : isUnlocked ? 'unlocked' : 'locked';
-    const btn = isClaimed
-      ? '<span class="road-node-tag">✅ Получено</span>'
-      : isUnlocked
-        ? `<button class="chip pri road-node-btn" data-claimroad="${m.id}">Забрать</button>`
-        : `<span class="road-node-tag">🔒 ${m.cups ? m.cups + ' 🏆' : 'Ур. ' + m.lvl}</span>`;
-    return `
-      <div class="road-node ${cls}">
-        <span class="road-node-ic">${m.ic}</span>
-        <div class="road-node-card">
-          <b class="road-node-title">${m.title}</b>
-          <small class="road-node-reward">${m.desc}</small>
-          ${btn}
-        </div>
-      </div>
-    `;
+/* The progress road as a map in the game's own style: level 1 top left, level 2 at the right edge, level 3 left again...
+   a cobbled road winds from one to the next, rivers cross it under little bridges, villages, woods and a castle stand
+   between. Everything is placed from a fixed seed, so the map is the same every time it is opened. */
+function roadMapHtml(ms, unlockedFn, claimed) {
+  const W = 360, ROW = 176, TOP = 130, n = ms.length, H = TOP + (n - 1) * ROW + 150;
+  const P = ms.map((m, i) => ({x: i % 2 ? 284 : 76, y: TOP + i * ROW}));
+  const cub = (p0, c1, c2, p1, t) => { const u = 1 - t; return [u * u * u * p0[0] + 3 * u * u * t * c1[0] + 3 * u * t * t * c2[0] + t * t * t * p1[0], u * u * u * p0[1] + 3 * u * u * t * c1[1] + 3 * u * t * t * c2[1] + t * t * t * p1[1]]; };
+  const segs = [];
+  for (let i = 0; i < n - 1; i++) {
+    const d = P[i + 1].x > P[i].x ? 1 : -1;
+    segs.push([[P[i].x, P[i].y], [P[i].x + d * 125, P[i].y + 6], [P[i + 1].x - d * 125, P[i + 1].y - 6], [P[i + 1].x, P[i + 1].y]]);
+  }
+  const head = [[-10, P[0].y - 72], [34, P[0].y - 72], [44, P[0].y], [P[0].x, P[0].y]];                    // in from the top-left corner
+  const tail = [[P[n - 1].x, P[n - 1].y], [P[n - 1].x + 4, P[n - 1].y + 50], [P[n - 1].x - 20, P[n - 1].y + 90], [P[n - 1].x - 40, H + 10]];   // and on to new seasons
+  const all = [head, ...segs, tail];
+  const pathD = c => `M${c[0][0]} ${c[0][1]}C${c[1][0]} ${c[1][1]} ${c[2][0]} ${c[2][1]} ${c[3][0]} ${c[3][1]}`;
+  const samples = []; all.forEach(c => { for (let k = 0; k <= 36; k++) samples.push(cub(c[0], c[1], c[2], c[3], k / 36)); });
+  // how far the player has walked: the road up to the last open level glows gold
+  let last = -1; ms.forEach((m, i) => { if (unlockedFn(m)) last = i; });
+  const walked = segs.slice(0, Math.max(0, last)).concat(last >= 0 ? [] : []).map(pathD).join('');
+  // rivers cross the road in the middle of three of its stretches, under a little plank bridge
+  const rivers = [];
+  [1, 4, 7].filter(k => k < segs.length).forEach(k => {
+    const c = segs[k], m = cub(c[0], c[1], c[2], c[3], .5), t1 = cub(c[0], c[1], c[2], c[3], .53), t0 = cub(c[0], c[1], c[2], c[3], .47);
+    const flip = k % 2 ? -1 : 1;
+    const r1 = [[-20, m[1] - 40 * flip], [70, m[1] - 78 * flip], [120, m[1] + 36 * flip], [m[0], m[1]]];
+    const r2 = [[m[0], m[1]], [2 * m[0] - 120, 2 * m[1] - (m[1] + 36 * flip)], [300, m[1] - 56 * flip], [380, m[1] + 30 * flip]];
+    rivers.push({r1, r2, m, ang: Math.atan2(t1[1] - t0[1], t1[0] - t0[0])});
+  });
+  const riverSamples = []; rivers.forEach(r => [r.r1, r.r2].forEach(c => { for (let k = 0; k <= 30; k++) riverSamples.push(cub(c[0], c[1], c[2], c[3], k / 30)); }));
+  const riverD = r => `M${r.r1[0][0]} ${r.r1[0][1]}C${r.r1[1][0]} ${r.r1[1][1]} ${r.r1[2][0]} ${r.r1[2][1]} ${r.r1[3][0]} ${r.r1[3][1]}C${r.r2[1][0]} ${r.r2[1][1]} ${r.r2[2][0]} ${r.r2[2][1]} ${r.r2[3][0]} ${r.r2[3][1]}`;
+  let svg = `<svg class="rd-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">`;
+  const stroke = (d, w, col, extra = '') => `<path d="${d}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" ${extra}/>`;
+  for (const r of rivers) {
+    const d = riverD(r);
+    svg += stroke(d, 44, 'rgba(30,70,20,.35)') + stroke(d, 38, '#a8975f') + stroke(d, 35, '#d6c48e') + stroke(d, 31, 'rgba(240,252,255,.85)') + stroke(d, 29, '#46b3d3') + stroke(d, 22, '#2f93c8') + stroke(d, 12, '#2276b8') + stroke(d, 2, 'rgba(235,250,255,.7)', 'stroke-dasharray="6 14"');
+  }
+  const road = all.map(pathD).join('');
+  svg += stroke(road, 34, 'rgba(60,90,30,.35)') + stroke(road, 28, '#80653e') + stroke(road, 24, '#d9bf88') + stroke(road, 17, '#c7a874') + stroke(road, 11, '#e2cb98') + stroke(road, 2, 'rgba(150,120,70,.5)', 'stroke-dasharray="3 10"');
+  if (walked) svg += stroke(walked, 4, '#f2b84b', 'stroke-dasharray="1 9" opacity=".95"');
+  svg += '</svg>';
+  // scenery: sprites of the game (houses, trees, hay, rocks, a keep), placed where there is room
+  const R = rng(20261106), dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+  const placed = [], spr = [];
+  const nodeBox = P.map(q => q);
+  const free = (x, y, r) => samples.every(q => dist(q, [x, y]) > r + 14) && riverSamples.every(q => dist(q, [x, y]) > r + 26)
+    && nodeBox.every(q => Math.abs(x - q.x) > 86 + r * .3 || y < q.y - 100 || y > q.y + 62) && placed.every(q => dist(q, [x, y]) > (r + q[2]) * .85) && x > 12 && x < W - 12 && y > 14 && y < H - 8;
+  const put = (k, x, y, r) => { if (!free(x, y, r)) return false; placed.push([x, y, r]); const d = SPR[k]; if (d) spr.push({k, x, y, w: Math.round(d.w * 1.7), h: Math.round(d.h * 1.7)}); return true; };
+  // villages: a cluster of houses and hay near the outer side of some levels, a keep at the end
+  [2, 4, 6, 8].filter(i => i < n).forEach((i, vi) => {
+    const side = P[i].x < W / 2 ? 1 : -1, cx = P[i].x + side * 112 - (side > 0 ? 0 : 0), cy = P[i].y + 70;
+    ['house', 'house2', 'house3', 'house4', 'house', 'hay'].forEach((k, j) => { for (let t = 0; t < 14; t++) { if (put(k, cx + (R() - .5) * 120, cy + (R() - .5) * 90, k === 'hay' ? 12 : 22)) break; } });
+  });
+  { const q = P[n - 1], side = q.x < W / 2 ? 1 : -1; for (let t = 0; t < 30; t++) if (put('tower', q.x + side * (90 + R() * 20), q.y + 8 + R() * 30, 30)) break; }
+  for (let t = 0; t < 700 && spr.length < 90; t++) {
+    const x = 10 + R() * (W - 20), y = 10 + R() * (H - 20), v = R();
+    const k = v < .34 ? 'pine' : v < .56 ? 'oak' : v < .66 ? 'birch' : v < .73 ? 'poplar' : v < .88 ? 'bush' : v < .95 ? 'rock' : 'hay';
+    put(k, x, y, k === 'bush' || k === 'rock' || k === 'hay' ? 9 : 14);
+  }
+  spr.sort((a, b) => a.y - b.y);
+  const sprHtml = spr.map(o => `<i class="rd-spr s-${o.k}" style="left:${(100 * o.x / W).toFixed(2)}%;top:${o.y}px;width:${o.w}px;height:${o.h}px"></i>`).join('');
+  const bridges = rivers.map(r => `<i class="rd-bridge" style="left:${(100 * r.m[0] / W).toFixed(2)}%;top:${Math.round(r.m[1])}px;--a:${(r.ang * 180 / Math.PI).toFixed(1)}deg"></i>`).join('');
+  // the levels
+  const nodes = ms.map((m, i) => {
+    const open = unlockedFn(m), got = claimed.includes(m.id), q = P[i];
+    const cls = got ? 'claimed' : open ? 'unlocked' : 'locked';
+    const act = got ? '<span class="rd-tag">✓ Получено</span>' : open ? `<button class="chip pri" data-claimroad="${m.id}">Забрать</button>` : `<span class="rd-tag">🔒 ${m.cups ? m.cups + ' 🏆 или ' : ''}${m.lvl} ур.</span>`;
+    return `<div class="rd-n ${cls}${i === last + 1 || (last === n - 1 && i === n - 1) ? ' next' : ''}" style="left:${(100 * q.x / W).toFixed(2)}%;top:${q.y}px">`
+      + `<div class="rd-sign"><b>${m.title}</b><small>${m.desc}</small></div>`
+      + `<span class="rd-med"><em>${m.lvl}</em>${got ? '✓' : m.ic}</span>${act}</div>`;
   }).join('');
+  return `<div class="rd-map" style="height:${H}px">${svg}${bridges}${sprHtml}${nodes}</div>`;
+}
+let roadScroll = false;
+function renderProgressRoad() {
+  const track = $('#ptab');
+  if (!track || ptab !== 'road') return;
+  const myLvl = PROG.lvl || 1, myCups = PROG.cups || 0, claimed = wallet.roadClaimed || [];
+  const need = xpNeed(myLvl), pct = Math.max(0, Math.min(100, 100 * PROG.xp / need));
+  const unlocked = m => myLvl >= m.lvl || myCups >= m.cups;
+  const next = PROGRESS_ROAD_MILESTONES.find(m => !unlocked(m));
+  const head = `<div class="rd-head"><div class="rd-lvl"><b>${myLvl}</b><small>уровень</small></div><div class="rd-info"><b>Прогресс</b>`
+    + `<div class="xpbar"><i style="width:${pct.toFixed(1)}%"></i></div><small>${PROG.xp} / ${need} опыта до ${myLvl + 1} уровня · 🏆 ${myCups}</small></div></div>`
+    + `<p class="rd-next">${next ? `Следующая награда: <b>${next.title}</b> — ${next.cups ? next.cups + ' 🏆 или ' : ''}${next.lvl} уровень` : 'Вы прошли всю дорогу, дальше — новые сезоны'}</p>`;
+  track.innerHTML = head + roadMapHtml(PROGRESS_ROAD_MILESTONES, unlocked, claimed);
+  if (roadScroll) {   // opening the tab: bring the level the player is at into view
+    roadScroll = false;
+    const el = track.querySelector('.rd-n.unlocked') || track.querySelector('.rd-n.next') || track.querySelector('.rd-n:last-child');
+    if (el) requestAnimationFrame(() => el.scrollIntoView({block: 'center'}));
+  }
 }
 
 function claimRoadMilestone(id) {
@@ -4613,19 +4629,46 @@ function claimRoadMilestone(id) {
   if (m.reward.fig && !(wallet.owned || []).includes(m.reward.fig)) {
     wallet.owned = [...(wallet.owned || []), m.reward.fig];
   }
+  // emoji / phrase rewards: collected, and straight into the deck while it has room
+  for (const kind of ['emote', 'phrase']) {
+    const id = m.reward[kind], R = PG.state.reactions;
+    if (!id || !R.grant(wallet, kind, id)) continue;
+    const key = kind === 'emote' ? 'emotes' : 'phrases', cur = R.deck(wallet, kind);
+    if (cur.length < 5 && !cur.includes(id)) wallet[key] = [...cur, id];
+    R.claimCollections(wallet);
+    renderSayBox();
+  }
   beep('coin');
   saveWallet();
   toastAny(`Награда «${m.title}» получена! 🎉`);
-  renderProgressRoad();
+  renderProgress();
   renderMenuProfile();
   progressDot();
 }
 
+/* The whole nickname is always shown on the main screen: a long one gets a smaller font (down to 10 px), never "…". */
+function fitNick(b) {
+  if (!b) return;
+  b.style.fontSize = '';
+  requestAnimationFrame(() => {
+    let px = parseFloat(getComputedStyle(b).fontSize) || 15;
+    while (b.scrollWidth > b.clientWidth + 1 && px > 10) { px -= .5; b.style.fontSize = px + 'px'; }
+  });
+}
+addEventListener('resize', () => fitNick(document.querySelector('#mprof .mpi b')));
 function renderMenuProfile() {
   const el = $('#mprof'); if (!el) return;
   try { earnedCheck(); } catch (_) {}
-  const need = xpNeed(PROG.lvl), name = profileName();
-  el.innerHTML = `<span class="av${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${name[0] || '?'}</span><span class="mpi"><b>${name}</b><span class="mpl"><em>Ур. ${PROG.lvl}</em><i class="mxp"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></i></span></span><div class="mp-badges"><span class="mpc" title="Кубки рейтинга">🏆 <b class="cupsN">${PROG.cups || 0}</b></span><span class="mpg" title="Золото"><i class="coin"></i><b class="goldN">${wallet.gold}</b></span></div>`;
+  const need = xpNeed(PROG.lvl), name = profileName(), pct = Math.max(0, Math.min(100, 100 * PROG.xp / need));
+  // The plate says who you are and how far to the next level, in words: «Уровень 3», «120 / 200 опыта», a bar.
+  el.innerHTML = `<span class="av${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${(name[0] || '?').toUpperCase()}</span>`
+    + `<span class="mpi"><b>${name}</b><span class="mpl"><em>Уровень ${PROG.lvl}</em><small>${PROG.xp} / ${need} опыта</small></span>`
+    + `<i class="mxp" role="progressbar" aria-valuemin="0" aria-valuemax="${need}" aria-valuenow="${PROG.xp}" aria-label="Опыт до уровня ${PROG.lvl + 1}"><i style="width:${pct.toFixed(1)}%"></i></i></span>`;
+  fitNick(el.querySelector('.mpi b'));
+  // Under the plate: trophies (to the rating) and gold (to the shop).
+  const st = $('#mstat');
+  if (st) st.innerHTML = `<button class="mpc" data-go="rating" title="Рейтинг игроков" aria-label="Кубки: ${PROG.cups || 0}. Открыть рейтинг">🏆 <b class="cupsN">${PROG.cups || 0}</b><small>кубков</small><i>›</i></button>`
+    + `<button class="mpg" data-go="shop" title="Витрина" aria-label="Золото: ${wallet.gold}"><i class="coin"></i><b class="goldN">${wallet.gold}</b></button>`;
   renderMenuQuestBanner();
 }
 function renderProfile() {
@@ -4644,7 +4687,6 @@ function renderProfile() {
   const bRate = bm.bots && bm.bots.games ? Math.round(100 * bm.bots.wins / bm.bots.games) : 0;
   const fRate = bm.friends && bm.friends.games ? Math.round(100 * bm.friends.wins / bm.friends.games) : 0;
   const oRate = bm.online && bm.online.games ? Math.round(100 * bm.online.wins / bm.online.games) : 0;
-  const dRate = bm.duel && bm.duel.games ? Math.round(100 * bm.duel.wins / bm.duel.games) : 0;
   const statsEl = $('#stats');
   if (statsEl) {
     statsEl.innerHTML = `<div class="sbig">${[[st.games, 'партий'], [st.wins, 'побед'], [rate + '%', '% побед'], [st.best, 'рекорд очков']].map(([v, l]) => `<div><b>${v}</b><small>${l}</small></div>`).join('')}</div><div class="smastery"><div class="h3 sec">Мастерство по режимам</div>${PG.ui.progress.renderMasteryGrid(bm)}</div>${PG.ui.progress.renderBuildingStats(st)}`;
@@ -4653,18 +4695,19 @@ function renderProfile() {
 
 function renderTasks() {
   questsToday();
-  renderProgressRoad();
   document.querySelectorAll('#ptabs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.pt === ptab));
   ptabsDot();
   const el = $('#ptab');
-  if (ptab === 'rewards') {
+  if (ptab === 'road') renderProgressRoad();
+  else if (ptab === 'rewards') {
     questsWeekly();
     el.innerHTML = (typeof PG !== 'undefined' && PG.ui && PG.ui.progress && PG.ui.progress.renderRewardsTabHtml)
       ? PG.ui.progress.renderRewardsTabHtml({
           progQuests: PROG.q || [],
           questDefs: QUESTS,
+          canReroll: PROG.qre !== PROG.day,
           progWeekly: PROG.wq || [],
-          weeklyDefs: WEEKLY_QUESTS,
+          weeklyDefs: WEEKLY_ALL,
           weeklyChestGold: WEEKLY_CHEST_GOLD || 100,
           weeklyChestClaimed: !!PROG.wchest,
           achDefs: ACH,
@@ -4684,16 +4727,16 @@ function renderTasks() {
             const ok = a.ok(PROG.st, PROG.lvl), got = PROG.ach[a.id] === 'got';
             return `<div class="quest${got ? ' got' : ok ? ' done' : ' lock'}"><span class="qi">${a.ic}</span><span class="qt"><b>${a.t}</b><small>${a.d} · <i class="coin"></i> ${a.g}</small></span>${got ? '<span class="pill">Получено</span>' : ok ? `<button class="chip pri" data-claima="${a.id}">Забрать</button>` : ''}</div>`;
           }).join('');
-          const wqDone = q => { const WQ = (WEEKLY_QUESTS || []).find(x => x.id === q.id); return WQ && q.n >= WQ.n; };
+          const wqDone = q => { const WQ = WEEKLY_ALL.find(x => x.id === q.id); return WQ && q.n >= WQ.n; };
           const wqList = PROG.wq || [];
           const wqRows = [...wqList].sort((a, b) => rank(wqDone(a), a.got) - rank(wqDone(b), b.got)).map(q => {
-            const WQ = (WEEKLY_QUESTS || []).find(x => x.id === q.id) || {ic: '🎯', t: 'Цель', n: 1, g: 10};
+            const WQ = WEEKLY_ALL.find(x => x.id === q.id) || {ic: '🎯', t: 'Цель', n: 1, g: 10};
             const done = q.n >= WQ.n;
             return `<div class="quest${q.got ? ' got' : done ? ' done' : ''}"><span class="qi">${WQ.ic}</span><span class="qt"><b>${WQ.t}</b><div class="xpbar"><i style="width:${Math.min(100, 100 * q.n / WQ.n)}%"></i></div><small>${q.n} / ${WQ.n} · <i class="coin"></i> ${WQ.g}</small></span>${q.got ? '<span class="pill">Получено</span>' : done ? `<button class="chip pri" data-claimwq="${q.id}">Забрать</button>` : ''}</div>`;
           }).join('');
           const allWqGot = wqList.length > 0 && wqList.every(q => q.got);
           const chestClaimed = !!PROG.wchest;
-          const chestRow = `<div class="quest weekly-chest${chestClaimed ? ' got' : allWqGot ? ' done' : ''}"><span class="qi">🎁</span><span class="qt"><b>Большой сундук недели</b><small>${chestClaimed ? 'Сундук недели открыт' : allWqGot ? 'Все цели недели достигнуты!' : 'Выполните все 3 цели недели'} · <i class="coin"></i> ${WEEKLY_CHEST_GOLD || 100}</small></span>${chestClaimed ? '<span class="pill">Получено</span>' : allWqGot ? '<button class="chip pri" data-claimwchest="1">Забрать +100</button>' : '<span class="pill lock">Заперт</span>'}</div>`;
+          const chestRow = `<div class="quest weekly-chest${chestClaimed ? ' got' : allWqGot ? ' done' : ''}"><span class="qi">🎁</span><span class="qt"><b>Большой сундук недели</b><small>${chestClaimed ? 'Сундук недели открыт' : allWqGot ? 'Все цели недели достигнуты!' : 'Выполните все ${wqList.length} цели недели'} · <i class="coin"></i> ${WEEKLY_CHEST_GOLD || 100}</small></span>${chestClaimed ? '<span class="pill">Получено</span>' : allWqGot ? '<button class="chip pri" data-claimwchest="1">Забрать +100</button>' : '<span class="pill lock">Заперт</span>'}</div>`;
           const wqGot = wqList.filter(q => q.got).length;
 
           const qGot = PROG.q.filter(q => q.got).length, aGot = ACH.filter(a => PROG.ach[a.id] === 'got').length;
@@ -4703,7 +4746,7 @@ function renderTasks() {
         })();
   } else if (ptab === 'cols') renderCollections(el);
   else if (ptab === 'hist') renderHistory(el);
-  else renderTop();
+  else { ptab = 'road'; renderProgressRoad(); }
 }
 function renderCollections(el) {
   if (!COLLECTIONS || !COLLECTIONS.length) { el.innerHTML = '<p class="shint">Коллекции появятся скоро</p>'; return; }
@@ -4838,27 +4881,25 @@ function renderProgress() {
 }
 $('#ptabs').onclick = e => {
   const b = e.target.closest('[data-pt]'); if (!b) return;
-  ptab = b.dataset.pt;
-  if (ptab === 'top') {
-    if (PROG.inTop10) { PROG.inTop10 = false; PROG.topSeen = true; saveWallet(); progressDot(); }
-    show('rating');
-    return;
-  }
+  ptab = b.dataset.pt; roadScroll = ptab === 'road';
   renderTasks();
 };
-const roadWrap = $('#progressRoadWrap');
-if (roadWrap) {
-  roadWrap.addEventListener('click', e => {
-    const btn = e.target.closest('[data-claimroad]');
-    if (btn) claimRoadMilestone(btn.dataset.claimroad);
-  });
-}
 
 $('#ptab').addEventListener('click', e => {
+  const road = e.target.closest('[data-claimroad]');
+  if (road) return claimRoadMilestone(road.dataset.claimroad);
   const q = e.target.closest('[data-claimq]'), a = e.target.closest('[data-claima]'), wq = e.target.closest('[data-claimwq]'), wch = e.target.closest('[data-claimwchest]'), cl = e.target.closest('[data-claimcol]');
+  const rr = e.target.closest('[data-reroll]');
+  if (rr) {   // one free swap a day: the quest goes, a fresh one (not on today's list) takes its place
+    const it = PROG.q.find(x => x.id === rr.dataset.reroll);
+    if (!it || it.got || PROG.qre === PROG.day) return;
+    const next = PG.state.progress.rerollQuest(PROG.day, PROG.q.map(x => x.id), it.id); if (!next) return;
+    Object.assign(it, {id: next, n: 0, got: false}); PROG.qre = PROG.day;
+    saveWallet(); renderProgress(); toastAny('Задание заменено'); return;
+  }
   if (q) { const it = PROG.q.find(x => x.id === q.dataset.claimq), Q = QUESTS.find(x => x.id === it.id); if (it.got || it.n < Q.n) return; it.got = true; wallet.gold += Q.g; }
   else if (a) { const A = ACH.find(x => x.id === a.dataset.claima); if (PROG.ach[A.id] === 'got' || !A.ok(PROG.st, PROG.lvl)) return; PROG.ach[A.id] = 'got'; wallet.gold += A.g; }
-  else if (wq) { const it = (PROG.wq || []).find(x => x.id === wq.dataset.claimwq), WQ = (WEEKLY_QUESTS || []).find(x => x.id === it.id); if (!it || !WQ || it.got || it.n < WQ.n) return; it.got = true; wallet.gold += WQ.g; }
+  else if (wq) { const it = (PROG.wq || []).find(x => x.id === wq.dataset.claimwq), WQ = WEEKLY_ALL.find(x => x.id === it.id); if (!it || !WQ || it.got || it.n < WQ.n) return; it.got = true; wallet.gold += WQ.g; }
   else if (wch) { if (PROG.wchest || !PROG.wq || !PROG.wq.length || !PROG.wq.every(x => x.got)) return; PROG.wchest = true; wallet.gold += WEEKLY_CHEST_GOLD || 100; toastAny('Большой сундук недели открыт! +100 золота 🎉'); }
   else if (cl) {
     const col = (COLLECTIONS || []).find(x => x.id === cl.dataset.claimcol);
@@ -4897,36 +4938,14 @@ async function syncRating(force) {
   } catch (_) {}
 }
 let topScope = 'all';
-const DEFAULT_LEADERS = [
-  { uid: 'u1', n: 'Crownfall', st: 'Плиточный барон', r: 1420, fr: 'gold', c: '#3a7bd5' },
-  { uid: 'u2', n: 'Александр Н.', st: 'Зодчий хаоса', r: 1385, fr: 'royal', c: '#e84545' },
-  { uid: 'u3', n: 'Елена Премудрая', st: 'Мипл-ниндзя', r: 1340, fr: 'emerald', c: '#3fc27a' },
-  { uid: 'u4', n: 'Монах Тук', st: 'В монастыре', r: 1290, fr: 'forest', c: '#f2994a' },
-  { uid: 'u5', n: 'Гроза Полей', st: 'Гроза огородов', r: 1255, fr: 'fire', c: '#ef5350' },
-  { uid: 'u6', n: 'Рыцарь Дивана', st: 'Рыцарь дивана', r: 1210, fr: 'sunset', c: '#b06cf0' },
-  { uid: 'u7', n: 'Капитан Моста', st: 'Шеф дороги', r: 1180, fr: 'sea', c: '#00c0f0' },
-  { uid: 'u8', n: 'Царь Горы', st: 'Король стола', r: 1145, fr: 'gold', c: '#ffd700' },
-  { uid: 'u9', n: 'Спящий Воин', st: 'Сплю на плитке', r: 1120, fr: 'ice', c: '#82b1ff' },
-  { uid: 'u10', n: 'Мастер Плиток', st: 'Плиточник PRO', r: 1095, fr: 'puzzle', c: '#69f0ae' },
-  { uid: 'u11', n: 'Где Замок?', st: 'Где мой замок?', r: 1070, fr: 'neon', c: '#ff4081' },
-  { uid: 'u12', n: 'Тактик 80lvl', st: 'Тактик от бога', r: 1050, fr: 'carbon', c: '#78909c' },
-  { uid: 'u13', n: 'Барон Кустов', st: 'Барон кустов', r: 1025, fr: 'forest', c: '#4caf50' },
-  { uid: 'u14', n: 'Случайный Гений', st: 'Случайный гений', r: 1005, fr: 'sakura', c: '#ff80ab' },
-  { uid: 'u15', n: 'Тракторист', st: 'Трактор в поле', r: 985, fr: 'lava', c: '#ff6e40' },
-  { uid: 'u16', n: 'Кот на Столе', st: 'Кот на столе', r: 960, fr: 'rainbow', c: '#e040fb' },
-  { uid: 'u17', n: 'Биг Босс', st: 'Биг Босс', r: 940, fr: 'royal', c: '#ffd54f' },
-  { uid: 'u18', n: 'Чайный Мастер', st: 'Ушёл пить чай', r: 915, fr: 'emerald', c: '#26a69a' },
-  { uid: 'u19', n: 'На Чилле', st: 'На чилле', r: 890, fr: 'sea', c: '#40c4ff' },
-  { uid: 'u20', n: 'Кирпич Судьбы', st: 'Кирпич судьбы', r: 865, fr: 'none', c: '#8d6e63' },
-];
 
 async function renderTop(customEl) {
   const el = customEl || $('#ratingContent') || $('#ptab');
   if (!el) return;
   const me = (fbAuth && fbAuth.uid) ? fbAuth.uid : 'me_player';
   const myName = profileName();
-  const mySt = myStatus() || 'Плиточный барон';
-  const myCups = (PROG && PROG.cups) || 1420;
+  const mySt = myStatus() || '';
+  const myCups = (PROG && PROG.cups) || 0;   // never a made-up number: a new player has 0 cups
   const curWeek = (PG.state.progress && PG.state.progress.weekId) ? PG.state.progress.weekId() : 'Сезон 1';
 
   let rows = [];
@@ -4940,16 +4959,12 @@ async function renderTop(customEl) {
     }
   } catch (_) {}
 
-  if (!rows || rows.length < 5) {
-    rows = DEFAULT_LEADERS.map((d, i) => {
-      if (i === 0) return { ...d, uid: me, n: myName, st: mySt, r: myCups, fr: wallet.frame || 'gold', c: wallet.color || '#3a7bd5' };
-      return d;
-    });
-  }
-
+  // The board shows real players only. Where it cannot be loaded (no network, the database says no) it is just the
+  // player themself, with the real cups — never invented rivals or a made-up first place.
+  const boardLoaded = rows.length > 0;
   // Ensure user is in rows
   if (!rows.some(x => x.uid === me)) {
-    rows.push({ uid: me, n: myName, st: mySt, r: myCups, fr: wallet.frame || 'gold', c: wallet.color || '#3a7bd5' });
+    rows.push({ uid: me, n: myName, st: mySt, r: myCups, fr: wallet.frame || 'none', c: wallet.color || '#3a7bd5' });
     rows.sort((a, b) => b.r - a.r);
   }
 
@@ -5014,7 +5029,8 @@ async function renderTop(customEl) {
   const scopeTabs = `<div class="scope-tabs"><button class="chip${topScope === 'all' ? ' pri' : ''}" id="topScopeAll">Все игроки (Топ-20)</button><button class="chip${topScope === 'friends' ? ' pri' : ''}" id="topScopeFriends">Среди друзей</button></div>`;
   const seasonTag = `<div style="text-align:center;color:var(--muted);font-size:12px;margin-bottom:8px">Лига · Сезон <b>${curWeek}</b> (сброс в понедельник)</div>`;
 
-  el.innerHTML = seasonTag + scopeTabs + `<div class="podium">${podium}</div>` + `<div class="leader-tile-list">${list}</div>` + myRow + '<p class="qnote">Нажмите на игрока, чтобы посмотреть профиль · За победу в рейтинге +10 🏆</p>';
+  const emptyNote = rows.length < 4 ? `<p class="qnote" style="text-align:center">${boardLoaded ? 'Пока вас мало в таблице — играйте онлайн и поднимайтесь выше.' : 'Таблица игроков сейчас недоступна. Здесь ваши кубки; общий рейтинг появится, когда связь вернётся.'}</p>` : '';
+  el.innerHTML = seasonTag + scopeTabs + `<div class="podium">${podium}</div>` + `<div class="leader-tile-list">${list}</div>` + myRow + emptyNote + '<p class="qnote">Нажмите на игрока, чтобы посмотреть профиль · За победу в рейтинге +10 🏆</p>';
 
   const btnAll = el.querySelector('#topScopeAll'), btnFriends = el.querySelector('#topScopeFriends');
   if (btnAll) btnAll.onclick = () => { topScope = 'all'; renderTop(); };
@@ -5025,7 +5041,7 @@ async function renderTop(customEl) {
     card.onclick = () => {
       const name = card.dataset.n || 'Игрок';
       const st = card.dataset.st || 'Искатель приключений';
-      const cups = card.dataset.cups || '1000';
+      const cups = card.dataset.cups || '0';
       const fr = card.dataset.fr || 'none';
       const ring = (FRAMES[fr] && FRAMES[fr].ring) || '';
       const c = card.dataset.c || '#3a7bd5';
@@ -5163,7 +5179,7 @@ function askProfile() {
   const box = document.createElement('div'); box.className = 'over'; box.id = 'profBox'; box.style.position = 'fixed';
   box.innerHTML = (typeof PG !== 'undefined' && PG.game && PG.game.tutorial && PG.game.tutorial.renderAskProfileDialogHtml)
     ? PG.game.tutorial.renderAskProfileDialogHtml(wallet.color)
-    : `<div class="ocard prof"><div class="pav" id="pav" style="--c:${wallet.color}">?</div><h3>Создайте профиль</h3><p>Придумайте никнейм и выберите цвет — их увидят соперники и рейтинг</p><input class="field" id="profName" maxlength="12" placeholder="Никнейм" autocomplete="off"><button class="cta wide" id="profOk" disabled>Готово</button><button class="ghostbtn" id="profLogin">У меня уже есть профиль — войти</button></div>`;
+    : `<div class="ocard prof"><div class="pav" id="pav" style="--c:${wallet.color}">?</div><h3>Создайте профиль</h3><p>Придумайте никнейм и выберите цвет — их увидят соперники и рейтинг</p><input class="field" id="profName" maxlength="12" placeholder="Никнейм" autocomplete="off"><small class="legal">Нажимая «Готово», вы принимаете <a href="https://crownfall90-dot.github.io/TileTopia/terms.html" target="_blank" rel="noopener">Соглашение</a> и <a href="https://crownfall90-dot.github.io/TileTopia/privacy.html" target="_blank" rel="noopener">Политику</a>. Профиль хранится в Google Firebase, то есть за границей</small><button class="cta wide" id="profOk" disabled>Готово</button><button class="ghostbtn" id="profLogin">У меня уже есть профиль — войти</button></div>`;
   document.body.append(box);
   const inp = box.querySelector('#profName'), ok = box.querySelector('#profOk'), av = box.querySelector('#pav'), dice = box.querySelector('#profDice');
   colorPick(box.querySelector('#profColorLabel') || inp, av);
@@ -5185,7 +5201,7 @@ function askProfile() {
       beep('coin');
     };
   }
-  ok.onclick = () => { if (!setProfileName(inp.value)) return; box.remove(); toastAny(`Привет, ${profileName()}!`); renderSetup(); if (FB) setTimeout(() => accountDialog('link'), 600); if (typeof checkNameProposal === 'function') setTimeout(checkNameProposal, 1200); };
+  ok.onclick = () => { if (!setProfileName(inp.value)) return; box.remove(); toastAny(`Привет, ${profileName()}!`); renderSetup(); setTimeout(askStats, 1200); if (FB) setTimeout(() => accountDialog('link'), 600); if (typeof checkNameProposal === 'function') setTimeout(checkNameProposal, 1200); };
   box.querySelector('#profLogin').onclick = () => { box.remove(); accountDialog('login'); };
   setTimeout(() => inp.focus(), 200);
 }
@@ -5570,10 +5586,11 @@ function renderItems() {
         ? PG.ui.shop.renderItemsEmotesHtml({
             allEmotes: allE,
             allPhrases: allP,
-            selectedEmotes: wallet.emotes || DEFAULT_EMOTES,
-            selectedPhrases: wallet.phrases || DEFAULT_PHRASES,
+            selectedEmotes: PG.state.reactions.deck(wallet, 'emote'),
+            selectedPhrases: PG.state.reactions.deck(wallet, 'phrase'),
             maxEmotes: 5,
-            maxPhrases: 5
+            maxPhrases: 5,
+            wallet
           })
         : '<p>Загрузка реакций...</p>';
     } else {
@@ -5620,10 +5637,12 @@ $('#itemsBody').addEventListener('click', e => {
     previewFrameKey = null; renderItems(); return;
   }
   if (t.closest('[data-unwear]')) { ST().wearStatus(wallet, null); return afterStatusChange(); }
+  const rb = t.closest('[data-rbuy]'); if (rb) return buyReaction(rb.dataset.rbuy, rb.dataset.rid);
   const te = t.closest('[data-toggle-emote]');
   if (te) {
     const em = te.dataset.toggleEmote;
-    let cur = (wallet.emotes && wallet.emotes.length) ? wallet.emotes.slice() : DEFAULT_EMOTES.slice();
+    if (!PG.state.reactions.isOwned(wallet, 'emote', em)) return buyReaction('emote', em);
+    let cur = PG.state.reactions.deck(wallet, 'emote').slice();
     if (cur.includes(em)) {
       if (cur.length <= 1) { toastAny('В колоде должна остаться хотя бы 1 эмоция'); return; }
       cur = cur.filter(x => x !== em);
@@ -5640,7 +5659,8 @@ $('#itemsBody').addEventListener('click', e => {
   const tp = t.closest('[data-toggle-phrase]');
   if (tp) {
     const ph = tp.dataset.togglePhrase;
-    let cur = (wallet.phrases && wallet.phrases.length) ? wallet.phrases.slice() : DEFAULT_PHRASES.slice();
+    if (!PG.state.reactions.isOwned(wallet, 'phrase', ph)) return buyReaction('phrase', ph);
+    let cur = PG.state.reactions.deck(wallet, 'phrase').slice();
     if (cur.includes(ph)) {
       if (cur.length <= 1) { toastAny('В колоде должна остаться хотя бы 1 фраза'); return; }
       cur = cur.filter(x => x !== ph);
@@ -5660,7 +5680,7 @@ $('#itemsBody').addEventListener('click', e => {
     saveWallet();
     renderItems();
     renderSayBox();
-    toastAny('Сброшено на базовую колоду (5 эмодзи + 5 фраз)');
+    toastAny('Сброшено на базовую колоду (3 эмодзи + 3 фразы)');
     return;
   }
   const w = t.closest('[data-iwear]'); if (w) { ST().wearStatus(wallet, wallet.statusKey === w.dataset.iwear ? null : w.dataset.iwear); return afterStatusChange(); }
@@ -6792,6 +6812,7 @@ function applyCloudWallet(w) {
   const keep = {}; LOCAL_ONLY.forEach(k => { if (k in wallet) keep[k] = wallet[k]; });
   for (const k of Object.keys(wallet)) delete wallet[k];
   Object.assign(wallet, w, keep);
+  PG.state.reactions.migrate(wallet); PG.state.reactions.sanitizeDeck(wallet);
   for (const k of Object.keys(PROG)) delete PROG[k];
   Object.assign(PROG, w.prog || {}); wallet.prog = PROG;
   if (wallet.name) setup.seats[0].name = wallet.name;
@@ -6801,7 +6822,7 @@ function applyCloudWallet(w) {
 // Everything on screen that shows profile data.
 function refreshProfileUI() {
   document.querySelectorAll('.goldN').forEach(e => e.textContent = wallet.gold);
-  try { renderAccount(); dailyBonus(); progressDot(); renderResume(); } catch (_) {}
+  try { renderAccount(); dailyBonus(); progressDot(); renderMenuProfile(); } catch (_) {}
   if (!$('#scr-shop').hidden) renderShop();
   if (!$('#scr-progress').hidden) renderProgress();
   if (!$('#scr-settings').hidden) renderPrefs();
@@ -6921,7 +6942,7 @@ function accountDialog(mode, prefill) {
     <input class="field" id="accMail" type="email" inputmode="email" placeholder="Почта" autocomplete="email" autocapitalize="off" spellcheck="false" value="${(prefill || '').replace(/"/g, '')}">
     <div class="pwrap"><input class="field" id="accPass" type="password" placeholder="Пароль" autocomplete="current-password" autocapitalize="off" spellcheck="false"><button type="button" class="peye" id="accEye" aria-label="Показать пароль" aria-pressed="false"></button></div>
     <p class="phint" id="accHint">Пароль от 6 символов</p>
-    <p class="accErr" id="accErr" role="alert"></p><button class="cta wide" id="accGo">Продолжить</button><button class="linkbtn" id="accReset">Забыли пароль?</button><button class="ghostbtn" id="accNo">${link ? 'Позже' : 'Отмена'}</button></div>`;
+    <p class="accErr" id="accErr" role="alert"></p><small class="legal">Продолжая, вы принимаете <a href="https://crownfall90-dot.github.io/TileTopia/terms.html" target="_blank" rel="noopener">Соглашение</a> и <a href="https://crownfall90-dot.github.io/TileTopia/privacy.html" target="_blank" rel="noopener">Политику</a>. Профиль хранится в Google Firebase, то есть за границей</small><button class="cta wide" id="accGo">Продолжить</button><button class="linkbtn" id="accReset">Забыли пароль?</button><button class="ghostbtn" id="accNo">${link ? 'Позже' : 'Отмена'}</button></div>`;
   document.body.append(box);
   const mailEl = box.querySelector('#accMail'), passEl = box.querySelector('#accPass'), eye = box.querySelector('#accEye'), hint = box.querySelector('#accHint');
   const mail = () => mailEl.value.trim(), pass = () => passEl.value;
@@ -7211,7 +7232,45 @@ document.addEventListener('click', e => {
 });
 
 /* ---------------- screens ---------------- */
+/* What players use: a counter per screen and per button (src/state/usage.js), kept per day, sent to /usage/{day}/{uid}
+   every few minutes and when the game is closed, and to Firebase Analytics as «feature_use». Counts only, no texts. */
+let usageState = null, usageTimer = 0;
+try { usageState = JSON.parse(localStorage.getItem('usage')); } catch (_) {}
+/* Consent for statistics: asked once, plainly, default off. Anything that is not an error report waits for «Разрешить». */
+let statsAskTries = 0;
+function askStats() {
+  if (wallet.statsAsked || tut || document.getElementById('statsBox')) return;
+  if (document.querySelector('.over:not(#over):not([hidden])') || document.hidden) { if (++statsAskTries < 6) setTimeout(askStats, 3000); return; }
+  const b = document.createElement('div'); b.className = 'over'; b.id = 'statsBox'; b.style.position = 'fixed';
+  b.innerHTML = `<div class="ocard"><div style="font-size:40px">📊</div><h3>Помочь улучшить игру?</h3><p>Мы смотрим, какими экранами и кнопками пользуются, чтобы убрать лишнее и сделать игру удобнее. Только числа, без имён и текстов.</p><details class="more"><summary>Что именно собирается</summary><p>Какие экраны открыты и какие кнопки нажаты (счётчиками по дням), события вроде «сыграна партия», модель устройства и версия игры, сбои. Не собираем имя, почту, переписку и местоположение. Хранится до 12 месяцев. Выключить можно в «Настройки» → «Статистика». Подробнее — в <a href="https://crownfall90-dot.github.io/TileTopia/privacy.html" target="_blank" rel="noopener">Политике конфиденциальности</a>.</p></details><button class="cta wide" id="statsYes">Разрешить</button><button class="ghostbtn" id="statsNo">Не сейчас</button></div>`;
+  document.body.append(b);
+  const done = on => { wallet.stats = on; wallet.statsAsked = true; saveWallet(); applyStatsConsent(); b.remove(); };
+  b.querySelector('#statsYes').onclick = () => done(true);
+  b.querySelector('#statsNo').onclick = () => done(false);
+}
+function useCount(id) {
+  try {
+    if (tut || wallet.stats !== true) return;   // statistics only with the player's consent
+    usageState = PG.state.usage.bump(usageState, id, new Date().toISOString().slice(0, 10));
+    localStorage.setItem('usage', JSON.stringify(usageState));
+    if (window.AndroidApp && AndroidApp.logEvent && !id.startsWith('screen:')) AndroidApp.logEvent('feature_use', JSON.stringify({feature: id}));
+    if (!usageTimer) usageTimer = setTimeout(usageFlush, 180000);
+  } catch (_) {}
+}
+async function usageFlush(keepalive) {
+  clearTimeout(usageTimer); usageTimer = 0;
+  try {
+    const body = PG.state.usage.payload(usageState); if (!body) return;
+    if (typeof FBC === 'undefined' || !FBC) return;
+    const tok = await FBC.token(), uid = FBC.session() && FBC.session().uid; if (!uid) return;
+    const r = await fetch(`${FB.dbUrl}/usage/${usageState.d}/${uid}.json?auth=${tok}`, {method: 'PUT', body: JSON.stringify(body), keepalive: !!keepalive});
+    if (r.ok) { usageState.dirty = false; localStorage.setItem('usage', JSON.stringify(usageState)); }
+  } catch (_) { /* the rules may not be published yet, or no network: it is tried again with the next change */ }
+}
+document.addEventListener('click', e => { const f = PG.state.usage.featureOf(e.target); if (f) useCount(f); }, true);
+document.addEventListener('visibilitychange', () => { if (document.hidden) usageFlush(true); });
 function show(name) {
+  useCount('screen:' + name);
   if (typeof recordAction === 'function') recordAction('show:' + name);
   document.querySelectorAll('.screen').forEach(s => s.hidden = s.id !== 'scr-' + name);
   const nav = $('#bnav'), onNav = ['menu', 'progress', 'friends', 'shop'].includes(name);
@@ -7229,8 +7288,8 @@ function show(name) {
   if (name === 'lobby') { renderLobby(); if (FB && registered()) loadFriends().then(renderLobbyFriends).catch(() => {}); }
   if (name === 'shop') renderShop();
   if (name === 'settings') renderPrefs();
-  if (name === 'menu') { renderResume(); saveWallet(); presenceCount(); progressDot(); renderMenuProfile(); updateNotifBadge(); }
-  if (name === 'progress') { renderTasks(); }
+  if (name === 'menu') { saveWallet(); presenceCount(); progressDot(); renderMenuProfile(); updateNotifBadge(); }
+  if (name === 'progress') { roadScroll = true; renderTasks(); }
   if (name === 'profile') { renderProfile(); renderAccount(); }
   if (name === 'rating') { renderTop(); }
   track('screen_view', {screen_name: name});
@@ -7678,7 +7737,10 @@ window.addEventListener('keydown', e => {
 });
 
 injectArt();
-dailyBonus(); renderResume(); renderPrefs(); checkMaintenance(); checkUpdatePolicy();
+dailyBonus(); renderPrefs(); checkMaintenance(); checkUpdatePolicy(); applyStatsConsent();
+// the start: once the splash is gone, a game that was going comes back by itself
+bootReady.then(() => setTimeout(() => { try { if (wallet.name) askStats(); } catch (_) {} }, 2500));
+bootReady.then(() => setTimeout(() => { try { autoResume(); } catch (e) { plog('error', 'autoResume ' + e.message); } }, 450));
 devVerify();
 // First open and the days people come back (D1, D3, D7), each reported once.
 (() => {
@@ -7758,43 +7820,26 @@ window.__ready = true;
 (function() {
 // Init Menu Hub Sliding Sheet
 function initMenuHub() {
-  const btn = $('#btnMenuHub');
-  const backdrop = $('#menuHubBackdrop');
-  const drawer = $('#menuHubDrawer');
-  const closeBtn = $('#btnCloseMenuHub');
-  if (!btn || !backdrop || !drawer) return;
-
-  const openDrawer = () => {
-    backdrop.hidden = false;
-    requestAnimationFrame(() => { backdrop.classList.add('open'); });
+  const btn = $('#btnMenuHub'), pop = $('#mhubPop');
+  if (!btn || !pop) return;
+  const close = () => { pop.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); setTimeout(() => { if (!pop.classList.contains('open')) pop.hidden = true; }, 160); };
+  const open = () => {
+    const c = $('#mhubCups'); if (c) c.textContent = '🏆 ' + ((PROG && PROG.cups) || 0);
+    pop.hidden = false; btn.setAttribute('aria-expanded', 'true');
+    requestAnimationFrame(() => pop.classList.add('open'));
   };
-
-  const closeDrawer = () => {
-    backdrop.classList.remove('open');
-    setTimeout(() => { backdrop.hidden = true; }, 360);
-  };
-
-  btn.onclick = openDrawer;
-  if (closeBtn) closeBtn.onclick = closeDrawer;
-  backdrop.onclick = e => { if (e.target === backdrop) closeDrawer(); };
-
-  drawer.onclick = e => {
-    const card = e.target.closest('[data-hub-action]');
-    if (!card) return;
-    const act = card.dataset.hubAction;
-    closeDrawer();
-    setTimeout(() => {
-      if (act === 'rating') {
-        show('rating');
-      } else if (act === 'rules') {
-        show('rules');
-      } else if (act === 'history') {
-        show('history');
-      } else if (act === 'settings') {
-        settingsReturn = 'menu';
-        show('settings');
-      }
-    }, 180);
+  btn.onclick = e => { e.stopPropagation(); pop.classList.contains('open') ? close() : open(); };
+  document.addEventListener('pointerdown', e => { if (pop.classList.contains('open') && !e.target.closest('#mhubPop,#btnMenuHub')) close(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && pop.classList.contains('open')) { close(); btn.focus(); } });
+  pop.onclick = e => {
+    const it = e.target.closest('[data-hub-action]');
+    if (!it) return;
+    const act = it.dataset.hubAction;
+    close();
+    if (act === 'rating') { if (PROG.inTop10) { PROG.inTop10 = false; PROG.topSeen = true; saveWallet(); progressDot(); } show('rating'); }
+    else if (act === 'rules') show('rules');
+    else if (act === 'history') show('history');
+    else if (act === 'settings') { settingsReturn = 'menu'; show('settings'); }
   };
 }
 
@@ -7838,7 +7883,6 @@ function initModeSheet() {
       if (activeMode === 'online') openSetup('online');
       else if (activeMode === 'lobby') show('lobby');
       else if (activeMode === 'local') openSetup('local');
-      else if (activeMode === 'duel') openSetup('duel');
       else openSetup('bots');
     };
   }
@@ -7853,7 +7897,6 @@ function initModeSheet() {
         if (act === 'online') openSetup('online');
         else if (act === 'lobby') show('lobby');
         else if (act === 'local') openSetup('local');
-        else if (act === 'duel') openSetup('duel');
         else openSetup('bots');
       }, 220);
     };
@@ -7869,8 +7912,9 @@ initMenuHub();
   document.addEventListener('click', e => {
     const buyBtn = e.target.closest('[data-daily-buy]');
     if (buyBtn) {
-      const parts = buyBtn.dataset.dailyBuy.split(':');
-      const kind = parts[0], key = parts[1], price = +parts[2];
+      const parts = buyBtn.dataset.dailyBuy.split('|');
+      const kind = parts[0], key = kind === 'status' ? parts[1].replace(/^sh:/, '') : parts[1], price = +parts[2];
+      if (kind === 'emote') return buyReaction('emote', key);
       if (wallet.gold < price) return toastAny(`Не хватает ${price - wallet.gold} золота`);
 
       if (kind === 'fig') {
@@ -7907,7 +7951,7 @@ initMenuHub();
 
     const pickBtn = e.target.closest('[data-daily-pick]');
     if (pickBtn) {
-      const [kind, key] = pickBtn.dataset.dailyPick.split(':');
+      const [kind, key] = pickBtn.dataset.dailyPick.split('|');
       if (kind === 'fig') {
         pickFig(key);
       } else if (kind === 'frame') {

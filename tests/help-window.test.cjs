@@ -19,7 +19,7 @@ test('help window: points per object and the rules, in a running game', {skip: !
     await page.click('#helpBtn');
     const text = () => page.textContent('#helpBox');
     let t = await text();
-    for (const want of ['Город', 'Дорога', 'Крепость', '2 очка за каждую карту города', '9 очков', 'Классика']) assert.ok(t.includes(want), 'points tab shows ' + want);
+    for (const want of ['Город', 'Дорога', 'Монастырь', '2 очка за каждую карту города', '9 очков', 'Классика']) assert.ok(t.includes(want), 'points tab shows ' + want);
     await page.click('[data-ht=rules]');
     t = await text();
     for (const want of ['Цель', 'Ваш ход', 'Конец игры']) assert.ok(t.includes(want), 'rules tab shows ' + want);

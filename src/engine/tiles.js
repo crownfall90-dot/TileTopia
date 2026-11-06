@@ -10,7 +10,7 @@ export const TYPES = {
   c3r:{e:'cccr',n:2,name:'Город с воротами'}, c4:{e:'cccc',n:1,name:'Центр города'},
   rS:{e:'rfrf',n:6,name:'Прямая дорога'}, rC:{e:'ffrr',n:6,name:'Поворот дороги'},
   r3:{e:'frrr',n:3,name:'Развилка'}, r4:{e:'rrrr',n:1,name:'Перекрёсток'},
-  fort:{e:'ffff',n:3,fort:true,name:'Крепость'}, fortR:{e:'ffrf',n:2,fort:true,name:'Крепость с дорогой'},
+  fort:{e:'ffff',n:3,fort:true,name:'Монастырь'}, fortR:{e:'ffrf',n:2,fort:true,name:'Монастырь у дороги'},
   wS:{e:'wfwf',n:2,name:'Река'}, wC:{e:'wwff',n:2,name:'Излучина реки'},
   wBr:{e:'wrwr',n:2,name:'Мост через реку'}, brHalf:{e:'fbfr',n:2,bridge:true,name:'Половина большого моста'}, wCity:{e:'wcwf',n:1,name:'Город у реки'},
   wEnd:{e:'wfff',n:2,name:'Исток реки'}, wRC:{e:'wwrr',n:1,name:'Излучина и дорога'},
@@ -48,7 +48,7 @@ export function deckList(rules) {
   for (const id in TYPES) {
     const t = TYPES[id];
     if (!rules.rivers && t.e.includes('w')) continue;
-    if ((rules.mode === 'fast' || rules.mode === 'duel') && t.rare) continue;
+    if (rules.mode === 'fast' && t.rare) continue;
     for (let i = 0; i < t.n * (t.rare ? 1 : k); i++) d.push(id);
   }
   return d;
