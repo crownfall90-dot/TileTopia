@@ -26,7 +26,9 @@ def signer_digest(text):
     return hashlib.sha256(certificate).hexdigest()
 
 def verify():
-    apk = Path('app/build/outputs/apk/github/release/app-github-release.apk')
+    apk = Path('app/build/outputs/apk/staging/release/app-staging-release.apk')
+    if not apk.is_file():
+        apk = Path('app/build/outputs/apk/github/release/app-github-release.apk')
     if not apk.is_file():
         apk = Path('app/build/outputs/apk/staging/debug/app-staging-debug.apk')
     if not apk.is_file():

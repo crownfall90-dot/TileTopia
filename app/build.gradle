@@ -45,6 +45,14 @@ android {
             buildConfigField 'String', 'UPDATE_REPO', '"crownfall90-dot/TileTopia"'
             buildConfigField 'String', 'PUSH_TOPIC', '"updates-github"'
         }
+        staging {
+            dimension 'store'
+            // .test suffix -> app.crownfall.tiletopia.test: installs as a separate app alongside production.
+            applicationIdSuffix '.test'
+            versionNameSuffix '-test'
+            buildConfigField 'String', 'UPDATE_REPO', '"crownfall90-dot/TileTopia"'
+            buildConfigField 'String', 'PUSH_TOPIC', '"updates-staging"'
+        }
     }
 
     signingConfigs {
