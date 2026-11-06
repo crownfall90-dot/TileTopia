@@ -70,7 +70,7 @@ export const COLLECTIONS = [
   },
   {
     id: 'folk',
-    name: 'Жители королевства',
+    name: 'Жители',
     desc: 'Крестьянин, монах, лучник и рамка «Лес»',
     ic: '🏹',
     figs: ['peasant', 'monk', 'archer'],

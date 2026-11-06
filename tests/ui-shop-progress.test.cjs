@@ -30,22 +30,19 @@ test('ui/shop: renderGiftCard, renderFiguresGrid, renderFramesGrid, renderLocati
   assert.ok(trioReady.includes('data-gidx="1"'));
   assert.ok(trioReady.includes('data-gidx="2"'));
 
-  // Trio showcase claimed markup with revealed contents
+  // Trio showcase claimed markup: single opened chest with return tomorrow message
   const trioClaimed = renderGiftTrioShowcase({
     giftReady: false,
-    day: 1,
-    streakDays: [15, 25, 40, 60],
     options: [{title: '+35 золота'}, {title: '×2 золото'}, {title: '+1 фигурка'}],
     chosenIdx: 0,
     nextGiftTimeStr: '08:15:30',
     chestSvg: '<svg>chest</svg>',
     chestOpenedSvg: '<svg>open</svg>'
   });
-  assert.ok(trioClaimed.includes('Ваш выбор 🏆'));
-  assert.ok(trioClaimed.includes('+35 золота'));
-  assert.ok(trioClaimed.includes('А здесь было:'));
-  assert.ok(trioClaimed.includes('×2 золото'));
+  assert.ok(trioClaimed.includes('Подарок уже забран'));
+  assert.ok(trioClaimed.includes('Возвращайтесь завтра'));
   assert.ok(trioClaimed.includes('08:15:30'));
+  assert.ok(trioClaimed.includes('gift-claimed-art'));
 
   // Figures grid markup
   const figs = {

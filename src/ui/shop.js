@@ -15,14 +15,12 @@ export function renderGiftCard({giftReady, chestSvg, boosts = {}, nextGiftTimeSt
   return `<div class="chest${giftReady ? ' ready' : ''}">${chestSvg}</div>` +
     `<div class="gi"><b>Ежедневный подарок</b>${statusLabel}<small>${giftReady ? 'Выберите 1 из 3 сундуков удачи!' : 'Следующий подарок — завтра'}` +
     `${inv ? '<br>У вас: ' + inv : ''}</small></div>` +
-    `${giftReady ? '<button class="cta" id="openGift">Открыть</button>' : '<button class="ghostbtn sm" id="openGiftCalendar" title="Календарь наград">Календарь</button>'}`;
+    `${giftReady ? '<button class="cta" id="openGift">Открыть</button>' : ''}`;
 }
 
 /** Generates HTML markup for the 3 Chests of Luck directly in the showcase. */
 export function renderGiftTrioShowcase({
   giftReady = true,
-  day = 0,
-  streakDays = [15, 25, 'x2', 40, '+1♟', 60, '150👑'],
   options = [],
   chosenIdx = null,
   nextGiftTimeStr = '',
@@ -35,88 +33,59 @@ export function renderGiftTrioShowcase({
     boosts.meeple ? `+1 фигурка ×${boosts.meeple}` : '',
   ].filter(Boolean).join(' · ');
 
-  const chestsHtml = [0, 1, 2].map(idx => {
-    const opt = options && options[idx];
-    if (giftReady || chosenIdx === null) {
-      return `
-        <button class="gift-chest-btn idle" data-gidx="${idx}" aria-label="Сундук ${idx + 1}">
-          <div class="gift-chest-art">${chestSvg}</div>
-          <span class="gift-chest-name">Сундук ${idx + 1}</span>
-          <span class="gift-chest-hint choose-hint">Выбрать 👆</span>
-        </button>`;
-    }
+  const footerHtml = inv ? `
+    <div class="gift-showcase-footer">
+      <small class="gift-inv-badge">У вас в запасе: ${inv}</small>
+    </div>` : '';
 
-    const isChosen = idx === chosenIdx;
-    if (isChosen) {
-      return `
-        <div class="gift-chest-btn opened chosen" data-gidx="${idx}">
-          <div class="gift-prize-reveal">${opt ? opt.title : 'Ваш приз!'}</div>
-          <div class="gift-chest-art">${chestOpenedSvg || chestSvg}</div>
-          <span class="gift-chest-name">Сундук ${idx + 1}</span>
-          <span class="gift-chest-hint chosen-hint">Ваш выбор 🏆</span>
-        </div>`;
-    }
-
+  // Если подарок уже получен сегодня: показываем открытый сундук с понятной надписью "Возвращайтесь завтра"
+  if (!giftReady) {
+    const chosenOpt = (chosenIdx !== null && options && options[chosenIdx]) ? options[chosenIdx] : null;
     return `
-      <div class="gift-chest-btn ghost" data-gidx="${idx}">
-        <div class="gift-chest-art">${chestOpenedSvg || chestSvg}</div>
-        <span class="gift-chest-name">Сундук ${idx + 1}</span>
-        <span class="gift-chest-ghost-note">А здесь было:<br><b>${opt ? opt.title : '...'}</b></span>
+      <div class="gift-showcase-card claimed-today">
+        <div class="gift-showcase-header">
+          <div class="gift-badge-pill done">✓ ПОДАРОК ПОЛУЧЕН</div>
+          <h3>Подарок уже забран</h3>
+          <p class="gift-showcase-sub">Вы уже забрали сегодняшний подарок${chosenOpt ? ` (<b>${chosenOpt.title}</b>)` : ''}. Возвращайтесь завтра за новым сундуком!</p>
+        </div>
+        <div class="gift-claimed-single">
+          <div class="gift-claimed-art">${chestOpenedSvg || chestSvg}</div>
+          <div class="gift-claimed-info">
+            <span class="gift-claimed-status">Открыто на сегодня</span>
+            <span class="gift-claimed-timer">Следующий подарок через: <b id="giftCountdown" class="countdown-gold">${nextGiftTimeStr || 'завтра'}</b></span>
+          </div>
+        </div>
+        ${footerHtml}
       </div>`;
+  }
+
+  // Когда подарок готов к открытию: 3 сундука удачи на выбор
+  const chestsHtml = [0, 1, 2].map(idx => {
+    return `
+      <button class="gift-chest-btn idle" data-gidx="${idx}" aria-label="Сундук ${idx + 1}">
+        <div class="gift-chest-art">${chestSvg}</div>
+        <span class="gift-chest-name">Сундук ${idx + 1}</span>
+        <span class="gift-chest-hint choose-hint">Выбрать 👆</span>
+      </button>`;
   }).join('');
-
-  const calTrack = renderGiftCalendarHtml({
-    streakDays,
-    currentDay: day,
-    isClaimedToday: !giftReady
-  });
-
-  const subText = giftReady
-    ? 'Выберите один из трёх сундуков, чтобы забрать подарок дня!'
-    : `Подарок на сегодня получен ✓ Следующий сундук через: <b id="giftCountdown" class="countdown-gold">${nextGiftTimeStr || 'завтра'}</b>`;
 
   return `
     <div class="gift-showcase-card">
       <div class="gift-showcase-header">
         <div class="gift-badge-pill">✨ ЕЖЕДНЕВНЫЙ ПОДАРОК ✨</div>
         <h3>Три сундука удачи</h3>
-        <p class="gift-showcase-sub">${subText}</p>
+        <p class="gift-showcase-sub">Выберите один из трёх сундуков, чтобы забрать подарок дня!</p>
       </div>
       <div class="gift-trio" id="giftTrio">
         ${chestsHtml}
       </div>
-      <div class="gift-showcase-footer">
-        <div class="gift-streak-header">
-          <span>Серия посещений: <b>День ${day + 1} из 7</b></span>
-          ${inv ? `<small class="gift-inv-badge">${inv}</small>` : ''}
-        </div>
-        ${calTrack}
-      </div>
+      ${footerHtml}
     </div>`;
 }
 
-/** Generates HTML for the 7-day reward calendar track. */
-export function renderGiftCalendarHtml({streakDays = [15, 25, 'x2', 40, '+1♟', 60, '150👑'], currentDay = 0, isClaimedToday = false}) {
-  const cells = streakDays.map((reward, i) => {
-    const isDone = i < currentDay || (i === currentDay && isClaimedToday);
-    const isCurrent = i === currentDay && !isClaimedToday;
-    const isSpecial = i === 6;
-    let label = '';
-    if (typeof reward === 'number') {
-      label = `<i class="coin"></i>${reward}`;
-    } else if (reward === 'x2') {
-      label = '⚡ ×2';
-    } else if (reward === '+1♟') {
-      label = '♟️ +1';
-    } else {
-      label = `${reward}`;
-    }
-    return `<div class="gcal-day${isDone ? ' done' : ''}${isCurrent ? ' now' : ''}${isSpecial ? ' mega' : ''}">` +
-      `<span class="gcal-num">День ${i + 1}</span>` +
-      `<span class="gcal-rew">${isDone ? '✓' : label}</span>` +
-      `</div>`;
-  }).join('');
-  return `<div class="gcal-track">${cells}</div>`;
+/** Legacy calendar track stub - visit streak is removed */
+export function renderGiftCalendarHtml() {
+  return '';
 }
 
 /** Generates HTML markup for figure buttons grid. */
@@ -602,7 +571,6 @@ export function renderShopStallsShowcase({
     title,
     sub,
     items,
-    totalPoolSize,
     emptyText,
     renderCardFn
   }) => {
@@ -615,21 +583,29 @@ export function renderShopStallsShowcase({
 
     return `
       <div class="shop-stall ${stallClass}">
-        <div class="stall-canopy">
-          <div class="stall-canopy-stripe"></div>
-          <div class="stall-signboard">
-            <span class="stall-icon">${icon}</span>
-            <div class="stall-titles">
-              <h3 class="stall-title">${title}</h3>
-              <p class="stall-sub">${sub} · <small>в наличии: ${items.length}</small></p>
+        <div class="stall-roof">
+          <div class="stall-awning">
+            <div class="stall-awning-stripes"></div>
+            <div class="stall-valance"></div>
+          </div>
+          <div class="stall-sign-wrap">
+            <div class="stall-post-left"></div>
+            <div class="stall-signboard">
+              <span class="stall-icon">${icon}</span>
+              <div class="stall-titles">
+                <h3 class="stall-title">${title}</h3>
+                <p class="stall-sub">${sub}</p>
+              </div>
             </div>
-            <div class="stall-badge">До 6 товаров</div>
+            <div class="stall-post-right"></div>
           </div>
         </div>
         <div class="stall-counter">
           <div class="stall-shelf-edge"></div>
           ${cardsHtml}
-          <div class="stall-counter-woodbase"></div>
+        </div>
+        <div class="stall-facade-base">
+          <div class="stall-planks"></div>
         </div>
       </div>
     `;
@@ -638,7 +614,7 @@ export function renderShopStallsShowcase({
   // 1. Прилавок резных фигурок
   const figStallHtml = renderSingleStall({
     stallClass: 'stall-figures',
-    icon: '♟️',
+    icon: '<svg class="stall-svg-ic" viewBox="0 0 24 24" width="26" height="26" fill="none"><circle cx="12" cy="5" r="3" fill="#ffd875"/><path d="M7 11c0-1.1.9-2 2-2h6a2 2 0 012 2v2a1 1 0 01-1 1h-1v5a2 2 0 01-2 2h-2a2 2 0 01-2-2v-5H8a1 1 0 01-1-1v-2z" fill="#f59e0b"/></svg>',
     title: 'Прилавок фигурок',
     sub: 'Персонажи для партий',
     items: figItems,
@@ -665,7 +641,7 @@ export function renderShopStallsShowcase({
   // 2. Прилавок рамок мастера
   const frameStallHtml = renderSingleStall({
     stallClass: 'stall-frames',
-    icon: '🖼️',
+    icon: '<svg class="stall-svg-ic" viewBox="0 0 24 24" width="26" height="26" fill="none"><rect x="3" y="3" width="18" height="18" rx="4" stroke="#60a5fa" stroke-width="2.5"/><rect x="6.5" y="6.5" width="11" height="11" rx="2" stroke="#93c5fd" stroke-width="1.5"/><circle cx="12" cy="12" r="2.5" fill="#ffd700"/></svg>',
     title: 'Прилавок рамок',
     sub: 'Оправы для аватара профиля',
     items: frameItems,
@@ -691,7 +667,7 @@ export function renderShopStallsShowcase({
   // 3. Прилавок благородных статусов
   const statusStallHtml = renderSingleStall({
     stallClass: 'stall-statuses',
-    icon: '🏷️',
+    icon: '<svg class="stall-svg-ic" viewBox="0 0 24 24" width="26" height="26" fill="none"><path d="M4 6a2 2 0 012-2h12a2 2 0 012 2v3H4V6zm0 5h16v7a2 2 0 01-2 2H6a2 2 0 01-2-2v-7zm5 3h6" stroke="#34d399" stroke-width="2.2" stroke-linecap="round"/></svg>',
     title: 'Прилавок статусов',
     sub: 'Статусы и подписи для профиля',
     items: statusItems,
@@ -715,7 +691,7 @@ export function renderShopStallsShowcase({
   // 4. Прилавок живых эмоций
   const emoteStallHtml = renderSingleStall({
     stallClass: 'stall-emotes',
-    icon: '😄',
+    icon: '<svg class="stall-svg-ic" viewBox="0 0 24 24" width="26" height="26" fill="none"><circle cx="12" cy="12" r="9" fill="rgba(245, 158, 11, 0.2)" stroke="#f59e0b" stroke-width="2"/><circle cx="9" cy="10" r="1.3" fill="#f59e0b"/><circle cx="15" cy="10" r="1.3" fill="#f59e0b"/><path d="M8.5 14c1 1.5 4 1.5 7 0" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/></svg>',
     title: 'Прилавок эмодзи',
     sub: 'Быстрые эмодзи для реакций в партиях',
     items: emoteItems,
@@ -741,7 +717,7 @@ export function renderShopStallsShowcase({
   // 5. Прилавок крылатых фраз
   const phraseStallHtml = renderSingleStall({
     stallClass: 'stall-phrases',
-    icon: '💬',
+    icon: '<svg class="stall-svg-ic" viewBox="0 0 24 24" width="26" height="26" fill="none"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.5 8.5 0 018 8.5z" stroke="#c084fc" stroke-width="2.2" fill="rgba(192, 132, 252, 0.15)"/><circle cx="9" cy="11.5" r="1" fill="#e9d5ff"/><circle cx="12" cy="11.5" r="1" fill="#e9d5ff"/><circle cx="15" cy="11.5" r="1" fill="#e9d5ff"/></svg>',
     title: 'Прилавок фраз',
     sub: 'Реплики для чата в партиях',
     items: phraseItems,
