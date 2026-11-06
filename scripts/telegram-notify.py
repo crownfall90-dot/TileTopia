@@ -13,7 +13,7 @@ DEV_FILTER_PATTERNS = [
     r'экспорт\s+спрайт',
     r'спрайт',
     r'плитк.*(?:отдельн|архив|zip|дизайн)',
-    r'дизайн',
+    r'дизайнер',
     r'внутренн',
     r'internal',
     r'staging',
@@ -38,14 +38,14 @@ DEV_FILTER_PATTERNS = [
 
 HEADLINES = [
     '🧩 <b>Tiletopia {ver}</b> — вышло обновление!',
-    '🚀 <b>Tiletopia {ver}</b> уже в игре! Встречайте свежий патч',
-    '✨ <b>Tiletopia {ver}</b> — новое обновление доступно!',
-    '⚔️ <b>Tiletopia {ver}</b> — готовы к новым партиям?',
-    '🎉 <b>Tiletopia {ver}</b> — встречаем свежие улучшения!',
+    '🚀 <b>Tiletopia {ver}</b> — вышло обновление!',
+    '✨ <b>Tiletopia {ver}</b> — вышло обновление!',
+    '⚔️ <b>Tiletopia {ver}</b> — вышло обновление!',
+    '🎉 <b>Tiletopia {ver}</b> — вышло обновление!',
 ]
 
 COMMUNITY_QUESTIONS = [
-    'Как вам обновлённый интерфейс и статус друзей в сети? Стало ли удобнее звать друзей в комнату?',
+    'Оцените обновлённый интерфейс и статус друзей в сети: удобно ли приглашать в комнату?',
     'Какой режим или механику вы хотите увидеть в игре следующей? Ждём ваши идеи!',
     'Хватает ли вам золота за победы и квесты, или стоит добавить больше ежедневных наград?',
     'С кем чаще играете — с друзьями по комнатам или со случайными соперниками в поиске матча?',
@@ -184,14 +184,14 @@ def build(version: str, notes: str, web_url: str = '', apk_url: str = '', bot_ur
     parsed = parse_release_notes(notes, version)
     is_mand = mandatory or parsed.get('is_mandatory', False)
 
+    seed = sum(ord(ch) for ch in version) if version else 0
     if is_mand:
-        headline = f"🚨 <b>Tiletopia {html.escape(version)} — Важное обязательное обновление!</b>"
-        notice = "<blockquote>⚠️ <b>Обязательное обновление:</b> включает важные исправления для сетевой игры и стабильности матчей. Пожалуйста, обновите игру для продолжения онлайн-битв!</blockquote>\n\n"
+        headline = f"🚨 <b>Tiletopia {html.escape(version)} — Важное обновление!</b>"
+        notice = "<blockquote>⚠️ <b>Обязательное обновление:</b> включает важные улучшения стабильности. Обновите игру для продолжения онлайн-битв!</blockquote>\n\n"
+        text = f"{headline}\n\n{notice}"
     else:
-        headline = f"🛠 <b>Tiletopia {html.escape(version)} — мелкие фиксы и доработки</b>"
-        notice = "<blockquote>ℹ️ <b>Это не крупное обновление, а небольшие доработки и фиксы</b>, которые позже войдут в обязательное обновление. Играть можно без обновления, а по желанию в настройках игры уже можно обновиться!</blockquote>\n\n"
-
-    text = f"{headline}\n\n{notice}"
+        headline = HEADLINES[seed % len(HEADLINES)].format(ver=html.escape(version))
+        text = f"{headline}\n\n"
 
     # 1. Что нового (выделяется красивой цитатой blockquote)
     if parsed['new']:
@@ -205,29 +205,31 @@ def build(version: str, notes: str, web_url: str = '', apk_url: str = '', bot_ur
     # 2. Что изменилось
     if parsed['changed']:
         text += '🔧 <b>Что изменилось:</b>\n'
-        text += '\n'.join(f'• {html.escape(i)}' for i in parsed['changed']) + '\n\n'
+        quote_content = '\n'.join(f'• {html.escape(i)}' for i in parsed['changed'])
+        text += f'<blockquote>{quote_content}</blockquote>\n\n'
 
     # 3. Что убрано
     if parsed['removed']:
         text += '🧹 <b>Что убрано:</b>\n'
-        text += '\n'.join(f'• {html.escape(i)}' for i in parsed['removed']) + '\n\n'
+        quote_content = '\n'.join(f'• {html.escape(i)}' for i in parsed['removed'])
+        text += f'<blockquote>{quote_content}</blockquote>\n\n'
 
-    # 4. 3 способа как играть (всегда должно быть)
+    # 4. 3 способа как играть: апк, сайт, телеграмм
     text += '🎮 <b>3 способа играть:</b>\n'
     if apk_url:
-        text += f'• <b>Android:</b> APK-приложение (<a href="{html.escape(apk_url, quote=True)}">Скачать APK</a> с автообновлением)\n'
+        text += f'• <b>Android:</b> APK-приложение (<a href="{html.escape(apk_url, quote=True)}">Скачать APK</a>)\n'
     else:
-        text += '• <b>Android:</b> APK-приложение с автообновлением\n'
+        text += '• <b>Android:</b> APK-приложение\n'
 
     if web_url:
-        text += f'• <b>Все устройства (ПК, iOS, планшеты):</b> сайт в браузере (<a href="{html.escape(web_url, quote=True)}">Играть в браузере</a>)\n'
+        text += f'• <b>Все устройства (ПК, iOS):</b> сайт в браузере (<a href="{html.escape(web_url, quote=True)}">Играть в браузере</a>)\n'
     else:
-        text += '• <b>Все устройства (ПК, iOS, планшеты):</b> сайт в браузере\n'
+        text += '• <b>Все устройства (ПК, iOS):</b> сайт в браузере\n'
 
     if bot_url:
-        text += f'• <b>Telegram:</b> мини-приложение прямо в боте (<a href="{html.escape(bot_url, quote=True)}">Играть в Telegram</a>)\n\n'
+        text += f'• <b>Telegram:</b> мини-приложение в боте (<a href="{html.escape(bot_url, quote=True)}">Играть в Telegram</a>)\n\n'
     else:
-        text += '• <b>Telegram:</b> мини-приложение прямо в боте без установки\n\n'
+        text += '• <b>Telegram:</b> мини-приложение в боте\n\n'
 
     text += '💬 <i>Приятной игры в Tiletopia! Делитесь впечатлениями в комментариях! 👇</i>'
 
@@ -272,7 +274,7 @@ def main() -> int:
     bot_url = args[4] if len(args) > 4 else os.environ.get('TELEGRAM_BOT_URL', '')
 
     if not bot_url:
-        bot_user = os.environ.get('TELEGRAM_BOT_USERNAME', '') or fetch_bot_username(token)
+        bot_user = os.environ.get('TELEGRAM_BOT_USERNAME', '') or fetch_bot_username(token) or 'TiletopiaBot'
         if bot_user:
             bot_user = bot_user.lstrip('@')
             bot_url = f'https://t.me/{bot_user}'
@@ -296,7 +298,7 @@ def main() -> int:
     send_poll_flag = '--poll' in flags or os.environ.get('TELEGRAM_SEND_POLL', '').lower() in ('1', 'true', 'yes')
     if ok and send_poll_flag:
         parsed = parse_release_notes(raw_notes, version)
-        poll_q = f"Опрос по обновлению {version}: как вам изменения?"
+        poll_q = f"Опрос по обновлению {version}: оценка изменений"
         send_telegram_poll(token, chat, poll_q, DEFAULT_POLL_OPTIONS)
 
     return 0 if ok else 1

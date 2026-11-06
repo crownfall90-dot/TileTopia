@@ -6,6 +6,7 @@ test('telegram: message lists changes, escapes HTML, links and platforms', () =>
   const r = py("import importlib.util as u;s=u.spec_from_file_location('t','scripts/telegram-notify.py');m=u.module_from_spec(s);s.loader.exec_module(m);print(m.build('1.0.9','- Новое <b>окно</b>\\n- Ещё','https://x/y/','https://x/a.apk','https://t.me/mybot'))");
   assert.equal(r.status, 0, r.stderr);
   assert.match(r.stdout, /Tiletopia 1\.0\.9/);
+  assert.match(r.stdout, /вышло обновление!/);
   assert.match(r.stdout, /• Новое &lt;b&gt;окно&lt;\/b&gt;/);
   assert.match(r.stdout, /Android:.*APK-приложение/);
   assert.match(r.stdout, /Все устройства.*сайт в браузере/);
@@ -48,12 +49,12 @@ test('telegram: formats new items with quotes, separates changes and removals, f
   assert.match(r.stdout, /• Зеленый кружок онлайна/);
   assert.match(r.stdout, /• Время активности друзей/);
 
-  // 2. Changed items
-  assert.match(r.stdout, /🔧 <b>Что изменилось:<\/b>/);
+  // 2. Changed items in blockquote
+  assert.match(r.stdout, /🔧 <b>Что изменилось:<\/b>\r?\n<blockquote>/);
   assert.match(r.stdout, /• Кнопка удаления аккаунта перенесена/);
 
-  // 3. Removed items
-  assert.match(r.stdout, /🧹 <b>Что убрано:<\/b>/);
+  // 3. Removed items in blockquote
+  assert.match(r.stdout, /🧹 <b>Что убрано:<\/b>\r?\n<blockquote>/);
   assert.match(r.stdout, /• Убран счетчик игроков в сети/);
 
   // 4. Developer / internal items MUST BE FILTERED OUT
@@ -63,7 +64,7 @@ test('telegram: formats new items with quotes, separates changes and removals, f
   assert.doesNotMatch(r.stdout, /дизайнер/i);
   assert.doesNotMatch(r.stdout, /PIN-код/i);
 
-  // 5. 3 ways to play
+  // 5. 3 ways to play (clean links)
   assert.match(r.stdout, /🎮 <b>3 способа играть:<\/b>/);
   assert.match(r.stdout, /Android:.*APK-приложение/);
   assert.match(r.stdout, /Все устройства.*сайт в браузере/);
