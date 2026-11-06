@@ -33,7 +33,10 @@
       <section class="screen" id="scr-menu" hidden>
         <div class="mtop">
           <button class="iconbtn" data-go="history" aria-label="История партий" hidden style="display:none"></button>
-          <button class="mprof" id="mprof" data-go="profile" aria-label="Профиль, уровень и золото"></button>
+          <div class="mleft">
+            <button class="mprof" id="mprof" data-go="profile" aria-label="Профиль, уровень и опыт"></button>
+            <div class="mstat" id="mstat"></div>
+          </div>
           <div class="mtop-right-group">
             <button class="mtop-rank-btn notif-bell-btn" id="btnMenuNotif" data-go="inbox" aria-label="Уведомления и награды" title="Уведомления">
               <span class="nb-icon">
@@ -44,32 +47,26 @@
                 <i class="notif-badge-dot" id="notifDot" hidden></i>
               </span>
             </button>
-            <button class="mtop-rank-btn" id="btnMenuRating" data-go="rating" aria-label="Рейтинг игроков" title="Рейтинг игроков"><span style="font-size:18px">🏆</span></button>
-            <button class="menu-hub-btn" id="btnMenuHub" aria-label="Меню" title="Меню">
-              <span class="mhub-tilt">
-                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>
-                <span>Меню</span>
-              </span>
-            </button>
+            <div class="mhub-wrap">
+              <button class="menu-hub-btn" id="btnMenuHub" aria-label="Меню" aria-haspopup="menu" aria-expanded="false" title="Меню">
+                <span class="mhub-tilt">
+                  <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>
+                  <span>Меню</span>
+                </span>
+              </button>
+              <div class="mhub-pop" id="mhubPop" role="menu" hidden>
+                <button role="menuitem" data-hub-action="rating"><span>🏆</span><b>Рейтинг игроков</b><i id="mhubCups"></i></button>
+                <button role="menuitem" data-hub-action="rules"><span>📖</span><b>Как играть</b></button>
+                <button role="menuitem" data-hub-action="history"><span>📜</span><b>История партий</b></button>
+                <button role="menuitem" data-hub-action="settings"><span>⚙️</span><b>Настройки</b></button>
+              </div>
+            </div>
           </div>
         </div>
         <div class="hero"><div class="mini" id="mini"></div></div>
         <div class="mbody">
           <h2 class="logo">Tile<span>topia</span></h2>
           <p class="tag">Стройте города, дороги и монастыри</p>
-          <button class="menu-rating-card" id="btnMenuRatingCard" data-go="rating" aria-label="Рейтинг игроков">
-            <div class="mrc-left">
-              <span class="mrc-icon">🏆</span>
-              <div class="mrc-info">
-                <b class="mrc-title">Рейтинг игроков</b>
-                <small class="mrc-sub" id="menuRatingSub">Лига · Сезон 1 · Топ-20</small>
-              </div>
-            </div>
-            <div class="mrc-right">
-              <span class="mrc-badge" id="menuRatingBadge">🏆 <b class="cupsN">0</b></span>
-              <i class="tgo">›</i>
-            </div>
-          </button>
           <button class="menu-gift-pill" id="menuGiftPill" aria-label="Открыть ежедневный подарок" hidden>
             <span class="mgp-ic">🎁</span>
             <span class="mgp-tx"><b>Подарок готов!</b><small>Три сундука удачи</small></span>
@@ -184,25 +181,7 @@
         <div class="lb">
           <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Задания и Прогресс</b></div>
 
-          <div class="road-container" id="progressRoadWrap">
-            <div class="road-header">
-              <div class="road-title-row">
-                <span class="road-badge-ic">⭐</span>
-                <div>
-                  <b class="road-title">Дорога прогресса</b>
-                  <small class="road-sub" id="roadSub">Побеждайте и забирайте награды</small>
-                </div>
-              </div>
-              <div class="road-stat-chip">
-                <span id="roadCurrentRank">🏆 0</span>
-              </div>
-            </div>
-            <div class="road-track-scroll">
-              <div class="road-track" id="roadTrack"></div>
-            </div>
-          </div>
-
-          <div class="seg ptabs" id="ptabs"><button data-pt="rewards" aria-pressed="true">Награды</button><button data-pt="cols" aria-pressed="false">Коллекции</button><button data-pt="top" aria-pressed="false">Рейтинг</button></div>
+          <div class="seg ptabs" id="ptabs"><button data-pt="road" aria-pressed="true">Дорога</button><button data-pt="rewards" aria-pressed="false">Задания</button><button data-pt="cols" aria-pressed="false">Коллекции</button></div>
           <div class="col" id="ptab"></div>
         </div>
       </section>
@@ -508,7 +487,6 @@
           <div class="netbad" id="netBad" hidden role="status"><i></i>Нет связи — переподключаемся…</div>
           <div class="edgeglow" id="edgeglow"></div>
           <div class="fabs">
-            <button class="fab scoutb" id="scoutBtn" aria-label="Разведка дозорного" title="Разведка дозорного"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg></button>
             <button class="fab tipb" id="tip" aria-label="Подсказка: лучший ход" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 00-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0012 3z"/></svg></button>
             <button class="fab helpb" id="helpBtn" aria-label="Очки и правила" title="Очки и правила"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.5h10a3 3 0 013 3V20H8a3 3 0 01-3-3z"/><path d="M5 17a3 3 0 013-3h10M9 8.5h5"/></svg></button>
             <button class="fab" id="zin" aria-label="Приблизить"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
@@ -568,76 +546,6 @@
     </aside>
       
       <!-- Menu Hub Sliding Sheet / Drawer -->
-      <div class="menu-hub-backdrop" id="menuHubBackdrop" hidden>
-        <div class="menu-hub-drawer" id="menuHubDrawer" role="dialog" aria-modal="true" aria-label="Меню">
-          <div class="sheet-handle"></div>
-          <div class="sheet-header">
-            <div class="sheet-title-row">
-              <span class="sheet-icon"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg></span>
-              <h3>Меню</h3>
-            </div>
-            <button class="sheet-close" id="btnCloseMenuHub" aria-label="Закрыть">✕</button>
-          </div>
-          <div class="sheet-modes-grid">
-            <button class="sheet-mode-card" data-hub-action="rating">
-              <div class="sm-badge sm-gold">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M19 5h-2V3H7v2H5c-1.1 0-2 .9-2 2v1c0 2.55 1.92 4.63 4.39 4.94A5.01 5.01 0 0011 15.9V19H7v2h10v-2h-4v-3.1c1.9-.31 3.49-1.63 4.1-3.41 2.47-.31 4.39-2.39 4.39-4.94V7c0-1.1-.9-2-2-2z"/></svg>
-              </div>
-              <div class="sm-info">
-                <div class="sm-top">
-                  <b>Рейтинг игроков</b>
-                  <span class="sm-tag gold">Лига</span>
-                </div>
-                <small>Таблица рекордов, кубки и ранги сезона</small>
-              </div>
-              <span class="sm-arrow">›</span>
-            </button>
-
-            <button class="sheet-mode-card" data-hub-action="rules">
-              <div class="sm-badge sm-blue">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M9.6 9.3a2.5 2.5 0 014.8.9c0 1.7-2.4 2.2-2.4 3.6"/><path d="M12 17.2h.01"/></svg>
-              </div>
-              <div class="sm-info">
-                <div class="sm-top">
-                  <b>Как играть</b>
-                  <span class="sm-tag blue">Обучение</span>
-                </div>
-                <small>Правила соединения плиток и подсчет очков</small>
-              </div>
-              <span class="sm-arrow">›</span>
-            </button>
-
-            <button class="sheet-mode-card" data-hub-action="history">
-              <div class="sm-badge sm-green">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>
-              </div>
-              <div class="sm-info">
-                <div class="sm-top">
-                  <b>История партий</b>
-                  <span class="sm-tag green">Статистика</span>
-                </div>
-                <small>Результаты прошедших матчей и детальный счет</small>
-              </div>
-              <span class="sm-arrow">›</span>
-            </button>
-
-            <button class="sheet-mode-card" data-hub-action="settings">
-              <div class="sm-badge sm-purple">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.7 1.7 0 00.3 1.8l.1.1a2 2 0 11-2.8 2.8l-.1-.1a1.7 1.7 0 00-1.8-.3 1.7 1.7 0 00-1 1.5V21a2 2 0 11-4 0v-.1a1.7 1.7 0 00-1.1-1.5 1.7 1.7 0 00-1.8.3l-.1.1a2 2 0 11-2.8-2.8l.1-.1a1.7 1.7 0 00.3-1.8 1.7 1.7 0 00-1.5-1H3a2 2 0 110-4h.1a1.7 1.7 0 001.5-1.1 1.7 1.7 0 00-.3-1.8l-.1-.1a2 2 0 112.8-2.8l.1.1a1.7 1.7 0 001.8.3H9a1.7 1.7 0 001-1.5V3a2 2 0 114 0v.1a1.7 1.7 0 001 1.5 1.7 1.7 0 001.8-.3l.1-.1a2 2 0 112.8 2.8l-.1.1a1.7 1.7 0 00-.3 1.8V9a1.7 1.7 0 001.5 1H21a2 2 0 110 4h-.1a1.7 1.7 0 00-1.5 1z"/></svg>
-              </div>
-              <div class="sm-info">
-                <div class="sm-top">
-                  <b>Настройки</b>
-                  <span class="sm-tag purple">Опции</span>
-                </div>
-                <small>Звук, графика, имя игрока и аккаунт</small>
-              </div>
-              <span class="sm-arrow">›</span>
-            </button>
-          </div>
-        </div>
-      </div>
-
       <!-- Smooth Game Modes Bottom Sheet -->
       <div class="mode-sheet-backdrop" id="modeSheetBackdrop" hidden>
         <div class="mode-sheet" id="modeSheet" role="dialog" aria-modal="true" aria-label="Режимы игры">
@@ -1413,7 +1321,7 @@ async function dropAt(t) {
   ghost.classList.remove('ghost');
   if (!(RM || fast())) await ghost.animate([{transform: 'translateZ(26px)'}, {transform: 'translateZ(0)'}], {duration: 260, easing: 'cubic-bezier(.5,0,.8,.4)'}).finished;
   ghost.remove(); ghost = null; lastPlaced = t;
-  t.el = tileEl(t, true, fast() ? null : .02); world.append(t.el); tiles.set(key(t.x, t.y), t); wallsAround(t); refreshRoadEnds(); markOwn(); updateFog(); checkRelicsAround(t.x, t.y);
+  t.el = tileEl(t, true, fast() ? null : .02); world.append(t.el); tiles.set(key(t.x, t.y), t); wallsAround(t); refreshRoadEnds(); markOwn(); updateFog();
   if (!fast()) beep('place');
   if (!fast()) { const pf = document.createElement('i'); pf.className = 'puff'; t.el.append(pf); setTimeout(() => pf.remove(), 600); }
   if (!fast()) { t.el.classList.add('puzzle-lock'); setTimeout(() => { if (t.el) t.el.classList.remove('puzzle-lock'); }, 350); }
@@ -1778,68 +1686,6 @@ const ranked = () => players.map((p, i) => ({...p, i})).sort((a, b) => {
 
 /* ==================== 4 Game Evolution Features: Fog, Cartography, Biomes, Relics & Scout ==================== */
 
-let FOG_RELICS = new Map();
-
-const RELIC_POOL = [
-  {id: 'chest', name: 'Сундук золота', icon: '🎁', gold: 40, pts: 2},
-  {id: 'obelisk', name: 'Древний обелиск', icon: '🏛️', gold: 25, pts: 4},
-  {id: 'gem', name: 'Кристалл мудрости', icon: '💎', gold: 50, pts: 3},
-  {id: 'scroll', name: 'Свиток картографа', icon: '📜', gold: 30, pts: 5},
-];
-
-function spawnFogRelics() {
-  document.querySelectorAll('.fog-relic').forEach(el => el.remove());
-  FOG_RELICS = new Map();
-  const coords = [
-    {x: 2, y: 1}, {x: -2, y: 2}, {x: 1, y: -2}, {x: -2, y: -2}, {x: 3, y: -1}
-  ];
-  coords.forEach((c, idx) => {
-    const k = key(c.x, c.y);
-    const item = RELIC_POOL[idx % RELIC_POOL.length];
-    const r = {...item, x: c.x, y: c.y, key: k, collected: false};
-    FOG_RELICS.set(k, r);
-    
-    const el = document.createElement('div');
-    el.className = 'fog-relic';
-    el.id = 'relic-' + k.replace(',', '_');
-    el.style.left = (c.x * T) + 'px';
-    el.style.top = (c.y * T) + 'px';
-    el.innerHTML = `
-      <div class="relic-pulse"></div>
-      <div class="relic-ico">${r.icon}</div>
-      <div class="relic-name">${r.name}</div>
-    `;
-    world.append(el);
-  });
-}
-
-function checkRelicsAround(tx, ty) {
-  if (!FOG_RELICS || !players || !players[turn]) return;
-  for (const [k, r] of FOG_RELICS.entries()) {
-    if (r.collected) continue;
-    const dist = Math.abs(r.x - tx) + Math.abs(r.y - ty);
-    if (dist <= 1) {
-      r.collected = true;
-      const el = document.getElementById('relic-' + k.replace(',', '_'));
-      if (el) {
-        el.classList.add('collected');
-        setTimeout(() => el.remove(), 700);
-      }
-      
-      // Award bonuses
-      if (players[turn]) {
-        players[turn].score += r.pts;
-        if (typeof paintScores === 'function') paintScores();
-      }
-      wallet.gold = (wallet.gold || 0) + r.gold;
-      saveWallet();
-      if (typeof updateGold === 'function') updateGold();
-      if (typeof beep === 'function') beep('fanfare');
-      
-      toastAny(`${r.name}: +${r.gold} 🪙 и +${r.pts} очков!`, 'relic', 'Тайник в тумане');
-    }
-  }
-}
 
 function initFog() {
   const old = $('#fogOfWar');
@@ -1954,42 +1800,6 @@ function updateFog() {
   }
 }
 
-// 4. Scout action (Дозорный)
-function doScout() {
-  if (!deck) return;
-  if (typeof beep === 'function') beep('place');
-  
-  // Wave animation
-  const boardEl = $('#board');
-  if (boardEl) {
-    const wave = document.createElement('div');
-    wave.className = 'scout-radar-wave';
-    boardEl.append(wave);
-    setTimeout(() => wave.remove(), 1200);
-  }
-
-  // Peek deck tile
-  const nxt = deck && deck[0];
-  const tileName = nxt && TYPES[nxt] ? TYPES[nxt].name : 'Таинственная плитка';
-  toastAny(`Следующая плитка в колоде: «${tileName}»`, 'ok', 'Дозорный');
-
-  // Pulse nearest relic
-  let nearest = null, minDist = 999;
-  for (const r of FOG_RELICS.values()) {
-    if (r.collected) continue;
-    const d = Math.abs(r.x) + Math.abs(r.y);
-    if (d < minDist) { minDist = d; nearest = r; }
-  }
-  if (nearest) {
-    const relEl = document.getElementById('relic-' + nearest.key.replace(',', '_'));
-    if (relEl) {
-      relEl.classList.add('scout-beacon');
-      setTimeout(() => relEl.classList.remove('scout-beacon'), 3500);
-    }
-  }
-}
-
-
 function buildBoard() {
   const R = rng(20261023);
   const pool = [];
@@ -2054,7 +1864,7 @@ function startGame(cfg, replay = []) {
   if (meepleResolve) { meepleResolve = null; mrow.hidden = true; prow.hidden = false; }
   // The menu shows a small built-up kingdom; the game itself starts from an empty table.
   buildBoard(); buildMini();
-  world.innerHTML = '<div class="ground"></div>'; try { initFog(); spawnFogRelics(); } catch(_) {}
+  world.innerHTML = '<div class="ground"></div>'; try { initFog(); } catch(_) {}
   ghost = null; slotEls = []; meeples = []; doneFeats = []; turn = 0; phase = 'idle';
   const rules = gameRules = cfg.rules;
   players = cfg.seats.map((s, i) => { const name = clean(s.name) || 'Игрок ' + (i + 1); return {name, init: name[0].toUpperCase(), col: validCol(s.col) ? s.col : PL0[i].col, human: s.human, ghost: !!s.ghost, st: PG.state.status.shownStatus(s.st), owner: s.owner, uid: s.uid || null, fig: FIGS[s.fig] ? s.fig : 'classic', botlvl: s.botlvl || (s.human ? null : (wallet.botlvl || 'normal')), score: 0, stats: {c: 0, r: 0, f: 0, t: 0, m: 0}, meeples: rules.meeples, missed: 0}; });
@@ -4558,7 +4368,7 @@ function progressDot() {
   ptabsDot();
   if (typeof updateNotifBadge === 'function') updateNotifBadge();
 }
-let ptab = 'rewards';
+let ptab = 'road';
 function ring(frac) { return PG.ui.progress.ringSvg(frac); }
 // The profile plate on the menu: avatar, nickname, level with its bar, gold. Taps open the profile.
 function renderMenuQuestBanner() {
@@ -4597,33 +4407,24 @@ const PROGRESS_ROAD_MILESTONES = [
 ];
 
 function renderProgressRoad() {
-  const track = $('#roadTrack');
-  if (!track) return;
-  const rankEl = $('#roadCurrentRank');
-  if (rankEl) rankEl.textContent = `🏆 ${PROG.cups || 0}`;
-  const myLvl = PROG.lvl || 1, myCups = PROG.cups || 0;
-  const claimed = wallet.roadClaimed || [];
-
-  track.innerHTML = PROGRESS_ROAD_MILESTONES.map(m => {
-    const isUnlocked = myLvl >= m.lvl || myCups >= m.cups;
-    const isClaimed = claimed.includes(m.id);
-    const cls = isClaimed ? 'claimed' : isUnlocked ? 'unlocked' : 'locked';
-    const btn = isClaimed
-      ? '<span class="road-node-tag">✅ Получено</span>'
-      : isUnlocked
-        ? `<button class="chip pri road-node-btn" data-claimroad="${m.id}">Забрать</button>`
-        : `<span class="road-node-tag">🔒 ${m.cups ? m.cups + ' 🏆' : 'Ур. ' + m.lvl}</span>`;
-    return `
-      <div class="road-node ${cls}">
-        <span class="road-node-ic">${m.ic}</span>
-        <div class="road-node-card">
-          <b class="road-node-title">${m.title}</b>
-          <small class="road-node-reward">${m.desc}</small>
-          ${btn}
-        </div>
-      </div>
-    `;
+  const track = $('#ptab');
+  if (!track || ptab !== 'road') return;
+  const myLvl = PROG.lvl || 1, myCups = PROG.cups || 0, claimed = wallet.roadClaimed || [];
+  const need = xpNeed(myLvl), pct = Math.max(0, Math.min(100, 100 * PROG.xp / need));
+  const unlocked = m => myLvl >= m.lvl || myCups >= m.cups;
+  const next = PROGRESS_ROAD_MILESTONES.find(m => !unlocked(m));
+  const head = `<div class="rd-head"><div class="rd-lvl"><b>${myLvl}</b><small>уровень</small></div><div class="rd-info"><b>Дорога прогресса</b>`
+    + `<div class="xpbar"><i style="width:${pct.toFixed(1)}%"></i></div><small>${PROG.xp} / ${need} опыта до ${myLvl + 1} уровня · 🏆 ${myCups}</small></div></div>`
+    + `<p class="rd-next">${next ? `Следующая награда: <b>${next.title}</b> — ${next.cups ? next.cups + ' 🏆 или ' : ''}${next.lvl} уровень` : 'Вы прошли всю дорогу, дальше — новые сезоны'}</p>`;
+  const nodes = PROGRESS_ROAD_MILESTONES.map(m => {
+    const open = unlocked(m), got = claimed.includes(m.id);
+    const cls = got ? 'claimed' : open ? 'unlocked' : 'locked';
+    const act = got ? '<span class="rd-tag">✓ Получено</span>'
+      : open ? `<button class="chip pri" data-claimroad="${m.id}">Забрать</button>`
+        : `<span class="rd-tag">🔒 ${m.lvl} ур.${m.cups ? ' · ' + m.cups + ' 🏆' : ''}</span>`;
+    return `<li class="rd-node ${cls}"><span class="rd-dot">${got ? '✓' : m.ic}</span><div class="rd-card"><b>${m.title}</b><small>${m.desc}</small>${act}</div></li>`;
   }).join('');
+  track.innerHTML = head + `<ol class="rd-list">${nodes}</ol>`;
 }
 
 function claimRoadMilestone(id) {
@@ -4657,7 +4458,7 @@ function claimRoadMilestone(id) {
   beep('coin');
   saveWallet();
   toastAny(`Награда «${m.title}» получена! 🎉`);
-  renderProgressRoad();
+  renderProgress();
   renderMenuProfile();
   progressDot();
 }
@@ -4675,9 +4476,16 @@ addEventListener('resize', () => fitNick(document.querySelector('#mprof .mpi b')
 function renderMenuProfile() {
   const el = $('#mprof'); if (!el) return;
   try { earnedCheck(); } catch (_) {}
-  const need = xpNeed(PROG.lvl), name = profileName();
-  el.innerHTML = `<span class="av${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${name[0] || '?'}</span><span class="mpi"><b>${name}</b><span class="mpl"><em>Ур. ${PROG.lvl}</em><i class="mxp"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></i><span class="mpc" title="Кубки рейтинга">🏆 <b class="cupsN">${PROG.cups || 0}</b></span><span class="mpg" title="Золото"><i class="coin"></i><b class="goldN">${wallet.gold}</b></span></span></span>`;
+  const need = xpNeed(PROG.lvl), name = profileName(), pct = Math.max(0, Math.min(100, 100 * PROG.xp / need));
+  // The plate says who you are and how far to the next level, in words: «Уровень 3», «120 / 200 опыта», a bar.
+  el.innerHTML = `<span class="av${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${(name[0] || '?').toUpperCase()}</span>`
+    + `<span class="mpi"><b>${name}</b><span class="mpl"><em>Уровень ${PROG.lvl}</em><small>${PROG.xp} / ${need} опыта</small></span>`
+    + `<i class="mxp" role="progressbar" aria-valuemin="0" aria-valuemax="${need}" aria-valuenow="${PROG.xp}" aria-label="Опыт до уровня ${PROG.lvl + 1}"><i style="width:${pct.toFixed(1)}%"></i></i></span>`;
   fitNick(el.querySelector('.mpi b'));
+  // Under the plate: trophies (to the rating) and gold (to the shop).
+  const st = $('#mstat');
+  if (st) st.innerHTML = `<button class="mpc" data-go="rating" title="Рейтинг игроков" aria-label="Кубки: ${PROG.cups || 0}. Открыть рейтинг">🏆 <b class="cupsN">${PROG.cups || 0}</b><small>кубков</small><i>›</i></button>`
+    + `<button class="mpg" data-go="shop" title="Витрина" aria-label="Золото: ${wallet.gold}"><i class="coin"></i><b class="goldN">${wallet.gold}</b></button>`;
   renderMenuQuestBanner();
 }
 function renderProfile() {
@@ -4705,11 +4513,11 @@ function renderProfile() {
 
 function renderTasks() {
   questsToday();
-  renderProgressRoad();
   document.querySelectorAll('#ptabs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.pt === ptab));
   ptabsDot();
   const el = $('#ptab');
-  if (ptab === 'rewards') {
+  if (ptab === 'road') renderProgressRoad();
+  else if (ptab === 'rewards') {
     questsWeekly();
     el.innerHTML = (typeof PG !== 'undefined' && PG.ui && PG.ui.progress && PG.ui.progress.renderRewardsTabHtml)
       ? PG.ui.progress.renderRewardsTabHtml({
@@ -4756,7 +4564,7 @@ function renderTasks() {
         })();
   } else if (ptab === 'cols') renderCollections(el);
   else if (ptab === 'hist') renderHistory(el);
-  else renderTop();
+  else { ptab = 'road'; renderProgressRoad(); }
 }
 function renderCollections(el) {
   if (!COLLECTIONS || !COLLECTIONS.length) { el.innerHTML = '<p class="shint">Коллекции появятся скоро</p>'; return; }
@@ -4892,22 +4700,12 @@ function renderProgress() {
 $('#ptabs').onclick = e => {
   const b = e.target.closest('[data-pt]'); if (!b) return;
   ptab = b.dataset.pt;
-  if (ptab === 'top') {
-    if (PROG.inTop10) { PROG.inTop10 = false; PROG.topSeen = true; saveWallet(); progressDot(); }
-    show('rating');
-    return;
-  }
   renderTasks();
 };
-const roadWrap = $('#progressRoadWrap');
-if (roadWrap) {
-  roadWrap.addEventListener('click', e => {
-    const btn = e.target.closest('[data-claimroad]');
-    if (btn) claimRoadMilestone(btn.dataset.claimroad);
-  });
-}
 
 $('#ptab').addEventListener('click', e => {
+  const road = e.target.closest('[data-claimroad]');
+  if (road) return claimRoadMilestone(road.dataset.claimroad);
   const q = e.target.closest('[data-claimq]'), a = e.target.closest('[data-claima]'), wq = e.target.closest('[data-claimwq]'), wch = e.target.closest('[data-claimwchest]'), cl = e.target.closest('[data-claimcol]');
   const rr = e.target.closest('[data-reroll]');
   if (rr) {   // one free swap a day: the quest goes, a fresh one (not on today's list) takes its place
@@ -4958,36 +4756,14 @@ async function syncRating(force) {
   } catch (_) {}
 }
 let topScope = 'all';
-const DEFAULT_LEADERS = [
-  { uid: 'u1', n: 'Crownfall', st: 'Плиточный барон', r: 1420, fr: 'gold', c: '#3a7bd5' },
-  { uid: 'u2', n: 'Александр Н.', st: 'Зодчий хаоса', r: 1385, fr: 'royal', c: '#e84545' },
-  { uid: 'u3', n: 'Елена Премудрая', st: 'Мипл-ниндзя', r: 1340, fr: 'emerald', c: '#3fc27a' },
-  { uid: 'u4', n: 'Монах Тук', st: 'В монастыре', r: 1290, fr: 'forest', c: '#f2994a' },
-  { uid: 'u5', n: 'Гроза Полей', st: 'Гроза огородов', r: 1255, fr: 'fire', c: '#ef5350' },
-  { uid: 'u6', n: 'Рыцарь Дивана', st: 'Рыцарь дивана', r: 1210, fr: 'sunset', c: '#b06cf0' },
-  { uid: 'u7', n: 'Капитан Моста', st: 'Шеф дороги', r: 1180, fr: 'sea', c: '#00c0f0' },
-  { uid: 'u8', n: 'Царь Горы', st: 'Король стола', r: 1145, fr: 'gold', c: '#ffd700' },
-  { uid: 'u9', n: 'Спящий Воин', st: 'Сплю на плитке', r: 1120, fr: 'ice', c: '#82b1ff' },
-  { uid: 'u10', n: 'Мастер Плиток', st: 'Плиточник PRO', r: 1095, fr: 'puzzle', c: '#69f0ae' },
-  { uid: 'u11', n: 'Где Замок?', st: 'Где мой замок?', r: 1070, fr: 'neon', c: '#ff4081' },
-  { uid: 'u12', n: 'Тактик 80lvl', st: 'Тактик от бога', r: 1050, fr: 'carbon', c: '#78909c' },
-  { uid: 'u13', n: 'Барон Кустов', st: 'Барон кустов', r: 1025, fr: 'forest', c: '#4caf50' },
-  { uid: 'u14', n: 'Случайный Гений', st: 'Случайный гений', r: 1005, fr: 'sakura', c: '#ff80ab' },
-  { uid: 'u15', n: 'Тракторист', st: 'Трактор в поле', r: 985, fr: 'lava', c: '#ff6e40' },
-  { uid: 'u16', n: 'Кот на Столе', st: 'Кот на столе', r: 960, fr: 'rainbow', c: '#e040fb' },
-  { uid: 'u17', n: 'Биг Босс', st: 'Биг Босс', r: 940, fr: 'royal', c: '#ffd54f' },
-  { uid: 'u18', n: 'Чайный Мастер', st: 'Ушёл пить чай', r: 915, fr: 'emerald', c: '#26a69a' },
-  { uid: 'u19', n: 'На Чилле', st: 'На чилле', r: 890, fr: 'sea', c: '#40c4ff' },
-  { uid: 'u20', n: 'Кирпич Судьбы', st: 'Кирпич судьбы', r: 865, fr: 'none', c: '#8d6e63' },
-];
 
 async function renderTop(customEl) {
   const el = customEl || $('#ratingContent') || $('#ptab');
   if (!el) return;
   const me = (fbAuth && fbAuth.uid) ? fbAuth.uid : 'me_player';
   const myName = profileName();
-  const mySt = myStatus() || 'Плиточный барон';
-  const myCups = (PROG && PROG.cups) || 1420;
+  const mySt = myStatus() || '';
+  const myCups = (PROG && PROG.cups) || 0;   // never a made-up number: a new player has 0 cups
   const curWeek = (PG.state.progress && PG.state.progress.weekId) ? PG.state.progress.weekId() : 'Сезон 1';
 
   let rows = [];
@@ -5001,16 +4777,12 @@ async function renderTop(customEl) {
     }
   } catch (_) {}
 
-  if (!rows || rows.length < 5) {
-    rows = DEFAULT_LEADERS.map((d, i) => {
-      if (i === 0) return { ...d, uid: me, n: myName, st: mySt, r: myCups, fr: wallet.frame || 'gold', c: wallet.color || '#3a7bd5' };
-      return d;
-    });
-  }
-
+  // The board shows real players only. Where it cannot be loaded (no network, the database says no) it is just the
+  // player themself, with the real cups — never invented rivals or a made-up first place.
+  const boardLoaded = rows.length > 0;
   // Ensure user is in rows
   if (!rows.some(x => x.uid === me)) {
-    rows.push({ uid: me, n: myName, st: mySt, r: myCups, fr: wallet.frame || 'gold', c: wallet.color || '#3a7bd5' });
+    rows.push({ uid: me, n: myName, st: mySt, r: myCups, fr: wallet.frame || 'none', c: wallet.color || '#3a7bd5' });
     rows.sort((a, b) => b.r - a.r);
   }
 
@@ -5075,7 +4847,8 @@ async function renderTop(customEl) {
   const scopeTabs = `<div class="scope-tabs"><button class="chip${topScope === 'all' ? ' pri' : ''}" id="topScopeAll">Все игроки (Топ-20)</button><button class="chip${topScope === 'friends' ? ' pri' : ''}" id="topScopeFriends">Среди друзей</button></div>`;
   const seasonTag = `<div style="text-align:center;color:var(--muted);font-size:12px;margin-bottom:8px">Лига · Сезон <b>${curWeek}</b> (сброс в понедельник)</div>`;
 
-  el.innerHTML = seasonTag + scopeTabs + `<div class="podium">${podium}</div>` + `<div class="leader-tile-list">${list}</div>` + myRow + '<p class="qnote">Нажмите на игрока, чтобы посмотреть профиль · За победу в рейтинге +10 🏆</p>';
+  const emptyNote = rows.length < 4 ? `<p class="qnote" style="text-align:center">${boardLoaded ? 'Пока вас мало в таблице — играйте онлайн и поднимайтесь выше.' : 'Таблица игроков сейчас недоступна. Здесь ваши кубки; общий рейтинг появится, когда связь вернётся.'}</p>` : '';
+  el.innerHTML = seasonTag + scopeTabs + `<div class="podium">${podium}</div>` + `<div class="leader-tile-list">${list}</div>` + myRow + emptyNote + '<p class="qnote">Нажмите на игрока, чтобы посмотреть профиль · За победу в рейтинге +10 🏆</p>';
 
   const btnAll = el.querySelector('#topScopeAll'), btnFriends = el.querySelector('#topScopeFriends');
   if (btnAll) btnAll.onclick = () => { topScope = 'all'; renderTop(); };
@@ -5086,7 +4859,7 @@ async function renderTop(customEl) {
     card.onclick = () => {
       const name = card.dataset.n || 'Игрок';
       const st = card.dataset.st || 'Искатель приключений';
-      const cups = card.dataset.cups || '1000';
+      const cups = card.dataset.cups || '0';
       const fr = card.dataset.fr || 'none';
       const ring = (FRAMES[fr] && FRAMES[fr].ring) || '';
       const c = card.dataset.c || '#3a7bd5';
@@ -7824,43 +7597,26 @@ window.__ready = true;
 (function() {
 // Init Menu Hub Sliding Sheet
 function initMenuHub() {
-  const btn = $('#btnMenuHub');
-  const backdrop = $('#menuHubBackdrop');
-  const drawer = $('#menuHubDrawer');
-  const closeBtn = $('#btnCloseMenuHub');
-  if (!btn || !backdrop || !drawer) return;
-
-  const openDrawer = () => {
-    backdrop.hidden = false;
-    requestAnimationFrame(() => { backdrop.classList.add('open'); });
+  const btn = $('#btnMenuHub'), pop = $('#mhubPop');
+  if (!btn || !pop) return;
+  const close = () => { pop.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); setTimeout(() => { if (!pop.classList.contains('open')) pop.hidden = true; }, 160); };
+  const open = () => {
+    const c = $('#mhubCups'); if (c) c.textContent = '🏆 ' + ((PROG && PROG.cups) || 0);
+    pop.hidden = false; btn.setAttribute('aria-expanded', 'true');
+    requestAnimationFrame(() => pop.classList.add('open'));
   };
-
-  const closeDrawer = () => {
-    backdrop.classList.remove('open');
-    setTimeout(() => { backdrop.hidden = true; }, 360);
-  };
-
-  btn.onclick = openDrawer;
-  if (closeBtn) closeBtn.onclick = closeDrawer;
-  backdrop.onclick = e => { if (e.target === backdrop) closeDrawer(); };
-
-  drawer.onclick = e => {
-    const card = e.target.closest('[data-hub-action]');
-    if (!card) return;
-    const act = card.dataset.hubAction;
-    closeDrawer();
-    setTimeout(() => {
-      if (act === 'rating') {
-        show('rating');
-      } else if (act === 'rules') {
-        show('rules');
-      } else if (act === 'history') {
-        show('history');
-      } else if (act === 'settings') {
-        settingsReturn = 'menu';
-        show('settings');
-      }
-    }, 180);
+  btn.onclick = e => { e.stopPropagation(); pop.classList.contains('open') ? close() : open(); };
+  document.addEventListener('pointerdown', e => { if (pop.classList.contains('open') && !e.target.closest('#mhubPop,#btnMenuHub')) close(); });
+  document.addEventListener('keydown', e => { if (e.key === 'Escape' && pop.classList.contains('open')) { close(); btn.focus(); } });
+  pop.onclick = e => {
+    const it = e.target.closest('[data-hub-action]');
+    if (!it) return;
+    const act = it.dataset.hubAction;
+    close();
+    if (act === 'rating') { if (PROG.inTop10) { PROG.inTop10 = false; PROG.topSeen = true; saveWallet(); progressDot(); } show('rating'); }
+    else if (act === 'rules') show('rules');
+    else if (act === 'history') show('history');
+    else if (act === 'settings') { settingsReturn = 'menu'; show('settings'); }
   };
 }
 

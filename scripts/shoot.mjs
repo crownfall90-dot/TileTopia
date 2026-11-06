@@ -30,6 +30,10 @@ const SCENES = {
   menu: `await boot();`,
   shop: `await boot(); document.querySelector('[data-nav="shop"]').click(); await wait(900); clear();`,
   progress: `await boot(); document.querySelector('[data-nav="progress"]').click(); await wait(900); clear();`,
+  inbox: `await boot(); document.getElementById('btnMenuNotif').click(); await wait(900); clear();`,
+  rating: `await boot(); document.getElementById('btnMenuHub').click(); await wait(400); document.querySelector('[data-hub-action="rating"]').click(); await wait(1500); clear();`,
+  popup: `await boot(); document.getElementById('btnMenuHub').click(); await wait(500);`,
+  profile: `await boot(); document.getElementById('mprof').click(); await wait(900); clear();`,
   setup: `await boot(); document.getElementById('btnMainPlay').click(); await wait(900); clear();`,
   game: `await boot(); document.getElementById('btnMainPlay').click(); await wait(900); clear();
     byText(/Начать партию/).click(); await wait(4500); clear(); await wait(300);`,

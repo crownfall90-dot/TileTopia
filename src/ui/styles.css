@@ -5194,3 +5194,100 @@ html body .dsh-tag.k-emote{background:rgba(242,184,75,.16);color:var(--m-gold)}
 html body .dsh-tile-card.k-emote.r-rare{border-color:rgba(76,141,255,.5)}
 html body .dsh-tile-card.k-emote.r-epic{border-color:rgba(176,108,240,.6)}
 html body .dsh-empty{padding:18px 14px;border-radius:14px;text-align:center;color:var(--muted);background:var(--m-surface);border:1px dashed var(--m-line)}
+
+/* profile: the card stacks (who → level → chips → account), wherever it is shown; quiet entry cards */
+html body #profile{display:flex;flex-direction:column;align-items:stretch;gap:12px;text-align:left;background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none}
+html body #profile .pctop{min-width:0}
+html body #profile .pwho small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;word-break:normal}
+html body #profile .pclvl .pi{min-width:0}
+html body #profile .pclvl small{display:block;white-space:normal}
+html body #scr-profile .tutcard.itemsentry,html body #scr-profile .tutcard.historyentry{background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none;color:var(--ink)}
+html body #scr-profile .tutcard.historyentry b,html body #scr-profile .tutcard.historyentry small,html body #scr-profile .tutcard.historyentry .tgo{color:inherit}
+html body #scr-profile .tutcard.historyentry small{color:var(--muted)}
+html body #scr-profile .pstats{background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none}
+
+/* no relics, bonuses or scout on the map */
+html body .fog-relic,html body .scout-radar-wave{display:none!important}
+
+/* ===== main screen header: plate (who, level, experience), trophies and gold under it, the menu pops out under its button ===== */
+html body .mtop{align-items:flex-start;gap:10px}
+html body .mleft{display:flex;flex-direction:column;gap:8px;min-width:0;flex:1 1 auto}
+html body .mprof{display:flex;align-items:center;gap:11px;width:100%;max-width:none;height:auto;min-height:56px;padding:7px 14px 7px 7px;border-radius:18px;text-align:left}
+html body .mprof .av{flex:0 0 auto;width:42px;height:42px;font-size:18px}
+html body .mprof .mpi{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:3px}
+html body .mprof .mpi b{font:800 clamp(13px,3.8vw,16px)/1.1 var(--f-display);color:#fff}
+html body .mprof .mpl{display:flex;align-items:baseline;justify-content:space-between;gap:8px;white-space:nowrap}
+html body .mprof .mpl em{font:700 11.5px var(--f-body);font-style:normal;color:var(--m-gold)}
+html body .mprof .mpl small{font:600 11px var(--f-body);color:var(--muted);font-variant-numeric:tabular-nums}
+html body .mprof .mxp{display:block;width:100%;height:6px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden}
+html body .mprof .mxp i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#f6c565,#f2b84b)}
+html body .mstat{display:flex;gap:6px;padding-left:2px}
+html body .mstat button{display:flex;align-items:center;gap:5px;height:30px;padding:0 11px;border-radius:999px;background:var(--m-surface);border:1px solid var(--m-line);color:var(--ink);font:700 13px var(--f-body);cursor:pointer;font-variant-numeric:tabular-nums}
+html body .mstat button small{color:var(--muted);font:600 11px var(--f-body)}
+html body .mstat button i{color:var(--muted);font-style:normal;margin-left:1px}
+html body .mstat button .coin{width:14px;height:14px;margin:0}
+html body .mstat button:hover{background:var(--m-surface-2)}
+html body .mstat button:active{transform:scale(.97)}
+html body .mhub-wrap{position:relative}
+html body .mhub-pop{position:absolute;right:0;top:calc(100% + 8px);z-index:30;min-width:210px;padding:6px;border-radius:16px;background:rgba(14,20,38,.97);border:1px solid var(--m-line);box-shadow:0 14px 36px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:2px;opacity:0;transform:translateY(-6px) scale(.98);transform-origin:top right;transition:opacity .15s ease,transform .15s ease;pointer-events:none}
+html body .mhub-pop.open{opacity:1;transform:none;pointer-events:auto}
+html body .mhub-pop[hidden]{display:none}
+html body .mhub-pop button{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-radius:11px;background:transparent;border:0;color:var(--ink);font:600 14px var(--f-body);text-align:left;cursor:pointer}
+html body .mhub-pop button:hover,html body .mhub-pop button:focus-visible{background:var(--m-surface-2);outline:none}
+html body .mhub-pop button span{width:22px;text-align:center}
+html body .mhub-pop button b{flex:1;font-weight:600}
+html body .mhub-pop button i{font-style:normal;color:var(--muted);font-size:12.5px;font-variant-numeric:tabular-nums}
+
+/* ===== progress road: its own tab, vertical ===== */
+html body .rd-head{display:flex;align-items:center;gap:14px;padding:14px;border-radius:18px;background:var(--m-surface);border:1px solid var(--m-line)}
+html body .rd-lvl{flex:0 0 auto;width:62px;height:62px;border-radius:50%;display:grid;place-content:center;text-align:center;border:3px solid var(--m-gold)}
+html body .rd-lvl b{font:800 24px/1 var(--f-display)}
+html body .rd-lvl small{font:600 9.5px var(--f-body);color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+html body .rd-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+html body .rd-info > b{font:800 15px var(--f-display)}
+html body .rd-info small{color:var(--muted);font-size:12px}
+html body .rd-next{margin:12px 2px 6px;color:var(--muted);font-size:13px}
+html body .rd-next b{color:var(--ink)}
+html body .rd-list{list-style:none;margin:0;padding:6px 0 0;position:relative;display:flex;flex-direction:column;gap:0}
+html body .rd-node{position:relative;display:flex;gap:14px;padding-bottom:14px}
+html body .rd-node::before{content:"";position:absolute;left:19px;top:40px;bottom:-2px;width:2px;background:var(--m-line)}
+html body .rd-node:last-child::before{display:none}
+html body .rd-node.claimed::before{background:var(--m-gold)}
+html body .rd-dot{flex:0 0 40px;height:40px;border-radius:50%;display:grid;place-items:center;font-size:19px;background:var(--m-surface-2);border:2px solid var(--m-line);z-index:1}
+html body .rd-node.claimed .rd-dot{background:var(--m-gold);border-color:var(--m-gold);color:#2a1d05;font-weight:800;font-size:17px}
+html body .rd-node.unlocked .rd-dot{border-color:var(--m-gold);box-shadow:0 0 0 4px rgba(242,184,75,.16)}
+html body .rd-node.locked .rd-dot{filter:grayscale(.8);opacity:.6}
+html body .rd-card{flex:1;min-width:0;display:flex;flex-direction:column;align-items:flex-start;gap:3px;padding:10px 12px;border-radius:14px;background:var(--m-surface);border:1px solid var(--m-line)}
+html body .rd-node.unlocked .rd-card{border-color:rgba(242,184,75,.45)}
+html body .rd-card b{font:700 14px var(--f-body)}
+html body .rd-card small{color:var(--muted);font-size:12.5px}
+html body .rd-card .rd-tag{font:600 11.5px var(--f-body);color:var(--muted);margin-top:3px}
+html body .rd-card .chip{margin-top:6px}
+
+/* header fixes: the experience bar is a thin line, the menu list does not wrap */
+html body .mprof .mxp{flex:0 0 auto;height:5px}
+html body .mhub-pop{min-width:232px}
+html body .mhub-pop button b{white-space:nowrap}
+
+/* ===== notifications and rewards: smaller, quieter ===== */
+/* toasts: a small straight chip under the top bar, one line of text, no skew or heavy shadow */
+html body .tile-toast,html body .note{transform:none;transform-origin:top right;top:max(58px,calc(env(safe-area-inset-top,0px) + 52px));right:12px;min-width:0;max-width:min(260px,calc(100vw - 24px));padding:6px 10px;gap:7px;border-radius:12px;background:rgba(14,20,38,.94);border:1px solid var(--m-line);box-shadow:0 6px 18px rgba(0,0,0,.35);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+html body .tile-toast .tt-body,html body .tile-toast .tt-icon,html body .tile-toast .tt-title,html body .tile-toast .tt-msg,html body .tile-toast .tt-close,html body .note i,html body .note span{transform:none}
+html body .tile-toast .tt-title{font-size:10px;letter-spacing:.06em;opacity:.7}
+html body .tile-toast .tt-msg,html body .note span{font:600 12.5px/1.25 var(--f-body)}
+html body .tile-toast .tt-icon,html body .note i{width:22px;height:22px;font-size:12px;border-radius:7px;box-shadow:none}
+html body .tile-toast.ok .tt-icon,html body .note.ok i{background:rgba(63,194,122,.2);color:#6fe0a2}
+/* the inbox: compact rows instead of big cards */
+html body .notif-card{padding:10px 12px 10px 14px;border-radius:14px;gap:6px;background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none}
+html body .notif-card::before{width:3px}
+html body .nc-icon{font-size:18px;width:30px;height:30px}
+html body .nc-title{font-size:13.5px;line-height:1.25}
+html body .nc-badge{font-size:9.5px;padding:1px 6px}
+html body .nc-date{font-size:10.5px}
+html body .nc-desc{font-size:12px;line-height:1.35;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+html body .nc-reward-pill{font-size:11.5px;padding:2px 8px}
+html body .nc-claim-btn{padding:7px 12px;font-size:12.5px;border-radius:11px;box-shadow:none}
+html body .nc-claim-btn.pri{background:var(--m-gold);color:var(--brass-ink)}
+html body .nc-actions{gap:6px}
+/* toasts sit above the bottom bar, out of the way of the header */
+html body .tile-toast,html body .note{top:auto;bottom:calc(86px + var(--ib,0px));right:12px}
