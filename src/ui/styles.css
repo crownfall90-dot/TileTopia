@@ -289,8 +289,8 @@ html.app input,html.app textarea,html.app a,html.app [contenteditable],html.app 
 /* --- Compact Slanted Strategy Tile Buttons (Main Menu) --- */
 .menu-action-row {
   display: flex;
-  gap: 10px;
-  align-items: stretch;
+  gap: 8px;
+  align-items: center;
   width: 100%;
   margin-top: 6px;
 }
@@ -322,18 +322,19 @@ html.app input,html.app textarea,html.app a,html.app [contenteditable],html.app 
 
 /* Compact Quest Tile */
 .tile-btn.tile-quest {
-  flex: 0.95;
-  min-height: 44px;
-  padding: 0 8px;
+  flex: 0.75;
+  height: 42px;
+  min-height: 42px;
+  padding: 0 6px;
   color: #fff;
   background: linear-gradient(165deg, rgba(235, 87, 87, 0.25) 0%, rgba(18, 26, 48, 0.92) 100%);
   border-top: 1.5px solid rgba(255, 120, 120, 0.5);
   border-left: 1px solid rgba(255, 120, 120, 0.3);
   border-bottom: 2px solid rgba(0, 0, 0, 0.6);
-  box-shadow: 0 4px 0 #12182c, 0 8px 18px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 3px 0 #12182c, 0 6px 14px rgba(0, 0, 0, 0.35);
 }
 .tile-btn.tile-quest .mq-ic {
-  font-size: 18px;
+  font-size: 16px;
   line-height: 1;
 }
 .tile-btn.tile-quest .mq-col {
@@ -343,13 +344,13 @@ html.app input,html.app textarea,html.app a,html.app [contenteditable],html.app 
   line-height: 1.1;
 }
 .tile-btn.tile-quest #mqTitle {
-  font-size: 13px;
+  font-size: 12px;
   font-weight: 800;
   color: #fff;
   font-family: var(--f-display);
 }
 .tile-btn.tile-quest #mqSub {
-  font-size: 9.5px;
+  font-size: 9px;
   font-weight: 700;
   color: #ffd877;
   text-transform: uppercase;
@@ -364,29 +365,32 @@ html.app input,html.app textarea,html.app a,html.app [contenteditable],html.app 
   box-shadow: 0 2px 0 #12182c;
 }
 
-/* Compact Play Tile */
+/* Hero Play Tile - Dominant and Big */
 .tile-btn.tile-play {
-  flex: 1.35;
-  min-height: 44px;
-  padding: 0 12px;
+  flex: 1.7;
+  height: 54px;
+  min-height: 54px;
+  padding: 0 16px;
   color: #241502;
-  background: linear-gradient(165deg, #ffe58f 0%, #f7be4d 46%, #d88e22 100%);
-  border-top: 1.5px solid rgba(255, 255, 255, 0.85);
-  border-left: 1px solid rgba(255, 255, 255, 0.5);
-  border-bottom: 2px solid rgba(110, 60, 4, 0.45);
-  box-shadow: 0 4px 0 #8f5807, 0 8px 18px rgba(216, 142, 34, 0.35);
+  background: linear-gradient(165deg, #fff0a6 0%, #f7be4d 44%, #d88e22 100%);
+  border-top: 2px solid rgba(255, 255, 255, 0.95);
+  border-left: 1.5px solid rgba(255, 255, 255, 0.6);
+  border-bottom: 2.5px solid rgba(110, 60, 4, 0.5);
+  box-shadow: 0 5px 0 #8f5807, 0 10px 24px rgba(216, 142, 34, 0.45);
 }
 .tile-btn.tile-play .t-title {
-  font: 800 15px var(--f-display);
-  letter-spacing: -0.2px;
+  font: 900 18px var(--f-display);
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
 }
 .tile-btn.tile-play svg {
-  width: 17px;
-  height: 17px;
+  width: 22px;
+  height: 22px;
+  filter: drop-shadow(0 1px 2px rgba(0,0,0,0.25));
 }
 .tile-btn.tile-play:hover {
   transform: skewX(-12deg) translateY(-2px);
-  box-shadow: 0 6px 0 #8f5807, 0 12px 22px rgba(216, 142, 34, 0.45);
+  box-shadow: 0 7px 0 #8f5807, 0 14px 28px rgba(216, 142, 34, 0.55);
 }
 .tile-btn.tile-play:active {
   transform: skewX(-12deg) translateY(2px);
@@ -395,28 +399,29 @@ html.app input,html.app textarea,html.app a,html.app [contenteditable],html.app 
 
 /* Compact Mode Tile */
 .tile-btn.tile-mode {
-  flex: 0.95;
-  min-height: 44px;
-  padding: 0 10px;
+  flex: 0.75;
+  height: 42px;
+  min-height: 42px;
+  padding: 0 8px;
   color: #eef2ff;
   background: linear-gradient(165deg, #2c3e6d 0%, #172140 100%);
   border-top: 1.5px solid rgba(255, 255, 255, 0.28);
   border-left: 1px solid rgba(255, 255, 255, 0.18);
   border-bottom: 2px solid rgba(8, 12, 24, 0.5);
-  box-shadow: 0 4px 0 #0d1428, 0 8px 18px rgba(0, 0, 0, 0.4);
+  box-shadow: 0 3px 0 #0d1428, 0 6px 14px rgba(0, 0, 0, 0.35);
 }
 .tile-btn.tile-mode .t-title {
-  font: 700 13px var(--f-display);
+  font: 700 12px var(--f-display);
   color: #fff;
 }
 .tile-btn.tile-mode svg {
-  width: 15px;
-  height: 15px;
+  width: 14px;
+  height: 14px;
 }
 .tile-btn.tile-mode .t-arrow {
   opacity: 0.7;
-  width: 11px;
-  height: 11px;
+  width: 10px;
+  height: 10px;
 }
 .tile-btn.tile-mode:hover {
   transform: skewX(-12deg) translateY(-2px);
