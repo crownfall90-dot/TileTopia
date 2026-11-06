@@ -21,6 +21,7 @@ TOP = .36               # rim top
 GRASS = .33             # grass top
 PLAYERS = {'red': (0.80, 0.05, 0.03), 'blue': (0.03, 0.20, 0.85), 'yellow': (1.0, 0.55, 0.0)}   # linear
 rnd = random.Random(7)
+HEXROT = math.pi / 6    # the cone's corners start at 30 deg; a flat-top hex needs them at 0 deg, or the tiles do not meet
 
 
 def srgb(c):
@@ -207,11 +208,11 @@ def edge_mid(c, deg):
 # ---------------------------------------------------------------- the tile
 def hex_tile(c, name):
     # wooden underlayer, the thick stone rim, the grass inside it
-    prism(c, R * .93, .08, 6, 'wood_base', name + '_wood', z0=-.02, bevel=.02)
-    rim = prism(c, R * .985, TOP - .04, 6, 'stone_rim', name + '_rim', z0=.04, bevel=.05)
-    grass = prism(c, R * .87, .02, 6, 'grass', name + '_grass', z0=GRASS - .02, bevel=.0)
+    prism(c, R * .93, .08, 6, 'wood_base', name + '_wood', z0=-.02, bevel=.02, rot=HEXROT)
+    rim = prism(c, R * .985, TOP - .04, 6, 'stone_rim', name + '_rim', z0=.04, bevel=.05, rot=HEXROT)
+    grass = prism(c, R * .87, .02, 6, 'grass', name + '_grass', z0=GRASS - .02, bevel=.0, rot=HEXROT)
     # the rim is a tray: cut the inside out down to the grass
-    cut = prism(c, R * .87, .2, 6, 'grass', name + '_cut', z0=GRASS - .001)
+    cut = prism(c, R * .87, .2, 6, 'grass', name + '_cut', z0=GRASS - .001, rot=HEXROT)
     bo = rim.modifiers.new('tray', 'BOOLEAN')
     bo.operation = 'DIFFERENCE'
     bo.object = cut
@@ -368,7 +369,7 @@ def notch(rims, mid, normal, width=.28):
 
 def band(c, player):
     """The owner's colour: a band round the stone rim of the tile."""
-    prism(c, R * .992, .05, 6, 'player_' + player, 'band_' + player, z0=.15, bevel=.012)
+    prism(c, R * .992, .05, 6, 'player_' + player, 'band_' + player, z0=.15, bevel=.012, rot=HEXROT)
 
 
 def waterfall(mid, deg):
@@ -436,7 +437,7 @@ def build():
     stub(gate + Vector((.1, 0)), C0, 30, rims['red'])
     stub(gate + Vector((.12, -.05)), C0, 330, rims['red'])
     stub(gate + Vector((-.1, .02)), C0, 150, rims['red'])
-    stub(C0 + Vector((0, .6)), C0, 90, rims['red'])            # the castle's back gate
+    stub(C0 + Vector((0, .45)), C0, 90, rims['red'])            # the castle's back gate
     stub(mill, C1, 150, rims['blue'])
     stub(mill, C1, 210, rims['blue'])
     stub(mill + Vector((.1, -.08)), C1, 270, rims['blue'])
@@ -451,7 +452,7 @@ def build():
     dv = roadB[min(i + 1, len(roadB) - 1)] - roadB[max(i - 1, 0)]
     bridge(mid, math.atan2(dv.y, dv.x))
     # red: the castle, the red figure by the gate
-    castle(C0 + Vector((0, .3)))
+    castle(C0 + Vector((0, .2)))
     red_m = gate + Vector((.3, -.22))
     meeple(red_m, 'red', s=.36, rot=.3)
     # blue: the mill, the blue figure at the bridge, a banner
@@ -469,13 +470,13 @@ def build():
     house(hut, .9, 'roof_dark', .8)
     yel_m = sq + Vector((-.04, -.1))
     meeple(yel_m, 'yellow', s=.36, rot=-.2)
-    yel_b = Vector((C2.x + .2, C2.y + .35))
+    yel_b = Vector((C2.x + .05, C2.y + .5))
     banner((yel_b.x, yel_b.y, GRASS), 'yellow', 1.0, .36)
     for k in range(4):   # rocks
         a = rnd.random() * 6.28
         blob((C0.x + .6 * math.cos(a), C0.y + .6 * math.sin(a), GRASS), .05, 'rock', 'rock', sz=.6, jitter=.3)
     dress((C0, C1, C2), (*roads, river),
-          [(C0 + Vector((0, .3)), .42), (mill, .2), (C2 + Vector((.52, -.25)), .25), (C2 + Vector((.45, .42)), .17),
+          [(C0 + Vector((0, .2)), .42), (mill, .2), (C2 + Vector((.52, -.25)), .25), (C2 + Vector((.45, .42)), .17),
            (C2 + Vector((.62, .12)), .17), (C2 + Vector((.2, -.5)), .17), (hut, .14), (sq, .22), (mid, .3),
            (red_m, .24), (blue_m, .24), (yel_m, .24), (blue_b, .1), (yel_b, .1)],
           river, sq, mill, C0)
