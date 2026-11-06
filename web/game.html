@@ -56,6 +56,7 @@
               </button>
               <div class="mhub-pop" id="mhubPop" role="menu" hidden>
                 <button role="menuitem" data-hub-action="rating"><span>🏆</span><b>Рейтинг игроков</b><i id="mhubCups"></i></button>
+                <button role="menuitem" data-hub-action="achievements"><span>🎖️</span><b>Достижения</b><i id="mhubAch"></i></button>
                 <button role="menuitem" data-hub-action="rules"><span>📖</span><b>Как играть</b></button>
                 <button role="menuitem" data-hub-action="history"><span>📜</span><b>История партий</b></button>
                 <button role="menuitem" data-hub-action="settings"><span>⚙️</span><b>Настройки</b></button>
@@ -103,11 +104,8 @@
           <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Витрина</b><span class="goldchip static"><i class="coin"></i><b class="goldN">0</b></span></div>
           <div class="gift" id="gift"></div>
           
-          <!-- Daily 6-Item Showcase in Tile Style -->
+          <!-- 5 Medieval Market Stalls (max 6 items per stall: 3 top, 3 bottom) -->
           <div id="dailyShopWrap"></div>
-
-          <div class="h3">Эмодзи и фразы</div>
-          <div id="reactShop"></div>
 
           <div class="h3">Свой статус</div>
           <div class="stcustom"><input class="field" id="stInput" maxlength="15" placeholder="Свой статус (до 15)" autocomplete="off"><button class="cta" id="stBuy">3000 <i class="coin"></i></button></div>
@@ -184,6 +182,13 @@
 
           <div class="seg ptabs" id="ptabs"><button data-pt="road" aria-pressed="true">Прогресс</button><button data-pt="rewards" aria-pressed="false">Задания</button><button data-pt="cols" aria-pressed="false">Коллекции</button></div>
           <div class="col" id="ptab"></div>
+        </div>
+      </section>
+
+      <section class="screen scroll" id="scr-achievements" hidden>
+        <div class="lb">
+          <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Достижения</b><span class="goldchip static"><i class="coin"></i><b class="goldN">0</b></span></div>
+          <div class="col" id="achievementsContent"></div>
         </div>
       </section>
 
@@ -2170,56 +2175,10 @@ function dailyBonus() {
   if (isReady && wallet.daily !== today()) { wallet.daily = today(); saveWallet(); }
 }
 
-function openGift(forceCalendar = false) {
-  const isReady = giftReady() && !forceCalendar;
-  const {st, next, day, usedFreeze, freezeAvail} = streakState();
-  const streakGold = (typeof STREAK_GOLD !== 'undefined' && STREAK_GOLD[day]) ? STREAK_GOLD[day] : 15;
-  const chestArtSvg = CHEST_SVG;
-  const chestOpenedSvg = (typeof CHEST_OPEN_SVG !== 'undefined') ? CHEST_OPEN_SVG : CHEST_SVG;
-
-  if (!isReady) {
-    // Режим просмотра календаря наград и таймера
-    const box = document.createElement('div');
-    box.className = 'over';
-    box.style.position = 'fixed';
-    const calTrack = (PG.ui.shop && PG.ui.shop.renderGiftCalendarHtml)
-      ? PG.ui.shop.renderGiftCalendarHtml({streakDays: STREAK_GOLD, currentDay: day, isClaimedToday: !giftReady()})
-      : '';
-
-    box.innerHTML = `
-      <div class="ocard gift-modal">
-        <div class="gift-modal-header">
-          <h3>Ежедневный подарок</h3>
-          <p>Заходите каждый день — награды растут!</p>
-        </div>
-        <div class="gift-timer-card">
-          <span>Следующий сундук через:</span>
-          <b id="giftCountdown">${timeUntilMidnightStr()}</b>
-        </div>
-        ${calTrack}
-        <button class="cta wide" id="giftCloseBtn" style="margin-top:14px">Понятно</button>
-      </div>`;
-
-    document.body.append(box);
-    const timerInterval = setInterval(() => {
-      const el = box.querySelector('#giftCountdown');
-      if (el) el.textContent = timeUntilMidnightStr();
-      else clearInterval(timerInterval);
-    }, 1000);
-
-    box.querySelector('#giftCloseBtn').onclick = () => {
-      clearInterval(timerInterval);
-      box.remove();
-    };
-    return;
+function getDailyTrioOptions(day, streakGold) {
+  if (wallet.dailyTrio && wallet.dailyTrio.date === today() && Array.isArray(wallet.dailyTrio.options) && wallet.dailyTrio.options.length === 3) {
+    return wallet.dailyTrio;
   }
-
-  // --- ИНТЕРАКТИВНЫЙ ВЫБОР ИЗ 3 СУНДУКОВ УДАЧИ ---
-  const box = document.createElement('div');
-  box.className = 'over';
-  box.style.position = 'fixed';
-
-  // Генерируем 3 разных ценных приза
   const notOwned = Object.keys(FIGS).filter(k => !wallet.owned.includes(k));
   const options = [];
 
@@ -2242,136 +2201,118 @@ function openGift(forceCalendar = false) {
 
   // Перемешиваем по 3 сундукам
   options.sort(() => Math.random() - 0.5);
+  const data = { date: today(), options, chosenIdx: null };
+  wallet.dailyTrio = data;
+  saveWallet();
+  return data;
+}
 
-  const calTrack = (PG.ui.shop && PG.ui.shop.renderGiftCalendarHtml)
-    ? PG.ui.shop.renderGiftCalendarHtml({streakDays: STREAK_GOLD, currentDay: day, isClaimedToday: false})
-    : '';
+let openingTrioChest = false;
+let giftCountdownInterval = null;
+function startGiftCountdownTimer() {
+  if (giftCountdownInterval) return;
+  giftCountdownInterval = setInterval(() => {
+    const el = document.getElementById('giftCountdown');
+    if (el) el.textContent = timeUntilMidnightStr();
+  }, 1000);
+}
 
-  box.innerHTML = `
-    <div class="ocard gift-modal">
-      <div class="gift-modal-header">
-        <h3>✨ Три сундука удачи ✨</h3>
-        <p>Выберите любой сундук, чтобы забрать подарок дня</p>
-      </div>
-      <div class="gift-trio" id="giftTrio">
-        <button class="gift-chest-btn idle" data-idx="0">
-          <div class="gift-chest-art">${chestArtSvg}</div>
-          <span class="gift-chest-name">Сундук 1</span>
-          <span class="gift-chest-hint">Открыть</span>
-        </button>
-        <button class="gift-chest-btn idle" data-idx="1">
-          <div class="gift-chest-art">${chestArtSvg}</div>
-          <span class="gift-chest-name">Сундук 2</span>
-          <span class="gift-chest-hint">Открыть</span>
-        </button>
-        <button class="gift-chest-btn idle" data-idx="2">
-          <div class="gift-chest-art">${chestArtSvg}</div>
-          <span class="gift-chest-name">Сундук 3</span>
-          <span class="gift-chest-hint">Открыть</span>
-        </button>
-      </div>
-      <div id="giftCalWrap">${calTrack}</div>
-      <div id="giftActionWrap" style="display:none;margin-top:14px">
-        <button class="cta wide" id="giftCollectBtn">Забрать награду ✨</button>
-      </div>
-    </div>`;
+function pickDailyChest(idx, trioData, btn, container) {
+  if (openingTrioChest || !giftReady() || !trioData || !trioData.options) return;
+  const chosen = trioData.options[idx];
+  if (!chosen) return;
+  openingTrioChest = true;
 
-  document.body.append(box);
+  const {next, usedFreeze} = streakState();
+  const curWeek = (PG.state.progress && PG.state.progress.weekId) ? PG.state.progress.weekId() : 'w1';
 
-  let opened = false;
-  box.querySelectorAll('.gift-chest-btn').forEach(btn => {
-    btn.onclick = () => {
-      if (opened) return;
-      opened = true;
-      const idx = parseInt(btn.dataset.idx, 10);
-      const chosen = options[idx];
+  // 1. Снимаем idle анимацию со всех сундуков
+  container.querySelectorAll('.gift-chest-btn').forEach(b => b.classList.remove('idle'));
 
-      // Снимаем idle анимацию со всех
-      box.querySelectorAll('.gift-chest-btn').forEach(b => b.classList.remove('idle'));
+  // 2. Тряска выбранного сундука (предвкушение)
+  btn.classList.add('shaking');
+  beep('click');
+  try { if (typeof telegramHaptic === 'function') telegramHaptic('impact', 'medium'); } catch(_) {}
 
-      // Тряска выбранного сундука (предвкушение)
-      btn.classList.add('shaking');
-      beep('click');
-      try { if (typeof telegramHaptic === 'function') telegramHaptic('impact', 'medium'); } catch(_) {}
+  setTimeout(() => {
+    btn.classList.remove('shaking');
+    btn.classList.add('opened', 'chosen');
+    const art = btn.querySelector('.gift-chest-art');
+    if (art) art.innerHTML = (typeof CHEST_OPEN_SVG !== 'undefined') ? CHEST_OPEN_SVG : CHEST_SVG;
+    const hint = btn.querySelector('.gift-chest-hint');
+    if (hint) {
+      hint.className = 'gift-chest-hint chosen-hint';
+      hint.textContent = 'Ваш выбор 🏆';
+    }
 
-      setTimeout(() => {
-        btn.classList.remove('shaking');
-        btn.classList.add('opened');
-        btn.querySelector('.gift-chest-art').innerHTML = chestOpenedSvg;
-        btn.querySelector('.gift-chest-hint').textContent = 'Ваш приз!';
+    // Всплывающий бейдж награды над сундуком
+    const badge = document.createElement('div');
+    badge.className = 'gift-prize-reveal';
+    badge.innerHTML = chosen.title;
+    btn.prepend(badge);
 
-        // Бейдж награды над сундуком
-        const badge = document.createElement('div');
-        badge.className = 'gift-prize-reveal';
-        badge.innerHTML = chosen.title;
-        btn.prepend(badge);
+    beep('win');
+    setTimeout(() => beep('coin'), 180);
+    try { if (typeof telegramHaptic === 'function') telegramHaptic('notification', 'success'); } catch(_) {}
 
-        beep('win');
-        setTimeout(() => beep('coin'), 180);
-        try { if (typeof telegramHaptic === 'function') telegramHaptic('notification', 'success'); } catch(_) {}
+    // Начисляем награду
+    if (chosen.type === 'gold') {
+      wallet.gold += chosen.amount;
+    } else if (chosen.type === 'boost_double') {
+      wallet.gold += chosen.amount;
+      wallet.boosts.double = (wallet.boosts.double || 0) + 1;
+    } else if (chosen.type === 'boost_meeple') {
+      wallet.gold += chosen.amount;
+      wallet.boosts.meeple = (wallet.boosts.meeple || 0) + 1;
+    } else if (chosen.type === 'fig') {
+      if (!wallet.owned.includes(chosen.figKey)) wallet.owned.push(chosen.figKey);
+    }
 
-        // Начисляем награду
-        if (chosen.type === 'gold') {
-          wallet.gold += chosen.amount;
-        } else if (chosen.type === 'boost_double') {
-          wallet.gold += chosen.amount;
-          wallet.boosts.double = (wallet.boosts.double || 0) + 1;
-        } else if (chosen.type === 'boost_meeple') {
-          wallet.gold += chosen.amount;
-          wallet.boosts.meeple = (wallet.boosts.meeple || 0) + 1;
-        } else if (chosen.type === 'fig') {
-          if (!wallet.owned.includes(chosen.figKey)) wallet.owned.push(chosen.figKey);
-        }
-
-        // Помечаем открытие сегодня
-        wallet.dailyBox = today();
-
-        // Обновляем серию посещений
-        const curWeek = (PG.state.progress && PG.state.progress.weekId) ? PG.state.progress.weekId() : 'w1';
-        wallet.streak = {
-          n: next,
-          last: localDay(),
-          best: Math.max(next, (wallet.streak && wallet.streak.best) || 0),
-          freezeWeek: usedFreeze ? curWeek : ((wallet.streak && wallet.streak.freezeWeek) || '')
-        };
-
-        saveWallet();
-        dailyBonus();
-        renderShop();
-        document.querySelectorAll('.goldN').forEach(e => e.textContent = wallet.gold);
-
-        // Вскрываем два других сундука в ghost-режиме
-        setTimeout(() => {
-          box.querySelectorAll('.gift-chest-btn').forEach(otherBtn => {
-            const oIdx = parseInt(otherBtn.dataset.idx, 10);
-            if (oIdx !== idx) {
-              const otherPrize = options[oIdx];
-              otherBtn.classList.add('ghost');
-              otherBtn.querySelector('.gift-chest-art').innerHTML = chestOpenedSvg;
-              otherBtn.querySelector('.gift-chest-hint').innerHTML = `<span class="gift-chest-ghost-note">А здесь:<b>\${otherPrize.title}</b></span>`;
-            }
-          });
-
-          // Обновляем календарь (сегодня зачеркнуто)
-          const updatedCal = (PG.ui.shop && PG.ui.shop.renderGiftCalendarHtml)
-            ? PG.ui.shop.renderGiftCalendarHtml({streakDays: STREAK_GOLD, currentDay: day, isClaimedToday: true})
-            : '';
-          const calWrap = box.querySelector('#giftCalWrap');
-          if (calWrap) calWrap.innerHTML = updatedCal;
-
-          // Показываем кнопку сбора
-          const actWrap = box.querySelector('#giftActionWrap');
-          if (actWrap) {
-            actWrap.style.display = 'block';
-            actWrap.querySelector('#giftCollectBtn').onclick = () => {
-              box.remove();
-              toastAny(`Награда получена: ${chosen.title}!`);
-            };
-          }
-        }, 400);
-      }, 450);
+    wallet.dailyBox = today();
+    wallet.streak = {
+      n: next,
+      last: localDay(),
+      best: Math.max(next, (wallet.streak && wallet.streak.best) || 0),
+      freezeWeek: usedFreeze ? curWeek : ((wallet.streak && wallet.streak.freezeWeek) || '')
     };
-  });
+    trioData.chosenIdx = idx;
+    wallet.dailyTrio = trioData;
+    saveWallet();
+    dailyBonus();
+    document.querySelectorAll('.goldN').forEach(e => e.textContent = wallet.gold);
+    toastAny(`🎉 Получено: ${chosen.title}!`);
+
+    // 3. Вскрываем два других сундука в ghost-режиме, наглядно отображая что было в каждом!
+    setTimeout(() => {
+      container.querySelectorAll('.gift-chest-btn[data-gidx]').forEach(otherBtn => {
+        const oIdx = parseInt(otherBtn.dataset.gidx, 10);
+        if (oIdx !== idx) {
+          const otherPrize = trioData.options[oIdx];
+          otherBtn.classList.add('ghost');
+          const oArt = otherBtn.querySelector('.gift-chest-art');
+          if (oArt) oArt.innerHTML = (typeof CHEST_OPEN_SVG !== 'undefined') ? CHEST_OPEN_SVG : CHEST_SVG;
+          const oHint = otherBtn.querySelector('.gift-chest-hint');
+          if (oHint) {
+            oHint.innerHTML = `<span class="gift-chest-ghost-note">А здесь было:<br><b>${otherPrize ? otherPrize.title : '...'}</b></span>`;
+          }
+        }
+      });
+
+      // Обновляем подзаголовок на таймер
+      const sub = container.querySelector('.gift-showcase-sub');
+      if (sub) {
+        sub.innerHTML = `Подарок на сегодня получен ✓ Следующий сундук через: <b id="giftCountdown" class="countdown-gold">${timeUntilMidnightStr()}</b>`;
+      }
+      startGiftCountdownTimer();
+      openingTrioChest = false;
+    }, 400);
+  }, 450);
+}
+
+function openGift(forceCalendar = false) {
+  show('shop');
+  const g = $('#gift');
+  if (g) g.scrollIntoView({behavior: 'smooth', block: 'start'});
 }
 /* Daily streak: the first visit of each day pays gold that grows day by day for a week
    (10 → 100), then the week starts again. Missing a day starts the streak over. Days are
@@ -2582,34 +2523,68 @@ function renderShop() {
   if (promoInp) promoInp.onkeydown = (e) => {
     if (e.key === 'Enter') redeemPromo(promoInp.value);
   };
-  $('#gift').innerHTML = PG.ui.shop.renderGiftCard({
-    giftReady: giftReady(),
-    chestSvg: CHEST_SVG,
-    boosts: wallet.boosts,
-    nextGiftTimeStr: timeUntilMidnightStr()
-  });
-  if (giftReady()) {
-    $('#openGift').onclick = () => openGift();
-  } else {
-    const ob = $('#openGiftCalendar');
-    if (ob) ob.onclick = () => openGift(true);
-  }
-  $('#gift').onclick = (e) => {
-    if (e.target.closest('#openGift')) return;
-    if (!giftReady()) openGift(true);
-  };
+  const isReady = giftReady();
+  const {day} = streakState();
+  const streakGold = (typeof STREAK_GOLD !== 'undefined' && STREAK_GOLD[day]) ? STREAK_GOLD[day] : 15;
+  const chestArtSvg = CHEST_SVG;
+  const chestOpenedSvg = (typeof CHEST_OPEN_SVG !== 'undefined') ? CHEST_OPEN_SVG : CHEST_SVG;
 
-  // Render Daily 6-Item Showcase in tile format
+  let trioData = (wallet.dailyTrio && wallet.dailyTrio.date === today()) ? wallet.dailyTrio : null;
+  if (!trioData && isReady) {
+    trioData = getDailyTrioOptions(day, streakGold);
+  }
+
+  const giftEl = $('#gift');
+  if (giftEl) {
+    if (PG.ui.shop && PG.ui.shop.renderGiftTrioShowcase) {
+      giftEl.innerHTML = PG.ui.shop.renderGiftTrioShowcase({
+        giftReady: isReady,
+        day,
+        streakDays: STREAK_GOLD,
+        options: trioData ? trioData.options : [],
+        chosenIdx: trioData ? trioData.chosenIdx : null,
+        nextGiftTimeStr: timeUntilMidnightStr(),
+        chestSvg: chestArtSvg,
+        chestOpenedSvg: chestOpenedSvg,
+        boosts: wallet.boosts
+      });
+    }
+
+    if (isReady && trioData) {
+      giftEl.querySelectorAll('.gift-chest-btn[data-gidx]').forEach(btn => {
+        btn.onclick = () => {
+          const idx = parseInt(btn.dataset.gidx, 10);
+          pickDailyChest(idx, trioData, btn, giftEl);
+        };
+      });
+    } else {
+      startGiftCountdownTimer();
+    }
+  }
+
+  // Render 5 Medieval Market Stalls: figures, frames, statuses, emotes, phrases (max 6 unowned, 3 top, 3 bottom)
   const dailyWrap = $('#dailyShopWrap');
-  if (dailyWrap && PG.ui.shop.renderDailyShopShowcase) {
-    const dailyItems = PG.ui.shop.getDailyShopItems(FIGS, FRAMES, PG.state.status.SHOP_STATUSES, new Date(), wallet);
-    dailyWrap.innerHTML = PG.ui.shop.renderDailyShopShowcase({
-      items: dailyItems,
-      wallet,
-      figPreview,
-      initial: profileName()[0],
-      frames: FRAMES
-    });
+  if (dailyWrap) {
+    if (PG.ui.shop.renderShopStallsShowcase) {
+      dailyWrap.innerHTML = PG.ui.shop.renderShopStallsShowcase({
+        figs: FIGS,
+        frames: FRAMES,
+        statuses: (PG.state.status && PG.state.status.SHOP_STATUSES) || [],
+        wallet,
+        figPreview,
+        initial: profileName()[0],
+        date: new Date()
+      });
+    } else if (PG.ui.shop.renderDailyShopShowcase) {
+      const dailyItems = PG.ui.shop.getDailyShopItems(FIGS, FRAMES, PG.state.status.SHOP_STATUSES, new Date(), wallet);
+      dailyWrap.innerHTML = PG.ui.shop.renderDailyShopShowcase({
+        items: dailyItems,
+        wallet,
+        figPreview,
+        initial: profileName()[0],
+        frames: FRAMES
+      });
+    }
   }
 
   $('#locgrid').innerHTML = PG.ui.shop.renderLocationsGrid(LOCS);
@@ -4592,6 +4567,16 @@ function roadMapHtml(ms, unlockedFn, claimed) {
   return `<div class="rd-map" style="height:${H}px">${svg}${bridges}${sprHtml}${nodes}</div>`;
 }
 let roadScroll = false;
+function renderAchievements() {
+  const el = $('#achievementsContent');
+  if (!el || !PG.ui.progress || !PG.ui.progress.renderAchievementsHtml) return;
+  el.innerHTML = PG.ui.progress.renderAchievementsHtml({
+    achDefs: ACH,
+    progAch: PROG.ach || {},
+    progStats: PROG.st || {},
+    progLvl: PROG.lvl || 1
+  });
+}
 function renderProgressRoad() {
   const track = $('#ptab');
   if (!track || ptab !== 'road') return;
@@ -4911,7 +4896,7 @@ $('#ptab').addEventListener('click', e => {
     toastAny(`Коллекция «${col.name}» собрана! +${col.reward} золота 🎉`);
   }
   else return;
-  beep('coin'); saveWallet(); progressDot(); renderProgress(); renderMenuProfile();
+  beep('coin'); saveWallet(); progressDot(); renderProgress(); if (typeof renderAchievements === 'function' && !$('#scr-achievements').hidden) renderAchievements(); renderMenuProfile();
 });
 /* Rating: cups from online games (1st +30, 2nd +15, 3rd +5, draw +10) in /leaders, top 50.
    The database rules let a player raise their own score by at most 30 a minute, so a big
@@ -7290,6 +7275,7 @@ function show(name) {
   if (name === 'settings') renderPrefs();
   if (name === 'menu') { saveWallet(); presenceCount(); progressDot(); renderMenuProfile(); updateNotifBadge(); }
   if (name === 'progress') { roadScroll = true; renderTasks(); }
+  if (name === 'achievements') { renderAchievements(); }
   if (name === 'profile') { renderProfile(); renderAccount(); }
   if (name === 'rating') { renderTop(); }
   track('screen_view', {screen_name: name});
@@ -7825,6 +7811,13 @@ function initMenuHub() {
   const close = () => { pop.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); setTimeout(() => { if (!pop.classList.contains('open')) pop.hidden = true; }, 160); };
   const open = () => {
     const c = $('#mhubCups'); if (c) c.textContent = '🏆 ' + ((PROG && PROG.cups) || 0);
+    const a = $('#mhubAch');
+    if (a && typeof ACH !== 'undefined' && PROG && PROG.st) {
+      const ready = ACH.filter(x => !PROG.ach[x.id] && x.ok(PROG.st, PROG.lvl)).length;
+      a.textContent = ready ? `+${ready}` : `${ACH.filter(x => PROG.ach[x.id] === 'got').length}/${ACH.length}`;
+      if (ready) a.style.color = '#7fe0a8';
+      else a.style.color = '';
+    }
     pop.hidden = false; btn.setAttribute('aria-expanded', 'true');
     requestAnimationFrame(() => pop.classList.add('open'));
   };
@@ -7837,6 +7830,7 @@ function initMenuHub() {
     const act = it.dataset.hubAction;
     close();
     if (act === 'rating') { if (PROG.inTop10) { PROG.inTop10 = false; PROG.topSeen = true; saveWallet(); progressDot(); } show('rating'); }
+    else if (act === 'achievements') show('achievements');
     else if (act === 'rules') show('rules');
     else if (act === 'history') show('history');
     else if (act === 'settings') { settingsReturn = 'menu'; show('settings'); }
@@ -7914,7 +7908,7 @@ initMenuHub();
     if (buyBtn) {
       const parts = buyBtn.dataset.dailyBuy.split('|');
       const kind = parts[0], key = kind === 'status' ? parts[1].replace(/^sh:/, '') : parts[1], price = +parts[2];
-      if (kind === 'emote') return buyReaction('emote', key);
+      if (kind === 'emote' || kind === 'phrase') return buyReaction(kind, key);
       if (wallet.gold < price) return toastAny(`Не хватает ${price - wallet.gold} золота`);
 
       if (kind === 'fig') {

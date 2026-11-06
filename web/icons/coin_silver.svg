@@ -1,0 +1,53 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <filter id="s-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="2.5" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+    <linearGradient id="s-edge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#636e72"/>
+      <stop offset="100%" stop-color="#2d3436"/>
+    </linearGradient>
+    <linearGradient id="s-rim" x1="0.2" y1="0.1" x2="0.8" y2="0.9">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="40%" stop-color="#b2bec3"/>
+      <stop offset="100%" stop-color="#3e4a52"/>
+    </linearGradient>
+    <radialGradient id="s-field" cx="38%" cy="32%" r="65%">
+      <stop offset="0%" stop-color="#e2e8f0"/>
+      <stop offset="55%" stop-color="#94a3b8"/>
+      <stop offset="100%" stop-color="#475569"/>
+    </radialGradient>
+    <linearGradient id="s-emboss" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#ffffff"/>
+      <stop offset="100%" stop-color="#334155"/>
+    </linearGradient>
+    <linearGradient id="s-glare" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.5"/>
+      <stop offset="45%" stop-color="#ffffff" stop-opacity="0.0"/>
+    </linearGradient>
+  </defs>
+
+  <g filter="url(#s-shadow)">
+    <!-- Bottom 3D thickness lip -->
+    <ellipse cx="32" cy="34" rx="27" ry="27" fill="url(#s-edge)"/>
+    <!-- Main coin face -->
+    <circle cx="32" cy="31" r="27" fill="url(#s-rim)"/>
+    <!-- Outer rim inner shadow -->
+    <circle cx="32" cy="31" r="24.5" fill="#242b35"/>
+    <!-- Recessed coin field -->
+    <circle cx="32" cy="31" r="23" fill="url(#s-field)"/>
+    <!-- Beaded / dashed milled ring -->
+    <circle cx="32" cy="31" r="21" fill="none" stroke="#f1f5f9" stroke-width="1.2" stroke-dasharray="2 2" opacity="0.75"/>
+    
+    <!-- EMBOSSED SYMBOL: Heraldic Knight Shield & Crossed Swords -->
+    <!-- Shadow underneath emboss -->
+    <path d="M32 20l9 3v8c0 7-5 11-9 13-4-2-9-6-9-13v-8l9-3zm-6 20l-3 3-1.5-1.5 3-3zm12 0l3 3 1.5-1.5-3-3z" fill="#1e293b" transform="translate(0, 1.2)"/>
+    <!-- Highlighted emboss body -->
+    <path d="M32 19l9 3v8c0 7-5 11-9 13-4-2-9-6-9-13v-8l9-3zm-6 20l-3 3-1.5-1.5 3-3zm12 0l3 3 1.5-1.5-3-3z" fill="url(#s-emboss)"/>
+    <!-- Inner shield ridge highlight -->
+    <path d="M32 21v19c3-1.5 7-5 7-10v-6.5l-7-2.5z" fill="#ffffff" opacity="0.45"/>
+    
+    <!-- Diagonal metallic coin sheen -->
+    <path d="M12 25 Q 32 10 46 14 A 23 23 0 0 0 16 16 Z" fill="url(#s-glare)"/>
+  </g>
+</svg>
