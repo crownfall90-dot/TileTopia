@@ -35,6 +35,15 @@
           <button class="iconbtn" data-go="history" aria-label="История партий" hidden style="display:none"></button>
           <button class="mprof" id="mprof" data-go="profile" aria-label="Профиль, уровень и золото"></button>
           <div class="mtop-right-group">
+            <button class="mtop-rank-btn notif-bell-btn" id="btnMenuNotif" data-go="inbox" aria-label="Уведомления и награды" title="Уведомления">
+              <span class="nb-icon">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+                  <path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/>
+                  <path d="M13.73 21a2 2 0 0 1-3.46 0"/>
+                </svg>
+                <i class="notif-badge-dot" id="notifDot" hidden></i>
+              </span>
+            </button>
             <button class="mtop-rank-btn" id="btnMenuRating" data-go="rating" aria-label="Рейтинг игроков" title="Рейтинг игроков"><span style="font-size:18px">🏆</span></button>
             <button class="menu-hub-btn" id="btnMenuHub" aria-label="Меню" title="Меню">
               <span class="mhub-tilt">
@@ -214,6 +223,22 @@
           <div class="ltop"><button class="iconbtn" data-go="profile" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Мои предметы</b></div>
           <div class="seg itabs" id="itabs"><button data-it="st" aria-pressed="true">Статусы</button><button data-it="fr" aria-pressed="false">Рамки</button><button data-it="fg" aria-pressed="false">Фигурки</button><button data-it="em" aria-pressed="false">Эмоции</button><button data-it="lc" aria-pressed="false">Локации</button></div>
           <div class="col" id="itemsBody"></div>
+        </div>
+      </section>
+
+            <section class="screen scroll" id="scr-inbox" hidden>
+        <div class="lb">
+          <div class="ltop">
+            <button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+            <b>Уведомления и награды</b>
+          </div>
+          <div class="seg ntabs" id="ntabs">
+            <button data-nt="all" aria-pressed="true">Все</button>
+            <button data-nt="rewards" aria-pressed="false">Награды</button>
+            <button data-nt="promo" aria-pressed="false">Промокоды</button>
+            <button data-nt="news" aria-pressed="false">Новости</button>
+          </div>
+          <div class="col notif-list" id="notifList"></div>
         </div>
       </section>
 
@@ -2522,6 +2547,18 @@ function drawFigure(g, w, h, fill, fig, ghost) {
   } else if (fig === 'archer') {
     shape('#3f8f4a', () => { g.moveTo(26, 14); g.quadraticCurveTo(46, -10, 78, 6); g.lineTo(70, 16); g.closePath(); });
     shape('#f2e6c8', () => { g.moveTo(66, 8); g.quadraticCurveTo(84, -16, 94, -14); g.quadraticCurveTo(86, -4, 70, 12); g.closePath(); });
+  } else if (fig === 'wizard') {
+    shape('#5b2d86', () => { g.moveTo(24, 18); g.quadraticCurveTo(50, -28, 60, -26); g.quadraticCurveTo(56, -4, 76, 18); g.closePath(); });
+    g.fillStyle = '#ffd54f'; g.beginPath(); g.arc(50, 6, 3, 0, 7); g.fill();
+    g.fillStyle = '#00e5ff'; g.beginPath(); g.arc(84, 45, 5, 0, 7); g.fill();
+  } else if (fig === 'ninja') {
+    shape('#1c202a', () => { g.moveTo(30, 24); g.lineTo(30, 8); g.quadraticCurveTo(30, -6, 50, -6); g.quadraticCurveTo(70, -6, 70, 8); g.lineTo(70, 24); g.closePath(); });
+    shape('#e53935', () => { g.moveTo(28, 12); g.lineTo(72, 12); g.lineTo(72, 16); g.lineTo(28, 16); g.closePath(); });
+    g.fillStyle = '#fff'; g.fillRect(38, 14, 24, 2.5);
+  } else if (fig === 'paladin') {
+    shape('#d8e0e8', () => { g.moveTo(30, 26); g.lineTo(30, 10); g.quadraticCurveTo(30, -4, 50, -4); g.quadraticCurveTo(70, -4, 70, 10); g.lineTo(70, 26); g.closePath(); });
+    shape('#fbc02d', () => { g.moveTo(48, -4); g.lineTo(52, -4); g.lineTo(52, -18); g.lineTo(48, -18); g.closePath(); });
+    g.fillStyle = '#fbc02d'; g.fillRect(35, 12, 30, 3.5);
   } else if (fig === 'king') {
     shape('#f2c230', () => { g.moveTo(32, 10); g.lineTo(32, -6); g.lineTo(41, 3); g.lineTo(50, -10); g.lineTo(59, 3); g.lineTo(68, -6); g.lineTo(68, 10); g.closePath(); });
     g.fillStyle = '#d6303f'; g.beginPath(); g.arc(50, 4, 3, 0, 7); g.fill();
@@ -2556,7 +2593,9 @@ async function redeemPromo(code) {
   const BUILTIN_PROMOS = {
     'TESTER2026': 500,
     'OPUS55': 300,
-    'PUZZLESTART': 200
+    'PUZZLESTART': 200,
+    'DIORAMA3D': 300,
+    'OLD2026': 400
   };
 
   let reward = BUILTIN_PROMOS[code] || 0, offline = false;
@@ -4485,6 +4524,7 @@ function progressDot() {
   const dotEl = $('#progNavDot');
   if (dotEl) dotEl.hidden = !hasDot;
   ptabsDot();
+  if (typeof updateNotifBadge === 'function') updateNotifBadge();
 }
 let ptab = 'rewards';
 function ring(frac) { return PG.ui.progress.ringSvg(frac); }
@@ -7082,6 +7122,94 @@ async function signOut() {
   location.reload();
 }
 
+
+/* ---------------- Inbox & Rewards Controller ---------------- */
+let ntab = 'all';
+function renderInbox() {
+  wallet.inbox = wallet.inbox || { claimed: [], read: [] };
+  const claimed = Array.isArray(wallet.inbox.claimed) ? wallet.inbox.claimed : [];
+  const listEl = $('#notifList');
+  if (listEl && typeof PG !== 'undefined' && PG.ui && PG.ui.inbox && PG.ui.inbox.renderInboxHtml) {
+    listEl.innerHTML = PG.ui.inbox.renderInboxHtml({
+      items: PG.ui.inbox.INBOX_ITEMS,
+      claimed: claimed,
+      filter: ntab
+    });
+  }
+  document.querySelectorAll('#ntabs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.nt === ntab));
+  updateNotifBadge();
+}
+
+function updateNotifBadge() {
+  wallet.inbox = wallet.inbox || { claimed: [], read: [] };
+  const claimed = Array.isArray(wallet.inbox.claimed) ? wallet.inbox.claimed : [];
+  const read = Array.isArray(wallet.inbox.read) ? wallet.inbox.read : [];
+  const count = (typeof PG !== 'undefined' && PG.ui && PG.ui.inbox && PG.ui.inbox.unreadInboxCount)
+    ? PG.ui.inbox.unreadInboxCount(claimed, read)
+    : 0;
+  const dot = $('#notifDot');
+  if (dot) {
+    dot.hidden = count <= 0;
+    dot.textContent = count > 9 ? '9+' : String(count);
+  }
+}
+
+document.addEventListener('click', e => {
+  const ntBtn = e.target.closest('#ntabs button');
+  if (ntBtn) {
+    ntab = ntBtn.dataset.nt;
+    renderInbox();
+    return;
+  }
+
+  const claimBtn = e.target.closest('[data-claim-notif]');
+  if (claimBtn) {
+    const nid = claimBtn.dataset.claimNotif;
+    wallet.inbox = wallet.inbox || { claimed: [], read: [] };
+    if (!wallet.inbox.claimed.includes(nid)) {
+      wallet.inbox.claimed.push(nid);
+    }
+
+    if (nid === 'notif_old_status') {
+      wallet.statuses = Array.isArray(wallet.statuses) ? wallet.statuses : [];
+      if (!wallet.statuses.includes('ex:old')) wallet.statuses.push('ex:old');
+      ST().wearStatus(wallet, 'ex:old');
+      saveWallet();
+      renderMenuProfile();
+      renderInbox();
+      toastAny('Статус «Олд» успешно получен и надет! 🗿', 'ok', 'Награда');
+      return;
+    }
+
+    if (nid === 'notif_welcome_gold') {
+      wallet.gold = (wallet.gold || 0) + 500;
+      saveWallet();
+      renderMenuProfile();
+      renderInbox();
+      toastAny('Получено +500 золота! 🪙', 'gold', 'Казна');
+      return;
+    }
+
+    if (nid === 'notif_promo_diorama') {
+      saveWallet();
+      renderInbox();
+      redeemPromo('DIORAMA3D');
+      return;
+    }
+
+    saveWallet();
+    renderInbox();
+    return;
+  }
+
+  const linkBtn = e.target.closest('[data-notif-link]');
+  if (linkBtn) {
+    const target = linkBtn.dataset.notifLink;
+    show(target);
+    return;
+  }
+});
+
 /* ---------------- screens ---------------- */
 function show(name) {
   if (typeof recordAction === 'function') recordAction('show:' + name);
@@ -7095,12 +7223,13 @@ function show(name) {
   if (mm && name !== 'match') stopMatch(name === 'game');
   if (name === 'results') renderResults(phase === 'end');
   if (name === 'items') renderItems();
+  if (name === 'inbox') renderInbox();
   if (name === 'history') renderHistory($('#historyList'));
   if (gameVisible) { applyCam(); if (pendingStart) startTurn(); else pumpRemote(); }
   if (name === 'lobby') { renderLobby(); if (FB && registered()) loadFriends().then(renderLobbyFriends).catch(() => {}); }
   if (name === 'shop') renderShop();
   if (name === 'settings') renderPrefs();
-  if (name === 'menu') { renderResume(); saveWallet(); presenceCount(); progressDot(); renderMenuProfile(); }
+  if (name === 'menu') { renderResume(); saveWallet(); presenceCount(); progressDot(); renderMenuProfile(); updateNotifBadge(); }
   if (name === 'progress') { renderTasks(); }
   if (name === 'profile') { renderProfile(); renderAccount(); }
   if (name === 'rating') { renderTop(); }
