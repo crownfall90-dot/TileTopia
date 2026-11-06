@@ -1,6 +1,6 @@
 # Tiletopia — Инструкции для разработчиков и агентов (Claude Opus 5.5 / Antigravity)
 
-> **Статус проекта: АКТИВЕН.** Все 265 unit-тестов проходят (`npm run build && node --test tests/*.test.cjs`; без `build/bundle/pg.js` часть тестов падает).
+> **Статус проекта: АКТИВЕН.** Все 266 unit-тестов проходят (`npm run build && node --test tests/*.test.cjs`; без `build/bundle/pg.js` часть тестов падает).
 > **Текущая боевая версия (Production):** `v261` (APK `app.crownfall.tiletopia`)
 > **Тестовая среда (Staging):** отдельное изолированное приложение **«Tiletopia Test»** (`app.crownfall.tiletopia.test`), публикуется в релиз `staging-latest`.
 > **Встроенный авто-апдейтер:** работает из коробки в тестовом приложении и обновляет APK без необходимости ручного скачивания из браузера.

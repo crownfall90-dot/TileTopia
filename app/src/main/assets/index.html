@@ -6958,96 +6958,7 @@ function initFog() {
   const old = $('#fogOfWar');
   if (old) old.remove();
   document.querySelectorAll('.fog-particle').forEach(p => p.remove());
-  return; // Fog of war removed as requested: clean harmonious board background
-
-  const curLoc = (typeof G !== 'undefined' && G.cfg && G.cfg.loc) || wallet.loc || 'village';
-  const BIOME_FOG = {
-    village: {
-      c0: '#89ad78', c1: '#3a573e', c2: '#142419',
-      label: 'НЕИЗВЕДАННЫЕ ЗЕМЛИ', particle: '✨', pClass: 'p-firefly'
-    },
-    siberia: {
-      c0: '#c6def5', c1: '#5479a2', c2: '#132136',
-      label: 'МОРОЗНАЯ ТАЙГА', particle: '❄️', pClass: 'p-snow'
-    },
-    city: {
-      c0: '#75549c', c1: '#312056', c2: '#0e0a22',
-      label: 'ЗАБРОШЕННЫЕ СЕКТОРА', particle: '💠', pClass: 'p-neon'
-    },
-    jungle: {
-      c0: '#468051', c1: '#1b4528', c2: '#0b1d11',
-      label: 'ТАИНСТВЕННЫЕ ДЖУНГЛИ', particle: '🌿', pClass: 'p-spore'
-    }
-  };
-  const b = BIOME_FOG[curLoc] || BIOME_FOG.village;
-
-  const NS = 'http://www.w3.org/2000/svg';
-  const svg = document.createElementNS(NS, 'svg');
-  svg.id = 'fogOfWar';
-  svg.setAttribute('class', 'fog-svg biome-' + curLoc);
-  svg.setAttribute('viewBox', '-1800 -1800 3600 3600');
-
-  svg.innerHTML = `
-    <defs>
-      <filter id="fogBlur" x="-30%" y="-30%" width="160%" height="160%">
-        <feGaussianBlur stdDeviation="24"/>
-      </filter>
-      <radialGradient id="fogMistGrad" cx="50%" cy="50%" r="55%">
-        <stop offset="0%" stop-color="${b.c0}" stop-opacity="0.82"/>
-        <stop offset="60%" stop-color="${b.c1}" stop-opacity="0.78"/>
-        <stop offset="100%" stop-color="${b.c2}" stop-opacity="0.94"/>
-      </radialGradient>
-      <pattern id="fogTopo" width="90" height="90" patternUnits="userSpaceOnUse">
-        <circle cx="45" cy="45" r="36" fill="none" stroke="rgba(255,255,255,0.05)" stroke-width="1.2"/>
-        <circle cx="45" cy="45" r="18" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="1"/>
-      </pattern>
-      <mask id="fogClearMask">
-        <rect x="-1800" y="-1800" width="3600" height="3600" fill="white"/>
-        <g id="fogClearHoles" filter="url(#fogBlur)"></g>
-      </mask>
-    </defs>
-    <rect x="-1800" y="-1800" width="3600" height="3600" fill="url(#fogMistGrad)" mask="url(#fogClearMask)" pointer-events="none"/>
-    <rect x="-1800" y="-1800" width="3600" height="3600" fill="url(#fogTopo)" mask="url(#fogClearMask)" pointer-events="none"/>
-
-    <!-- Antique Cartography & Nautical Wind Rose -->
-    <g class="fog-antique-cartography" mask="url(#fogClearMask)" pointer-events="none">
-      <!-- Ornate Compass Rose at top right -->
-      <g transform="translate(680, -680)" opacity="0.45">
-        <circle r="120" fill="none" stroke="#ffd875" stroke-width="2" stroke-dasharray="6,4"/>
-        <circle r="90" fill="none" stroke="#ffd875" stroke-width="1.2"/>
-        <path d="M0 -120 L16 -30 L70 -70 L30 -16 L120 0 L30 16 L70 70 L16 30 L0 120 L-16 30 L-70 70 L-30 16 L-120 0 L-30 -16 L-70 -70 L-16 -30 Z" fill="#ffd875" fill-opacity="0.3" stroke="#ffd875" stroke-width="1.5"/>
-        <text y="-130" text-anchor="middle" font-family="'Unbounded', sans-serif" font-size="18" font-weight="900" fill="#ffd875">N</text>
-        <text x="145" y="6" text-anchor="middle" font-family="'Unbounded', sans-serif" font-size="16" font-weight="900" fill="#ffd875">E</text>
-        <text y="145" text-anchor="middle" font-family="'Unbounded', sans-serif" font-size="16" font-weight="900" fill="#ffd875">S</text>
-        <text x="-145" y="6" text-anchor="middle" font-family="'Unbounded', sans-serif" font-size="16" font-weight="900" fill="#ffd875">W</text>
-      </g>
-
-      <!-- Cartography Labels -->
-      <g opacity="0.38">
-        <text x="420" y="-340" font-family="'Unbounded', sans-serif" font-size="17" font-weight="900" fill="#fff" letter-spacing="4px">TERRA INCOGNITA</text>
-        <text x="-560" y="440" font-family="'Unbounded', sans-serif" font-size="15" font-weight="900" fill="#fff" letter-spacing="3px">${b.label}</text>
-        <text x="-520" y="-480" font-family="'Onest', sans-serif" font-size="13" font-style="italic" fill="#e2c690" letter-spacing="2px">HIC SVNT DRACONES 🐉</text>
-      </g>
-    </g>
-  `;
-  world.append(svg);
-
-  // Spawn gentle ambient biome particles
-  const boardEl = $('#board');
-  if (boardEl) {
-    for (let i = 0; i < 9; i++) {
-      const p = document.createElement('div');
-      p.className = `fog-particle ${b.pClass}`;
-      p.textContent = b.particle;
-      p.style.left = (15 + Math.random() * 70) + '%';
-      p.style.top = (15 + Math.random() * 70) + '%';
-      p.style.animationDelay = (Math.random() * 4) + 's';
-      p.style.animationDuration = (4 + Math.random() * 4) + 's';
-      boardEl.append(p);
-    }
-  }
-
-  updateFog();
+  // Fog of war was removed: a clean board background
 }
 
 function updateFog() {
@@ -7796,29 +7707,6 @@ function renderShop() {
 
   $('#locgrid').innerHTML = PG.ui.shop.renderLocationsGrid(LOCS);
 }
-const _frg = $('#frgrid'); if (_frg) _frg.addEventListener('click', e => {
-  const b = e.target.closest('[data-fr]'); if (!b) return;
-  const k = b.dataset.fr, f = FRAMES[k], owned = wallet.frames || [];
-  const pick = () => { wallet.frame = k; saveWallet(); renderShop(); renderMenuProfile(); };
-  if (f.earn && !owned.includes(k)) return toastAny('Рамка за достижение. Получить: ' + f.earn);
-  if (!f.price || owned.includes(k)) return pick();
-  if (wallet.gold < f.price) return toastAny(`Не хватает ${f.price - wallet.gold} золота`);
-  confirmBox(`Купить рамку «${f.name}» за ${f.price} золота?`, 'Купить', () => {
-    if ((wallet.frames || []).includes(k) || wallet.gold < f.price) return;
-    wallet.gold -= f.price; wallet.frames = [...(wallet.frames || []), k]; beep('coin');
-    track('spend_virtual_currency', {item_name: 'frame_' + k, virtual_currency_name: 'gold', value: f.price});
-    pick(); toastAny(`Рамка «${f.name}» — ваша!`);
-  });
-});
-const _fgg = $('#figgrid'); if (_fgg) _fgg.addEventListener('click', e => {
-  const b = e.target.closest('[data-fig]'); if (!b) return;
-  const k = b.dataset.fig, f = FIGS[k];
-  if (!wallet.owned.includes(k)) {
-    if (wallet.gold < f.price) return toastAny(`Не хватает ${f.price - wallet.gold} золота`);
-    return confirmBuy(k);
-  }
-  pickFig(k);
-});
 function pickFig(k) {
   wallet.fig = k; saveWallet(); renderShop();
   if (net) netSend({t: 'hello', v2: 1, st: myStatus(), id: myId, uid: myUid(), reg: registered() ? 1 : 0, name: myName(), fig: k, col: wallet.color});
@@ -10583,19 +10471,6 @@ function renderStatusShop() {
 }
 const STATUS_ERR = {short: 'Слишком короткий статус', long: 'Не больше 15 символов', bad: 'Такой текст нельзя: выберите другой', owned: 'Такой статус у вас уже есть', gold: 'Не хватает золота'};
 function afterStatusChange() { saveWallet(); renderStatusShop(); renderMenuProfile(); if (!$('#scr-items').hidden) renderItems(); presenceMark(true); syncRating(true); }
-const _stg = $('#stgrid'); if (_stg) _stg.addEventListener('click', e => {
-  const b = e.target.closest('[data-stb]'); if (!b) return;
-  const x = ST().SHOP_STATUSES.find(q => q.id === b.dataset.stb), k = 'sh:' + x.id;
-  if (ST().ownedStatuses(wallet).includes(k)) { ST().wearStatus(wallet, wallet.statusKey === k ? null : k); return afterStatusChange(); }
-  if (wallet.gold < x.price) return toastAny(`Не хватает ${x.price - wallet.gold} золота`);
-  confirmBox(`Купить статус «${x.text}» за ${x.price} золота?`, 'Купить', () => {
-    const r = ST().buyShopStatus(wallet, x.id);
-    if (!r.ok) return toastAny(STATUS_ERR[r.reason] || 'Не получилось');
-    ST().wearStatus(wallet, r.key); beep('coin');
-    track('spend_virtual_currency', {item_name: 'status_' + x.id, virtual_currency_name: 'gold', value: x.price});
-    afterStatusChange(); toastAny(`Статус «${x.text}» — ваш!`);
-  });
-});
 $('#stBuy').onclick = () => {
   const inp = $('#stInput'), t = ST().cleanStatus(inp.value);
   if (String(inp.value).trim().length > ST().STATUS_MAX) return toastAny(STATUS_ERR.long);

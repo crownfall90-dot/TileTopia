@@ -21,4 +21,9 @@ jobs:
       - uses: actions/checkout@v4
       - env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-        run: python3 scripts/fcm-send.py "updates-${{ inputs.store }}" "${{ inputs.code }}" "1.0.${{ inputs.code }}" release-notes.md
+          STORE: ${{ inputs.store }}
+          CODE: ${{ inputs.code }}
+        run: |
+          # inputs go through env vars, never into the script text
+          case "$CODE" in ''|*[!0-9]*) echo "code must be digits only" >&2; exit 1;; esac
+          python3 scripts/fcm-send.py "updates-$STORE" "$CODE" "1.0.$CODE" release-notes.md

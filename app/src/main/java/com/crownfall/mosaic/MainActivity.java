@@ -217,7 +217,9 @@ public class MainActivity extends Activity {
         WebSettings s = web.getSettings();
         s.setJavaScriptEnabled(true);
         s.setDomStorageEnabled(true);
-        s.setAllowFileAccess(true);
+        s.setAllowFileAccess(false); // the page is read through file:///android_asset, which stays available
+        s.setAllowFileAccessFromFileURLs(false);
+        s.setAllowUniversalAccessFromFileURLs(false);
         s.setTextZoom(100); // large system fonts must not break the game layout
         web.addJavascriptInterface(new Bridge(), "AndroidApp");
         web.setWebChromeClient(new WebChromeClient());
@@ -234,6 +236,9 @@ public class MainActivity extends Activity {
             public boolean shouldOverrideUrlLoading(WebView view, WebResourceRequest request) {
                 Uri u = request.getUrl();
                 if ("file".equals(u.getScheme())) return false;
+                // Only ordinary links leave the game: no intent:, content: or other app-launching schemes.
+                String sc = u.getScheme() == null ? "" : u.getScheme().toLowerCase(java.util.Locale.ROOT);
+                if (!(sc.equals("https") || sc.equals("http") || sc.equals("market") || sc.equals("mailto") || sc.equals("tg"))) return true;
                 try {
                     startActivity(new Intent(Intent.ACTION_VIEW, u));
                 } catch (Exception e) {

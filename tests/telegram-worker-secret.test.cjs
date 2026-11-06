@@ -29,3 +29,13 @@ test('app: update downloads are limited to this repository\'s releases and manif
   assert.ok(!game.includes('package=com.crownfall.mosaic'), 'intent link uses the real application id');
   assert.match(fs.readFileSync(`${__dirname}/../app/src/main/AndroidManifest.xml`, 'utf8'), /pathPrefix="\/TileTopia"/);
 });
+
+test('hardening: notify workflow takes inputs through env, WebView blocks file access and app-launching schemes', () => {
+  const fs = require('node:fs');
+  const wf = fs.readFileSync(`${__dirname}/../.github/workflows/notify.yml`, 'utf8');
+  assert.ok(!/run:[^\n]*\$\{\{\s*inputs\./.test(wf), 'no workflow input is pasted into a run line');
+  const m = fs.readFileSync(`${__dirname}/../app/src/main/java/com/crownfall/mosaic/MainActivity.java`, 'utf8');
+  assert.match(m, /setAllowFileAccess\(false\)/);
+  assert.match(m, /setAllowUniversalAccessFromFileURLs\(false\)/);
+  assert.match(m, /sc\.equals\("https"\)/);
+});
