@@ -27,6 +27,11 @@ export const FEATURES = {
   'rules:fast': 'Правила: быстрая', 'rules:classic': 'Правила: классика', 'rules:big': 'Правила: большая', 'rules:epic': 'Правила: эпическая', 'rules:duel': 'Правила: дуэль',
 };
 
+/** Events that are about the game working or about security, never about what a player does: they need no consent. */
+export const ESSENTIAL_LOG = new Set(['error', 'maintenance', 'reinstall_offer', 'reinstall_download', 'reinstall_remove', 'wallet_sig_mismatch', 'google_error', 'google_redirect', 'net_down', 'net_back']);
+/** May this event, or a usage counter, be recorded? Statistics only with the player's consent (stats === true). */
+export const mayRecord = (kind, stats) => stats === true || (kind != null && ESSENTIAL_LOG.has(kind));
+
 const KEY = /^[a-z0-9:_-]{1,32}$/i;
 export const isFeatureId = id => typeof id === 'string' && KEY.test(id);
 

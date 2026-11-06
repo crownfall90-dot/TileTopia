@@ -46,6 +46,10 @@ if [ "$target" = web ]; then
   touch "$site/.nojekyll"
   touch "$site/staging/.nojekyll"
   "$PY_BIN" scripts/privacy-page.py "$site/privacy.html"
+  "$PY_BIN" scripts/privacy-page.py "$site/privacy-en.html" docs/legal/privacy-policy-en.md "Privacy Policy — Tiletopia" en
+  "$PY_BIN" scripts/privacy-page.py "$site/terms.html" docs/legal/terms.md "Пользовательское соглашение — Tiletopia" ru
+  "$PY_BIN" scripts/privacy-page.py "$site/terms-en.html" docs/legal/terms-en.md "Terms of Use — Tiletopia" en
+  "$PY_BIN" scripts/privacy-page.py "$site/licenses.html" docs/legal/THIRD-PARTY.md "Сторонние материалы — Tiletopia" ru
   cp web/delete-account.html "$site/delete-account.html"
   # Owner pages (the in-game owner panel links here). No secrets inside: the data behind them is
   # admin-only in the Firebase rules. Kept out of search engines.

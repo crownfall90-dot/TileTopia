@@ -504,6 +504,17 @@ public class MainActivity extends Activity {
             }
         }
 
+        /** Statistics consent: Firebase Analytics collects only after the player agreed (off by default, see the manifest). */
+        @JavascriptInterface
+        public void setAnalytics(boolean on) {
+            try {
+                if (FirebaseApp.getApps(MainActivity.this).isEmpty()) return;
+                com.google.firebase.analytics.FirebaseAnalytics.getInstance(MainActivity.this).setAnalyticsCollectionEnabled(on);
+            } catch (Exception e) {
+                report(e);
+            }
+        }
+
         /** Account deletion: forget what Firebase Analytics collected on this device and start a new anonymous instance. */
         @JavascriptInterface
         public void resetAnalytics() {

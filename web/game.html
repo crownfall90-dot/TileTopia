@@ -140,6 +140,8 @@
             <button class="srow btn" id="checkUpd"><span class="sic">🔄</span><span class="stx"><b>Проверить обновления</b></span><span class="sgo">›</span></button>
             <button class="srow btn" id="delAccBtn"><span class="sic">🗂️</span><span class="stx"><b>Аккаунт и данные</b><small>Управление данными и удаление аккаунта</small></span><span class="sgo">›</span></button>
             <a class="srow btn" href="https://crownfall90-dot.github.io/TileTopia/privacy.html" target="_blank" rel="noopener"><span class="sic">🔒</span><span class="stx"><b>Политика конфиденциальности</b></span><span class="sgo">›</span></a>
+            <a class="srow btn" href="https://crownfall90-dot.github.io/TileTopia/terms.html" target="_blank" rel="noopener"><span class="sic">📄</span><span class="stx"><b>Пользовательское соглашение</b><small>English: Terms of Use, Privacy Policy — на сайте игры</small></span><span class="sgo">›</span></a>
+            <a class="srow btn" href="https://crownfall90-dot.github.io/TileTopia/licenses.html" target="_blank" rel="noopener"><span class="sic">©</span><span class="stx"><b>Сторонние материалы</b></span><span class="sgo">›</span></a>
             <button class="srow btn" id="devBtn" hidden><span class="sic">📣</span><span class="stx"><b>Панель владельца</b></span><span class="sgo">›</span></button>
           </div>
           <p class="shint scenter">Tiletopia</p>
@@ -2001,9 +2003,13 @@ const wallet = PG.state.loadWallet(localStorage, validCol, PALETTE[0].col, info 
 PG.state.reactions.migrate(wallet); PG.state.reactions.sanitizeDeck(wallet);
 // Analytics (Firebase Analytics in the Android app; elsewhere a no-op). Params: flat strings / numbers.
 function track(name, params) {
+  // Statistics only with the player's consent (Settings → Statistics); errors and security events need none.
+  if (!PG.state.usage.mayRecord(name, wallet.stats)) return;
   try { if (window.AndroidApp && AndroidApp.logEvent) AndroidApp.logEvent(name, JSON.stringify(params || {})); } catch (_) {}
   if (LOG_KINDS.has(name)) plog(name, params);
 }
+// Firebase Analytics collection in the Android app follows the same consent (off until the player agrees).
+function applyStatsConsent() { try { if (window.AndroidApp && AndroidApp.setAnalytics) AndroidApp.setAnalytics(wallet.stats === true); } catch (_) {} }
 /* Event log for the owner's panel: the few events that explain what happened to a player (sign-in, games, drops, errors,
    purchases) go to /logs/{uid}, in batches, at most 80 a day per phone. No e-mails and no texts typed by the player. */
 const LOG_KINDS = new Set([
@@ -2017,6 +2023,7 @@ const logBuf = [];
 let logTimer = 0;
 function plog(kind, detail) {
   try {
+    if (!PG.state.usage.mayRecord(String(kind), wallet.stats)) return;
     const day = new Date().toISOString().slice(0, 10), cap = JSON.parse(localStorage.getItem('logCap') || '{}');
     if (cap.d !== day) { cap.d = day; cap.n = 0; }
     if (cap.n >= 80) return;
@@ -2707,6 +2714,7 @@ $('#prefs').addEventListener('click', e => {
   if (r.k === 'music') { try { audio(); musicUpdate(); } catch (_) {} }
   if (r.k === 'sound') beep('turn');
   if (r.k === 'notify' && window.AndroidApp && AndroidApp.setUpdateNotifications) AndroidApp.setUpdateNotifications(wallet.notify);
+  if (r.k === 'stats') { wallet.statsAsked = true; saveWallet(); applyStatsConsent(); if (!wallet.stats) { usageState = null; try { localStorage.removeItem('usage'); } catch (_) {} } }
   if (r.k === 'view') setView(wallet.view);
   if (r.k === 'zones') { markOwn(); updateOwnership(); }
   if (r.k === 'gfx') { applyGfx(); redecorate(); }
@@ -5075,7 +5083,7 @@ function askProfile() {
   const box = document.createElement('div'); box.className = 'over'; box.id = 'profBox'; box.style.position = 'fixed';
   box.innerHTML = (typeof PG !== 'undefined' && PG.game && PG.game.tutorial && PG.game.tutorial.renderAskProfileDialogHtml)
     ? PG.game.tutorial.renderAskProfileDialogHtml(wallet.color)
-    : `<div class="ocard prof"><div class="pav" id="pav" style="--c:${wallet.color}">?</div><h3>Создайте профиль</h3><p>Придумайте никнейм и выберите цвет — их увидят соперники и рейтинг</p><input class="field" id="profName" maxlength="12" placeholder="Никнейм" autocomplete="off"><button class="cta wide" id="profOk" disabled>Готово</button><button class="ghostbtn" id="profLogin">У меня уже есть профиль — войти</button></div>`;
+    : `<div class="ocard prof"><div class="pav" id="pav" style="--c:${wallet.color}">?</div><h3>Создайте профиль</h3><p>Придумайте никнейм и выберите цвет — их увидят соперники и рейтинг</p><input class="field" id="profName" maxlength="12" placeholder="Никнейм" autocomplete="off"><small class="legal">Нажимая «Готово», вы принимаете <a href="https://crownfall90-dot.github.io/TileTopia/terms.html" target="_blank" rel="noopener">Соглашение</a> и <a href="https://crownfall90-dot.github.io/TileTopia/privacy.html" target="_blank" rel="noopener">Политику конфиденциальности</a> и соглашаетесь на обработку данных и их передачу за границу (Google Firebase)</small><button class="cta wide" id="profOk" disabled>Готово</button><button class="ghostbtn" id="profLogin">У меня уже есть профиль — войти</button></div>`;
   document.body.append(box);
   const inp = box.querySelector('#profName'), ok = box.querySelector('#profOk'), av = box.querySelector('#pav'), dice = box.querySelector('#profDice');
   colorPick(box.querySelector('#profColorLabel') || inp, av);
@@ -5097,7 +5105,7 @@ function askProfile() {
       beep('coin');
     };
   }
-  ok.onclick = () => { if (!setProfileName(inp.value)) return; box.remove(); toastAny(`Привет, ${profileName()}!`); renderSetup(); if (FB) setTimeout(() => accountDialog('link'), 600); if (typeof checkNameProposal === 'function') setTimeout(checkNameProposal, 1200); };
+  ok.onclick = () => { if (!setProfileName(inp.value)) return; box.remove(); toastAny(`Привет, ${profileName()}!`); renderSetup(); setTimeout(askStats, 1200); if (FB) setTimeout(() => accountDialog('link'), 600); if (typeof checkNameProposal === 'function') setTimeout(checkNameProposal, 1200); };
   box.querySelector('#profLogin').onclick = () => { box.remove(); accountDialog('login'); };
   setTimeout(() => inp.focus(), 200);
 }
@@ -6838,7 +6846,7 @@ function accountDialog(mode, prefill) {
     <input class="field" id="accMail" type="email" inputmode="email" placeholder="Почта" autocomplete="email" autocapitalize="off" spellcheck="false" value="${(prefill || '').replace(/"/g, '')}">
     <div class="pwrap"><input class="field" id="accPass" type="password" placeholder="Пароль" autocomplete="current-password" autocapitalize="off" spellcheck="false"><button type="button" class="peye" id="accEye" aria-label="Показать пароль" aria-pressed="false"></button></div>
     <p class="phint" id="accHint">Пароль от 6 символов</p>
-    <p class="accErr" id="accErr" role="alert"></p><button class="cta wide" id="accGo">Продолжить</button><button class="linkbtn" id="accReset">Забыли пароль?</button><button class="ghostbtn" id="accNo">${link ? 'Позже' : 'Отмена'}</button></div>`;
+    <p class="accErr" id="accErr" role="alert"></p><small class="legal">Продолжая, вы принимаете <a href="https://crownfall90-dot.github.io/TileTopia/terms.html" target="_blank" rel="noopener">Соглашение</a> и <a href="https://crownfall90-dot.github.io/TileTopia/privacy.html" target="_blank" rel="noopener">Политику конфиденциальности</a> и соглашаетесь на обработку данных и их передачу за границу (Google Firebase)</small><button class="cta wide" id="accGo">Продолжить</button><button class="linkbtn" id="accReset">Забыли пароль?</button><button class="ghostbtn" id="accNo">${link ? 'Позже' : 'Отмена'}</button></div>`;
   document.body.append(box);
   const mailEl = box.querySelector('#accMail'), passEl = box.querySelector('#accPass'), eye = box.querySelector('#accEye'), hint = box.querySelector('#accHint');
   const mail = () => mailEl.value.trim(), pass = () => passEl.value;
@@ -7132,9 +7140,21 @@ document.addEventListener('click', e => {
    every few minutes and when the game is closed, and to Firebase Analytics as «feature_use». Counts only, no texts. */
 let usageState = null, usageTimer = 0;
 try { usageState = JSON.parse(localStorage.getItem('usage')); } catch (_) {}
+/* Consent for statistics: asked once, plainly, default off. Anything that is not an error report waits for «Разрешить». */
+let statsAskTries = 0;
+function askStats() {
+  if (wallet.statsAsked || tut || document.getElementById('statsBox')) return;
+  if (document.querySelector('.over:not(#over):not([hidden])') || document.hidden) { if (++statsAskTries < 6) setTimeout(askStats, 3000); return; }
+  const b = document.createElement('div'); b.className = 'over'; b.id = 'statsBox'; b.style.position = 'fixed';
+  b.innerHTML = `<div class="ocard"><div style="font-size:40px">📊</div><h3>Помочь улучшить игру?</h3><p>Разрешите анонимную статистику: только числа о том, какие экраны и кнопки используются, и события вроде «сыграна партия». Без текстов, имён и почты. Это можно изменить в «Настройки» → «Статистика».</p><button class="cta wide" id="statsYes">Разрешить</button><button class="ghostbtn" id="statsNo">Не сейчас</button></div>`;
+  document.body.append(b);
+  const done = on => { wallet.stats = on; wallet.statsAsked = true; saveWallet(); applyStatsConsent(); b.remove(); };
+  b.querySelector('#statsYes').onclick = () => done(true);
+  b.querySelector('#statsNo').onclick = () => done(false);
+}
 function useCount(id) {
   try {
-    if (tut) return;
+    if (tut || wallet.stats !== true) return;   // statistics only with the player's consent
     usageState = PG.state.usage.bump(usageState, id, new Date().toISOString().slice(0, 10));
     localStorage.setItem('usage', JSON.stringify(usageState));
     if (window.AndroidApp && AndroidApp.logEvent && !id.startsWith('screen:')) AndroidApp.logEvent('feature_use', JSON.stringify({feature: id}));
@@ -7621,8 +7641,9 @@ window.addEventListener('keydown', e => {
 });
 
 injectArt();
-dailyBonus(); renderPrefs(); checkMaintenance(); checkUpdatePolicy();
+dailyBonus(); renderPrefs(); checkMaintenance(); checkUpdatePolicy(); applyStatsConsent();
 // the start: once the splash is gone, a game that was going comes back by itself
+bootReady.then(() => setTimeout(() => { try { if (wallet.name) askStats(); } catch (_) {} }, 2500));
 bootReady.then(() => setTimeout(() => { try { autoResume(); } catch (e) { plog('error', 'autoResume ' + e.message); } }, 450));
 devVerify();
 // First open and the days people come back (D1, D3, D7), each reported once.

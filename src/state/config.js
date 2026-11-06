@@ -42,9 +42,10 @@ export const PREFS = [
   {k: 'zones', ic: '🎨', label: 'Цвет владельца', hint: 'Подсветка своих городов и дорог', opts: [[true, 'Вкл'], [false, 'Выкл']]},
   {k: 'gfx', ic: '✨', label: 'Графика', hint: 'Оптимизация производительности', opts: [['high', 'Красивая'], ['low', 'Экономная']]},
   {k: 'notify', ic: '🔔', label: 'Уведомления', hint: 'Новости и обновления игры', opts: [[true, 'Вкл'], [false, 'Выкл']], app: true},
+  {k: 'stats', ic: '📊', label: 'Статистика', hint: 'Анонимные числа о том, чем пользуются в игре. Без текстов и имён', opts: [[true, 'Вкл'], [false, 'Выкл']]},
 ];
 
-export const PREF_GROUPS = [['Звук', ['sound', 'music']], ['Игра', ['coach', 'view', 'botlvl', 'speed', 'alert', 'zones']], ['Экран', ['gfx']], ['Уведомления', ['notify']]];
+export const PREF_GROUPS = [['Звук', ['sound', 'music']], ['Игра', ['coach', 'view', 'botlvl', 'speed', 'alert', 'zones']], ['Экран', ['gfx']], ['Уведомления', ['notify']], ['Данные', ['stats']]];
 
 export const STREAK_GOLD = [10, 15, 20, 25, 35, 50, 100];
 

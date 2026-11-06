@@ -5299,3 +5299,7 @@ html body .nc-claim-btn.pri{background:var(--m-gold);color:var(--brass-ink)}
 html body .nc-actions{gap:6px}
 /* toasts sit above the bottom bar, out of the way of the header */
 html body .tile-toast,html body .note{top:auto;bottom:calc(86px + var(--ib,0px));right:12px}
+
+/* the consent line under the sign-up buttons */
+html body .legal{display:block;margin:2px 0 10px;color:var(--muted);font:500 11px/1.4 var(--f-body);text-align:center}
+html body .legal a{color:#8db4ff;text-decoration:underline;word-break:normal}

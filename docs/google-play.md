@@ -10,7 +10,9 @@
 | Значок 512×512 | `store/icon-512.png` |
 | Баннер 1024×500 | `store/feature-1024x500.png` |
 | Скриншоты телефона 1080×1920 | `store/screenshots/` |
-| Политика конфиденциальности | https://crownfall90-dot.github.io/TileTopia/privacy.html |
+| Политика конфиденциальности | https://crownfall90-dot.github.io/TileTopia/privacy.html (English: …/privacy-en.html) |
+| Пользовательское соглашение | https://crownfall90-dot.github.io/TileTopia/terms.html (English: …/terms-en.html) |
+| Сторонние материалы | https://crownfall90-dot.github.io/TileTopia/licenses.html |
 | Страница удаления аккаунта | https://crownfall90-dot.github.io/TileTopia/delete-account.html |
 | Ответы для «Безопасности данных» | `docs/product/GOOGLE-PLAY-DATA-SAFETY.md` |
 

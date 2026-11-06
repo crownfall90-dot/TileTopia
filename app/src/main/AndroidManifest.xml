@@ -17,6 +17,8 @@
         android:hardwareAccelerated="true"
         android:enableOnBackInvokedCallback="true"
         tools:targetApi="33">
+        <!-- Analytics stays off until the player agrees in the game (consent for statistics; GDPR / ePrivacy). -->
+        <meta-data android:name="firebase_analytics_collection_enabled" android:value="false" />
         <meta-data android:name="google_analytics_adid_collection_enabled" android:value="false" />
         <meta-data android:name="google_analytics_default_allow_ad_personalization_signals" android:value="false" />
         <meta-data android:name="google_analytics_default_allow_ad_storage" android:value="false" />

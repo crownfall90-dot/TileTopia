@@ -74,3 +74,21 @@ test('usage: the database rules accept exactly what the game sends', () => {
   assert.match(uid['.write'], /auth\.uid === \$uid/, 'a player writes only their own record');
   assert.ok(uid.$feature['.validate'].includes('isNumber'));
 });
+
+test('consent: statistics need a yes, errors and security events do not; the settings and sign-up carry the legal text', async () => {
+  const U = await import('../src/state/usage.js');
+  assert.equal(U.mayRecord('game_start', undefined), false, 'not asked yet: nothing is recorded');
+  assert.equal(U.mayRecord('game_start', false), false);
+  assert.equal(U.mayRecord('game_start', true), true);
+  for (const k of ['error', 'maintenance', 'wallet_sig_mismatch', 'net_down']) assert.equal(U.mayRecord(k, false), true, k + ' is needed to keep the game working');
+  const C = await import('../src/state/config.js');
+  assert.ok(C.PREFS.some(p => p.k === 'stats') && C.PREF_GROUPS.some(([, ks]) => ks.includes('stats')), 'a Statistics switch in Settings');
+  const fs = require('node:fs'), html = fs.readFileSync(__dirname + '/../web/game.html', 'utf8');
+  assert.equal((html.match(/class="legal"/g) || []).length, 2, 'the consent line is on both sign-up dialogs');
+  for (const page of ['terms.html', 'privacy.html', 'licenses.html']) assert.ok(html.includes('/TileTopia/' + page), page + ' is linked');
+  assert.ok(html.includes('wallet.stats !== true'), 'the usage counters wait for consent');
+  const manifest = fs.readFileSync(__dirname + '/../app/src/main/AndroidManifest.xml', 'utf8');
+  assert.match(manifest, /firebase_analytics_collection_enabled"\s+android:value="false"/, 'Firebase Analytics is off until the player agrees');
+  assert.match(fs.readFileSync(__dirname + '/../app/src/main/java/com/crownfall/mosaic/MainActivity.java', 'utf8'), /setAnalyticsCollectionEnabled\(on\)/);
+  for (const f of ['privacy-policy-en.md', 'terms.md', 'terms-en.md', 'THIRD-PARTY.md', 'OWNER-TODO.md', 'LEGAL-MEMO.md']) assert.ok(fs.existsSync(__dirname + '/../docs/legal/' + f), f);
+});
