@@ -18,7 +18,7 @@ with sync_playwright() as p:
  gid=ev('gameLog.cfg.localId');assert gid and ev('!!loadSave()')
  ev("const p=allMoves(current.type)[0];selectSlot(p.x,p.y);setRot(p.r);okBtn.onclick();true");page.wait_for_function("__pgEval(\"phase==='meeple'||applied===1\")");ev('if(meepleResolve)meepleResolve(null);true');page.wait_for_function("__pgEval('applied===1')")
  assert ev("gameLog.moves.length===1 && tiles.size===2")
- page.reload();page.wait_for_function('typeof __pgEval==="function"');assert ev('!!loadSave()');ev("$('#resume').click();true");page.wait_for_function("__pgEval('applied===1 && tiles.size===2')");assert ev('gameLog.cfg.localId')==gid
+ page.reload();page.wait_for_function('typeof __pgEval==="function"');assert ev('!!loadSave()');ev("autoResume();true");page.wait_for_function("__pgEval('applied===1 && tiles.size===2')");assert ev('gameLog.cfg.localId')==gid
  ev("Promise.all([endGame('draw'),endGame('draw')])");assert ev("phase==='end' && loadSave()===null && gameFinished(gameKey())");assert len(ev("JSON.parse(localStorage.getItem('gameHistory'))"))==1
  page.evaluate("document.dispatchEvent(new Event('visibilitychange'))");assert page.locator('#scr-menu').evaluate('(e)=>!e.hidden')
  ev("window.__calls=0;confirmBox('Проверка','Да',()=>window.__calls++);confirmBox('Повтор','Да',()=>window.__calls+=100);true");assert page.locator('#confirmBox').count()==1;page.locator('#confirmBox [data-a=y]').click();assert page.evaluate('window.__calls')==100

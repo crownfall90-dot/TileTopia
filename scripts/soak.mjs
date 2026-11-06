@@ -8,7 +8,8 @@ import fs from 'node:fs';
 import path from 'node:path';
 import os from 'node:os';
 
-const GAMES = +(process.argv[2] || 1), MODE = process.argv[3] || 'fast';
+const GAMES = +(process.argv[2] || 1), MODE = process.argv[3] || 'fast', PROFILE = process.argv.includes('--profile');
+const LIMIT_MS = +(process.env.SOAK_MS || 540000);
 const SITE = process.env.SITE || 'http://localhost:8123/';
 const CHROME = process.env.CHROME || 'C:\\Program Files\\Google\\Chrome\\Application\\chrome.exe';
 const sleep = ms => new Promise(r => setTimeout(r, ms));
@@ -76,7 +77,7 @@ async function playOne(page) {
   const val = async e => (await page.send('Runtime.evaluate', {expression: e, awaitPromise: true, returnByValue: true})).result.value;
   await val(START);
   const t0 = Date.now(); let steps = 0, last = '';
-  while (Date.now() - t0 < 540000) {
+  while (Date.now() - t0 < LIMIT_MS) {
     await sleep(400);
     const st = await val(STATE);
     if (!st) continue;
@@ -110,7 +111,15 @@ try {
   for (let g = 0; g < GAMES; g++) {
     await page.send('Page.navigate', {url: SITE});
     await sleep(1500);
+    if (PROFILE) { await page.send('Profiler.enable'); await page.send('Profiler.setSamplingInterval', {interval: 1000}); await page.send('Profiler.start'); }
     out.push(await playOne(page));
+    if (PROFILE) {
+      const {profile} = await page.send('Profiler.stop');
+      const self = new Map(), byId = new Map(profile.nodes.map(n => [n.id, n]));
+      profile.samples.forEach((id, i) => { const n = byId.get(id), f = n.callFrame, k = `${f.functionName || '(anon)'} ${f.url.split('/').pop()}:${f.lineNumber + 1}`; self.set(k, (self.get(k) || 0) + (profile.timeDeltas[i] || 0)); });
+      const total = [...self.values()].reduce((a, b) => a + b, 0);
+      out.push({profileTop: [...self.entries()].sort((a, b) => b[1] - a[1]).slice(0, 14).map(([k, v]) => `${Math.round(v / 1000)} ms  ${(100 * v / total).toFixed(1)}%  ${k}`)});
+    }
   }
   out.push({console: [...new Set(logs)].slice(0, 30)});
   page.close();

@@ -71,7 +71,6 @@
             <span class="mgp-ic">🎁</span>
             <span class="mgp-tx"><b>Подарок готов!</b><small>Три сундука удачи</small></span>
           </button>
-          <button class="resume" id="resume" hidden><span class="ric"><svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M8 5.5v13l10.5-6.5z"/></svg></span><span class="rtx"><b>Продолжить партию</b><small id="resumeInfo"></small></span></button>
           <div class="menu-action-row compact-action-row">
             <button class="tile-btn tile-quest" id="menuQuestBanner" aria-label="Ежедневные задания">
               <span class="btn-tilt-inner">
@@ -2603,7 +2602,6 @@ function saveGame() {
 function clearSave() {
   if (typeof PG !== 'undefined' && PG.state && PG.state.save) PG.state.save.clearActiveGame(localStorage);
   else try { localStorage.removeItem('savedGame'); } catch (_) {}
-  renderResume();
 }
 function loadSave() {
   if (typeof PG !== 'undefined' && PG.state && PG.state.save) return PG.state.save.loadActiveGame(localStorage);
@@ -2621,44 +2619,47 @@ function lastOnline() {
   if (typeof PG !== 'undefined' && PG.state && PG.state.save) return PG.state.save.getLastOnline(localStorage);
   try { const g = JSON.parse(localStorage.getItem('lastGame')); return g && Date.now() - g.at < 3 * 3600e3 ? g : null; } catch (_) { return null; }
 }
-function renderResume() {
-  const sv = loadSave(), b = $('#resume'), lg = lastOnline() && (!net || !gameVisible); // also when a dead room object is left behind after a drop
-  const off = sv && sv.moves && sv.cfg;
-  b.hidden = !off && !lg;
-  b.querySelector('.rtx b').textContent = off ? 'Продолжить партию' : 'Вернуться в онлайн-партию';
-  if (off) $('#resumeInfo').textContent = `${sv.cfg.seats.length} ${sv.cfg.seats.length < 5 ? 'игрока' : 'игроков'} · сделано ходов: ${sv.moves.length}`;
-  else if (lg) $('#resumeInfo').textContent = 'Пока вас не было, за вас играл бот';
+/* A game that is still going is never lost and needs no button: coming back to the game (a new start, or back from the
+   background after the phone dropped the player out) puts the player straight into it — the saved game of this phone,
+   or the online room they were in. Leaving by «Выйти в главное меню» on purpose pauses that until the next start. */
+let resumeHold = false;
+function pendingGame() {
+  const sv = loadSave(), lg = lastOnline() && (!net || !gameVisible); // also when a dead room object is left behind after a drop
+  if (sv && sv.moves && sv.cfg) return {kind: 'saved', sv};
+  return lg ? {kind: 'online', lg: lastOnline()} : null;
 }
-$('#resume').onclick = () => {
-  const sv = loadSave();
-  if (sv && sv.moves && sv.cfg) { if (net) leaveRoom(); startGame(sv.cfg, sv.moves); return show('game'); }
-  const lg = lastOnline(); if (!lg) return renderResume();
-  if (net) leaveRoom();
-  connect(lg.code, false); show('lobby');
-};
+function autoResume() {
+  if (tut || resumeHold || gameVisible || document.hidden || mm) return false;
+  // only what must be answered first holds it back: an update offer, the maintenance screen, the reinstall card
+  if ((updBox && document.body.contains(updBox)) || document.getElementById('maintBox') || document.getElementById('reinst')) return false;
+  const g = pendingGame(); if (!g) return false;
+  if (g.kind === 'saved') { if (net) leaveRoom(); startGame(g.sv.cfg, g.sv.moves); show('game'); return true; }
+  connect(g.lg.code, false); show('lobby');
+  return true;
+}
 
 /* ---------------- minimised for over a minute: out of the online game ----------------
    In the background the phone does not play, so after AFK_MS the player is taken out of the room; on coming back a
    card says so and offers to rejoin (the game goes on from the room's log, a bot plays for the player meanwhile). */
 const AFK_MS = 60000;
 let hiddenAt = 0, afkTimer = 0;
+let afkRejoin = null;
 function afkKick() {
-  if (tut || document.getElementById('afkBox') || (!net && !mm)) return;
+  if (tut || (!net && !mm)) return;
   let kind = 'room', code = null;
   token++; turnTok++; stopTimer(); clearInterval(watchId);
   if (mm) { kind = 'search'; stopMatch(false); }
   else { code = net.code; leaveRoom(); }
   closeGameMenu(); const sb = document.getElementById('sayBox'); if (sb) sb.hidden = true;
   show('menu');
-  const b = document.createElement('div'); b.className = 'over'; b.id = 'afkBox'; b.style.position = 'fixed';
-  b.innerHTML = `<div class="ocard"><div style="font-size:46px">💤</div><h3>Из-за бездействия вы отключились</h3><p>${kind === 'search' ? 'Игра была свёрнута больше минуты, поиск остановлен' : 'Игра была свёрнута больше минуты. Пока вас нет, за вас играет бот'}</p><button class="cta wide" id="afkBack">${kind === 'search' ? 'Искать снова' : 'Перезайти'}</button><button class="ghostbtn" id="afkMenu">В меню</button></div>`;
-  document.body.append(b);
-  b.querySelector('#afkMenu').onclick = () => b.remove();
-  b.querySelector('#afkBack').onclick = () => { b.remove(); if (kind === 'search') quickMatch(); else { connect(code, false); show('lobby'); } };
+  if (kind === 'search') { toastAny('Поиск игры остановлен, пока игра была свёрнута'); return; }
+  // back into the game at once if the player is looking at the phone; otherwise on the first look
+  if (document.hidden) afkRejoin = {code}; else { connect(code, false); show('lobby'); }
 }
 document.addEventListener('visibilitychange', () => {
   clearTimeout(afkTimer);
   if (document.hidden) { hiddenAt = Date.now(); afkTimer = setTimeout(afkKick, AFK_MS); return; }
+  if (afkRejoin) { const r = afkRejoin; afkRejoin = null; hiddenAt = 0; resumeHold = false; connect(r.code, false); show('lobby'); return; }
   // Only a finished game left on screen goes home: the lobby, results or friends screens stay where the player was.
   if (phase === 'end' && !mm && gameVisible) { closeGameMenu(); show('menu'); }
   else if (hiddenAt && Date.now() - hiddenAt >= AFK_MS) afkKick();
@@ -2757,7 +2758,7 @@ function openGameMenu() {
     const a = b.dataset.a;
     if (a === 'resume') return closeGameMenu();
     if (a === 'settings') { box.remove(); settingsReturn = 'game'; return show('settings'); }
-    if (a === 'menu') { box.remove(); return show('menu'); }
+    if (a === 'menu') { box.remove(); resumeHold = true; return show('menu'); }
     if (a === 'cancel') {
       if (!confirmOnce(b, 'Точно отменить? Нажмите ещё раз')) return;
       if (online) { netSend({t: 'resign', g: net.gameId, p: seat}); leaveRoom(); }
@@ -3273,7 +3274,7 @@ function netDown(me) {
   clearTimeout(me.downT);
   me.downT = setTimeout(() => {
     if (net !== me || !me.down) return;
-    confirmBox('Связь с игрой потеряна<br><small>Партия сохранена на сервере. Проверьте интернет и попробуйте снова — ходы подтянутся сами</small>', 'Повторить', () => netRetry(me), 'В меню', () => { show('menu'); renderResume(); });
+    confirmBox('Связь с игрой потеряна<br><small>Партия сохранена на сервере. Проверьте интернет и попробуйте снова — ходы подтянутся сами</small>', 'Повторить', () => netRetry(me), 'В меню', () => { show('menu'); });
   }, NET_DIALOG_AFTER);
 }
 function netUp(me) {
@@ -6640,7 +6641,7 @@ function applyCloudWallet(w) {
 // Everything on screen that shows profile data.
 function refreshProfileUI() {
   document.querySelectorAll('.goldN').forEach(e => e.textContent = wallet.gold);
-  try { renderAccount(); dailyBonus(); progressDot(); renderResume(); renderMenuProfile(); } catch (_) {}
+  try { renderAccount(); dailyBonus(); progressDot(); renderMenuProfile(); } catch (_) {}
   if (!$('#scr-shop').hidden) renderShop();
   if (!$('#scr-progress').hidden) renderProgress();
   if (!$('#scr-settings').hidden) renderPrefs();
@@ -7068,7 +7069,7 @@ function show(name) {
   if (name === 'lobby') { renderLobby(); if (FB && registered()) loadFriends().then(renderLobbyFriends).catch(() => {}); }
   if (name === 'shop') renderShop();
   if (name === 'settings') renderPrefs();
-  if (name === 'menu') { renderResume(); saveWallet(); presenceCount(); progressDot(); renderMenuProfile(); updateNotifBadge(); }
+  if (name === 'menu') { saveWallet(); presenceCount(); progressDot(); renderMenuProfile(); updateNotifBadge(); }
   if (name === 'progress') { renderTasks(); }
   if (name === 'profile') { renderProfile(); renderAccount(); }
   if (name === 'rating') { renderTop(); }
@@ -7517,7 +7518,9 @@ window.addEventListener('keydown', e => {
 });
 
 injectArt();
-dailyBonus(); renderResume(); renderPrefs(); checkMaintenance(); checkUpdatePolicy();
+dailyBonus(); renderPrefs(); checkMaintenance(); checkUpdatePolicy();
+// the start: once the splash is gone, a game that was going comes back by itself
+bootReady.then(() => setTimeout(() => { try { autoResume(); } catch (e) { plog('error', 'autoResume ' + e.message); } }, 450));
 devVerify();
 // First open and the days people come back (D1, D3, D7), each reported once.
 (() => {
