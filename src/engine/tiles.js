@@ -48,7 +48,7 @@ export function deckList(rules) {
   for (const id in TYPES) {
     const t = TYPES[id];
     if (!rules.rivers && t.e.includes('w')) continue;
-    if ((rules.mode === 'fast' || rules.mode === 'duel') && t.rare) continue;
+    if (rules.mode === 'fast' && t.rare) continue;
     for (let i = 0; i < t.n * (t.rare ? 1 : k); i++) d.push(id);
   }
   return d;

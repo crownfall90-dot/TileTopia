@@ -26,7 +26,6 @@ Draw and place landscape tiles onto a growing board, connect winding roads, fort
   - **Quick Match**: 30 cards, ~8 minutes — ideal for quick breaks.
   - **Classic**: 50 cards, ~15 minutes — the golden standard of tactical depth.
   - **Grand Epic**: 100 cards with rare tiles and monumental constructions.
-  - **1v1 Timed Duel**: High-stakes fast-paced duel with a 20-second turn timer!
 • **100% Offline Capable**: Full offline gameplay supported — play on flights, commutes, or off the grid without internet.
 • **Profile Showcase & Customization**:
   - Collect exclusive sets of wooden meeples (Royal Court, Elements, and more).

@@ -23,8 +23,8 @@ export const FEATURES = {
   'claim:collection': 'Награда за коллекцию', 'claim:road': 'Награда с пути прогресса', 'claim:reroll': 'Замена задания',
   'buy:emote': 'Покупка: эмодзи', 'buy:phrase': 'Покупка: фраза', 'buy:daily': 'Покупка в дневной витрине', 'pick:daily': 'Выбор купленного в витрине',
   'deck:emote': 'Колода: эмодзи', 'deck:phrase': 'Колода: фраза',
-  'mode:bots': 'Режим: с ботами', 'mode:local': 'Режим: на одном телефоне', 'mode:lobby': 'Режим: с друзьями (комната)', 'mode:online': 'Режим: онлайн', 'mode:duel': 'Режим: дуэль',
-  'rules:fast': 'Правила: быстрая', 'rules:classic': 'Правила: классика', 'rules:big': 'Правила: большая', 'rules:epic': 'Правила: эпическая', 'rules:duel': 'Правила: дуэль',
+  'mode:bots': 'Режим: с ботами', 'mode:local': 'Режим: на одном телефоне', 'mode:lobby': 'Режим: с друзьями (комната)', 'mode:online': 'Режим: онлайн',
+  'rules:fast': 'Правила: быстрая', 'rules:classic': 'Правила: классика', 'rules:big': 'Правила: большая', 'rules:epic': 'Правила: эпическая',
 };
 
 /** Events that are about the game working or about security, never about what a player does: they need no consent. */

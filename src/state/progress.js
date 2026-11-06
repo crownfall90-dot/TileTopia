@@ -17,7 +17,6 @@ export const QUESTS = [
   {id: 'bc5', ic: '🏯', t: 'Достройте город из 5 плиток и больше', k: 'bigc', n: 1, g: 20},
   {id: 'lr4', ic: '🛣️', t: 'Достройте дорогу из 4 плиток и больше', k: 'longr', n: 1, g: 15},
   {id: 'hw1', ic: '🔥', t: 'Победите сложных ботов', k: 'hardwin', n: 1, g: 30},
-  {id: 'dw1', ic: '⚔️', t: 'Победите в дуэли', k: 'duelwin', n: 1, g: 25},
   {id: 's40', ic: '🌟', t: 'Наберите 40 очков за партию', k: 's40', n: 1, g: 25},
   {id: 'say3', ic: '💬', t: 'Отправьте 3 реакции в партиях', k: 'say', n: 3, g: 10},
   {id: 'f2', ic: '⛪', t: 'Окружите 2 монастыря', k: 'f', n: 2, g: 25},
@@ -63,7 +62,6 @@ export const ACH = [
   {id: 'mr8', tier: 'silver', ic: '🛣️', t: 'Великий тракт', d: 'Достройте дорогу из 8 плиток', ok: s => (s.maxRoad || 0) >= 8, g: 60},
   {id: 'b100', tier: 'gold', ic: '💫', t: 'Легенда стола', d: '100 очков за одну партию', ok: s => s.best >= 100, g: 150},
   {id: 'hw5', tier: 'silver', ic: '🤖', t: 'Гроза ботов', d: '5 побед над сложными ботами', ok: s => (s.hardwin || 0) >= 5, g: 80},
-  {id: 'dw5', tier: 'silver', ic: '⚔️', t: 'Дуэлянт', d: '5 побед в дуэлях', ok: s => (s.duelwin || 0) >= 5, g: 80},
   {id: 'o10', tier: 'gold', ic: '🌐', t: 'Чемпион сети', d: '10 побед онлайн', ok: s => s.owins >= 10, g: 150},
   {id: 'say50', tier: 'bronze', ic: '💬', t: 'Душа компании', d: 'Отправьте 50 реакций', ok: s => (s.say || 0) >= 50, g: 40},
   {id: 'l20', tier: 'gold', ic: '👑', t: 'Двадцатый уровень', d: 'Достигните 20 уровня', ok: (s, lvl) => lvl >= 20, g: 200},
@@ -137,7 +135,6 @@ export function normalizeStats(st = {}) {
     bigc: st.bigc || 0,
     longr: st.longr || 0,
     hardwin: st.hardwin || 0,
-    duelwin: st.duelwin || 0,
     say: st.say || 0,
     streak: st.streak || 0,
     bestStreak: st.bestStreak || 0,
@@ -147,13 +144,12 @@ export function normalizeStats(st = {}) {
       bots: Object.assign({games: 0, wins: 0, best: 0}, byMode.bots),
       friends: Object.assign({games: 0, wins: 0, best: 0}, byMode.friends),
       online: Object.assign({games: 0, wins: 0, best: 0}, byMode.online),
-      duel: Object.assign({games: 0, wins: 0, best: 0}, byMode.duel),
     }
   };
 }
 
 export function recordGameMode(st, mode, win, score) {
-  const m = mode === 'online' || mode === 'friends' || mode === 'duel' ? mode : 'bots';
+  const m = mode === 'online' || mode === 'friends' ? mode : 'bots';
   if (!st.byMode) st.byMode = {};
   if (!st.byMode[m]) st.byMode[m] = {games: 0, wins: 0, best: 0};
   st.byMode[m].games++;

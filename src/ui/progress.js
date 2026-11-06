@@ -17,7 +17,7 @@ export function renderMasteryGrid(byMode = {}) {
     const body = g ? `<small>${rate}% (${w}/${g}) · рек. ${m.best || 0}</small>` : '<small class="mnone">Сыграйте первую партию</small>';
     return `<div class="mcard${g ? '' : ' empty'}"><span class="mic">${ic}</span><div><b>${name}</b>${body}</div></div>`;
   };
-  return `<div class="mgrid">${tile('bots', '🤖', 'Боты')}${tile('duel', '⚔️', 'Дуэль')}${tile('friends', '👥', 'Друзья')}${tile('online', '🌐', 'Онлайн')}</div>`;
+  return `<div class="mgrid">${tile('bots', '🤖', 'Боты')}${tile('friends', '👥', 'Друзья')}${tile('online', '🌐', 'Онлайн')}</div>`;
 }
 
 /** Generates HTML markup for completed features summary (cities, roads, forts). */

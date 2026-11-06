@@ -91,14 +91,12 @@ test('behavioral: progress UI renders collections and mastery with proper DOM el
   assert.ok(html.includes('В процессе'));
 
   const masteryHtml = renderMasteryGrid({
-    bots: {games: 10, wins: 8, best: 70},
-    duel: {games: 5, wins: 4, best: 55}
+    bots: {games: 10, wins: 8, best: 70}
   });
   assert.ok(masteryHtml.includes('mgrid'));
   assert.ok(masteryHtml.includes('Боты'));
   assert.ok(masteryHtml.includes('80% (8/10) · рек. 70'));
-  assert.ok(masteryHtml.includes('Дуэль'));
-  assert.ok(masteryHtml.includes('80% (4/5) · рек. 55'));
+  assert.ok(!masteryHtml.includes('Дуэль'), 'no duel tile');
 });
 
 test('progress: normalizeStats and recordGameMode (R-11)', async () => {

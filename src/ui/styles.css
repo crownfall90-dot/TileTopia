@@ -5303,3 +5303,4 @@ html body .tile-toast,html body .note{top:auto;bottom:calc(86px + var(--ib,0px))
 /* the consent line under the sign-up buttons */
 html body .legal{display:block;margin:2px 0 10px;color:var(--muted);font:500 11px/1.4 var(--f-body);text-align:center}
 html body .legal a{color:#8db4ff;text-decoration:underline;word-break:normal}
+.mgrid .mcard:last-child:nth-child(odd){grid-column:1/-1}

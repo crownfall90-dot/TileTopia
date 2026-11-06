@@ -614,20 +614,6 @@
               </div>
               <span class="sm-arrow">›</span>
             </button>
-
-            <button class="sheet-mode-card" data-mode-action="duel">
-              <div class="sm-badge sm-orange">
-                <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polygon points="13 2 3 14 12 14 11 22 21 10 12 10 13 2"/></svg>
-              </div>
-              <div class="sm-info">
-                <div class="sm-top">
-                  <b>Быстрая дуэль</b>
-                  <span class="sm-tag orange">20 сек</span>
-                </div>
-                <small>Динамичная схватка 1×1 на 30 плитках с таймером</small>
-              </div>
-              <span class="sm-arrow">›</span>
-            </button>
           </div>
         </div>
       </div>
@@ -1831,7 +1817,7 @@ function makeDeck(rules) {
 function newGame() {
   if (net) leaveRoom();
   let firstHuman = true;
-  const numSeats = setup.rules && setup.rules.mode === 'duel' ? 2 : setup.n;
+  const numSeats = setup.n;
   const seats = setup.seats.slice(0, numSeats).map((s, i) => {
     const fig = s.human ? (firstHuman ? wallet.fig : 'classic') : randomFig();
     if (s.human) firstHuman = false;
@@ -3007,7 +2993,7 @@ function renderRules() {
   const cards = (locked) => (typeof PG !== 'undefined' && PG.ui && PG.ui.setup)
     ? PG.ui.setup.renderModeCardsHtml(MODES, setup.rules.mode, locked)
     : (() => {
-      const ICON = {fast: '⚡', classic: '⚖️', epic: '🏰', duel: '⚔️'};
+      const ICON = {fast: '⚡', classic: '⚖️', epic: '🏰'};
       return `<div class="modecards">${Object.entries(MODES).map(([k, m]) => `<button class="mcard" data-setmode="${k}" aria-pressed="${setup.rules.mode === k}"${locked ? ' disabled' : ''}><i>${ICON[k]}</i><b>${m.label}</b><small>${m.desc.split(' · ').slice(0, 2).join(' · ')}</small></button>`).join('')}</div>`;
     })();
   const rows = (on, room) => (typeof PG !== 'undefined' && PG.ui && PG.ui.setup)
@@ -4240,7 +4226,7 @@ function questsWeekly() {
 }
 // Three quests a day, the same for the whole day.
 function questsToday() {
-  if (PROG.day === today()) return;
+  if (PROG.day === today() && (PROG.q || []).every(q => QUESTS.some(x => x.id === q.id))) return;   // a quest that no longer exists: pick the day again
   PROG.day = today(); PROG.q = PG.state.progress.dailyQuests(PROG.day).map(id => ({id, n: 0, got: false}));
 }
 // Earned statuses and frames: a day counts when every daily task is done; the month is checked in grantEarned.
@@ -4284,8 +4270,7 @@ function progress(d) {
 function gameDone(place, score) {
   const win = place === 0;
   PROG.st.best = Math.max(PROG.st.best, score);
-  const isDuel = gameRules && gameRules.mode === 'duel';
-  const mode = isDuel ? 'duel' : (net ? (net.quick ? 'online' : 'friends') : 'bots');
+  const mode = net ? (net.quick ? 'online' : 'friends') : 'bots';
   recordGameMode(PROG.st, mode, win, score);
   if (!net && mode === 'bots') {
     const curLevel = botLevel();
@@ -4322,8 +4307,8 @@ function gameDone(place, score) {
   { const n = PROG.st.games + 1; if (n <= 3) track(['first_game_done', 'second_game_done', 'third_game_done'][n - 1], {win: win ? 1 : 0, score}); }
   PROG.st.streak = win ? (PROG.st.streak || 0) + 1 : 0;
   PROG.st.bestStreak = Math.max(PROG.st.bestStreak || 0, PROG.st.streak);
-  const hard = !net && !isDuel && win && typeof botLevel === 'function' && botLevel() === 'hard';
-  progress({games: 1, win: win ? 1 : 0, wins: win ? 1 : 0, s30: score >= ((deckMax <= 30) ? 20 : 30) ? 1 : 0, s40: score >= 40 ? 1 : 0, online: net ? 1 : 0, ogames: net ? 1 : 0, owins: net && win ? 1 : 0, hardwin: hard ? 1 : 0, duelwin: isDuel && win ? 1 : 0});
+  const hard = !net && win && typeof botLevel === 'function' && botLevel() === 'hard';
+  progress({games: 1, win: win ? 1 : 0, wins: win ? 1 : 0, s30: score >= ((deckMax <= 30) ? 20 : 30) ? 1 : 0, s40: score >= 40 ? 1 : 0, online: net ? 1 : 0, ogames: net ? 1 : 0, owins: net && win ? 1 : 0, hardwin: hard ? 1 : 0});
   // Experience: a share for taking part, more for the place and for the points, half again online. A game where this
   // player laid fewer than 6 cards gives nothing (quitting early is not farming).
   const me = players.find(isMe), laid = me && me.stats ? me.stats.t || 0 : 6;
@@ -4590,7 +4575,6 @@ function renderProfile() {
   const bRate = bm.bots && bm.bots.games ? Math.round(100 * bm.bots.wins / bm.bots.games) : 0;
   const fRate = bm.friends && bm.friends.games ? Math.round(100 * bm.friends.wins / bm.friends.games) : 0;
   const oRate = bm.online && bm.online.games ? Math.round(100 * bm.online.wins / bm.online.games) : 0;
-  const dRate = bm.duel && bm.duel.games ? Math.round(100 * bm.duel.wins / bm.duel.games) : 0;
   const statsEl = $('#stats');
   if (statsEl) {
     statsEl.innerHTML = `<div class="sbig">${[[st.games, 'партий'], [st.wins, 'побед'], [rate + '%', '% побед'], [st.best, 'рекорд очков']].map(([v, l]) => `<div><b>${v}</b><small>${l}</small></div>`).join('')}</div><div class="smastery"><div class="h3 sec">Мастерство по режимам</div>${PG.ui.progress.renderMasteryGrid(bm)}</div>${PG.ui.progress.renderBuildingStats(st)}`;
@@ -7787,7 +7771,6 @@ function initModeSheet() {
       if (activeMode === 'online') openSetup('online');
       else if (activeMode === 'lobby') show('lobby');
       else if (activeMode === 'local') openSetup('local');
-      else if (activeMode === 'duel') openSetup('duel');
       else openSetup('bots');
     };
   }
@@ -7802,7 +7785,6 @@ function initModeSheet() {
         if (act === 'online') openSetup('online');
         else if (act === 'lobby') show('lobby');
         else if (act === 'local') openSetup('local');
-        else if (act === 'duel') openSetup('duel');
         else openSetup('bots');
       }, 220);
     };

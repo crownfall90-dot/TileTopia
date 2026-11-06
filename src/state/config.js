@@ -18,7 +18,6 @@ export const MODES = {
   fast: {label: 'Быстрая', desc: '30 плиток · ~8 мин · 4 мипла', set: {deck: 30, meeples: 4}},
   classic: {label: 'Классика', desc: '50 плиток · ~15 мин · 6 миплов', set: {deck: 50, meeples: 6}},
   epic: {label: 'Большая', desc: '100 плиток · ~30 мин · 8 миплов', set: {deck: 100, meeples: 8}},
-  duel: {label: 'Дуэль 1×1', desc: '30 плиток · 20 с на ход · 2 игрока · 5 миплов', set: {deck: 30, meeples: 5, timer: 20}},
 };
 
 export const RULES = [

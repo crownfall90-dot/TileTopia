@@ -37,7 +37,7 @@ test('progress: one free swap picks a quest not on today\'s list', async () => {
 test('progress: tiered achievements read the new stats; weekly goals are three core ones and one extra', async () => {
   const P = await import('../src/state/progress.js');
   const st = P.normalizeStats({});
-  for (const k of ['tiles', 'figs', 'bigc', 'longr', 'maxRoad', 'hardwin', 'duelwin', 'say', 'streak', 'bestStreak']) assert.equal(st[k], 0, k);
+  for (const k of ['tiles', 'figs', 'bigc', 'longr', 'maxRoad', 'hardwin', 'say', 'streak', 'bestStreak']) assert.equal(st[k], 0, k);
   const ws3 = P.ACH.find(a => a.id === 'ws3');
   assert.ok(ws3.ok({bestStreak: 3}) && !ws3.ok({bestStreak: 2}));
   assert.ok(P.ACH.every(a => !a.tier || ['bronze', 'silver', 'gold'].includes(a.tier)));
