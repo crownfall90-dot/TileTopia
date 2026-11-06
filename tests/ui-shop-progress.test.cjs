@@ -84,6 +84,26 @@ test('ui/shop: renderGiftCard, renderFiguresGrid, renderFramesGrid, renderLocati
 
   const itemsLocsHtml = renderItemsLocsHtml(locs);
   assert.ok(itemsLocsHtml.includes('locgrid'));
+
+  // Emotes tab markup
+  const {renderItemsEmotesHtml, ALL_EMOTES, ALL_PHRASES, DEFAULT_EMOTES, DEFAULT_PHRASES} = await import('../src/ui/shop.js');
+  assert.equal(DEFAULT_EMOTES.length, 5);
+  assert.equal(DEFAULT_PHRASES.length, 5);
+  assert.ok(ALL_EMOTES.length >= 20);
+  assert.ok(ALL_PHRASES.length >= 20);
+
+  const emotesHtml = renderItemsEmotesHtml({
+    allEmotes: ALL_EMOTES,
+    allPhrases: ALL_PHRASES,
+    selectedEmotes: ['👑', '🧩'],
+    selectedPhrases: ['Отличный ход!'],
+    maxEmotes: 5,
+    maxPhrases: 5
+  });
+  assert.ok(emotesHtml.includes('deck-summary-card'));
+  assert.ok(emotesHtml.includes('data-toggle-emote="👑"'));
+  assert.ok(emotesHtml.includes('data-toggle-phrase="Отличный ход!"'));
+  assert.ok(emotesHtml.includes('data-reset-deck'));
 });
 
 test('ui/progress: ringSvg, renderMasteryGrid, renderBuildingStats, renderCollectionCard', async () => {

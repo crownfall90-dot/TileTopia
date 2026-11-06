@@ -226,13 +226,14 @@ body:not(.authed) main > .card:not(#loginCard) { display: none; }
       <!-- Staging Box -->
       <div style="background:var(--bg);padding:14px;border-radius:10px;border:1px solid rgba(214,158,46,0.3);display:flex;flex-direction:column;gap:8px">
         <div style="display:flex;justify-content:space-between;align-items:center">
-          <b style="color:var(--warning);font-size:14px">🟡 Тестовый контур (Staging)</b>
+          <b style="color:var(--warning);font-size:14px">🟡 Тестовая сборка (Tiletopia Test)</b>
           <span style="background:rgba(214,158,46,0.15);color:var(--warning);font-size:11px;padding:2px 8px;border-radius:6px;font-weight:700" id="stagingBadge">Тест</span>
         </div>
-        <div style="font-size:13px;color:var(--muted)">Статус сборки: <b id="stagingStatus" style="color:var(--fg)">…</b></div>
-        <p class="stat-sub" style="font-size:11.5px;line-height:1.35">Обновляется автоматически при коммитах в dev-ветки. <b>Без пуш-уведомлений и без постов в канал.</b></p>
+        <div style="font-size:13px;color:var(--muted)">Текущая сборка: <b id="stagingStatus" style="color:var(--fg)">…</b></div>
+        <div style="font-size:11px;color:var(--muted);background:rgba(255,255,255,0.03);padding:3px 8px;border-radius:5px">📦 Пакет: <code>app.crownfall.tiletopia.test</code> (отдельное приложение)</div>
+        <p class="stat-sub" style="font-size:11.5px;line-height:1.35;margin:0">Обновляется <b>автоматически на каждый коммит</b>. Устанавливается рядом с боевой версией.</p>
         <div style="display:flex;gap:6px;flex-wrap:wrap;margin-top:4px">
-          <a class="btn btn-sm" id="btnDownloadStaging" href="https://github.com/crownfall90-dot/TileTopia/releases/tag/staging-latest" target="_blank" rel="noopener" style="font-size:12px;padding:6px 10px;text-decoration:none">📥 Скачать APK</a>
+          <a class="btn btn-sm" id="btnDownloadStaging" href="https://github.com/crownfall90-dot/TileTopia/releases/tag/staging-latest" target="_blank" rel="noopener" style="font-size:12px;padding:6px 10px;text-decoration:none">📥 Скачать тест APK</a>
           <a class="btn btn-sm" id="btnOpenStaging" href="https://crownfall90-dot.github.io/TileTopia/staging/" target="_blank" rel="noopener" style="font-size:12px;padding:6px 10px;text-decoration:none">🌐 Тестовый веб</a>
         </div>
       </div>
@@ -253,13 +254,30 @@ body:not(.authed) main > .card:not(#loginCard) { display: none; }
       </div>
     </div>
 
+    <!-- Что уже вошло в тестовую версию, но ещё не вышло в боевой -->
+    <div id="unreleasedBox" style="background:var(--bg);padding:14px;border-radius:10px;border:1px solid rgba(214,158,46,0.35)">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
+        <div style="display:flex;align-items:center;gap:6px">
+          <b style="font-size:13.5px;color:var(--warning)">⏳ Вошло в тест, ожидает релиза в боевую:</b>
+          <span style="background:rgba(214,158,46,0.2);color:var(--warning);font-size:11px;padding:2px 8px;border-radius:999px;font-weight:700" id="unreleasedBadge"><span id="unreleasedCount">…</span> изменений</span>
+        </div>
+        <button class="btn btn-sm" id="btnReloadChanges" style="font-size:11px;padding:3px 8px">🔄 Обновить</button>
+      </div>
+      <p class="stat-sub" style="font-size:11.5px;margin:0 0 10px;line-height:1.4">
+        Эти функции уже проверены и работают в тестовом APK <b>«Tiletopia Test»</b> у тестеров, но ещё не выпущены для обычных игроков в боевой версии.
+      </p>
+      <div id="unreleasedList" style="max-height:190px;overflow-y:auto;background:rgba(0,0,0,0.2);padding:8px 10px;border-radius:6px">
+        <div style="color:var(--muted);font-size:12px">Загрузка списка изменений…</div>
+      </div>
+    </div>
+
     <!-- Release notes ready for publish -->
     <div style="background:var(--bg);padding:12px 14px;border-radius:10px;border:1px solid var(--border)">
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px">
-        <b style="font-size:13px;color:var(--accent)">📝 Что войдёт в следующий релиз (Release Notes):</b>
+        <b style="font-size:13px;color:var(--accent)">📝 Описание для игроков и Telegram (Release Notes):</b>
         <button class="btn btn-sm" id="btnReloadNotes" style="font-size:11px;padding:3px 8px">🔄 Обновить</button>
       </div>
-      <div id="releaseNotesContent" style="font-size:12.5px;color:var(--fg);line-height:1.5;max-height:160px;overflow-y:auto;white-space:pre-wrap;background:rgba(0,0,0,0.2);padding:8px 10px;border-radius:6px">Загрузка release-notes.md…</div>
+      <div id="releaseNotesContent" style="font-size:12.5px;color:var(--fg);line-height:1.5;max-height:140px;overflow-y:auto;white-space:pre-wrap;background:rgba(0,0,0,0.2);padding:8px 10px;border-radius:6px">Загрузка release-notes.md…</div>
     </div>
 
     <!-- Pipeline status indicator -->
@@ -272,8 +290,8 @@ body:not(.authed) main > .card:not(#loginCard) { display: none; }
     </div>
 
     <div style="display:flex;flex-direction:column;gap:8px">
-      <button class="btn btn-primary" id="btnPromote" style="padding:14px;font-size:15px;font-weight:700">
-        🚀 Выпустить обновление в Production (для всех игроков)
+      <button class="btn btn-primary" id="btnPromote" style="padding:15px;font-size:15px;font-weight:800;letter-spacing:0.3px">
+        🚀 Выпустить тестовую сборку в боевую версию (Production)
       </button>
       <button class="btn" id="btnRollback" style="font-size:13px">
         🔄 Откатить версию (Rollback)
@@ -793,17 +811,30 @@ $('btnRefreshStats').onclick = loadStats;
 /* ---------- releases and GitHub workflows (run under the owner's own GitHub login) ---------- */
 const ACTIONS = `https://github.com/${REPO}/actions/workflows/`;
 const openWorkflow = (file, what) => { log('Открываю ' + file + ': нажмите «Run workflow» (ветка main), чтобы ' + what); window.open(ACTIONS + file, '_blank', 'noopener'); };
+if ($('btnReloadChanges')) $('btnReloadChanges').onclick = () => loadUnreleasedChanges(latestProdTag);
+
 $('btnPromote').onclick = () => {
-  const msg = '🚀 ВЫПУСК ОБНОВЛЕНИЯ В PRODUCTION ДЛЯ ВСЕХ ИГРОКОВ\n\n' +
-    'Что произойдёт автоматически:\n' +
-    '1. Соберётся боевой APK и AAB (Google Play)\n' +
-    '2. Обновится сайт игры для всех пользователей\n' +
-    '3. Опубликуется пост с описанием в Telegram-канал @diarydevelopment\n' +
-    '4. Разошлётся push-уведомление игрокам о новой версии\n\n' +
-    'На открывшейся странице GitHub нажмите «Run workflow» (ветка main).\n' +
-    'Перейти к запуску выпуска?';
+  const count = unreleasedCommitsList.length;
+  const prodNum = parseInt(latestProdTag.replace(/\D/g, ''), 10) || 261;
+  const nextVer = `1.0.${prodNum + 1}`;
+
+  const topChanges = unreleasedCommitsList.slice(0, 5).map(c => '• ' + c.commit.message.split('\n')[0]).join('\n');
+  const changesSummary = count > 0
+    ? `Готово к релизу изменений: ${count}\n${topChanges}${count > 5 ? '\n• ...и ещё ' + (count - 5) + ' коммитов' : ''}`
+    : 'Все текущие изменения из ветки main будут упакованы в боевой релиз.';
+
+  const msg = `🚀 ВЫПУСК ТЕСТОВОЙ СБОРКИ В БОЕВУЮ ВЕРСИЮ (${nextVer})\n\n` +
+    `${changesSummary}\n\n` +
+    'Что произойдёт автоматически при запуске:\n' +
+    '1. Сборка официального боевого APK и Google Play AAB\n' +
+    '2. Обновление боевого сайта игры на GitHub Pages\n' +
+    '3. Публикация красивого поста с описанием в Telegram-канал @diarydevelopment\n' +
+    '4. Отправка Push-уведомлений всем игрокам\n\n' +
+    'На открывшейся странице GitHub нажмите зелёную кнопку «Run workflow» (ветка main).\n\n' +
+    'Выпустить версию ' + nextVer + ' для всех игроков?';
+
   if (confirm(msg)) {
-    openWorkflow('promote-production.yml', 'выпустить версию для всех игроков');
+    openWorkflow('promote-production.yml', 'выпустить версию ' + nextVer + ' для всех игроков');
     setTimeout(checkCiStatus, 3000);
   }
 };
@@ -849,6 +880,67 @@ async function checkCiStatus() {
   } catch (_) {}
 }
 
+let latestProdTag = 'v261';
+let unreleasedCommitsList = [];
+
+async function loadUnreleasedChanges(prodTag) {
+  try {
+    latestProdTag = prodTag;
+    const countEl = $('unreleasedCount');
+    const listEl = $('unreleasedList');
+    if (!listEl) return;
+
+    const res = await fetch(`https://api.github.com/repos/${REPO}/compare/${prodTag}...main`).then(r => r.ok ? r.json() : null);
+    if (!res || !res.commits) {
+      if (countEl) countEl.textContent = '—';
+      listEl.innerHTML = '<div style="color:var(--muted);font-size:12px">Список изменений формируется из release-notes.md ниже.</div>';
+      return;
+    }
+
+    unreleasedCommitsList = res.commits;
+    const total = res.total_commits || unreleasedCommitsList.length;
+    if (countEl) countEl.textContent = `${total}`;
+
+    const prodNum = parseInt(prodTag.replace(/\D/g, ''), 10) || 261;
+    const nextProdVer = `1.0.${prodNum + 1}`;
+    if ($('btnPromote')) {
+      $('btnPromote').innerHTML = `🚀 Выпустить тестовую сборку в боевую (${nextProdVer}) · ${total} изменений`;
+    }
+
+    if (!unreleasedCommitsList.length) {
+      listEl.innerHTML = '<div style="color:var(--success);font-size:12px;padding:6px 0">Все изменения из тестовой версии уже выпущены в боевую! Боевая версия актуальна.</div>';
+      return;
+    }
+
+    listEl.innerHTML = unreleasedCommitsList.map(c => {
+      const fullMsg = c.commit.message || '';
+      const title = fullMsg.split('\n')[0];
+      const sha = c.sha.slice(0, 7);
+      const author = (c.author && c.author.login) || c.commit.author.name || 'dev';
+      const timeStr = new Date(c.commit.author.date).toLocaleString('ru-RU', {day:'2-digit', month:'2-digit', hour:'2-digit', minute:'2-digit'});
+      
+      let badgeColor = 'rgba(255,255,255,0.1)';
+      let badgeText = 'код';
+      if (title.startsWith('feat')) { badgeColor = 'rgba(66, 153, 225, 0.25); color:#63b3ed'; badgeText = 'фича'; }
+      else if (title.startsWith('fix')) { badgeColor = 'rgba(237, 137, 54, 0.25); color:#fbd38d'; badgeText = 'фикс'; }
+      else if (title.startsWith('ui')) { badgeColor = 'rgba(159, 122, 234, 0.25); color:#d6bcfa'; badgeText = 'интерфейс'; }
+      else if (title.startsWith('refactor')) { badgeColor = 'rgba(72, 187, 120, 0.25); color:#9ae6b4'; badgeText = 'рефакторинг'; }
+      else if (title.startsWith('ci')) { badgeColor = 'rgba(236, 201, 75, 0.25); color:#faf089'; badgeText = 'сборка'; }
+
+      return `<div style="display:flex;align-items:baseline;justify-content:space-between;gap:8px;padding:6px 0;border-bottom:1px solid rgba(255,255,255,0.06);font-size:12px">` +
+        `<div style="display:flex;align-items:center;gap:6px;min-width:0;flex:1">` +
+        `<span style="background:${badgeColor};font-size:10px;padding:1px 6px;border-radius:4px;font-weight:700;white-space:nowrap">${badgeText}</span>` +
+        `<a href="${c.html_url}" target="_blank" rel="noopener" style="color:var(--fg);text-decoration:none;white-space:nowrap;overflow:hidden;text-overflow:ellipsis" title="${esc(fullMsg)}">${esc(title)}</a>` +
+        `</div>` +
+        `<span style="color:var(--muted);font-size:11px;white-space:nowrap">${esc(author)} · ${timeStr} · <code>${sha}</code></span>` +
+        `</div>`;
+    }).join('');
+
+  } catch (err) {
+    console.warn('loadUnreleasedChanges error:', err);
+  }
+}
+
 async function loadVersions() {
   try {
     const rel = await fetch(`https://api.github.com/repos/${REPO}/releases?per_page=10`).then(r => r.json());
@@ -857,11 +949,15 @@ async function loadVersions() {
       $('curVersion').textContent = prod.name;
       $('prodStatus').textContent = prod.name + ' · ' + new Date(prod.published_at).toLocaleString('ru-RU');
       if ($('btnDownloadProd')) $('btnDownloadProd').href = `https://github.com/${REPO}/releases/download/${prod.tag_name}/Tiletopia.apk`;
+      loadUnreleasedChanges(prod.tag_name);
     }
     if (stg) {
-      const stgName = stg.name.replace(/^.*#/, 'сборка #').replace(/\)$/, '');
+      const stgName = stg.name || 'Tiletopia Test';
       $('stagingStatus').textContent = stgName + ' · ' + new Date(stg.published_at).toLocaleString('ru-RU');
-      if ($('stagingBadge')) $('stagingBadge').textContent = stgName;
+      const badgeMatch = stgName.match(/\((.*?)\)/);
+      if ($('stagingBadge')) $('stagingBadge').textContent = badgeMatch ? badgeMatch[1] : 'Тест';
+      const apkAsset = (stg.assets || []).find(a => a.name.endsWith('.apk'));
+      if (apkAsset && $('btnDownloadStaging')) $('btnDownloadStaging').href = apkAsset.browser_download_url;
     } else {
       $('stagingStatus').textContent = 'нет';
     }
