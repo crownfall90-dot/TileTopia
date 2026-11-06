@@ -214,7 +214,7 @@ export function renderItemsFigsHtml({figs = {}, ownedFigs = [], selectedFig = 'c
 export function renderItemsLocsHtml(locs = []) {
   const openCount = locs.filter(l => l.open).length;
   return `<div class="icount">Открыто <b>${openCount}</b> из ${locs.length}</div>
-    <p class="shint" style="margin:-2px 0 10px">Локации меняют оформление игрового поля, архитектуру городов и атмосферу королевства.</p>
+    <p class="shint" style="margin:-2px 0 10px">Локации меняют оформление игрового поля, архитектуру городов и атмосферу игры.</p>
     <div class="locgrid">${locs.map(l => `
       <div class="loccard${l.open ? ' active' : ' locked'}">
         <div class="locart">
@@ -639,8 +639,8 @@ export function renderShopStallsShowcase({
   const figStallHtml = renderSingleStall({
     stallClass: 'stall-figures',
     icon: '♟️',
-    title: 'Прилавок резных фигурок',
-    sub: 'Деревянные и каменные персонажи для партий',
+    title: 'Прилавок фигурок',
+    sub: 'Персонажи для партий',
     items: figItems,
     totalPoolSize: figPool.length,
     emptyText: 'Все фигурки в вашей коллекции! Новые персонажи появятся в обновлениях.',
@@ -666,11 +666,11 @@ export function renderShopStallsShowcase({
   const frameStallHtml = renderSingleStall({
     stallClass: 'stall-frames',
     icon: '🖼️',
-    title: 'Прилавок рамок мастера',
-    sub: 'Изысканные оправы для портрета вашего лорда',
+    title: 'Прилавок рамок',
+    sub: 'Оправы для аватара профиля',
     items: frameItems,
     totalPoolSize: framePool.length,
-    emptyText: 'Все рамки собраны! Ваша коллекция достойна королей.',
+    emptyText: 'Все рамки собраны! Примеряйте в профиле.',
     renderCardFn: item => {
       const canAfford = gold >= item.price;
       const ring = item.ring || (frames[item.key] && frames[item.key].ring) || '';
@@ -692,8 +692,8 @@ export function renderShopStallsShowcase({
   const statusStallHtml = renderSingleStall({
     stallClass: 'stall-statuses',
     icon: '🏷️',
-    title: 'Прилавок благородных статусов',
-    sub: 'Титулы и почетные звания средневековья',
+    title: 'Прилавок статусов',
+    sub: 'Статусы и подписи для профиля',
     items: statusItems,
     totalPoolSize: statusPool.length,
     emptyText: 'Все статусы из лавки уже у вас! Примеряйте в профиле.',
@@ -716,8 +716,8 @@ export function renderShopStallsShowcase({
   const emoteStallHtml = renderSingleStall({
     stallClass: 'stall-emotes',
     icon: '😄',
-    title: 'Прилавок живых эмоций',
-    sub: 'Эмодзи для быстрых реакций в партиях',
+    title: 'Прилавок эмодзи',
+    sub: 'Быстрые эмодзи для реакций в партиях',
     items: emoteItems,
     totalPoolSize: emotePool.length,
     emptyText: 'Все эмодзи собраны! Полный набор реакций в вашем распоряжении.',
@@ -742,11 +742,11 @@ export function renderShopStallsShowcase({
   const phraseStallHtml = renderSingleStall({
     stallClass: 'stall-phrases',
     icon: '💬',
-    title: 'Прилавок крылатых фраз',
-    sub: 'Реплики и боевые возгласы для чата за столом',
+    title: 'Прилавок фраз',
+    sub: 'Реплики для чата в партиях',
     items: phraseItems,
     totalPoolSize: phrasePool.length,
-    emptyText: 'Все фразы открыты! Ваше красноречие не знает равных.',
+    emptyText: 'Все фразы открыты!',
     renderCardFn: item => {
       const canAfford = gold >= item.price;
       const rarClass = item.rarity ? ' r-' + item.rarity : '';

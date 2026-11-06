@@ -240,7 +240,7 @@ test('ui/progress: ringSvg, renderMasteryGrid, renderBuildingStats, renderCollec
     progStats: {wins: 1},
     progLvl: 2
   });
-  assert.ok(achHtml.includes('Зал славы королевства'));
+  assert.ok(achHtml.includes('Достижения'));
   assert.ok(achHtml.includes('Первая победа'));
   assert.ok(achHtml.includes('Король стола'));
   assert.ok(achHtml.includes('Получено ✓'));
@@ -274,11 +274,11 @@ test('ui/progress: ringSvg, renderMasteryGrid, renderBuildingStats, renderCollec
     date: new Date('2026-11-07T12:00:00Z')
   });
 
-  assert.ok(stallsHtml.includes('Прилавок резных фигурок'));
-  assert.ok(stallsHtml.includes('Прилавок рамок мастера'));
-  assert.ok(stallsHtml.includes('Прилавок благородных статусов'));
-  assert.ok(stallsHtml.includes('Прилавок живых эмоций'));
-  assert.ok(stallsHtml.includes('Прилавок крылатых фраз'));
+  assert.ok(stallsHtml.includes('Прилавок фигурок'));
+  assert.ok(stallsHtml.includes('Прилавок рамок'));
+  assert.ok(stallsHtml.includes('Прилавок статусов'));
+  assert.ok(stallsHtml.includes('Прилавок эмодзи'));
+  assert.ok(stallsHtml.includes('Прилавок фраз'));
   assert.ok(stallsHtml.includes('fig-pedestal-wrap'));
   assert.ok(stallsHtml.includes('stall-3x2'));
 });

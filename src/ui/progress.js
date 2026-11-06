@@ -157,7 +157,7 @@ export function renderAchievementsHtml({
       <div class="ach-header-left">
         <span class="ach-trophy-icon">🎖️</span>
         <div>
-          <h3>Зал славы королевства</h3>
+          <h3>Достижения</h3>
           <p>Собрано <b>${gotCount}</b> из <b>${totalCount}</b> достижений${readyCount ? ` · <b class="ach-ready-notice">${readyCount} готово к получению!</b>` : ''}</p>
         </div>
       </div>
