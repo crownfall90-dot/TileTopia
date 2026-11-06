@@ -5,8 +5,9 @@
  * Free 24/7 serverless deployment:
  * 1. Create a free worker on cloudflare.com (or via wrangler)
  * 2. Set Secret: TELEGRAM_BOT_TOKEN
- * 3. Set Webhook:
- *    curl "https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://<your-worker>.workers.dev"
+ * 3. Set Secret: TELEGRAM_WEBHOOK_SECRET (random string, A-Z a-z 0-9 _ -, up to 256 chars)
+ * 4. Set Webhook (Telegram then sends the secret in X-Telegram-Bot-Api-Secret-Token; other callers get 403):
+ *    curl "https://api.telegram.org/bot<TOKEN>/setWebhook?url=https://<your-worker>.workers.dev&secret_token=<TELEGRAM_WEBHOOK_SECRET>"
  */
 
 const DEFAULT_WEB_URL = 'https://crownfall90-dot.github.io/TileTopia/';
@@ -69,6 +70,18 @@ export default {
       return new Response('TELEGRAM_BOT_TOKEN not configured', { status: 500 });
     }
 
+    // Without the shared secret anyone could make the bot message arbitrary chats.
+    const secret = env.TELEGRAM_WEBHOOK_SECRET;
+    if (!secret) {
+      return new Response('TELEGRAM_WEBHOOK_SECRET not configured', { status: 500 });
+    }
+    const got = request.headers.get('X-Telegram-Bot-Api-Secret-Token') || '';
+    let diff = got.length ^ secret.length;
+    for (let i = 0; i < secret.length; i++) diff |= (got.charCodeAt(i) || 0) ^ secret.charCodeAt(i);
+    if (diff !== 0) {
+      return new Response('Forbidden', { status: 403 });
+    }
+
     try {
       const update = await request.json();
       const message = update.message || update.edited_message;
@@ -113,7 +126,7 @@ export default {
 
       return new Response('OK');
     } catch (e) {
-      return new Response('Error: ' + e.message, { status: 200 });
+      return new Response('Error', { status: 200 });
     }
   }
 };

@@ -1,0 +1,27 @@
+name: Tests
+
+on:
+  push:
+    branches: [main, 'dev/**', 'claude/**']
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+
+jobs:
+  unit:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: npm ci
+      # tests load build/bundle/pg.js, so the bundle has to exist first
+      - run: npm run build
+      # browser tests (golden replays, screens) skip themselves when playwright is missing
+      - run: npm install --no-save --no-audit --no-fund playwright@1.63.0
+      - run: npx playwright install --with-deps chromium
+      - run: npm test
