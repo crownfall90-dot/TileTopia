@@ -806,21 +806,23 @@ def p_stall(tm, c, yaw, i):
         tm.blob((q.x, q.y, q.z + .008), .011, ('apple', 'hay', 'oak')[(i + k) % 3])
 
 
-def p_keep(tm, c):
-    """The keep on the square of a big town: a stone block with battlements and four round corner towers."""
+def p_keep(tm, c, k=1.0):
+    """The keep of a town (art.js draws it on the square, smaller in a small town): a stone block with
+    battlements, four round corner towers and a banner."""
     x, y, z = c
-    s = .22
-    tm.box((x, y, z), s, s, .2, 0, 'stone')
-    for k in range(-2, 3):
-        for (ax, ay) in ((k * s / 5, s / 2), (k * s / 5, -s / 2), (s / 2, k * s / 5), (-s / 2, k * s / 5)):
-            tm.box((x + ax, y + ay, z + .2), .022, .022, .03, 0, 'stone')
+    s = .22 * k
+    hb = .2 * k
+    tm.box((x, y, z), s, s, hb, 0, 'stone')
+    for i in range(-2, 3):
+        for (ax, ay) in ((i * s / 5, s / 2), (i * s / 5, -s / 2), (s / 2, i * s / 5), (-s / 2, i * s / 5)):
+            tm.box((x + ax, y + ay, z + hb), .022 * k, .022 * k, .03 * k, 0, 'stone')
     for sx, sy in ((-1, -1), (1, -1), (1, 1), (-1, 1)):
         q = (x + sx * s / 2, y + sy * s / 2)
-        tm.cylinder((q[0], q[1], z), .048, .29, 8, 'stone')
-        tm.cone((q[0], q[1], z + .29), .058, .12, 8, 'roof_red')
-    banner(tm, (x, y, z + .2), .85, pole=.24)
+        tm.cylinder((q[0], q[1], z), .048 * k, .29 * k, 8, 'stone')
+        tm.cone((q[0], q[1], z + .29 * k), .058 * k, .12 * k, 8, 'roof_red')
+    banner(tm, (x, y, z + hb), .85 * k, pole=.24)
     q = Vector((x, y - s / 2 - .002, z))
-    tm.face([q + Vector((-.03, 0, 0)), q + Vector((.03, 0, 0)), q + Vector((.03, 0, .07)), q + Vector((0, 0, .09)), q + Vector((-.03, 0, .07))], 'door')
+    tm.face([q + Vector((-.03 * k, 0, 0)), q + Vector((.03 * k, 0, 0)), q + Vector((.03 * k, 0, .07 * k)), q + Vector((0, 0, .09 * k)), q + Vector((-.03 * k, 0, .07 * k))], 'door')
 
 
 def p_gazebo(tm, c):
@@ -840,9 +842,10 @@ def town_layout(t):
     if not city:
         return None
     big = len(city) >= 3
-    tc = Vector((0, 0)) if len(city) == 4 else sum((MID[d] for d in city), Vector((0, 0))) / len(city) * .5
-    sq = (30 if big else 18) / 96
-    stall_r = (25 if big else 16) / 96
+    tc = Vector((0, 0)) if len(city) == 4 else sum((MID[d] for d in city), Vector((0, 0))) / len(city) * (.72 if len(city) == 1 else .5)
+    sq = (30 if big else 24 if len(city) > 1 else 11) / 96
+    stall_r = (25 if big else 21) / 96
+    keep = 1.0 if big else .78 if len(city) > 1 else .62
     stalls = [(tc + Vector((math.cos(math.radians(a)), -math.sin(math.radians(a)))) * stall_r, math.radians(-a) + math.pi / 2)
               for a in (45, 135, 225, 315)] if len(city) > 1 else []
     lanes = []
@@ -850,7 +853,7 @@ def town_layout(t):
         side = 1 if d % 2 else -1
         k2 = (MID[d] + tc) / 2 + Vector((GV[d][1], GV[d][0])) * 6 * side / 96
         lanes.append(quad_pts(MID[d], k2, tc, 14))
-    return {'city': city, 'big': big, 'tc': tc, 'sq': sq, 'stalls': stalls, 'lanes': lanes}
+    return {'city': city, 'big': big, 'tc': tc, 'sq': sq, 'stalls': stalls, 'lanes': lanes, 'keep': keep}
 
 
 def well(tm, c):
@@ -978,11 +981,9 @@ def build_tile(t):
         p_tower(tm, (c.x, c.y, H - .01), .62)
     city = [d for d in range(4) if t['edges'][d] == 'c']
     lay = town_layout(t)
+    if lay:
+        p_keep(tm, (lay['tc'].x, lay['tc'].y, H), lay['keep'])
     if lay and len(city) > 1:
-        if lay['big']:
-            p_keep(tm, (lay['tc'].x, lay['tc'].y, H))
-        else:
-            well(tm, lay['tc'])
         for i, (q, yaw) in enumerate(lay['stalls']):
             p_stall(tm, (q.x, q.y, H), yaw, i)
     if lay and poly:
@@ -1012,15 +1013,15 @@ def build_tile(t):
         if kind in ('pine', 'oak', 'birch', 'poplar') and rnd.random() < .5:
             extra.append([rnd.choice(('bush', 'rock', 'bush')), gx + (rnd.random() - .5) * .14, gy + .08])
     items += extra
-    sq = lay['tc'] if lay and len(city) > 1 else None
-    sq_r = (lay['sq'] + .12) if sq is not None else 0
+    sq = lay['tc'] if lay else None
+    sq_r = (lay['sq'] + (.12 if len(city) > 1 else .19)) if sq is not None else 0   # a small keep needs room to be seen
     for kind, gx, gy in sorted(items, key=lambda it: -it[2]):
         x, y = max(-.39, min(.39, gx)) * 2, -max(-.39, min(.39, gy)) * 2
         q = Vector((x, y))
         if any((q - c).length < .26 for c in towers) or (sq is not None and (q - sq).length < sq_r):
             continue
-        if kind == 'tower' and lay and lay['big']:
-            continue   # a big town has its keep on the square
+        if kind == 'tower' and lay:
+            continue   # every town has its keep
         if y < y0 + .12:
             continue
         if 'fort' in t['features'] and kind not in PROPS:

@@ -310,9 +310,10 @@ function drawTile(id) {
     const city = idx('c'), Kp = g.getTransform().a;
     const tc = city.length === 4 ? C : (() => {
       const m = city.reduce((o, d) => [o[0] + mid[d][0], o[1] + mid[d][1]], [0, 0]).map(v => v / city.length);
-      return [C[0] + (m[0] - C[0]) * .5, C[1] + (m[1] - C[1]) * .5];
+      const f = city.length === 1 ? .72 : .5;   // a small town keeps its keep deep inside, clear of the wall tower
+      return [C[0] + (m[0] - C[0]) * f, C[1] + (m[1] - C[1]) * f];
     })();
-    const big = city.length >= 3, SQ = big ? 30 : 18, STALL_R = big ? 25 : 16;
+    const big = city.length >= 3, SQ = big ? 30 : 24, STALL_R = big ? 25 : 21, KEEP = big ? 1 : city.length > 1 ? .78 : .62;
     const stalls = city.length > 1 ? [45, 135, 225, 315].map(a => [tc[0] + Math.cos(a * Math.PI / 180) * STALL_R, tc[1] + Math.sin(a * Math.PI / 180) * STALL_R, a]) : [];
     const lanes = city.map(d => {
       const side = d % 2 ? 1 : -1, k2 = [(mid[d][0] + tc[0]) / 2 + V[d][1] * 6 * side, (mid[d][1] + tc[1]) / 2 - V[d][0] * 6 * side], pts = [];
@@ -331,34 +332,38 @@ function drawTile(id) {
       for (const pts of lanes) { g.beginPath(); pts.forEach((q, i) => i ? g.lineTo(...q) : g.moveTo(...q)); g.lineWidth = lw; g.strokeStyle = col; g.setLineDash(dash || []); g.stroke(); }
     }
     g.setLineDash([]);
+    // every town has its keep: a stone square with a courtyard, four round corner towers and a banner
+    // (smaller in a small town); tools/blender_generators/generate_tiles.py builds it on the same spot (p_keep)
+    const keep = (kx, ky, k) => {
+      g.save(); g.translate(kx, ky); g.scale(k, k);
+      g.fillStyle = 'rgba(30,18,8,.35)'; g.fillRect(-9, -7.5, 20, 20);
+      g.fillStyle = '#7d7464'; g.fillRect(-10.5, -10.5, 21, 21);
+      g.fillStyle = '#cfc4ad'; g.fillRect(-9, -9, 18, 18);
+      g.fillStyle = '#b0a58e'; g.fillRect(-5, -5, 10, 10);
+      g.fillStyle = '#7d7464'; for (let k3 = -8; k3 <= 8; k3 += 4) { g.fillRect(k3 - .8, -10.5, 1.6, 1.6); g.fillRect(k3 - .8, 8.9, 1.6, 1.6); g.fillRect(-10.5, k3 - .8, 1.6, 1.6); g.fillRect(8.9, k3 - .8, 1.6, 1.6); }
+      for (const [sx, sy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
+        const tx = sx * 10, ty = sy * 10;
+        g.fillStyle = '#6d665a'; g.beginPath(); g.arc(tx, ty, 4.6, 0, 7); g.fill();
+        const rg = g.createRadialGradient(tx - 1, ty - 1.2, .4, tx, ty, 3.8); rg.addColorStop(0, '#f08a68'); rg.addColorStop(.6, '#c8503a'); rg.addColorStop(1, '#8f3020');
+        g.fillStyle = rg; g.beginPath(); g.arc(tx, ty, 3.6, 0, 7); g.fill();
+      }
+      // the banner seen from above: a swallow-tailed cloth with its shadow and a gold finial
+      g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.moveTo(1.2, .2); g.quadraticCurveTo(4.5, -.6, 8.2, 1); g.lineTo(6.6, 2.4); g.lineTo(8.2, 3.8); g.quadraticCurveTo(4.5, 4.6, 1.2, 3.6); g.fill();
+      g.fillStyle = '#d9361f'; g.beginPath(); g.moveTo(0, -1.2); g.quadraticCurveTo(3.5, -2.2, 7.2, -.4); g.lineTo(5.6, 1); g.lineTo(7.2, 2.4); g.quadraticCurveTo(3.5, 3.4, 0, 2.2); g.fill();
+      g.fillStyle = '#f2c14e'; g.fillRect(0, -1.3, .9, 3.6); g.beginPath(); g.arc(0, -1.4, .9, 0, 7); g.fill();
+      g.restore();
+    };
     const square = city.length > 1;
-    if (square) {   // the square: a paved round, the well (two sides) or the keep (three or four)
+    if (square) {   // the square: a paved round with the keep in the middle
       g.fillStyle = 'rgba(120,92,60,.4)'; g.beginPath(); g.arc(tc[0], tc[1], SQ + 1.5, 0, 7); g.fill();
       g.fillStyle = '#e4d2ad'; g.beginPath(); g.arc(tc[0], tc[1], SQ, 0, 7); g.fill();
       g.strokeStyle = 'rgba(150,120,80,.35)'; g.lineWidth = .7; for (let r2 = 5; r2 < SQ; r2 += 4.5) { g.beginPath(); g.arc(tc[0], tc[1], r2, 0, 7); g.stroke(); }
-      if (!big) {
-        g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.arc(tc[0] + 1, tc[1] + 1.4, 4.6, 0, 7); g.fill();
-        g.fillStyle = '#8f8778'; g.beginPath(); g.arc(tc[0], tc[1], 4.4, 0, 7); g.fill();
-        g.fillStyle = '#2f7fc0'; g.beginPath(); g.arc(tc[0], tc[1], 2.6, 0, 7); g.fill();
-        g.fillStyle = 'rgba(255,255,255,.7)'; g.beginPath(); g.arc(tc[0] - .8, tc[1] - .8, .8, 0, 7); g.fill();
-      } else {   // the keep: a stone square with a courtyard and four round corner towers
-        const kx = tc[0], ky = tc[1];
-        g.fillStyle = 'rgba(30,18,8,.35)'; g.fillRect(kx - 9, ky - 7.5, 20, 20);
-        g.fillStyle = '#7d7464'; g.fillRect(kx - 10.5, ky - 10.5, 21, 21);
-        g.fillStyle = '#cfc4ad'; g.fillRect(kx - 9, ky - 9, 18, 18);
-        g.fillStyle = '#b0a58e'; g.fillRect(kx - 5, ky - 5, 10, 10);
-        g.fillStyle = '#7d7464'; for (let k3 = -8; k3 <= 8; k3 += 4) { g.fillRect(kx + k3 - .8, ky - 10.5, 1.6, 1.6); g.fillRect(kx + k3 - .8, ky + 8.9, 1.6, 1.6); g.fillRect(kx - 10.5, ky + k3 - .8, 1.6, 1.6); g.fillRect(kx + 8.9, ky + k3 - .8, 1.6, 1.6); }
-        for (const [sx, sy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
-          const tx = kx + sx * 10, ty = ky + sy * 10;
-          g.fillStyle = '#6d665a'; g.beginPath(); g.arc(tx, ty, 4.6, 0, 7); g.fill();
-          const rg = g.createRadialGradient(tx - 1, ty - 1.2, .4, tx, ty, 3.8); rg.addColorStop(0, '#f08a68'); rg.addColorStop(.6, '#c8503a'); rg.addColorStop(1, '#8f3020');
-          g.fillStyle = rg; g.beginPath(); g.arc(tx, ty, 3.6, 0, 7); g.fill();
-        }
-        // the banner over the keep, seen from above: a swallow-tailed cloth with its shadow and a gold finial
-        g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.moveTo(kx + 1.2, ky + .2); g.quadraticCurveTo(kx + 4.5, ky - .6, kx + 8.2, ky + 1); g.lineTo(kx + 6.6, ky + 2.4); g.lineTo(kx + 8.2, ky + 3.8); g.quadraticCurveTo(kx + 4.5, ky + 4.6, kx + 1.2, ky + 3.6); g.fill();
-        g.fillStyle = '#d9361f'; g.beginPath(); g.moveTo(kx, ky - 1.2); g.quadraticCurveTo(kx + 3.5, ky - 2.2, kx + 7.2, ky - .4); g.lineTo(kx + 5.6, ky + 1); g.lineTo(kx + 7.2, ky + 2.4); g.quadraticCurveTo(kx + 3.5, ky + 3.4, kx, ky + 2.2); g.fill();
-        g.fillStyle = '#f2c14e'; g.fillRect(kx, ky - 1.3, .9, 3.6); g.beginPath(); g.arc(kx, ky - 1.4, .9, 0, 7); g.fill();
-      }
+    } else {        // a small town: a little paved yard round its keep
+      g.fillStyle = 'rgba(120,92,60,.4)'; g.beginPath(); g.arc(tc[0], tc[1], 11.5, 0, 7); g.fill();
+      g.fillStyle = '#e4d2ad'; g.beginPath(); g.arc(tc[0], tc[1], 10.5, 0, 7); g.fill();
+    }
+    keep(tc[0], tc[1], KEEP);
+    if (square) {
       // market stalls round the square: a striped awning over a counter, turned to the middle
       const AWN = [['#d9433a', '#f4ece0'], ['#3f78c8', '#eef2f8'], ['#e0a83a', '#fbf2dc'], ['#3fa060', '#eef8f0']];
       stalls.forEach(([sx, sy, a], i) => {
@@ -377,7 +382,7 @@ function drawTile(id) {
       const px = x + (R() - .5) * 6, py = y + (R() - .5) * 6;
       if (!g.isPointInPath(cp.fill, px * Kp, py * Kp)) continue;
       if (cp.wall) { g.lineWidth = 20; if (g.isPointInStroke(cp.wall, px * Kp, py * Kp)) continue; }
-      if (laneDist(px, py) < 9 || (square && Math.hypot(px - tc[0], py - tc[1]) < SQ + 7)) continue;
+      if (laneDist(px, py) < 9 || Math.hypot(px - tc[0], py - tc[1]) < (square ? SQ + 7 : 18)) continue;
       homes.push([px, py]);
     }
     for (const [px, py] of homes) {
