@@ -5834,69 +5834,6 @@ function devPanel() {
       if (!r.ok) { st.textContent = `Токен сохранён, но у GitHub ответ ${r.status}: проверьте права Actions (чтение и запись)`; return; }
       return draw();
     }
-    if (id === 'devPromote') {
-      const tok = devGet('devToken');
-      if (!tok) return toastAny('Сначала сохраните токен GitHub выше');
-      const pst = box.querySelector('#devPromoteState') || st;
-      const isMandatory = !!(box.querySelector('#devMandatory') && box.querySelector('#devMandatory').checked);
-
-      pst.textContent = 'Проверяем статус релизов на GitHub...';
-      let nextVer = '1.0.X';
-      try {
-        const relRes = await fetch('https://api.github.com/repos/' + DEV_REPO + '/releases/latest').then(r => r.ok ? r.json() : null);
-        const curCode = relRes ? parseInt(relRes.tag_name.replace(/\D/g, ''), 10) : 262;
-        nextVer = '1.0.' + (curCode + 1);
-      } catch (_) {}
-
-      const goPromote = async () => {
-        e.target.disabled = true;
-        pst.innerHTML = '<b style="color:#f6ad55">⏳ Запускаем выпуск версии ' + nextVer + '...</b>';
-        try {
-          const r = await gh('/actions/workflows/promote-production.yml/dispatches', {
-            method: 'POST',
-            body: JSON.stringify({ref: 'main', inputs: {mandatory: isMandatory ? 'true' : 'false'}})
-          });
-          if (r.status !== 204) {
-            pst.textContent = r.status === 401 || r.status === 403 ? 'Нет прав — проверьте токен (Actions: Read and write)' : 'GitHub ответил ' + r.status;
-            e.target.disabled = false;
-            return;
-          }
-        } catch (_) {
-          pst.textContent = 'Нет связи с GitHub';
-          e.target.disabled = false;
-          return;
-        }
-
-        toastAny('🚀 Выпуск ' + nextVer + ' запущен! Собираем боевой APK...');
-        pst.innerHTML = '<b style="color:#f6ad55">🟡 Идёт сборка версии ' + nextVer + ' на сервере...</b>';
-
-        for (let i = 0; i < 25 && box.isConnected; i++) {
-          await new Promise(r => setTimeout(r, i ? 8000 : 3000));
-          try {
-            const r2 = await gh('/actions/workflows/promote-production.yml/runs?per_page=1');
-            if (r2.ok) {
-              const run = ((await r2.json()).workflow_runs || [])[0];
-              if (run) {
-                if (run.status === 'completed') {
-                  const win = run.conclusion === 'success';
-                  pst.innerHTML = win
-                    ? '<b style="color:#48bb78">🟢 Боевой релиз ' + nextVer + ' успешно опубликован!</b>'
-                    : '<b style="color:#f56565">❌ Сборка завершилась ошибкой. Проверьте GitHub Actions.</b>';
-                  toastAny(win ? 'Боевой релиз ' + nextVer + ' успешно опубликован!' : 'Ошибка сборки');
-                  break;
-                } else {
-                  pst.innerHTML = '<b style="color:#f6ad55">⏳ Идёт автосборка #' + run.run_number + ' (' + run.status + ')...</b>';
-                }
-              }
-            }
-          } catch (_) {}
-        }
-        e.target.disabled = false;
-      };
-
-      confirmBox('Выпустить версию ' + nextVer + ' на боевой сервер для ВСЕХ игроков?' + (isMandatory ? '\n(Обязательное обновление)' : ''), '🚀 Выпустить в боевую', goPromote);
-      return;
-    }
     if (id !== 'devSend') return;
     const title = box.querySelector('#devTitle').value.trim(), body = box.querySelector('#devBody').value.trim(), test = box.querySelector('#devTest').checked;
     if (!title || !body) return toastAny('Нужны заголовок и текст');
@@ -7525,12 +7462,10 @@ window.onUpdateAvailable = (info, manual) => {
   lastUpd = info;
   if (typeof updateSettingsUpdateBtn === 'function') updateSettingsUpdateBtn(info);
 
-  const curCode = appCode();
-  const minCode = window.MIN_REQUIRED_CODE || (info && info.minRequiredCode) || 0;
   // Determine whether this update is mandatory (breaking protocol, desync fix, or admin enforced)
   const isMandatory = (typeof PG !== 'undefined' && PG.app && PG.app.update && PG.app.update.isUpdateMandatory)
-    ? PG.app.update.isUpdateMandatory(info, minCode, curCode)
-    : !!(info && (info.mandatory === true || info.force === true || (minCode > 0 && curCode > 0 && curCode < minCode)));
+    ? PG.app.update.isUpdateMandatory(info, window.MIN_REQUIRED_CODE || 0)
+    : !!(info && (info.mandatory === true || info.force === true || (window.MIN_REQUIRED_CODE && info.code <= window.MIN_REQUIRED_CODE)));
 
   // If update is optional (not mandatory) and check was automatic (on startup or periodic),
   // do NOT interrupt the player with a blocking popup dialog!
@@ -7690,26 +7625,19 @@ async function checkMaintenance() {
   } catch (_) {}
 }
 async function checkUpdatePolicy() {
-  let minCode = 0;
-  if (typeof FB !== 'undefined' && FB && FB.dbUrl) {
-    try {
-      const r = await fetch(`${FB.dbUrl}/config/update.json`);
-      if (r.ok) {
-        const cfg = await r.json();
-        if (cfg && cfg.minRequiredCode) minCode = cfg.minRequiredCode;
+  if (typeof FB === 'undefined' || !FB || !FB.dbUrl) return;
+  try {
+    const r = await fetch(`${FB.dbUrl}/config/update.json`);
+    if (!r.ok) return;
+    const cfg = await r.json();
+    if (cfg && cfg.minRequiredCode) {
+      window.MIN_REQUIRED_CODE = cfg.minRequiredCode;
+      if (lastUpd) {
+        if (typeof updateSettingsUpdateBtn === 'function') updateSettingsUpdateBtn(lastUpd);
+        if (appCode() < cfg.minRequiredCode) window.onUpdateAvailable(lastUpd, false);
       }
-    } catch (_) {}
-  }
-  if (!minCode && lastUpd && lastUpd.minRequiredCode) {
-    minCode = lastUpd.minRequiredCode;
-  }
-  if (minCode) {
-    window.MIN_REQUIRED_CODE = minCode;
-    if (lastUpd) {
-      if (typeof updateSettingsUpdateBtn === 'function') updateSettingsUpdateBtn(lastUpd);
-      if (appCode() < minCode) window.onUpdateAvailable(lastUpd, false);
     }
-  }
+  } catch (_) {}
 }
 // Checked at start, on every return to the app, and every minute while the maintenance screen is up.
 document.addEventListener('visibilitychange', () => { if (!document.hidden) checkMaintenance(); });

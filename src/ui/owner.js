@@ -77,23 +77,13 @@ export function renderDevPanelCardHtml({tok, devTitle, devBody, devTestOn, siteU
     <p class="shint" id="devState">Проверяем…</p>
     <button class="linkbtn" id="devForget">Сменить токен GitHub</button>
   ` : `
-    <p>Действия основателя выполняются через GitHub Actions. Нужен ваш токен: GitHub → Settings → Developer settings → Personal access tokens → репозиторий ${curRepo}, разрешение «Actions: Read and write». Токен хранится только на этом устройстве.</p>
+    <p>Пуш уходит через GitHub. Нужен ваш токен: GitHub → Settings → Developer settings → Fine-grained tokens → репозиторий ${curRepo}, разрешение «Actions: Read and write». Токен хранится только на этом телефоне.</p>
     <input class="field" id="devTok" type="password" placeholder="github_pat_…" autocomplete="off">
     <button class="cta wide" id="devSave">Сохранить</button><p class="shint" id="devState"></p>
   `;
 
-  return `<div class="ocard dev"><div style="font-size:38px">👑</div><h3>Панель основателя</h3>
-    <div style="background:rgba(255,255,255,0.03);border:1px solid rgba(255,255,255,0.08);border-radius:12px;padding:12px;display:flex;flex-direction:column;gap:8px;margin-bottom:12px">
-      <b style="font-size:14px;color:#fff">🚀 Выпуск на боевой сервер (Production)</b>
-      <p style="font-size:12px;color:#a0aec0;margin:0;line-height:1.4">Сборка боевого APK, AAB для Google Play и обновление сайта в один клик прямо из приложения.</p>
-      <label style="display:flex;align-items:center;gap:6px;font-size:12px;color:#cbd5e0;cursor:pointer"><input type="checkbox" id="devMandatory"> Обязательное обновление (требует установки для онлайна)</label>
-      <button class="cta wide" id="devPromote" style="background:linear-gradient(135deg,#e53e3e,#dd6b20);color:#fff;font-weight:700">🚀 Выпустить в боевую версию</button>
-      <p class="shint" id="devPromoteState" style="margin:0"></p>
-    </div>
-    <div style="border-top:1px solid rgba(255,255,255,0.08);padding-top:10px;margin-bottom:10px">
-      <b style="font-size:13px;color:#cbd5e0">📢 Сообщение всем игрокам (FCM)</b>
-      ${content}
-    </div>
+  return `<div class="ocard dev"><div style="font-size:38px">📣</div><h3>Сообщение всем игрокам</h3>
+    ${content}
     <button class="ghostbtn" id="devStats">📊 Статистика игры</button>
     <a class="ghostbtn devlink" href="${siteUrl || '/'}admin/" target="_blank" rel="noopener">🛠 Админ-панель и отзывы на сайте</a>
     <button class="ghostbtn" id="devClose">Закрыть</button></div>`;

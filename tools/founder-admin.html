@@ -280,12 +280,6 @@ body:not(.authed) main > .card:not(#loginCard) { display: none; }
       <div id="releaseNotesContent" style="font-size:12.5px;color:var(--fg);line-height:1.5;max-height:140px;overflow-y:auto;white-space:pre-wrap;background:rgba(0,0,0,0.2);padding:8px 10px;border-radius:6px">Загрузка release-notes.md…</div>
     </div>
 
-    <!-- GitHub Token status bar -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:8px 12px;border-radius:8px;background:rgba(255,255,255,0.02);border:1px solid var(--border);font-size:12px">
-      <span style="color:var(--muted)">GitHub API (выпуск в 1 клик): <b id="ghTokenStatus" style="color:var(--warning)">проверяем...</b></span>
-      <button class="btn btn-sm" id="btnEditGhToken" style="font-size:11px;padding:3px 8px">⚙️ Настроить токен</button>
-    </div>
-
     <!-- Pipeline status indicator -->
     <div id="ciStatusBox" style="display:flex;align-items:center;justify-content:space-between;padding:10px 12px;border-radius:8px;background:rgba(255,255,255,0.03);border:1px solid var(--border)">
       <div style="display:flex;align-items:center;gap:8px;font-size:13px">
@@ -633,27 +627,9 @@ $('btnDisableMaint').onclick = async () => {
 /* ---------- update policy ---------- */
 async function loadUpdatePolicy() {
   try {
-    let u = null;
-    if (auth) {
-      try { u = await db('config/update'); } catch (_) {}
-    }
-    if (!u) {
-      const r = await fetch(`${DB}/config/update.json`).catch(() => null);
-      if (r && r.ok) u = await r.json();
-    }
-    if (!u) {
-      const r2 = await fetch(`https://api.github.com/repos/${REPO}/releases/latest`).catch(() => null);
-      const rel = r2 && r2.ok ? await r2.json() : null;
-      if (rel) {
-        const ast = (rel.assets || []).find(a => a.name === 'latest.json');
-        if (ast) {
-          const r3 = await fetch(ast.browser_download_url).catch(() => null);
-          const j = r3 && r3.ok ? await r3.json() : null;
-          if (j) u = { nextMandatory: !!j.mandatory, minRequiredCode: j.minRequiredCode || 0 };
-        }
-      }
-    }
-    const isNextMandatory = !!(u && (u.nextMandatory || u.mandatory));
+    const r = await fetch(`${DB}/config/update.json`);
+    const u = r.ok ? await r.json() : null;
+    const isNextMandatory = !!(u && u.nextMandatory);
     $('updatePolicyBadge').textContent = isNextMandatory ? 'СЛЕДУЮЩЕЕ: ОБЯЗАТЕЛЬНОЕ 🚨' : 'Следующее: Необязательное 🟢';
     $('updatePolicyBadge').style.color = isNextMandatory ? 'var(--danger)' : 'var(--success)';
     if (u && u.minRequiredCode) $('inputMinCode').value = u.minRequiredCode;
@@ -837,90 +813,9 @@ const ACTIONS = `https://github.com/${REPO}/actions/workflows/`;
 const openWorkflow = (file, what) => { log('Открываю ' + file + ': нажмите «Run workflow» (ветка main), чтобы ' + what); window.open(ACTIONS + file, '_blank', 'noopener'); };
 if ($('btnReloadChanges')) $('btnReloadChanges').onclick = () => loadUnreleasedChanges(latestProdTag);
 
-function getGhToken() {
-  return localStorage.getItem('ghToken') || localStorage.getItem('devToken') || '';
-}
-
-function updateGhTokenUi() {
-  const tok = getGhToken();
-  const el = $('ghTokenStatus');
-  if (!el) return;
-  if (tok) {
-    el.textContent = '● Подключён (запуск в 1 клик)';
-    el.style.color = 'var(--success)';
-  } else {
-    el.textContent = 'Не настроен (нажмите Настроить)';
-    el.style.color = 'var(--warning)';
-  }
-}
-
-if ($('btnEditGhToken')) {
-  $('btnEditGhToken').onclick = () => {
-    const cur = getGhToken();
-    const val = prompt('Введите токен GitHub (Personal Access Token с правами Actions: Read & Write):', cur ? '••••••••' : '');
-    if (val === null) return;
-    const clean = val.trim();
-    if (!clean || clean === '••••••••') {
-      if (!clean) {
-        localStorage.removeItem('ghToken');
-        localStorage.removeItem('devToken');
-        log('Токен GitHub удалён.');
-      }
-    } else {
-      localStorage.setItem('ghToken', clean);
-      localStorage.setItem('devToken', clean);
-      log('Токен GitHub сохранён!');
-    }
-    updateGhTokenUi();
-  };
-}
-
-async function triggerWorkflowDispatch(wfFile, inputs = {}) {
-  let tok = getGhToken();
-  if (!tok) {
-    const val = prompt('Для запуска выпуска на боевой сервер в 1 клик введите ваш токен GitHub (Personal Access Token с правами Actions: Read & Write):');
-    if (!val || !val.trim()) return false;
-    tok = val.trim();
-    localStorage.setItem('ghToken', tok);
-    localStorage.setItem('devToken', tok);
-    updateGhTokenUi();
-  }
-
-  log(`Запускаю workflow ${wfFile} через GitHub API...`);
-  try {
-    const res = await fetch(`https://api.github.com/repos/${REPO}/actions/workflows/${wfFile}/dispatches`, {
-      method: 'POST',
-      headers: {
-        'Accept': 'application/vnd.github+json',
-        'Authorization': `Bearer ${tok}`,
-        'X-GitHub-Api-Version': '2022-11-28',
-        'Content-Type': 'application/json'
-      },
-      body: JSON.stringify({
-        ref: 'main',
-        inputs
-      })
-    });
-    if (res.status === 204) {
-      log(`✅ Workflow ${wfFile} успешно запущен на сервере GitHub Actions!`);
-      return true;
-    }
-    if (res.status === 401 || res.status === 403) {
-      log(`❌ Ошибка токена GitHub (${res.status}): проверьте права Actions (Read and write)`);
-      return false;
-    }
-    const errText = await res.text();
-    log(`❌ GitHub ответил ${res.status}: ${errText}`);
-    return false;
-  } catch (err) {
-    log(`❌ Ошибка вызова GitHub API: ${err.message}`);
-    return false;
-  }
-}
-
-$('btnPromote').onclick = async () => {
+$('btnPromote').onclick = () => {
   const count = unreleasedCommitsList.length;
-  const prodNum = parseInt(latestProdTag.replace(/\D/g, ''), 10) || 262;
+  const prodNum = parseInt(latestProdTag.replace(/\D/g, ''), 10) || 261;
   const nextVer = `1.0.${prodNum + 1}`;
 
   const topChanges = unreleasedCommitsList.slice(0, 5).map(c => '• ' + c.commit.message.split('\n')[0]).join('\n');
@@ -928,46 +823,19 @@ $('btnPromote').onclick = async () => {
     ? `Готово к релизу изменений: ${count}\n${topChanges}${count > 5 ? '\n• ...и ещё ' + (count - 5) + ' коммитов' : ''}`
     : 'Все текущие изменения из ветки main будут упакованы в боевой релиз.';
 
-  const isMandatory = $('updatePolicyBadge') && $('updatePolicyBadge').textContent.includes('ОБЯЗАТЕЛЬНОЕ');
-
   const msg = `🚀 ВЫПУСК ТЕСТОВОЙ СБОРКИ В БОЕВУЮ ВЕРСИЮ (${nextVer})\n\n` +
     `${changesSummary}\n\n` +
-    `Политика обновления: ${isMandatory ? '🚨 ОБЯЗАТЕЛЬНОЕ (все игроки увидят окно обновления)' : '🟢 Необязательное'}\n\n` +
-    'Что произойдёт автоматически на сервере:\n' +
+    'Что произойдёт автоматически при запуске:\n' +
     '1. Сборка официального боевого APK и Google Play AAB\n' +
     '2. Обновление боевого сайта игры на GitHub Pages\n' +
     '3. Публикация красивого поста с описанием в Telegram-канал @diarydevelopment\n' +
     '4. Отправка Push-уведомлений всем игрокам\n\n' +
-    'Выпустить версию ' + nextVer + ' на боевой сервер?';
+    'На открывшейся странице GitHub нажмите зелёную кнопку «Run workflow» (ветка main).\n\n' +
+    'Выпустить версию ' + nextVer + ' для всех игроков?';
 
-  if (!confirm(msg)) return;
-
-  const prevText = $('btnPromote').innerHTML;
-  $('btnPromote').disabled = true;
-  $('btnPromote').innerHTML = `⏳ Запуск выпуска версии ${nextVer}...`;
-
-  const ok = await triggerWorkflowDispatch('promote-production.yml', {
-    mandatory: isMandatory ? 'true' : 'false'
-  });
-
-  if (ok) {
-    $('btnPromote').innerHTML = `🚀 Выпуск ${nextVer} запущен! Идёт сборка...`;
-    let attempts = 0;
-    const interval = setInterval(async () => {
-      attempts++;
-      await checkCiStatus();
-      if (attempts > 50) {
-        clearInterval(interval);
-        $('btnPromote').disabled = false;
-        $('btnPromote').innerHTML = prevText;
-      }
-    }, 4000);
-  } else {
-    if (confirm('Не удалось запустить через API. Открыть страницу GitHub Actions для ручного запуска?')) {
-      openWorkflow('promote-production.yml', 'выпустить версию ' + nextVer + ' для всех игроков');
-    }
-    $('btnPromote').disabled = false;
-    $('btnPromote').innerHTML = prevText;
+  if (confirm(msg)) {
+    openWorkflow('promote-production.yml', 'выпустить версию ' + nextVer + ' для всех игроков');
+    setTimeout(checkCiStatus, 3000);
   }
 };
 $('btnRollback').onclick = () => openWorkflow('android.yml', 'выпустить старую версию заново (поле «Вернуть версию», например v217)');
@@ -1519,8 +1387,7 @@ $('btnErrors').onclick = loadErrors;
 if ($('btnFilterEmpty')) $('btnFilterEmpty').onclick = () => { hideEmptyGuests = !hideEmptyGuests; renderPlayers(); };
 if ($('btnPurgeEmpty')) $('btnPurgeEmpty').onclick = purgeEmptyGuests;
 
-function refreshAll() {
-  updateGhTokenUi(); loadVersions(); loadMaint(); loadUpdatePolicy(); loadPin(); loadStats(); loadFeedback(); loadNameSuggestions(); loadPlayers(); }
+function refreshAll() { loadVersions(); loadMaint(); loadUpdatePolicy(); loadPin(); loadStats(); loadFeedback(); loadNameSuggestions(); loadPlayers(); }
 if (auth) afterSignIn();
 </script>
 </body>
