@@ -2,7 +2,7 @@ name: Test APK (Tiletopia Test)
 
 on:
   push:
-    branches: [setup/test-environment, dev, 'dev/**', test, 'test/**']
+    branches: [main, dev, 'dev/**', test, 'test/**', setup/test-environment]
   pull_request:
     branches: [main]
   workflow_dispatch:
@@ -21,7 +21,7 @@ concurrency:
 
 jobs:
   build:
-    if: github.event_name == 'workflow_dispatch' || github.event_name == 'pull_request' || github.ref == 'refs/heads/setup/test-environment' || github.ref == 'refs/heads/dev' || startsWith(github.ref, 'refs/heads/dev/') || startsWith(github.ref, 'refs/heads/test')
+    if: github.event_name == 'workflow_dispatch' || github.event_name == 'push' || github.event_name == 'pull_request'
     runs-on: ubuntu-latest
     timeout-minutes: 30
     outputs:
@@ -83,10 +83,14 @@ jobs:
         if: github.event_name != 'pull_request'
         env:
           GH_TOKEN: ${{ github.token }}
+          CODE: ${{ steps.ver.outputs.code }}
+          VERSION: ${{ steps.ver.outputs.version }}
         run: |
+          python3 -c 'import json,os; c=int(os.environ["CODE"]); v=os.environ["VERSION"]; r=os.environ["GITHUB_REPOSITORY"]; json.dump({"code": c, "version": v, "notes": "Тестовая сборка " + v, "url": "https://github.com/%s/releases/download/staging-latest/Tiletopia-Test-%s.apk" % (r, v), "package": "app.crownfall.tiletopia.test"}, open("latest-staging.json", "w", encoding="utf-8"), ensure_ascii=False)'
           gh release delete staging-latest --yes || true
           gh release create staging-latest \
             "Tiletopia-Test-${{ steps.ver.outputs.version }}.apk" \
+            latest-staging.json \
             --title "Tiletopia Test (${{ steps.ver.outputs.version }})" \
             --notes "Тестовая сборка (отдельное приложение «Tiletopia Test»). Устанавливается рядом с боевой версией, не заменяет её. Пакет: app.crownfall.tiletopia.test. Версия: ${{ steps.ver.outputs.version }}" \
             --prerelease

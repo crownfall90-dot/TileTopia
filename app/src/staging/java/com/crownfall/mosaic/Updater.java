@@ -73,7 +73,7 @@ class Updater {
         boolean saidCurrent = false;
         try {
             // The release CDN may serve a stale copy for a few minutes after a release: a changing query dodges it.
-            JSONObject f = new JSONObject(get("https://github.com/" + BuildConfig.UPDATE_REPO + "/releases/latest/download/latest.json?t=" + System.currentTimeMillis(), null));
+            JSONObject f = new JSONObject(get("https://github.com/" + BuildConfig.UPDATE_REPO + "/releases/download/staging-latest/latest-staging.json?t=" + System.currentTimeMillis(), null));
             // A check the player asked for double-checks a "no update" answer with the API before saying so.
             if (f.getInt("code") <= BuildConfig.VERSION_CODE) { if (!deep) return null; saidCurrent = true; throw new java.io.IOException("no newer in latest.json"); }
             JSONObject info = new JSONObject();
@@ -93,7 +93,7 @@ class Updater {
             // An older release without latest.json, or the download failed: ask the API.
         }
         try {
-            JSONObject rel = new JSONObject(get("https://api.github.com/repos/" + BuildConfig.UPDATE_REPO + "/releases/latest", "application/vnd.github+json"));
+            JSONObject rel = new JSONObject(get("https://api.github.com/repos/" + BuildConfig.UPDATE_REPO + "/releases/tags/staging-latest", "application/vnd.github+json"));
             int code = Integer.parseInt(rel.getString("tag_name").replaceAll("[^0-9]", ""));
             if (code <= BuildConfig.VERSION_CODE) return null;
             String url = null;
