@@ -46,6 +46,8 @@ if [ "$target" = web ]; then
   touch "$site/.nojekyll"
   touch "$site/staging/.nojekyll"
   "$PY_BIN" scripts/privacy-page.py "$site/privacy.html"
+  "$PY_BIN" -c "import PIL" >/dev/null 2>&1 || "$PY_BIN" -m pip install --quiet pillow >/dev/null 2>&1 || true   # for the About-page screenshots
+  "$PY_BIN" scripts/seo.py "$site"
   "$PY_BIN" scripts/privacy-page.py "$site/privacy-en.html" docs/legal/privacy-policy-en.md "Privacy Policy — Tiletopia" en
   "$PY_BIN" scripts/privacy-page.py "$site/terms.html" docs/legal/terms.md "Пользовательское соглашение — Tiletopia" ru
   "$PY_BIN" scripts/privacy-page.py "$site/terms-en.html" docs/legal/terms-en.md "Terms of Use — Tiletopia" en
@@ -116,7 +118,11 @@ build_page() {
   if (z < .995) document.querySelector('meta[name=viewport]').setAttribute('content', 'width=' + Math.round(w / z) + ',viewport-fit=cover,user-scalable=no');
 })();
 </script>
-<meta name="description" content="Tiletopia — стройте города, дороги и крепости из общей стопки. Играйте онлайн, с друзьями и с ботами.">
+<meta name="description" content="Tiletopia — бесплатная настольная игра с плитками. Стройте города, дороги и монастыри из общей стопки, играйте онлайн с друзьями, с ботами или за одним телефоном. Без рекламы.">
+<link rel="canonical" href="https://crownfall90-dot.github.io/TileTopia/">
+<link rel="alternate" hreflang="ru" href="https://crownfall90-dot.github.io/TileTopia/about.html"><link rel="alternate" hreflang="en" href="https://crownfall90-dot.github.io/TileTopia/about-en.html">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Tiletopia"><meta property="og:url" content="https://crownfall90-dot.github.io/TileTopia/"><meta property="og:locale" content="ru_RU">
+<meta name="twitter:card" content="summary">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -124,7 +130,7 @@ build_page() {
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Tiletopia">
-<meta property="og:title" content="Tiletopia"><meta property="og:description" content="Стройте города, дороги и крепости — играйте с друзьями онлайн"><meta property="og:image" content="icons/icon-512.png">
+<meta property="og:title" content="Tiletopia — настольная игра с плитками"><meta property="og:description" content="Стройте города, дороги и монастыри — играйте с друзьями онлайн. Бесплатно, без рекламы."><meta property="og:image" content="https://crownfall90-dot.github.io/TileTopia/icons/icon-512.png">
 <script>
 (function () {
   setTimeout(function () {
@@ -136,6 +142,7 @@ build_page() {
 HEAD
       if [ "$staging" = "true" ]; then
         printf '<script>window.WEBAPP = true; window.IS_STAGING = true; window.WEB_VERSION = "%s";</script>\n' "$vstring"
+        printf '<meta name="robots" content="noindex,nofollow">\n'
       else
         printf '<script>window.WEBAPP = true; window.IS_STAGING = false; window.WEB_VERSION = "%s";</script>\n' "$vstring"
       fi
