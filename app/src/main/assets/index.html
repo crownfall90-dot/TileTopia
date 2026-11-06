@@ -5526,6 +5526,12 @@ html body .tile-toast,html body .note{top:auto;bottom:calc(86px + var(--ib,0px))
 html body .legal{display:block;margin:2px 0 10px;color:var(--muted);font:500 11px/1.4 var(--f-body);text-align:center}
 html body .legal a{color:#8db4ff;text-decoration:underline;word-break:normal}
 .mgrid .mcard:last-child:nth-child(odd){grid-column:1/-1}
+
+/* the consent window: the short reason first, the exact list one tap away */
+html body .ocard details.more{margin:2px 0 12px;text-align:left}
+html body .ocard details.more summary{cursor:pointer;color:#8db4ff;font:600 13px var(--f-body);text-align:center;list-style:none}
+html body .ocard details.more p{margin:8px 0 0;font-size:12.5px;line-height:1.45;color:var(--muted)}
+html body .ocard details.more a{color:#8db4ff}
 </style>
 
 <div class="page">
@@ -12652,7 +12658,7 @@ function askStats() {
   if (wallet.statsAsked || tut || document.getElementById('statsBox')) return;
   if (document.querySelector('.over:not(#over):not([hidden])') || document.hidden) { if (++statsAskTries < 6) setTimeout(askStats, 3000); return; }
   const b = document.createElement('div'); b.className = 'over'; b.id = 'statsBox'; b.style.position = 'fixed';
-  b.innerHTML = `<div class="ocard"><div style="font-size:40px">📊</div><h3>Помочь улучшить игру?</h3><p>Разрешите анонимную статистику: только числа о том, какие экраны и кнопки используются, и события вроде «сыграна партия». Без текстов, имён и почты. Это можно изменить в «Настройки» → «Статистика».</p><button class="cta wide" id="statsYes">Разрешить</button><button class="ghostbtn" id="statsNo">Не сейчас</button></div>`;
+  b.innerHTML = `<div class="ocard"><div style="font-size:40px">📊</div><h3>Помочь улучшить игру?</h3><p>Мы смотрим, какими экранами и кнопками пользуются, чтобы убрать лишнее и сделать игру удобнее. Только числа, без имён и текстов.</p><details class="more"><summary>Что именно собирается</summary><p>Какие экраны открыты и какие кнопки нажаты (счётчиками по дням), события вроде «сыграна партия», модель устройства и версия игры, сбои. Не собираем имя, почту, переписку и местоположение. Хранится до 12 месяцев. Выключить можно в «Настройки» → «Статистика». Подробнее — в <a href="https://crownfall90-dot.github.io/TileTopia/privacy.html" target="_blank" rel="noopener">Политике конфиденциальности</a>.</p></details><button class="cta wide" id="statsYes">Разрешить</button><button class="ghostbtn" id="statsNo">Не сейчас</button></div>`;
   document.body.append(b);
   const done = on => { wallet.stats = on; wallet.statsAsked = true; saveWallet(); applyStatsConsent(); b.remove(); };
   b.querySelector('#statsYes').onclick = () => done(true);

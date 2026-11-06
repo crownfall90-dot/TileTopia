@@ -92,3 +92,11 @@ test('consent: statistics need a yes, errors and security events do not; the set
   assert.match(fs.readFileSync(__dirname + '/../app/src/main/java/com/crownfall/mosaic/MainActivity.java', 'utf8'), /setAnalyticsCollectionEnabled\(on\)/);
   for (const f of ['privacy-policy-en.md', 'terms.md', 'terms-en.md', 'THIRD-PARTY.md', 'OWNER-TODO.md', 'LEGAL-MEMO.md']) assert.ok(fs.existsSync(__dirname + '/../docs/legal/' + f), f);
 });
+
+test('consent window: a short plain reason, and the exact list of what is collected one tap away', () => {
+  const html = require('node:fs').readFileSync(__dirname + '/../web/game.html', 'utf8');
+  const box = html.slice(html.indexOf("id = 'statsBox'"), html.indexOf("id=\"statsNo\""));
+  assert.match(box, /убрать лишнее и сделать игру удобнее/, 'the purpose is named');
+  assert.match(box, /<details class="more">/, 'the details are one tap away');
+  for (const w of ['Какие экраны открыты', 'модель устройства', 'Не собираем имя, почту', 'до 12 месяцев', 'privacy.html']) assert.ok(box.includes(w), w);
+});
