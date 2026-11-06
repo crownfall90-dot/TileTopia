@@ -582,6 +582,31 @@ def p_house(tm, c, yaw, kind, s=1.0):
         tm.box((q.x, q.y, q.z), .045 * s, .045 * s, .14 * s, yaw, 'chimney')
 
 
+def banner(tm, top, s=1.0, pole=.16):
+    """A banner like the one on the game's tower sprite: a pole with a gold finial and a swallow-tailed cloth
+    waving in the wind (both sides), a gold band at the hoist."""
+    x, y, z = top
+    tm.cylinder((x, y, z), .006 * s, pole * s, 5, 'rail')
+    tm.blob((x, y, z + pole * s + .008 * s), .013 * s, 'gold', sub=1)
+    L, Hh = .19 * s, .095 * s
+    cols = 6
+    z1 = z + pole * s - .006 * s
+    def pt(i, j):
+        u = i / cols
+        wave = math.sin(u * 5.2 + .6) * .016 * s * u
+        x0 = x + .004 + u * L
+        zz = z1 - j * Hh - (.006 * s * u if j else 0)
+        if i == cols and j == .5:
+            x0 -= L * .22   # the notch of the swallow tail
+        return Vector((x0, y + wave, zz))
+    for i in range(cols):
+        for j0, j1 in ((0, .5), (.5, 1)):
+            a, b, c, d = pt(i, j0), pt(i + 1, j0), pt(i + 1, j1), pt(i, j1)
+            mat = 'gold' if i == 0 else 'flag'
+            tm.face([a, b, c, d], mat)
+            tm.face([d, c, b, a], mat)
+
+
 def p_tower(tm, c, s=1.0):
     """A round keep with a red cone roof and a flag — the castles of the icon and the banner — on a stone body."""
     x, y, z = c
@@ -595,10 +620,7 @@ def p_tower(tm, c, s=1.0):
         a = 2 * math.pi * k / 10
         tm.box((x + math.cos(a) * r * 1.08, y + math.sin(a) * r * 1.08, z + h + .07 * s), .06 * s, .05 * s, .05 * s, a, 'stone')
     tm.cone((x, y, z + h + .07 * s), r * 1.05, .34 * s, 10, 'roof_red')
-    tm.cylinder((x, y, z + h + .38 * s), .006 * s, .16 * s, 4, 'beam')
-    f0 = Vector((x, y, z + h + .54 * s))
-    tm.face([f0, f0 + Vector((.12 * s, 0, -.03 * s)), f0 + Vector((0, 0, -.07 * s))], 'flag')
-    tm.face([f0 + Vector((0, 0, -.07 * s)), f0 + Vector((.12 * s, 0, -.03 * s)), f0], 'flag')
+    banner(tm, (x, y, z + h + .38 * s), s)
     front = Vector((0, -1, 0))
     for zz in (.28, .46):   # arrow slits and a gate, facing the camera side
         q = Vector((x, y - r - .003, z + zz * s))
@@ -796,10 +818,7 @@ def p_keep(tm, c):
         q = (x + sx * s / 2, y + sy * s / 2)
         tm.cylinder((q[0], q[1], z), .048, .29, 8, 'stone')
         tm.cone((q[0], q[1], z + .29), .058, .12, 8, 'roof_red')
-    tm.cylinder((x, y, z + .2), .005, .2, 4, 'beam')
-    f0 = Vector((x, y, z + .4))
-    tm.face([f0, f0 + Vector((.09, 0, -.025)), f0 + Vector((0, 0, -.055))], 'flag')
-    tm.face([f0 + Vector((0, 0, -.055)), f0 + Vector((.09, 0, -.025)), f0], 'flag')
+    banner(tm, (x, y, z + .2), .85, pole=.24)
     q = Vector((x, y - s / 2 - .002, z))
     tm.face([q + Vector((-.03, 0, 0)), q + Vector((.03, 0, 0)), q + Vector((.03, 0, .07)), q + Vector((0, 0, .09)), q + Vector((-.03, 0, .07))], 'door')
 

@@ -354,7 +354,10 @@ function drawTile(id) {
           const rg = g.createRadialGradient(tx - 1, ty - 1.2, .4, tx, ty, 3.8); rg.addColorStop(0, '#f08a68'); rg.addColorStop(.6, '#c8503a'); rg.addColorStop(1, '#8f3020');
           g.fillStyle = rg; g.beginPath(); g.arc(tx, ty, 3.6, 0, 7); g.fill();
         }
-        g.fillStyle = '#d9291f'; g.beginPath(); g.moveTo(kx, ky - 1); g.lineTo(kx + 6, ky + .5); g.lineTo(kx, ky + 2); g.fill();
+        // the banner over the keep, seen from above: a swallow-tailed cloth with its shadow and a gold finial
+        g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.moveTo(kx + 1.2, ky + .2); g.quadraticCurveTo(kx + 4.5, ky - .6, kx + 8.2, ky + 1); g.lineTo(kx + 6.6, ky + 2.4); g.lineTo(kx + 8.2, ky + 3.8); g.quadraticCurveTo(kx + 4.5, ky + 4.6, kx + 1.2, ky + 3.6); g.fill();
+        g.fillStyle = '#d9361f'; g.beginPath(); g.moveTo(kx, ky - 1.2); g.quadraticCurveTo(kx + 3.5, ky - 2.2, kx + 7.2, ky - .4); g.lineTo(kx + 5.6, ky + 1); g.lineTo(kx + 7.2, ky + 2.4); g.quadraticCurveTo(kx + 3.5, ky + 3.4, kx, ky + 2.2); g.fill();
+        g.fillStyle = '#f2c14e'; g.fillRect(kx, ky - 1.3, .9, 3.6); g.beginPath(); g.arc(kx, ky - 1.4, .9, 0, 7); g.fill();
       }
       // market stalls round the square: a striped awning over a counter, turned to the middle
       const AWN = [['#d9433a', '#f4ece0'], ['#3f78c8', '#eef2f8'], ['#e0a83a', '#fbf2dc'], ['#3fa060', '#eef8f0']];
@@ -644,11 +647,21 @@ function drawSprites() {
     g.fillStyle = lin(g, 13.5, 0, 23.5, 0, [[0, '#6a4426'], [1, '#43291a']]); g.beginPath(); g.moveTo(13.6, 54.5); g.lineTo(13.6, 46.4); g.arc(18.5, 46.4, 4.9, Math.PI, 0); g.lineTo(23.4, 54.5); g.fill();
     g.strokeStyle = 'rgba(0,0,0,.35)'; g.lineWidth = .4; for (let x = 15.2; x < 23; x += 1.6) { g.beginPath(); g.moveTo(x, 54.5); g.lineTo(x, 43); g.stroke(); }
     g.fillStyle = '#2b2b2e'; g.fillRect(13.6, 47.5, 9.8, .8); g.fillRect(13.6, 51.5, 9.8, .8); g.fillStyle = '#c9a24a'; g.beginPath(); g.arc(20.8, 50.2, .55, 0, 7); g.fill();
-    // flag on a pole
-    g.strokeStyle = '#3a2c20'; g.lineWidth = 1; g.beginPath(); g.moveTo(19, 10); g.lineTo(19, .6); g.stroke();
-    g.fillStyle = '#e04a3a'; g.beginPath(); g.moveTo(19.4, 1); g.quadraticCurveTo(24, -.2, 30, 2.6); g.quadraticCurveTo(25, 4.6, 19.4, 6.4); g.closePath(); g.fill();
-    g.fillStyle = 'rgba(0,0,0,.2)'; g.beginPath(); g.moveTo(24, 1.4); g.quadraticCurveTo(27, 2.4, 30, 2.6); g.quadraticCurveTo(27, 3.8, 24, 5); g.closePath(); g.fill();
-    g.fillStyle = '#f6d36a'; g.beginPath(); g.arc(23, 3.7, .9, 0, 7); g.fill();
+    // a banner on a pole: swallow-tailed, waving, a gold band at the hoist, a lit fold and a shaded one, a gold finial
+    g.strokeStyle = '#3a2c20'; g.lineWidth = 1; g.beginPath(); g.moveTo(19, 10); g.lineTo(19, 1.2); g.stroke();
+    const banner = new Path2D();
+    banner.moveTo(19.4, 1.4); banner.bezierCurveTo(22.5, .2, 25.5, 2.6, 31, 1.2); banner.lineTo(28.2, 4); banner.lineTo(31, 6.8);
+    banner.bezierCurveTo(25.5, 8.2, 22.5, 5.8, 19.4, 7); banner.closePath();
+    const bg = g.createLinearGradient(19.4, 0, 31, 0); bg.addColorStop(0, '#c8341f'); bg.addColorStop(.45, '#ec5a3e'); bg.addColorStop(1, '#b02c19');
+    g.fillStyle = bg; g.fill(banner);
+    g.save(); g.clip(banner);
+    g.fillStyle = 'rgba(255,230,200,.35)'; g.beginPath(); g.ellipse(23.4, 3.6, 1.4, 4, -.15, 0, 7); g.fill();
+    g.fillStyle = 'rgba(60,10,5,.28)'; g.beginPath(); g.ellipse(27.2, 4.4, 1.3, 4, .12, 0, 7); g.fill();
+    g.fillStyle = '#f2c14e'; g.fillRect(19.4, 0, 1.3, 9);
+    g.restore();
+    g.strokeStyle = 'rgba(80,15,8,.55)'; g.lineWidth = .35; g.stroke(banner);
+    g.fillStyle = '#f6d36a'; g.beginPath(); g.arc(19, .9, 1, 0, 7); g.fill();
+    g.fillStyle = 'rgba(255,255,255,.7)'; g.beginPath(); g.arc(18.7, .6, .35, 0, 7); g.fill();
   });
   const meeple = (fill, stroke) => (g, w, h) => {
     const p = new Path2D(MEEPLE_D); g.save(); g.translate(1, 1); g.scale((w - 2) / 100, (h - 2) / 110);

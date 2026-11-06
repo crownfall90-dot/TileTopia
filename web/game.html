@@ -957,6 +957,7 @@ function placeMeeple(t, g, p, anim) {
   const el = addSprite(t.el, 'm' + p, x, y, '', anim && !fast() ? 0 : null);
   meeples.push({gid: gid(t, g), p, el, t, g}); markOwn();
   players[p].meeples--;
+  if (anim && !fast() && !tut && meCounted() && isMe(players[p])) progress({figs: 1});
 }
 function removeMeeple(m) {
   meeples.splice(meeples.indexOf(m), 1); players[m.p].meeples++; markOwn();
@@ -1395,6 +1396,7 @@ okBtn.onclick = async () => {
   phase = 'busy'; okBtn.disabled = rotBtn.disabled = true; clearSlots(); showTip();
   tutEvent('placed');
   const t = {x: sel.x, y: sel.y, type: current.type, r: current.r, seed: (Math.random() * 1e9) | 0};
+  if (meCounted() && isMe(players[turn]) && !tut) progress({tiles: 1});
   const my = token; await dropAt(t); if (my !== token) return; afterPlace(t, turn);
 };
 function tap(x, y) {
@@ -1553,7 +1555,8 @@ async function resolveFeature(c, final, placer) {
   win.forEach(i => { players[i].score += each; players[i].stats[c.kind] += each; });
   if (!final) markDone(c, win.map(i => players[i].col));
   if (!final && !fast()) {
-    win.forEach(i => { if (meCounted() && isMe(players[i])) progress({[c.kind]: 1, pts: each, cityTiles: c.kind === 'c' ? c.tiles.length : 0}); });
+    const n = c.tiles.length;
+    win.forEach(i => { if (meCounted() && isMe(players[i])) progress({[c.kind]: 1, pts: each, cityTiles: c.kind === 'c' ? n : 0, roadTiles: c.kind === 'r' ? n : 0, bigc: c.kind === 'c' && n >= 5 ? 1 : 0, longr: c.kind === 'r' && n >= 4 ? 1 : 0}); });
     if (win.length && c.tiles && c.tiles[0]) featureConfetti(c.tiles[0], players[win[0]].col);
     if (gameRules && gameRules.mode === 'epic' && (c.tiles.length >= 5 || c.tiles.some(x => TYPES[x.type] && TYPES[x.type].rare))) {
       setTimeout(() => toastAny(`🌟 Событие в Большой игре: ${KIND[c.kind]} завершён! (${c.tiles.length} карт)`), 500);
@@ -3062,6 +3065,8 @@ function setProfileName(n) {
   n = clean(n); if (!n) return false;
   wallet.name = n; wallet.nameAt = Date.now(); setup.seats[0].name = n; saveWallet(); saveSetup();
   if (typeof presenceMark === 'function') presenceMark(true);
+  // the new nickname shows at once wherever it is on screen: the main menu header and the profile
+  try { renderMenuProfile(); if (!$('#scr-profile').hidden) renderProfile(); } catch (_) {}
   return true;
 }
 function saveSetup() { try { localStorage.setItem('setup', JSON.stringify(setup)); } catch (_) {} }
@@ -4368,6 +4373,7 @@ $('#sayBox').addEventListener('click', e => {
   const me = players.findIndex(isMe); if (me < 0) return;
   $('#sayBox').hidden = true;
   sayAt = Date.now() + SAY_MS; sayLockUi(); setTimeout(() => { $('#sayBox').classList.remove('lock'); $('#sayBtn').classList.remove('cool'); }, SAY_MS);
+  if (meCounted()) progress({say: 1});
   if (net) {
     netSend({t: 'say', g: net.gameId, p: me, i: +b.dataset.say});
   } else {
@@ -4401,6 +4407,8 @@ function showSay(p, i) {
    Counted games are the ones that pay gold: you alone against bots, or online. */
 const meCounted = () => { const me = players.findIndex(isMe); return me >= 0 && (!!net || (localHumans() === 1 && !players.every(p => p.human))); };
 const {xpNeed, QUESTS, ACH, WEEKLY_QUESTS, WEEKLY_CHEST_GOLD, weekId, normalizeStats, recordGameMode} = PG.state.progress;
+// every weekly goal there can be (three core ones and the extra of each week), to look a goal up by its id
+const WEEKLY_ALL = [...WEEKLY_QUESTS, ...(PG.state.progress.WEEKLY_EXTRA || [])];
 const PROG = Object.assign({xp: 0, lvl: 1, st: {}, day: '', q: [], ach: {}, cups: 0, up: 0, cupsSeen: 0, inTop10: false, topSeen: false}, wallet.prog);
 PROG.st = normalizeStats(PROG.st);
 wallet.prog = PROG;
@@ -4408,7 +4416,7 @@ function questsWeekly() {
   const curWeek = (PG.state.progress && PG.state.progress.weekId) ? PG.state.progress.weekId() : 'w1';
   if (PROG.week === curWeek && PROG.wq && PROG.wq.length) return;
   PROG.week = curWeek;
-  PROG.wq = (WEEKLY_QUESTS || []).map(q => ({id: q.id, n: 0, got: false}));
+  PROG.wq = PG.state.progress.weeklyQuests(curWeek).map(q => ({id: q.id, n: 0, got: false}));
   PROG.wchest = false;
 }
 // Three quests a day, the same for the whole day.
@@ -4442,11 +4450,12 @@ function progress(d) {
   questsToday();
   questsWeekly();
   if (d.cityTiles) PROG.st.maxCity = Math.max(PROG.st.maxCity || 0, d.cityTiles);
+  if (d.roadTiles) PROG.st.maxRoad = Math.max(PROG.st.maxRoad || 0, d.roadTiles);
   for (const [k, v] of Object.entries(d)) {
-    if (k in PROG.st && k !== 'best' && k !== 'maxCity' && k !== 'byMode') PROG.st[k] += v;
+    if (k in PROG.st && !['best', 'maxCity', 'maxRoad', 'byMode', 'streak', 'bestStreak'].includes(k)) PROG.st[k] += v;
     PROG.q.forEach(q => { const Q = QUESTS.find(x => x.id === q.id); if (Q && Q.k === k && !q.got) q.n = Math.min(Q.n, q.n + v); });
     if (PROG.wq) {
-      PROG.wq.forEach(q => { const WQ = (WEEKLY_QUESTS || []).find(x => x.id === q.id); if (WQ && WQ.k === k && !q.got) q.n = Math.min(WQ.n, q.n + v); });
+      PROG.wq.forEach(q => { const WQ = WEEKLY_ALL.find(x => x.id === q.id); if (WQ && WQ.k === k && !q.got) q.n = Math.min(WQ.n, q.n + v); });
     }
   }
   markQuestDay(); earnedCheck();
@@ -4492,7 +4501,10 @@ function gameDone(place, score) {
   }
   // Funnel markers: the owner's panel and Analytics show where newcomers stop.
   { const n = PROG.st.games + 1; if (n <= 3) track(['first_game_done', 'second_game_done', 'third_game_done'][n - 1], {win: win ? 1 : 0, score}); }
-  progress({games: 1, win: win ? 1 : 0, wins: win ? 1 : 0, s30: score >= ((deckMax <= 30) ? 20 : 30) ? 1 : 0, online: net ? 1 : 0, ogames: net ? 1 : 0, owins: net && win ? 1 : 0});
+  PROG.st.streak = win ? (PROG.st.streak || 0) + 1 : 0;
+  PROG.st.bestStreak = Math.max(PROG.st.bestStreak || 0, PROG.st.streak);
+  const hard = !net && !isDuel && win && typeof botLevel === 'function' && botLevel() === 'hard';
+  progress({games: 1, win: win ? 1 : 0, wins: win ? 1 : 0, s30: score >= ((deckMax <= 30) ? 20 : 30) ? 1 : 0, s40: score >= 40 ? 1 : 0, online: net ? 1 : 0, ogames: net ? 1 : 0, owins: net && win ? 1 : 0, hardwin: hard ? 1 : 0, duelwin: isDuel && win ? 1 : 0});
   // Experience: a share for taking part, more for the place and for the points, half again online. A game where this
   // player laid fewer than 6 cards gives nothing (quitting early is not farming).
   const me = players.find(isMe), laid = me && me.stats ? me.stats.t || 0 : 6;
@@ -4516,7 +4528,7 @@ const rewardReady = () => {
   questsToday();
   questsWeekly();
   const qDot = PROG.q.some(q => !q.got && q.n >= QUESTS.find(x => x.id === q.id).n);
-  const wqDot = PROG.wq && (PROG.wq.some(q => !q.got && q.n >= (WEEKLY_QUESTS.find(x => x.id === q.id) || {}).n) || (!PROG.wchest && PROG.wq.every(q => q.got)));
+  const wqDot = PROG.wq && (PROG.wq.some(q => !q.got && q.n >= (WEEKLY_ALL.find(x => x.id === q.id) || {}).n) || (!PROG.wchest && PROG.wq.every(q => q.got)));
   const aDot = ACH.some(a => a.ok(PROG.st, PROG.lvl) && PROG.ach[a.id] !== 'got');
   const cDot = typeof COLLECTIONS !== 'undefined' && Array.isArray(COLLECTIONS) && typeof collectionProgress === 'function' ? COLLECTIONS.some(c => { const p = collectionProgress(c, wallet); return p.isComplete && !p.isClaimed; }) : false;
   return qDot || wqDot || aDot || cDot || !!PROG.inTop10;
@@ -4525,7 +4537,7 @@ function ptabsDot() {
   questsToday();
   questsWeekly();
   const qDot = PROG.q.some(q => !q.got && q.n >= QUESTS.find(x => x.id === q.id).n);
-  const wqDot = PROG.wq && (PROG.wq.some(q => !q.got && q.n >= (WEEKLY_QUESTS.find(x => x.id === q.id) || {}).n) || (!PROG.wchest && PROG.wq.every(q => q.got)));
+  const wqDot = PROG.wq && (PROG.wq.some(q => !q.got && q.n >= (WEEKLY_ALL.find(x => x.id === q.id) || {}).n) || (!PROG.wchest && PROG.wq.every(q => q.got)));
   const aDot = ACH.some(a => a.ok(PROG.st, PROG.lvl) && PROG.ach[a.id] !== 'got');
   const cDot = typeof COLLECTIONS !== 'undefined' && Array.isArray(COLLECTIONS) && typeof collectionProgress === 'function' ? COLLECTIONS.some(c => { const p = collectionProgress(c, wallet); return p.isComplete && !p.isClaimed; }) : false;
   const tDot = !!PROG.inTop10;
@@ -4650,11 +4662,22 @@ function claimRoadMilestone(id) {
   progressDot();
 }
 
+/* The whole nickname is always shown on the main screen: a long one gets a smaller font (down to 10 px), never "…". */
+function fitNick(b) {
+  if (!b) return;
+  b.style.fontSize = '';
+  requestAnimationFrame(() => {
+    let px = parseFloat(getComputedStyle(b).fontSize) || 15;
+    while (b.scrollWidth > b.clientWidth + 1 && px > 10) { px -= .5; b.style.fontSize = px + 'px'; }
+  });
+}
+addEventListener('resize', () => fitNick(document.querySelector('#mprof .mpi b')));
 function renderMenuProfile() {
   const el = $('#mprof'); if (!el) return;
   try { earnedCheck(); } catch (_) {}
   const need = xpNeed(PROG.lvl), name = profileName();
-  el.innerHTML = `<span class="av${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${name[0] || '?'}</span><span class="mpi"><b>${name}</b><span class="mpl"><em>Ур. ${PROG.lvl}</em><i class="mxp"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></i></span></span><div class="mp-badges"><span class="mpc" title="Кубки рейтинга">🏆 <b class="cupsN">${PROG.cups || 0}</b></span><span class="mpg" title="Золото"><i class="coin"></i><b class="goldN">${wallet.gold}</b></span></div>`;
+  el.innerHTML = `<span class="av${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${name[0] || '?'}</span><span class="mpi"><b>${name}</b><span class="mpl"><em>Ур. ${PROG.lvl}</em><i class="mxp"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></i><span class="mpc" title="Кубки рейтинга">🏆 <b class="cupsN">${PROG.cups || 0}</b></span><span class="mpg" title="Золото"><i class="coin"></i><b class="goldN">${wallet.gold}</b></span></span></span>`;
+  fitNick(el.querySelector('.mpi b'));
   renderMenuQuestBanner();
 }
 function renderProfile() {
@@ -4692,8 +4715,9 @@ function renderTasks() {
       ? PG.ui.progress.renderRewardsTabHtml({
           progQuests: PROG.q || [],
           questDefs: QUESTS,
+          canReroll: PROG.qre !== PROG.day,
           progWeekly: PROG.wq || [],
-          weeklyDefs: WEEKLY_QUESTS,
+          weeklyDefs: WEEKLY_ALL,
           weeklyChestGold: WEEKLY_CHEST_GOLD || 100,
           weeklyChestClaimed: !!PROG.wchest,
           achDefs: ACH,
@@ -4713,16 +4737,16 @@ function renderTasks() {
             const ok = a.ok(PROG.st, PROG.lvl), got = PROG.ach[a.id] === 'got';
             return `<div class="quest${got ? ' got' : ok ? ' done' : ' lock'}"><span class="qi">${a.ic}</span><span class="qt"><b>${a.t}</b><small>${a.d} · <i class="coin"></i> ${a.g}</small></span>${got ? '<span class="pill">Получено</span>' : ok ? `<button class="chip pri" data-claima="${a.id}">Забрать</button>` : ''}</div>`;
           }).join('');
-          const wqDone = q => { const WQ = (WEEKLY_QUESTS || []).find(x => x.id === q.id); return WQ && q.n >= WQ.n; };
+          const wqDone = q => { const WQ = WEEKLY_ALL.find(x => x.id === q.id); return WQ && q.n >= WQ.n; };
           const wqList = PROG.wq || [];
           const wqRows = [...wqList].sort((a, b) => rank(wqDone(a), a.got) - rank(wqDone(b), b.got)).map(q => {
-            const WQ = (WEEKLY_QUESTS || []).find(x => x.id === q.id) || {ic: '🎯', t: 'Цель', n: 1, g: 10};
+            const WQ = WEEKLY_ALL.find(x => x.id === q.id) || {ic: '🎯', t: 'Цель', n: 1, g: 10};
             const done = q.n >= WQ.n;
             return `<div class="quest${q.got ? ' got' : done ? ' done' : ''}"><span class="qi">${WQ.ic}</span><span class="qt"><b>${WQ.t}</b><div class="xpbar"><i style="width:${Math.min(100, 100 * q.n / WQ.n)}%"></i></div><small>${q.n} / ${WQ.n} · <i class="coin"></i> ${WQ.g}</small></span>${q.got ? '<span class="pill">Получено</span>' : done ? `<button class="chip pri" data-claimwq="${q.id}">Забрать</button>` : ''}</div>`;
           }).join('');
           const allWqGot = wqList.length > 0 && wqList.every(q => q.got);
           const chestClaimed = !!PROG.wchest;
-          const chestRow = `<div class="quest weekly-chest${chestClaimed ? ' got' : allWqGot ? ' done' : ''}"><span class="qi">🎁</span><span class="qt"><b>Большой сундук недели</b><small>${chestClaimed ? 'Сундук недели открыт' : allWqGot ? 'Все цели недели достигнуты!' : 'Выполните все 3 цели недели'} · <i class="coin"></i> ${WEEKLY_CHEST_GOLD || 100}</small></span>${chestClaimed ? '<span class="pill">Получено</span>' : allWqGot ? '<button class="chip pri" data-claimwchest="1">Забрать +100</button>' : '<span class="pill lock">Заперт</span>'}</div>`;
+          const chestRow = `<div class="quest weekly-chest${chestClaimed ? ' got' : allWqGot ? ' done' : ''}"><span class="qi">🎁</span><span class="qt"><b>Большой сундук недели</b><small>${chestClaimed ? 'Сундук недели открыт' : allWqGot ? 'Все цели недели достигнуты!' : 'Выполните все ${wqList.length} цели недели'} · <i class="coin"></i> ${WEEKLY_CHEST_GOLD || 100}</small></span>${chestClaimed ? '<span class="pill">Получено</span>' : allWqGot ? '<button class="chip pri" data-claimwchest="1">Забрать +100</button>' : '<span class="pill lock">Заперт</span>'}</div>`;
           const wqGot = wqList.filter(q => q.got).length;
 
           const qGot = PROG.q.filter(q => q.got).length, aGot = ACH.filter(a => PROG.ach[a.id] === 'got').length;
@@ -4885,9 +4909,17 @@ if (roadWrap) {
 
 $('#ptab').addEventListener('click', e => {
   const q = e.target.closest('[data-claimq]'), a = e.target.closest('[data-claima]'), wq = e.target.closest('[data-claimwq]'), wch = e.target.closest('[data-claimwchest]'), cl = e.target.closest('[data-claimcol]');
+  const rr = e.target.closest('[data-reroll]');
+  if (rr) {   // one free swap a day: the quest goes, a fresh one (not on today's list) takes its place
+    const it = PROG.q.find(x => x.id === rr.dataset.reroll);
+    if (!it || it.got || PROG.qre === PROG.day) return;
+    const next = PG.state.progress.rerollQuest(PROG.day, PROG.q.map(x => x.id), it.id); if (!next) return;
+    Object.assign(it, {id: next, n: 0, got: false}); PROG.qre = PROG.day;
+    saveWallet(); renderProgress(); toastAny('Задание заменено'); return;
+  }
   if (q) { const it = PROG.q.find(x => x.id === q.dataset.claimq), Q = QUESTS.find(x => x.id === it.id); if (it.got || it.n < Q.n) return; it.got = true; wallet.gold += Q.g; }
   else if (a) { const A = ACH.find(x => x.id === a.dataset.claima); if (PROG.ach[A.id] === 'got' || !A.ok(PROG.st, PROG.lvl)) return; PROG.ach[A.id] = 'got'; wallet.gold += A.g; }
-  else if (wq) { const it = (PROG.wq || []).find(x => x.id === wq.dataset.claimwq), WQ = (WEEKLY_QUESTS || []).find(x => x.id === it.id); if (!it || !WQ || it.got || it.n < WQ.n) return; it.got = true; wallet.gold += WQ.g; }
+  else if (wq) { const it = (PROG.wq || []).find(x => x.id === wq.dataset.claimwq), WQ = WEEKLY_ALL.find(x => x.id === it.id); if (!it || !WQ || it.got || it.n < WQ.n) return; it.got = true; wallet.gold += WQ.g; }
   else if (wch) { if (PROG.wchest || !PROG.wq || !PROG.wq.length || !PROG.wq.every(x => x.got)) return; PROG.wchest = true; wallet.gold += WEEKLY_CHEST_GOLD || 100; toastAny('Большой сундук недели открыт! +100 золота 🎉'); }
   else if (cl) {
     const col = (COLLECTIONS || []).find(x => x.id === cl.dataset.claimcol);
@@ -6835,7 +6867,7 @@ function applyCloudWallet(w) {
 // Everything on screen that shows profile data.
 function refreshProfileUI() {
   document.querySelectorAll('.goldN').forEach(e => e.textContent = wallet.gold);
-  try { renderAccount(); dailyBonus(); progressDot(); renderResume(); } catch (_) {}
+  try { renderAccount(); dailyBonus(); progressDot(); renderResume(); renderMenuProfile(); } catch (_) {}
   if (!$('#scr-shop').hidden) renderShop();
   if (!$('#scr-progress').hidden) renderProgress();
   if (!$('#scr-settings').hidden) renderPrefs();
