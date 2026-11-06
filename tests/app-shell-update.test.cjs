@@ -79,3 +79,43 @@ test('app/update: UPD_WAIT and appCode', async () => {
 
   assert.equal(U.formatUpdCountdown(125), 'Само продолжится через 2:05');
 });
+
+test('app/update: isUpdateMandatory, shouldPromptUpdate, and formatUpdateSettingsBadge', async () => {
+  const U = await import('../src/app/update.js');
+
+  // Null check
+  assert.equal(U.isUpdateMandatory(null), false);
+  assert.equal(U.shouldPromptUpdate(null), false);
+
+  // Flagged mandatory or force
+  assert.equal(U.isUpdateMandatory({mandatory: true, code: 263}), true);
+  assert.equal(U.isUpdateMandatory({force: true, code: 263}), true);
+
+  // Optional release without minRequiredCode
+  assert.equal(U.isUpdateMandatory({mandatory: false, code: 263}, 0, 262), false);
+
+  // Outdated client when minRequiredCode is active
+  assert.equal(U.isUpdateMandatory({mandatory: false, code: 263}, 262, 260), true);
+  assert.equal(U.isUpdateMandatory({code: 263, minRequiredCode: 262}, 0, 261), true);
+
+  // Client meets minRequiredCode
+  assert.equal(U.isUpdateMandatory({mandatory: false, code: 263}, 262, 262), false);
+  assert.equal(U.isUpdateMandatory({mandatory: false, code: 263}, 262, 263), false);
+
+  // shouldPromptUpdate: manual check always prompts
+  assert.equal(U.shouldPromptUpdate({code: 263, mandatory: false}, {manual: true}), true);
+
+  // shouldPromptUpdate: test builds always prompt testers
+  assert.equal(U.shouldPromptUpdate({code: 275, version: '1.0.275-test', mandatory: false}, {manual: false}), true);
+
+  // shouldPromptUpdate: background check for optional release does not interrupt
+  assert.equal(U.shouldPromptUpdate({code: 263, version: '1.0.263', mandatory: false}, {manual: false, minRequiredCode: 260, currentCode: 262}), false);
+
+  // shouldPromptUpdate: background check for mandatory release interrupts
+  assert.equal(U.shouldPromptUpdate({code: 263, version: '1.0.263', mandatory: true}, {manual: false}), true);
+
+  // formatUpdateSettingsBadge
+  assert.equal(U.formatUpdateSettingsBadge(null), 'Проверить обновления');
+  assert.equal(U.formatUpdateSettingsBadge({version: '1.0.263', mandatory: false}), 'Обновить до 1.0.263 (по желанию)');
+  assert.equal(U.formatUpdateSettingsBadge({version: '1.0.263', mandatory: true}), 'Обновить до 1.0.263 (важно!)');
+});
