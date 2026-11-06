@@ -83,6 +83,7 @@ public class MainActivity extends Activity {
         hideSystemBars();
         createWebView();
         grabLink(getIntent());
+        registerBack();
     }
 
     @Override
@@ -297,9 +298,23 @@ public class MainActivity extends Activity {
         handler.postDelayed(recheck, RECHECK_MS);
     }
 
+    /* Android 13+ (and always from targetSdk 36): back comes through OnBackInvokedCallback, onBackPressed is no longer
+       called (manifest: enableOnBackInvokedCallback). Older phones still use onBackPressed. */
+    private void registerBack() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
+                    android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT, this::handleBack);
+        }
+    }
+
     @Override
+    @SuppressWarnings("deprecation")
     public void onBackPressed() {
-        if (web == null || !pageReady) { super.onBackPressed(); return; }
+        handleBack();
+    }
+
+    private void handleBack() {
+        if (web == null || !pageReady) { finish(); return; }
         // The game decides: close a dialog, open the game menu, go back a screen, or let the app close.
         web.evaluateJavascript("window.onBack ? window.onBack() : false", handled -> {
             if (!"true".equals(handled)) finish();
