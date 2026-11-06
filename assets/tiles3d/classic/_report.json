@@ -1,63 +1,63 @@
 [
  {
   "id": "cap",
-  "tris": 958,
+  "tris": 1412,
   "fall_tris": 0,
-  "glb_kb": 54.1
+  "glb_kb": 77.1
  },
  {
   "id": "capRS",
-  "tris": 898,
+  "tris": 1352,
   "fall_tris": 0,
-  "glb_kb": 51.0
+  "glb_kb": 74.1
  },
  {
   "id": "capRL",
-  "tris": 940,
+  "tris": 1280,
   "fall_tris": 0,
-  "glb_kb": 53.1
+  "glb_kb": 70.3
  },
  {
   "id": "capRR",
-  "tris": 916,
+  "tris": 1370,
   "fall_tris": 0,
-  "glb_kb": 51.4
+  "glb_kb": 74.4
  },
  {
   "id": "c2",
-  "tris": 1448,
+  "tris": 1800,
   "fall_tris": 0,
-  "glb_kb": 75.3
+  "glb_kb": 93.0
  },
  {
   "id": "c2r",
-  "tris": 1310,
+  "tris": 1662,
   "fall_tris": 0,
-  "glb_kb": 68.6
+  "glb_kb": 86.4
  },
  {
   "id": "band",
-  "tris": 1748,
+  "tris": 2147,
   "fall_tris": 0,
-  "glb_kb": 95.3
+  "glb_kb": 114.5
  },
  {
   "id": "c3",
-  "tris": 1528,
+  "tris": 1622,
   "fall_tris": 0,
-  "glb_kb": 82.2
+  "glb_kb": 86.6
  },
  {
   "id": "c3r",
-  "tris": 1528,
+  "tris": 1622,
   "fall_tris": 0,
-  "glb_kb": 82.2
+  "glb_kb": 86.6
  },
  {
   "id": "c4",
-  "tris": 1050,
+  "tris": 1097,
   "fall_tris": 0,
-  "glb_kb": 53.5
+  "glb_kb": 55.8
  },
  {
   "id": "rS",
@@ -121,9 +121,9 @@
  },
  {
   "id": "wCity",
-  "tris": 858,
+  "tris": 1312,
   "fall_tris": 136,
-  "glb_kb": 57.7
+  "glb_kb": 80.9
  },
  {
   "id": "wEnd",
@@ -175,50 +175,50 @@
  },
  {
   "id": "xccrf",
-  "tris": 1328,
+  "tris": 1680,
   "fall_tris": 0,
-  "glb_kb": 69.9
+  "glb_kb": 87.6
  },
  {
   "id": "xccfr",
-  "tris": 1448,
+  "tris": 1800,
   "fall_tris": 0,
-  "glb_kb": 75.4
+  "glb_kb": 93.2
  },
  {
   "id": "xcrcr",
-  "tris": 1748,
+  "tris": 2147,
   "fall_tris": 0,
-  "glb_kb": 95.3
+  "glb_kb": 114.7
  },
  {
   "id": "xcrcf",
-  "tris": 1748,
+  "tris": 2147,
   "fall_tris": 0,
-  "glb_kb": 95.0
+  "glb_kb": 114.4
  },
  {
   "id": "xcrrr",
-  "tris": 802,
+  "tris": 1370,
   "fall_tris": 0,
-  "glb_kb": 45.6
+  "glb_kb": 74.6
  },
  {
   "id": "xcrff",
-  "tris": 1206,
+  "tris": 1660,
   "fall_tris": 0,
-  "glb_kb": 65.8
+  "glb_kb": 89.1
  },
  {
   "id": "xcfrf",
-  "tris": 900,
+  "tris": 1354,
   "fall_tris": 0,
-  "glb_kb": 50.8
+  "glb_kb": 73.8
  },
  {
   "id": "xcffr",
-  "tris": 916,
+  "tris": 1370,
   "fall_tris": 0,
-  "glb_kb": 51.8
+  "glb_kb": 74.8
  }
 ]
