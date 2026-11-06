@@ -4407,6 +4407,80 @@ const PROGRESS_ROAD_MILESTONES = [
   { id: 'm10', lvl: 10, cups: 1000, title: 'Чемпион', desc: 'Кубок Чемпиона +500 золота и эмодзи 🏆', reward: { frame: 'gold', gold: 500, emote: '🏆' }, ic: '🏆' },
 ];
 
+/* The progress road as a map in the game's own style: level 1 top left, level 2 at the right edge, level 3 left again...
+   a cobbled road winds from one to the next, rivers cross it under little bridges, villages, woods and a castle stand
+   between. Everything is placed from a fixed seed, so the map is the same every time it is opened. */
+function roadMapHtml(ms, unlockedFn, claimed) {
+  const W = 360, ROW = 176, TOP = 130, n = ms.length, H = TOP + (n - 1) * ROW + 150;
+  const P = ms.map((m, i) => ({x: i % 2 ? 284 : 76, y: TOP + i * ROW}));
+  const cub = (p0, c1, c2, p1, t) => { const u = 1 - t; return [u * u * u * p0[0] + 3 * u * u * t * c1[0] + 3 * u * t * t * c2[0] + t * t * t * p1[0], u * u * u * p0[1] + 3 * u * u * t * c1[1] + 3 * u * t * t * c2[1] + t * t * t * p1[1]]; };
+  const segs = [];
+  for (let i = 0; i < n - 1; i++) {
+    const d = P[i + 1].x > P[i].x ? 1 : -1;
+    segs.push([[P[i].x, P[i].y], [P[i].x + d * 125, P[i].y + 6], [P[i + 1].x - d * 125, P[i + 1].y - 6], [P[i + 1].x, P[i + 1].y]]);
+  }
+  const head = [[-10, P[0].y - 72], [34, P[0].y - 72], [44, P[0].y], [P[0].x, P[0].y]];                    // in from the top-left corner
+  const tail = [[P[n - 1].x, P[n - 1].y], [P[n - 1].x + 4, P[n - 1].y + 50], [P[n - 1].x - 20, P[n - 1].y + 90], [P[n - 1].x - 40, H + 10]];   // and on to new seasons
+  const all = [head, ...segs, tail];
+  const pathD = c => `M${c[0][0]} ${c[0][1]}C${c[1][0]} ${c[1][1]} ${c[2][0]} ${c[2][1]} ${c[3][0]} ${c[3][1]}`;
+  const samples = []; all.forEach(c => { for (let k = 0; k <= 36; k++) samples.push(cub(c[0], c[1], c[2], c[3], k / 36)); });
+  // how far the player has walked: the road up to the last open level glows gold
+  let last = -1; ms.forEach((m, i) => { if (unlockedFn(m)) last = i; });
+  const walked = segs.slice(0, Math.max(0, last)).concat(last >= 0 ? [] : []).map(pathD).join('');
+  // rivers cross the road in the middle of three of its stretches, under a little plank bridge
+  const rivers = [];
+  [1, 4, 7].filter(k => k < segs.length).forEach(k => {
+    const c = segs[k], m = cub(c[0], c[1], c[2], c[3], .5), t1 = cub(c[0], c[1], c[2], c[3], .53), t0 = cub(c[0], c[1], c[2], c[3], .47);
+    const flip = k % 2 ? -1 : 1;
+    const r1 = [[-20, m[1] - 40 * flip], [70, m[1] - 78 * flip], [120, m[1] + 36 * flip], [m[0], m[1]]];
+    const r2 = [[m[0], m[1]], [2 * m[0] - 120, 2 * m[1] - (m[1] + 36 * flip)], [300, m[1] - 56 * flip], [380, m[1] + 30 * flip]];
+    rivers.push({r1, r2, m, ang: Math.atan2(t1[1] - t0[1], t1[0] - t0[0])});
+  });
+  const riverSamples = []; rivers.forEach(r => [r.r1, r.r2].forEach(c => { for (let k = 0; k <= 30; k++) riverSamples.push(cub(c[0], c[1], c[2], c[3], k / 30)); }));
+  const riverD = r => `M${r.r1[0][0]} ${r.r1[0][1]}C${r.r1[1][0]} ${r.r1[1][1]} ${r.r1[2][0]} ${r.r1[2][1]} ${r.r1[3][0]} ${r.r1[3][1]}C${r.r2[1][0]} ${r.r2[1][1]} ${r.r2[2][0]} ${r.r2[2][1]} ${r.r2[3][0]} ${r.r2[3][1]}`;
+  let svg = `<svg class="rd-svg" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" aria-hidden="true">`;
+  const stroke = (d, w, col, extra = '') => `<path d="${d}" fill="none" stroke="${col}" stroke-width="${w}" stroke-linecap="round" stroke-linejoin="round" vector-effect="non-scaling-stroke" ${extra}/>`;
+  for (const r of rivers) {
+    const d = riverD(r);
+    svg += stroke(d, 44, 'rgba(30,70,20,.35)') + stroke(d, 38, '#a8975f') + stroke(d, 35, '#d6c48e') + stroke(d, 31, 'rgba(240,252,255,.85)') + stroke(d, 29, '#46b3d3') + stroke(d, 22, '#2f93c8') + stroke(d, 12, '#2276b8') + stroke(d, 2, 'rgba(235,250,255,.7)', 'stroke-dasharray="6 14"');
+  }
+  const road = all.map(pathD).join('');
+  svg += stroke(road, 34, 'rgba(60,90,30,.35)') + stroke(road, 28, '#80653e') + stroke(road, 24, '#d9bf88') + stroke(road, 17, '#c7a874') + stroke(road, 11, '#e2cb98') + stroke(road, 2, 'rgba(150,120,70,.5)', 'stroke-dasharray="3 10"');
+  if (walked) svg += stroke(walked, 4, '#f2b84b', 'stroke-dasharray="1 9" opacity=".95"');
+  svg += '</svg>';
+  // scenery: sprites of the game (houses, trees, hay, rocks, a keep), placed where there is room
+  const R = rng(20261106), dist = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]);
+  const placed = [], spr = [];
+  const nodeBox = P.map(q => q);
+  const free = (x, y, r) => samples.every(q => dist(q, [x, y]) > r + 14) && riverSamples.every(q => dist(q, [x, y]) > r + 26)
+    && nodeBox.every(q => Math.abs(x - q.x) > 86 + r * .3 || y < q.y - 100 || y > q.y + 62) && placed.every(q => dist(q, [x, y]) > (r + q[2]) * .85) && x > 12 && x < W - 12 && y > 14 && y < H - 8;
+  const put = (k, x, y, r) => { if (!free(x, y, r)) return false; placed.push([x, y, r]); const d = SPR[k]; if (d) spr.push({k, x, y, w: Math.round(d.w * 1.7), h: Math.round(d.h * 1.7)}); return true; };
+  // villages: a cluster of houses and hay near the outer side of some levels, a keep at the end
+  [2, 4, 6, 8].filter(i => i < n).forEach((i, vi) => {
+    const side = P[i].x < W / 2 ? 1 : -1, cx = P[i].x + side * 112 - (side > 0 ? 0 : 0), cy = P[i].y + 70;
+    ['house', 'house2', 'house3', 'house4', 'house', 'hay'].forEach((k, j) => { for (let t = 0; t < 14; t++) { if (put(k, cx + (R() - .5) * 120, cy + (R() - .5) * 90, k === 'hay' ? 12 : 22)) break; } });
+  });
+  { const q = P[n - 1], side = q.x < W / 2 ? 1 : -1; for (let t = 0; t < 30; t++) if (put('tower', q.x + side * (90 + R() * 20), q.y + 8 + R() * 30, 30)) break; }
+  for (let t = 0; t < 700 && spr.length < 90; t++) {
+    const x = 10 + R() * (W - 20), y = 10 + R() * (H - 20), v = R();
+    const k = v < .34 ? 'pine' : v < .56 ? 'oak' : v < .66 ? 'birch' : v < .73 ? 'poplar' : v < .88 ? 'bush' : v < .95 ? 'rock' : 'hay';
+    put(k, x, y, k === 'bush' || k === 'rock' || k === 'hay' ? 9 : 14);
+  }
+  spr.sort((a, b) => a.y - b.y);
+  const sprHtml = spr.map(o => `<i class="rd-spr s-${o.k}" style="left:${(100 * o.x / W).toFixed(2)}%;top:${o.y}px;width:${o.w}px;height:${o.h}px"></i>`).join('');
+  const bridges = rivers.map(r => `<i class="rd-bridge" style="left:${(100 * r.m[0] / W).toFixed(2)}%;top:${Math.round(r.m[1])}px;--a:${(r.ang * 180 / Math.PI).toFixed(1)}deg"></i>`).join('');
+  // the levels
+  const nodes = ms.map((m, i) => {
+    const open = unlockedFn(m), got = claimed.includes(m.id), q = P[i];
+    const cls = got ? 'claimed' : open ? 'unlocked' : 'locked';
+    const act = got ? '<span class="rd-tag">✓ Получено</span>' : open ? `<button class="chip pri" data-claimroad="${m.id}">Забрать</button>` : `<span class="rd-tag">🔒 ${m.cups ? m.cups + ' 🏆 или ' : ''}${m.lvl} ур.</span>`;
+    return `<div class="rd-n ${cls}${i === last + 1 || (last === n - 1 && i === n - 1) ? ' next' : ''}" style="left:${(100 * q.x / W).toFixed(2)}%;top:${q.y}px">`
+      + `<div class="rd-sign"><b>${m.title}</b><small>${m.desc}</small></div>`
+      + `<span class="rd-med"><em>${m.lvl}</em>${got ? '✓' : m.ic}</span>${act}</div>`;
+  }).join('');
+  return `<div class="rd-map" style="height:${H}px">${svg}${bridges}${sprHtml}${nodes}</div>`;
+}
+let roadScroll = false;
 function renderProgressRoad() {
   const track = $('#ptab');
   if (!track || ptab !== 'road') return;
@@ -4417,15 +4491,12 @@ function renderProgressRoad() {
   const head = `<div class="rd-head"><div class="rd-lvl"><b>${myLvl}</b><small>уровень</small></div><div class="rd-info"><b>Дорога прогресса</b>`
     + `<div class="xpbar"><i style="width:${pct.toFixed(1)}%"></i></div><small>${PROG.xp} / ${need} опыта до ${myLvl + 1} уровня · 🏆 ${myCups}</small></div></div>`
     + `<p class="rd-next">${next ? `Следующая награда: <b>${next.title}</b> — ${next.cups ? next.cups + ' 🏆 или ' : ''}${next.lvl} уровень` : 'Вы прошли всю дорогу, дальше — новые сезоны'}</p>`;
-  const nodes = PROGRESS_ROAD_MILESTONES.map(m => {
-    const open = unlocked(m), got = claimed.includes(m.id);
-    const cls = got ? 'claimed' : open ? 'unlocked' : 'locked';
-    const act = got ? '<span class="rd-tag">✓ Получено</span>'
-      : open ? `<button class="chip pri" data-claimroad="${m.id}">Забрать</button>`
-        : `<span class="rd-tag">🔒 ${m.lvl} ур.${m.cups ? ' · ' + m.cups + ' 🏆' : ''}</span>`;
-    return `<li class="rd-node ${cls}"><span class="rd-dot">${got ? '✓' : m.ic}</span><div class="rd-card"><b>${m.title}</b><small>${m.desc}</small>${act}</div></li>`;
-  }).join('');
-  track.innerHTML = head + `<ol class="rd-list">${nodes}</ol>`;
+  track.innerHTML = head + roadMapHtml(PROGRESS_ROAD_MILESTONES, unlocked, claimed);
+  if (roadScroll) {   // opening the tab: bring the level the player is at into view
+    roadScroll = false;
+    const el = track.querySelector('.rd-n.unlocked') || track.querySelector('.rd-n.next') || track.querySelector('.rd-n:last-child');
+    if (el) requestAnimationFrame(() => el.scrollIntoView({block: 'center'}));
+  }
 }
 
 function claimRoadMilestone(id) {
@@ -4700,7 +4771,7 @@ function renderProgress() {
 }
 $('#ptabs').onclick = e => {
   const b = e.target.closest('[data-pt]'); if (!b) return;
-  ptab = b.dataset.pt;
+  ptab = b.dataset.pt; roadScroll = ptab === 'road';
   renderTasks();
 };
 
@@ -7070,7 +7141,7 @@ function show(name) {
   if (name === 'shop') renderShop();
   if (name === 'settings') renderPrefs();
   if (name === 'menu') { saveWallet(); presenceCount(); progressDot(); renderMenuProfile(); updateNotifBadge(); }
-  if (name === 'progress') { renderTasks(); }
+  if (name === 'progress') { roadScroll = true; renderTasks(); }
   if (name === 'profile') { renderProfile(); renderAccount(); }
   if (name === 'rating') { renderTop(); }
   track('screen_view', {screen_name: name});
