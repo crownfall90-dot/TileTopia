@@ -16,7 +16,7 @@ export function botPick(tiles, type, random) {
 export const BOT_ARCHETYPES = {
   builder: {id: 'builder', label: 'Зодчий', desc: 'Упор на города и завершение построек'},
   roadman: {id: 'roadman', label: 'Дорожник', desc: 'Приоритет длинным дорогам и трактам'},
-  monk: {id: 'monk', label: 'Хранитель', desc: 'Стремится окружать и закрывать крепости'},
+  monk: {id: 'monk', label: 'Хранитель', desc: 'Стремится окружать и закрывать монастыри'},
   balanced: {id: 'balanced', label: 'Тактик', desc: 'Сбалансированная универсальная стратегия'}
 };
 
@@ -51,7 +51,7 @@ export function helperPick(tiles, meeples, type, p, players, random, sharp = 1, 
   return best || botPick(tiles, type, random);
 }
 
-const NOUN = {c: 'ваш город', r: 'вашу дорогу', f: 'вашу крепость'};
+const NOUN = {c: 'ваш город', r: 'вашу дорогу', f: 'ваш монастырь'};
 const FREE = {c: 'Город без хозяина', r: 'Дорога без хозяина'};
 const plural = (n, one, few, many) => n % 10 === 1 && n % 100 !== 11 ? one : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? few : many;
 const pts = n => `${n} ${plural(n, 'очко', 'очка', 'очков')}`;
@@ -81,7 +81,7 @@ export function hintPick(tiles, meeples, type, p, players, haveFigure) {
       const c = component(tiles, meeples, t, g), v0 = featurePoints(tiles, c, false), miss = c.complete ? 0 : missing(tiles, c);
       if (!c.meeples.length) {
         // a figure can only go on a feature nobody holds, on the card just placed
-        if (haveFigure && !c.complete) { const v = 2.5 + Math.min(v0, 12) * .25; s += v; say(v, g.kind === 'f' ? `Крепость — поставьте фишку: окружите картами — +${pts(v0)}, ${left(g.kind, miss)}` : `${FREE[g.kind]} — поставьте фишку: достроите — минимум +${pts(atLeast(g.kind, v0, miss))}, ${left(g.kind, miss)}`); }
+        if (haveFigure && !c.complete) { const v = 2.5 + Math.min(v0, 12) * .25; s += v; say(v, g.kind === 'f' ? `Монастырь — поставьте фишку: окружите картами — +${pts(v0)}, ${left(g.kind, miss)}` : `${FREE[g.kind]} — поставьте фишку: достроите — минимум +${pts(atLeast(g.kind, v0, miss))}, ${left(g.kind, miss)}`); }
         continue;
       }
       const cnt = Array.from({length: players}, () => 0); c.meeples.forEach(x => cnt[x.p]++);

@@ -26,7 +26,7 @@ export function renderBuildingStats(st = {}) {
   return `<div class="sbuild">` +
     `<span>🏰 <b>${st.c || 0}</b> городов${maxCityText}</span>` +
     `<span>🛤 <b>${st.r || 0}</b> дорог</span>` +
-    `<span>🏯 <b>${st.f || 0}</b> крепостей</span>` +
+    `<span>⛪ <b>${st.f || 0}</b> монастырей</span>` +
     `</div>`;
 }
 

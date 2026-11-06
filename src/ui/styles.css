@@ -5096,3 +5096,72 @@ html.app .screen.scroll{--sp:var(--it,0px);padding-top:0}/* the status-bar gap i
 .ph-cat-btn.lockd{opacity:.65}
 .ph-cat-btn .ph-badge.lock{color:#f2b84b;display:flex;align-items:center;gap:3px}
 .rs-item .rs-earn{font:600 9px var(--f-body);color:#8fd18a;text-align:center;line-height:1.2}
+
+/* =====================================================================================================
+   Minimal pass («тихий стол»): one surface, one hairline, one gold call to action per screen. No skew, no double
+   shadows, no glows; the board is the brightest thing on the game screen. Everything here only overrides looks
+   (colour, border, shadow, transform), never layout or behaviour. Tokens: */
+:root{--m-surface:rgba(255,255,255,.045);--m-surface-2:rgba(255,255,255,.075);--m-line:rgba(226,232,255,.09);--m-r:16px;--m-gold:#f2b84b}
+
+/* main menu: flat action row, quiet cards, a calm bottom bar */
+html body .tile-btn,html body .tile-btn .btn-tilt-inner{transform:none}
+html body .tile-btn{border-radius:var(--m-r);transition:transform .15s ease,background .15s ease}
+html body .tile-btn:hover{transform:none;filter:none}
+html body .tile-btn:active{transform:scale(.97)}
+html body .tile-btn.tile-quest,html body .tile-btn.tile-mode{background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none;color:var(--ink)}
+html body .tile-btn.tile-quest:hover,html body .tile-btn.tile-mode:hover{background:var(--m-surface-2);box-shadow:none}
+html body .tile-btn.tile-play{background:linear-gradient(180deg,#f6c565,#eeae3c);border:0;box-shadow:0 8px 22px rgba(242,184,75,.22);color:var(--brass-ink)}
+html body .tile-btn.tile-play:hover{box-shadow:0 8px 22px rgba(242,184,75,.28)}
+html body .menu-rating-card,html body .menu-gift-pill,html body .resume{background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none;backdrop-filter:none}
+html body .menu-gift-pill{border-color:rgba(242,184,75,.32)}
+html body .menu-gift-pill *,html body .menu-rating-card *{text-shadow:none}
+html body .mtop-rank-btn,html body .menu-hub-btn,html body #mprof{background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none}
+html body .mhub-tilt{transform:none}
+html body .logo{text-shadow:none;filter:none}
+html body .bnav{filter:none;gap:2px;padding:5px;border-radius:20px;background:rgba(12,17,32,.9);border:1px solid var(--m-line);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
+html body .bnav button{transform:none;background:transparent;border:0;box-shadow:none;border-radius:15px;color:var(--muted)}
+html body .bnav button svg,html body .bnav button span{transform:none}
+html body .bnav button:hover{transform:none;box-shadow:none;background:var(--m-surface);color:var(--ink)}
+html body .bnav button:active{transform:scale(.96);box-shadow:none}
+html body .bnav button.on{background:rgba(242,184,75,.14);border:0;box-shadow:none;color:var(--m-gold)}
+html body .bnav button.on svg{color:var(--m-gold)}
+
+/* cards and headers on the other screens */
+html body .ocard{box-shadow:0 18px 48px rgba(0,0,0,.5)}
+html body .ltop .iconbtn,html body .gtop .iconbtn{background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none}
+
+/* game screen: the board first — a calm night table, the tools in one quiet column, flat player chips */
+html body #scr-game{background-image:none;background-color:#0f1626}
+html body .board{background:radial-gradient(75% 60% at 50% 46%,#1c2944 0%,#121b2f 62%,#0e1524 100%)}
+html body .village-backdrop{display:none}
+html body .relic-name{display:none}
+html body .fabs{gap:2px;padding:4px;border-radius:18px;background:rgba(12,17,32,.72);border:1px solid var(--m-line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+html body .fabs .fab{background:transparent;border:0;box-shadow:none;color:var(--muted);border-radius:13px}
+html body .fabs .fab:hover{background:var(--m-surface-2);color:var(--ink)}
+html body .fabs .fab:active{transform:scale(.94)}
+html body .pl{background:var(--m-surface);border:1px solid transparent;box-shadow:none}
+html body .pl.active{background:rgba(242,184,75,.1);border:1.5px solid var(--m-gold);box-shadow:none}
+html body .deck{background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none}
+html body .tray{background:linear-gradient(180deg,rgba(15,22,38,0),#0f1626 32%);border-top:0}
+html body #status{background:transparent;border-color:transparent;color:var(--muted)}
+html body #rot{background:var(--m-surface);border:1px solid var(--m-line)}
+/* the free spots for a move: a light outline in the player's colour, a faint tint, a small plus */
+html body .slot{border-width:1.5px;background:rgba(255,255,255,.03)}
+html body .slot::before{opacity:.1}
+html body .slot::after{width:16px;height:16px;opacity:.75}
+/* the stack counter: a quiet chip like the rest of the top bar */
+html body .deck{background:var(--m-surface)}
+/* no parallelograms: cards, badges and buttons stand straight (and their contents need no counter-skew) */
+html body .dsh-badge,html body .dsh-badge span,html body .dsh-tile-card,html body .dsh-tile-inner,
+html body .rank-top-btn,html body .rank-top-btn svg,html body .menu-hub-btn,html body .menu-hub-btn .mhub-tilt,
+html body .tile-lead-card,html body .tile-lead-card .av,html body .tile-lead-card .lead-cups-badge,html body .tile-lead-card .lead-player-info,
+html body .tile-lead-card .rank-num,html body .tile-lead-card .st-rank-badge,html body .pod,html body .pod > *,
+html body .pim-card,html body .pim-card > *,html body #scr-shop .gift,html body #scr-shop .gift > *,
+html body #scr-shop .stcustom,html body #scr-shop .stcustom > *,html body #scr-shop .loc,html body #scr-shop .loc > *{transform:none}
+html body .dsh-tile-card:hover,html body .tile-lead-card:hover,html body .pod:hover,html body .pim-card:hover,html body .menu-hub-btn:hover,html body .rank-top-btn:hover{transform:translateY(-1px)}
+html body .dsh-tile-card:active,html body .tile-lead-card:active,html body .pim-card:active,html body .rank-top-btn:active{transform:scale(.98)}
+html body .dsh-tile-card,html body .pim-card,html body #scr-shop .gift{box-shadow:none;border:1px solid var(--m-line);background:var(--m-surface)}
+html body .dsh-tile-card .dsh-price,html body .dsh-tile-card button{box-shadow:none}
+html body .dsh-btn{box-shadow:none;border:0;border-radius:12px}
+html body .dsh-btn.buy{background:rgba(242,184,75,.16);color:var(--m-gold)}
+html body .dsh-btn.buy.poor{background:var(--m-surface);color:var(--muted)}

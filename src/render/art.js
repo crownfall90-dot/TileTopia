@@ -13,15 +13,17 @@ function cityPaths(E) {
   const city = [0,1,2,3].filter(d => E[d] === 'c'), k = city.length;
   if (!k) return null;
   const corner = [[0,0],[S,0],[S,S],[0,S]], mid = [[S/2,0],[S,S/2],[S/2,S],[0,S/2]], C = S / 2;
-  const fill = new Path2D(), wall = new Path2D();
-  if (k === 4) { fill.rect(0, 0, S, S); return {fill, wall: null}; }
+  const fill = new Path2D(), wall = new Path2D(), towers = [];
+  // the middle of a wall curve (a quadratic from p through kk to q): a round tower stands there
+  const qmid = (p, kk, q) => [(p[0] + 2 * kk[0] + q[0]) / 4, (p[1] + 2 * kk[1] + q[1]) / 4];
+  if (k === 4) { fill.rect(0, 0, S, S); return {fill, wall: null, towers}; }
   if (k === 1) {
     const i = city[0];
     const rot = ([x, y]) => { let dx = x - C, dy = y - C; for (let n = 0; n < i; n++) [dx, dy] = [-dy, dx]; return [C + dx, C + dy]; };
     const A = rot([0,0]), B = rot([S,0]), K = rot([S/2, S*0.64]);
     fill.moveTo(...A); fill.lineTo(...B); fill.quadraticCurveTo(...K, ...A);
     wall.moveTo(...B); wall.quadraticCurveTo(...K, ...A);
-    return {fill, wall};
+    return {fill, wall, towers: [qmid(B, K, A)]};
   }
   const s = city.find(d => E[(d + 3) % 4] !== 'c');
   fill.moveTo(...corner[s]);
@@ -33,10 +35,11 @@ function cityPaths(E) {
     const p = L === 1 ? mid[i] : corner[(i + 1) % 4], f = L === 1 ? 0.88 : 0.86;
     const K = [p[0] + (C - p[0]) * f, p[1] + (C - p[1]) * f];
     fill.quadraticCurveTo(...K, ...to); wall.moveTo(...from); wall.quadraticCurveTo(...K, ...to);
+    towers.push(qmid(from, K, to));
     i = (i + L) % 4; n += L;
   }
   fill.closePath();
-  return {fill, wall};
+  return {fill, wall, towers};
 }
 
 function drawTile(id) {
@@ -299,32 +302,187 @@ function drawTile(id) {
   }
   const cp = cityPaths(E);
   if (cp) {
-    // Town: cobbled lanes, then rows of gabled roofs (lit and shaded halves, a ridge, the odd chimney).
-    g.save(); g.clip(cp.fill); g.fillStyle = '#cdb48c'; g.fillRect(0, 0, S, S);
-    for (let i = 0; i < 520; i++) { g.fillStyle = R() < .5 ? 'rgba(120,100,70,.35)' : 'rgba(250,235,205,.45)'; g.beginPath(); g.ellipse(R() * S, R() * S, 2.2, 1.6, R() * 3, 0, 7); g.fill(); }
-    const ROOFS = [['#c8503a','#8f3020'],['#d4733f','#9c4a24'],['#a9432f','#73281b'],['#5f7488','#3a4a5a'],['#c79a45','#8a6420']];
-    for (let y = -6, row = 0; y < S; y += 16, row++) for (let x = row % 2 ? -4 : 6; x < S; x += 19) {
-      if (R() < .08) { g.fillStyle = '#4f8e3a'; g.beginPath(); g.arc(x + 8, y + 6, 6, 0, 7); g.fill(); g.fillStyle = '#6fb050'; g.beginPath(); g.arc(x + 6.5, y + 4.5, 3.5, 0, 7); g.fill(); continue; }
-      const jx = x + R() * 4, jy = y + R() * 3, ww = 13 + R() * 4, hh = 10 + R() * 2, [lt, dk] = ROOFS[(R() * ROOFS.length) | 0];
-      g.fillStyle = 'rgba(0,0,0,.28)'; g.fillRect(jx + 2, jy + 2.5, ww, hh);
-      g.fillStyle = lt; g.fillRect(jx, jy, ww, hh / 2); g.fillStyle = dk; g.fillRect(jx, jy + hh / 2, ww, hh / 2);
-      g.fillStyle = 'rgba(255,240,220,.45)'; g.fillRect(jx, jy + hh / 2 - .6, ww, 1.2);
-      g.strokeStyle = 'rgba(0,0,0,.18)'; g.lineWidth = .6; for (let k = 3; k < ww; k += 3) { g.beginPath(); g.moveTo(jx + k, jy); g.lineTo(jx + k, jy + hh); g.stroke(); }
-      if (R() < .35) { g.fillStyle = '#6d4a36'; g.fillRect(jx + ww * .7, jy + 1, 2.4, 3.2); }
+    // Town, as on the icon and the banner: warm cobbles, lanes from every town edge to the square, houses of every
+    // size along the lanes (gabled roofs turned to the street), gardens and gazebos in the gaps; a market (stalls under
+    // striped awnings) round the well of a two-sided town, round a keep with corner towers in a big one; a crenellated
+    // wall with round towers. The square, the stalls and the keep sit where tools/blender_generators/generate_tiles.py
+    // puts them in 3D, so keep their rules in step (town_layout there).
+    const city = idx('c'), Kp = g.getTransform().a;
+    const tc = city.length === 4 ? C : (() => {
+      const m = city.reduce((o, d) => [o[0] + mid[d][0], o[1] + mid[d][1]], [0, 0]).map(v => v / city.length);
+      return [C[0] + (m[0] - C[0]) * .5, C[1] + (m[1] - C[1]) * .5];
+    })();
+    const big = city.length >= 3, SQ = big ? 30 : 18, STALL_R = big ? 25 : 16;
+    const stalls = city.length > 1 ? [45, 135, 225, 315].map(a => [tc[0] + Math.cos(a * Math.PI / 180) * STALL_R, tc[1] + Math.sin(a * Math.PI / 180) * STALL_R, a]) : [];
+    const lanes = city.map(d => {
+      const side = d % 2 ? 1 : -1, k2 = [(mid[d][0] + tc[0]) / 2 + V[d][1] * 6 * side, (mid[d][1] + tc[1]) / 2 - V[d][0] * 6 * side], pts = [];
+      for (let i = 0; i <= 14; i++) { const t = i / 14, u = 1 - t; pts.push([u * u * mid[d][0] + 2 * u * t * k2[0] + t * t * tc[0], u * u * mid[d][1] + 2 * u * t * k2[1] + t * t * tc[1]]); }
+      return pts;
+    });
+    const laneDist = (x, y) => Math.min(...lanes.map(pts => Math.min(...pts.map(([px, py]) => Math.hypot(px - x, py - y)))));
+    g.save(); g.clip(cp.fill);
+    g.fillStyle = '#c4a67c'; g.fillRect(0, 0, S, S);
+    for (let i = 0; i < 900; i++) {
+      g.fillStyle = ['rgba(120,96,64,.32)', 'rgba(250,236,206,.42)', 'rgba(170,140,100,.35)'][i % 3];
+      g.beginPath(); g.ellipse(R() * S, R() * S, 1.9 + R(), 1.3 + R() * .6, R() * 3, 0, 7); g.fill();
     }
+    g.lineCap = 'round'; g.lineJoin = 'round';
+    for (const [lw, col, dash] of [[12, 'rgba(120,92,60,.45)'], [9, '#e0cba3'], [2, 'rgba(160,130,90,.5)', [2, 4]]]) {
+      for (const pts of lanes) { g.beginPath(); pts.forEach((q, i) => i ? g.lineTo(...q) : g.moveTo(...q)); g.lineWidth = lw; g.strokeStyle = col; g.setLineDash(dash || []); g.stroke(); }
+    }
+    g.setLineDash([]);
+    const square = city.length > 1;
+    if (square) {   // the square: a paved round, the well (two sides) or the keep (three or four)
+      g.fillStyle = 'rgba(120,92,60,.4)'; g.beginPath(); g.arc(tc[0], tc[1], SQ + 1.5, 0, 7); g.fill();
+      g.fillStyle = '#e4d2ad'; g.beginPath(); g.arc(tc[0], tc[1], SQ, 0, 7); g.fill();
+      g.strokeStyle = 'rgba(150,120,80,.35)'; g.lineWidth = .7; for (let r2 = 5; r2 < SQ; r2 += 4.5) { g.beginPath(); g.arc(tc[0], tc[1], r2, 0, 7); g.stroke(); }
+      if (!big) {
+        g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.arc(tc[0] + 1, tc[1] + 1.4, 4.6, 0, 7); g.fill();
+        g.fillStyle = '#8f8778'; g.beginPath(); g.arc(tc[0], tc[1], 4.4, 0, 7); g.fill();
+        g.fillStyle = '#2f7fc0'; g.beginPath(); g.arc(tc[0], tc[1], 2.6, 0, 7); g.fill();
+        g.fillStyle = 'rgba(255,255,255,.7)'; g.beginPath(); g.arc(tc[0] - .8, tc[1] - .8, .8, 0, 7); g.fill();
+      } else {   // the keep: a stone square with a courtyard and four round corner towers
+        const kx = tc[0], ky = tc[1];
+        g.fillStyle = 'rgba(30,18,8,.35)'; g.fillRect(kx - 9, ky - 7.5, 20, 20);
+        g.fillStyle = '#7d7464'; g.fillRect(kx - 10.5, ky - 10.5, 21, 21);
+        g.fillStyle = '#cfc4ad'; g.fillRect(kx - 9, ky - 9, 18, 18);
+        g.fillStyle = '#b0a58e'; g.fillRect(kx - 5, ky - 5, 10, 10);
+        g.fillStyle = '#7d7464'; for (let k3 = -8; k3 <= 8; k3 += 4) { g.fillRect(kx + k3 - .8, ky - 10.5, 1.6, 1.6); g.fillRect(kx + k3 - .8, ky + 8.9, 1.6, 1.6); g.fillRect(kx - 10.5, ky + k3 - .8, 1.6, 1.6); g.fillRect(kx + 8.9, ky + k3 - .8, 1.6, 1.6); }
+        for (const [sx, sy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
+          const tx = kx + sx * 10, ty = ky + sy * 10;
+          g.fillStyle = '#6d665a'; g.beginPath(); g.arc(tx, ty, 4.6, 0, 7); g.fill();
+          const rg = g.createRadialGradient(tx - 1, ty - 1.2, .4, tx, ty, 3.8); rg.addColorStop(0, '#f08a68'); rg.addColorStop(.6, '#c8503a'); rg.addColorStop(1, '#8f3020');
+          g.fillStyle = rg; g.beginPath(); g.arc(tx, ty, 3.6, 0, 7); g.fill();
+        }
+        g.fillStyle = '#d9291f'; g.beginPath(); g.moveTo(kx, ky - 1); g.lineTo(kx + 6, ky + .5); g.lineTo(kx, ky + 2); g.fill();
+      }
+      // market stalls round the square: a striped awning over a counter, turned to the middle
+      const AWN = [['#d9433a', '#f4ece0'], ['#3f78c8', '#eef2f8'], ['#e0a83a', '#fbf2dc'], ['#3fa060', '#eef8f0']];
+      stalls.forEach(([sx, sy, a], i) => {
+        const [c1, c2] = AWN[i % AWN.length];
+        g.save(); g.translate(sx, sy); g.rotate(a * Math.PI / 180 + Math.PI / 2);
+        g.fillStyle = 'rgba(30,18,8,.3)'; g.fillRect(-4.6 + 1.3, -3.2 + 1.6, 9.2, 6.4);
+        for (let k3 = 0; k3 < 6; k3++) { g.fillStyle = k3 % 2 ? c2 : c1; g.fillRect(-4.6 + k3 * 9.2 / 6, -3.2, 9.2 / 6 + .05, 6.4); }
+        g.fillStyle = 'rgba(0,0,0,.18)'; g.fillRect(-4.6, .4, 9.2, 2.8);
+        g.strokeStyle = 'rgba(40,20,10,.5)'; g.lineWidth = .6; g.strokeRect(-4.6, -3.2, 9.2, 6.4);
+        g.restore();
+      });
+    }
+    const ROOFS = [['#d0573e', '#913222'], ['#d97a43', '#9c4c25'], ['#b4472f', '#76291b'], ['#6a8098', '#3d4e60'], ['#d1a24a', '#8d6620'], ['#9a6440', '#62391f']];
+    const homes = [];
+    for (let y = 5, row = 0; y < S; y += 16, row++) for (let x = row % 2 ? 5 : 13; x < S; x += 16) {
+      const px = x + (R() - .5) * 6, py = y + (R() - .5) * 6;
+      if (!g.isPointInPath(cp.fill, px * Kp, py * Kp)) continue;
+      if (cp.wall) { g.lineWidth = 20; if (g.isPointInStroke(cp.wall, px * Kp, py * Kp)) continue; }
+      if (laneDist(px, py) < 9 || (square && Math.hypot(px - tc[0], py - tc[1]) < SQ + 7)) continue;
+      homes.push([px, py]);
+    }
+    for (const [px, py] of homes) {
+      const r0 = R();
+      if (r0 < .07) {   // a gazebo: an eight-sided roof on a little green
+        g.fillStyle = '#6fb050'; g.beginPath(); g.arc(px, py, 7, 0, 7); g.fill();
+        g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); for (let k3 = 0; k3 < 8; k3++) { const q = k3 / 8 * 6.283 + .39; g[k3 ? 'lineTo' : 'moveTo'](px + 1.4 + Math.cos(q) * 5, py + 1.8 + Math.sin(q) * 5); } g.fill();
+        g.fillStyle = '#9a5a34'; g.beginPath(); for (let k3 = 0; k3 < 8; k3++) { const q = k3 / 8 * 6.283 + .39; g[k3 ? 'lineTo' : 'moveTo'](px + Math.cos(q) * 5, py + Math.sin(q) * 5); } g.fill();
+        g.strokeStyle = 'rgba(255,225,180,.55)'; g.lineWidth = .5; for (let k3 = 0; k3 < 8; k3++) { const q = k3 / 8 * 6.283 + .39; g.beginPath(); g.moveTo(px, py); g.lineTo(px + Math.cos(q) * 5, py + Math.sin(q) * 5); g.stroke(); }
+        g.fillStyle = '#f2b84b'; g.beginPath(); g.arc(px, py, 1, 0, 7); g.fill();
+        continue;
+      }
+      if (r0 < .17) {   // a garden: a fruit tree
+        g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.arc(px + 1.6, py + 2, 6, 0, 7); g.fill();
+        g.fillStyle = '#3f7f33'; g.beginPath(); g.arc(px, py, 6, 0, 7); g.fill();
+        g.fillStyle = '#5fa547'; g.beginPath(); g.arc(px - 1.5, py - 1.5, 3.8, 0, 7); g.fill();
+        g.fillStyle = '#d8423a'; g.beginPath(); g.arc(px + 2.4, py + .8, .9, 0, 7); g.fill();
+        continue;
+      }
+      // turned to the nearest lane, so the town reads as streets, not as a grid; small cottages to long rows
+      let best = null, bd = 1e9;
+      for (const pts of lanes) for (const q of pts) { const dd = Math.hypot(q[0] - px, q[1] - py); if (dd < bd) { bd = dd; best = q; } }
+      const ang = best ? Math.atan2(best[1] - py, best[0] - px) + Math.PI / 2 : 0;
+      const sz = R(), ww = sz < .3 ? 9 + R() * 2 : sz < .8 ? 12 + R() * 3 : 16 + R() * 3, hh = 8 + R() * 2.5, [lt, dk] = ROOFS[(R() * ROOFS.length) | 0];
+      g.save(); g.translate(px, py); g.rotate(Math.round(ang / (Math.PI / 2)) * Math.PI / 2 + (R() - .5) * .35);
+      g.fillStyle = 'rgba(30,18,8,.32)'; g.fillRect(-ww / 2 + 1.8, -hh / 2 + 2.2, ww, hh);
+      g.fillStyle = lt; g.fillRect(-ww / 2, -hh / 2, ww, hh / 2);
+      g.fillStyle = dk; g.fillRect(-ww / 2, 0, ww, hh / 2);
+      g.strokeStyle = 'rgba(0,0,0,.16)'; g.lineWidth = .5;
+      for (let k3 = -ww / 2 + 2.5; k3 < ww / 2; k3 += 2.5) { g.beginPath(); g.moveTo(k3, -hh / 2); g.lineTo(k3, hh / 2); g.stroke(); }
+      g.fillStyle = 'rgba(255,240,215,.55)'; g.fillRect(-ww / 2, -.55, ww, 1.1);
+      g.strokeStyle = 'rgba(40,20,10,.45)'; g.lineWidth = .7; g.strokeRect(-ww / 2, -hh / 2, ww, hh);
+      if (R() < .4) { g.fillStyle = '#7a5038'; g.fillRect(ww * .18, -hh / 2 + 1, 2.4, 2.6); g.fillStyle = '#3c2a1e'; g.fillRect(ww * .18, -hh / 2 + 1, 2.4, .8); }
+      g.restore();
+    }
+    if (cp.wall) soft(q => { q.lineWidth = 24; q.strokeStyle = 'rgba(50,30,12,.38)'; q.stroke(cp.wall); }, 4);
     g.restore();
     if (cp.wall) {
       g.lineJoin = 'round'; g.lineCap = 'round';
-      for (const [lw, col, dash] of [[13,'rgba(0,0,0,.25)'],[10,'#6d665a'],[6,'#d7cdb7'],[6,'#9a917f',[3,5]]]) { g.setLineDash(dash || []); g.lineWidth = lw; g.strokeStyle = col; g.stroke(cp.wall); }
+      // a crenellated stone wall: shadow, merlons, the stone body, the walkway, mortar lines
+      for (const [lw, col, dash] of [[16, 'rgba(0,0,0,.3)'], [14.5, '#55504a', [3.2, 2.6]], [10.5, '#8f8675'], [7, '#e6dcc6'], [7, '#b3a890', [2.6, 3.4]], [1, 'rgba(70,60,48,.5)']]) { g.setLineDash(dash || []); g.lineWidth = lw; g.strokeStyle = col; g.stroke(cp.wall); }
       g.setLineDash([]);
+      for (const [tx, ty] of cp.towers) {   // a round tower seen from above: stone ring, battlements, a red cone roof
+        g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.arc(tx + 1.8, ty + 2.4, 8.5, 0, 7); g.fill();
+        g.fillStyle = '#6d665a'; g.beginPath(); g.arc(tx, ty, 8.5, 0, 7); g.fill();
+        g.fillStyle = '#d7cdb7'; g.beginPath(); g.arc(tx, ty, 7, 0, 7); g.fill();
+        g.fillStyle = '#6d665a';
+        for (let k3 = 0; k3 < 8; k3++) { const q = k3 / 8 * 6.283; g.fillRect(tx + Math.cos(q) * 6.6 - 1, ty + Math.sin(q) * 6.6 - 1, 2, 2); }
+        const rg = g.createRadialGradient(tx - 1.6, ty - 1.8, .5, tx, ty, 5.4);
+        rg.addColorStop(0, '#f08a68'); rg.addColorStop(.6, '#c8503a'); rg.addColorStop(1, '#8f3020');
+        g.fillStyle = rg; g.beginPath(); g.arc(tx, ty, 5.2, 0, 7); g.fill();
+      }
     }
   }
   if (def.fort) {
+    // Monastery (the card the game scores with 9 when all 8 neighbours are laid): a low stone enclosure with a gate
+    // to the south, a church with a cross-shaped roof and an apse, a bell tower with a cross, a cloister round
+    // a garden with a fountain, a vegetable plot. tools/blender_generators/generate_tiles.py builds it in 3D on the
+    // same spots (p_monastery), so keep the two in step.
     const rr = (x, y, w2, h2, rad) => { g.beginPath(); g.roundRect ? g.roundRect(x, y, w2, h2, rad) : g.rect(x, y, w2, h2); };
-    g.fillStyle = 'rgba(0,0,0,.25)'; rr(C[0] - 39, C[1] - 35, 84, 84, 12); g.fill();
-    g.fillStyle = '#9f937c'; rr(C[0] - 42, C[1] - 42, 84, 84, 12); g.fill();
-    g.fillStyle = '#bdb299'; rr(C[0] - 36, C[1] - 36, 72, 72, 9); g.fill();
-    g.fillStyle = 'rgba(120,108,88,.5)'; for (let i = 0; i < 40; i++) g.fillRect(C[0] - 34 + R()*62, C[1] - 34 + R()*62, 6, 4);
+    const roof = (x, y, w2, h2, vertical, lt, dk) => {   // a gabled roof seen from above: lit and shaded halves, ridge
+      g.fillStyle = 'rgba(30,18,8,.32)'; g.fillRect(x + 2, y + 2.6, w2, h2);
+      if (vertical) { g.fillStyle = lt; g.fillRect(x, y, w2 / 2, h2); g.fillStyle = dk; g.fillRect(x + w2 / 2, y, w2 / 2, h2); g.fillStyle = 'rgba(255,240,215,.6)'; g.fillRect(x + w2 / 2 - .6, y, 1.2, h2); }
+      else { g.fillStyle = lt; g.fillRect(x, y, w2, h2 / 2); g.fillStyle = dk; g.fillRect(x, y + h2 / 2, w2, h2 / 2); g.fillStyle = 'rgba(255,240,215,.6)'; g.fillRect(x, y + h2 / 2 - .6, w2, 1.2); }
+      g.strokeStyle = 'rgba(0,0,0,.15)'; g.lineWidth = .5;
+      if (vertical) for (let k3 = 3; k3 < h2; k3 += 3) { g.beginPath(); g.moveTo(x, y + k3); g.lineTo(x + w2, y + k3); g.stroke(); }
+      else for (let k3 = 3; k3 < w2; k3 += 3) { g.beginPath(); g.moveTo(x + k3, y); g.lineTo(x + k3, y + h2); g.stroke(); }
+      g.strokeStyle = 'rgba(40,20,10,.5)'; g.lineWidth = .7; g.strokeRect(x, y, w2, h2);
+    };
+    const [cx, cy] = C;
+    // enclosure: shadow, stone wall, the green inside, gravel paths, the gate
+    g.fillStyle = 'rgba(0,0,0,.25)'; rr(cx - 42, cy - 40, 88, 88, 14); g.fill();
+    g.fillStyle = '#8f8675'; rr(cx - 44, cy - 44, 88, 88, 14); g.fill();
+    g.fillStyle = '#d8ceb6'; rr(cx - 41, cy - 41, 82, 82, 12); g.fill();
+    g.fillStyle = '#86c062'; rr(cx - 38, cy - 38, 76, 76, 10); g.fill();
+    g.fillStyle = '#e2d3ae'; g.fillRect(cx - 3.5, cy + 14, 7, 30); g.fillRect(cx - 34, cy + 2, 68, 6);
+    g.fillStyle = '#e2d3ae'; g.fillRect(cx - 6, cy + 38, 12, 8);   // the gate
+    g.fillStyle = '#6d4a2e'; g.fillRect(cx - 6, cy + 41, 2, 4); g.fillRect(cx + 4, cy + 41, 2, 4);
+    // vegetable plot: dark soil, rows of greens
+    g.fillStyle = '#7a5a3a'; g.fillRect(cx - 34, cy + 12, 24, 24);
+    for (let r2 = 0; r2 < 4; r2++) for (let k3 = 0; k3 < 6; k3++) { g.fillStyle = (r2 + k3) % 3 ? '#5fa547' : '#9bd060'; g.beginPath(); g.arc(cx - 31 + k3 * 3.8, cy + 15.5 + r2 * 5.6, 1.4, 0, 7); g.fill(); }
+    // cloister: a slate-roofed walk round a little garden with a fountain
+    g.fillStyle = 'rgba(30,18,8,.3)'; g.fillRect(cx + 10 + 2, cy + 12 + 2.5, 26, 26);
+    g.fillStyle = '#6a8098'; g.fillRect(cx + 10, cy + 12, 26, 26);
+    g.fillStyle = '#3d4e60'; g.fillRect(cx + 10, cy + 24, 26, 14);
+    g.fillStyle = '#7cc05a'; g.fillRect(cx + 16, cy + 18, 14, 14);
+    g.fillStyle = '#8f8778'; g.beginPath(); g.arc(cx + 23, cy + 25, 3.4, 0, 7); g.fill();
+    g.fillStyle = '#2f7fc0'; g.beginPath(); g.arc(cx + 23, cy + 25, 2, 0, 7); g.fill();
+    // church: transept across, nave along, a round apse to the north
+    g.fillStyle = 'rgba(30,18,8,.3)'; g.beginPath(); g.arc(cx + 2, cy - 31.5, 10, 0, 7); g.fill();
+    const ap = g.createRadialGradient(cx - 3, cy - 36, 1, cx, cy - 33, 10); ap.addColorStop(0, '#e06a4c'); ap.addColorStop(1, '#8f3020');
+    g.fillStyle = ap; g.beginPath(); g.arc(cx, cy - 33, 10, Math.PI, 0); g.fill();
+    roof(cx - 10, cy - 33, 20, 46, true, '#cf5a40', '#8f3020');
+    roof(cx - 26, cy - 22, 52, 15, false, '#cf5a40', '#8f3020');
+    // bell tower at the west front of the nave: a pyramid roof and a gold cross
+    const bx = cx, by = cy + 15;
+    g.fillStyle = 'rgba(30,18,8,.35)'; g.fillRect(bx - 7 + 2, by - 7 + 2.6, 14, 14);
+    g.fillStyle = '#b7ab92'; g.fillRect(bx - 7, by - 7, 14, 14);
+    for (const [pts, col] of [[[[bx - 6, by - 6], [bx + 6, by - 6], [bx, by]], '#7a8ea4'], [[[bx + 6, by - 6], [bx + 6, by + 6], [bx, by]], '#4a5b6e'], [[[bx + 6, by + 6], [bx - 6, by + 6], [bx, by]], '#3d4e60'], [[[bx - 6, by + 6], [bx - 6, by - 6], [bx, by]], '#6a8098']]) {
+      g.fillStyle = col; g.beginPath(); pts.forEach((p, i) => i ? g.lineTo(...p) : g.moveTo(...p)); g.closePath(); g.fill();
+    }
+    g.fillStyle = '#f2c14e'; g.fillRect(bx - .6, by - 3, 1.2, 6); g.fillRect(bx - 2.2, by - 1.4, 4.4, 1.2);
+    // two trees in the corners of the yard
+    for (const [tx, ty] of [[cx + 30, cy - 30], [cx - 30, cy - 30]]) {
+      g.fillStyle = 'rgba(0,0,0,.25)'; g.beginPath(); g.arc(tx + 1.6, ty + 2, 6, 0, 7); g.fill();
+      g.fillStyle = '#3f7f33'; g.beginPath(); g.arc(tx, ty, 6, 0, 7); g.fill();
+      g.fillStyle = '#5fa547'; g.beginPath(); g.arc(tx - 1.5, ty - 1.5, 3.8, 0, 7); g.fill();
+    }
   }
   if (def.end === 'cliff') return c.toDataURL('image/png'); // the chasm is a real hole, so this card needs transparency and no frame
   g.strokeStyle = 'rgba(0,0,0,.22)'; g.lineWidth = 3; g.strokeRect(1.5, 1.5, S - 3, S - 3);

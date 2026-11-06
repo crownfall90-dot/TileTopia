@@ -16,7 +16,7 @@ const sleep = ms => new Promise(r => setTimeout(r, ms));
 const PRELUDE = `
   const wait = ms => new Promise(r => setTimeout(r, ms));
   const byText = (re, root = document) => [...root.querySelectorAll('button,a,[role=button]')].find(b => b.offsetParent && re.test(b.textContent.trim()));
-  const clear = () => document.querySelectorAll('.over').forEach(o => o.remove());
+  const clear = () => document.querySelectorAll('.over:not(#over)').forEach(o => o.remove());   // #over is the game's own
   async function boot() {
     for (let i = 0; i < 80 && document.getElementById('boot'); i++) await wait(250);   // the splash is gone
     for (let i = 0; i < 40 && !byText(/Пропустить обучение|ИГРАТЬ|Играть/i); i++) await wait(250);

@@ -433,7 +433,7 @@
   },
   {
    "id": "fort",
-   "name": "Крепость",
+   "name": "Монастырь",
    "edges": "ffff",
    "sides": {
     "N": "field",
@@ -456,7 +456,7 @@
   },
   {
    "id": "fortR",
-   "name": "Крепость с дорогой",
+   "name": "Монастырь у дороги",
    "edges": "ffrf",
    "sides": {
     "N": "field",

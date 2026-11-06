@@ -135,7 +135,7 @@ test('ui/progress: ringSvg, renderMasteryGrid, renderBuildingStats, renderCollec
   assert.ok(buildHtml.includes('12</b> городов'));
   assert.ok(buildHtml.includes('рекорд: 14 карт'));
   assert.ok(buildHtml.includes('25</b> дорог'));
-  assert.ok(buildHtml.includes('4</b> крепостей'));
+  assert.ok(buildHtml.includes('4</b> монастырей'));
 
   // Collection card
   const col = {

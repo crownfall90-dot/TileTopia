@@ -435,8 +435,7 @@ def decor_items(t, rnd):
         n = 4 if len(city) >= 3 else 3
         for i in range(n):
             items.append(['tower' if i == 0 and len(city) >= 3 else rnd.choice(list(HOUSES)), cx + pts[i][0], cy + pts[i][1]])
-    if 'fort' in t['features']:
-        items.append(['tower', 0, .2])
+    # the monastery card: its buildings come from p_monastery, the decor only dresses the corners
     end = t.get('roadEnd')
     if end and end != 'cliff':
         d = E.index('r')
@@ -695,6 +694,156 @@ def wall(tm, pts):
             tm.box((m.x, m.y, H + .065), dv.length * .5, .05, .03, yaw, 'stone')
 
 
+
+def art(px, py):
+    """A point of the card art (192 px, y down, as in src/render/art.js) on the 3D tile."""
+    return Vector((px / 96 - 1, 1 - py / 96))
+
+
+def gabled(tm, c, w, d, h, ridge, yaw, roof, wallm='stone'):
+    """A plain building with a gabled roof, ridge along w (churches, cloister walks)."""
+    x, y, z = c
+    tm.box((x, y, z), w, d, h, yaw, wallm, top=False)
+    R = Matrix.Rotation(yaw, 3, 'Z')
+    P = lambda a, b, cz: Vector((x, y, z)) + R @ Vector((a, b, cz))
+    ow, od = w / 2 + .012, d / 2 + .016
+    a1, b1, c1, d1 = P(-ow, -od, h), P(ow, -od, h), P(ow, od, h), P(-ow, od, h)
+    r1, r2 = P(-ow, 0, h + ridge), P(ow, 0, h + ridge)
+    tm.face([a1, b1, r2, r1], roof)
+    tm.face([c1, d1, r1, r2], roof)
+    tm.face([P(-w / 2, d / 2, h), P(-w / 2, -d / 2, h), P(-w / 2, 0, h + ridge * .92)], wallm)
+    tm.face([P(w / 2, -d / 2, h), P(w / 2, d / 2, h), P(w / 2, 0, h + ridge * .92)], wallm)
+
+
+def p_monastery(tm):
+    """The monastery card (scored 9 when all 8 neighbours are laid), on the spots art.js paints it."""
+    z = H
+    # enclosure: a low stone wall with a gate to the south
+    hw, th, wh = .45, .03, .055
+    tm.box((0, hw, z), 2 * hw, th, wh, 0, 'stone')
+    tm.box((hw, 0, z), th, 2 * hw, wh, 0, 'stone')
+    tm.box((-hw, 0, z), th, 2 * hw, wh, 0, 'stone')
+    for sx in (-1, 1):
+        tm.box((sx * (hw + .07) / 2, -hw, z), hw - .07, th, wh, 0, 'stone')
+    for sx in (-1, 1):
+        tm.box((sx * .07, -hw, z), .03, .035, .09, 0, 'wood')
+    # church: nave (north-south), transept (east-west), apse to the north
+    nave = (art(96, 86) + art(96, 86)) / 2
+    gabled(tm, (0, (1 - 63 / 96 + 1 - 109 / 96) / 2, z), .479, .2, .15, .1, math.pi / 2, 'roof_red')
+    gabled(tm, (0, (1 - 74 / 96 + 1 - 89 / 96) / 2, z), .54, .15, .15, .085, 0, 'roof_red')
+    ax = art(96, 63)
+    tm.cylinder((ax.x, ax.y, z), .1, .15, 10, 'stone', caps=False)
+    tm.cone((ax.x, ax.y, z + .15), .112, .085, 10, 'roof_red')
+    for k in range(3):   # windows of the nave
+        q = Vector((.102, .25 - k * .12, z + .06))
+        tm.face([q, q + Vector((0, -.035, 0)), q + Vector((0, -.035, .055)), q + Vector((0, 0, .055))], 'window')
+    # bell tower at the south front: stone, a slate pyramid, a gold cross
+    b = art(96, 111)
+    tm.box((b.x, b.y, z), .145, .145, .38, 0, 'stone')
+    for k in range(4):
+        a = math.pi / 2 * k
+        q = Vector((b.x + math.cos(a) * .0735, b.y + math.sin(a) * .0735, z + .27))
+        nrm = Vector((math.cos(a), math.sin(a), 0)) * .002
+        side = Vector((-math.sin(a), math.cos(a), 0)) * .022
+        tm.face([q + nrm - side, q + nrm + side, q + nrm + side + Vector((0, 0, .06)), q + nrm - side + Vector((0, 0, .06))], 'slit')
+    M = Matrix.Translation(Vector((b.x, b.y, z + .38 + .09))) @ Matrix.Rotation(math.pi / 4, 4, 'Z')
+    tm.prim(bmesh.ops.create_cone(tm.bm, cap_ends=True, cap_tris=False, segments=4, radius1=.11, radius2=0, depth=.18, matrix=M), 'roof_slate')
+    top = z + .38 + .18
+    tm.box((b.x, b.y, top), .008, .008, .09, 0, 'gold')
+    tm.box((b.x, b.y, top + .055), .05, .008, .008, 0, 'gold')
+    # cloister: a slate-roofed walk round a garden with a fountain
+    c0, c1 = art(106, 108), art(132, 134)
+    cc, half = (c0 + c1) / 2, (c1.x - c0.x) / 2
+    for k in range(4):
+        a = math.pi / 2 * k
+        o = Vector((math.cos(a), math.sin(a))) * (half - .03)
+        gabled(tm, (cc.x + o.x, cc.y + o.y, z), half * 2, .06, .06, .035, a + math.pi / 2, 'roof_slate', 'plaster')
+    tm.cylinder((cc.x, cc.y, z), .035, .03, 8, 'stone')
+    tm.cylinder((cc.x, cc.y, z + .031), .025, .001, 8, 'fall')
+    for px in (126, 66):
+        p_oak(tm, (*art(px, 66), z), random.Random(px), .55)
+
+
+def p_stall(tm, c, yaw, i):
+    """A market stall: four posts, a counter, a striped awning sloping to the street."""
+    x, y, z = c
+    R = Matrix.Rotation(yaw, 3, 'Z')
+    P = lambda a, b, cz: Vector((x, y, z)) + R @ Vector((a, b, cz))
+    w, d = .095, .066
+    for sa, sb in ((-1, -1), (1, -1), (1, 1), (-1, 1)):
+        q = P(sa * w / 2, sb * d / 2, 0)
+        tm.box((q.x, q.y, z), .008, .008, .085 if sb < 0 else .1, yaw, 'beam')
+    tm.box((x, y, z), w * .9, d * .5, .04, yaw, 'wood')
+    stripes = (('flag', 'birch_bark'), ('awn_blue', 'birch_bark'), ('hay', 'birch_bark'), ('oak', 'birch_bark'))[i % 4]
+    n = 6
+    for k in range(n):
+        a0, a1 = -w / 2 - .01 + (w + .02) * k / n, -w / 2 - .01 + (w + .02) * (k + 1) / n
+        tm.face([P(a0, -d / 2 - .02, .085), P(a1, -d / 2 - .02, .085), P(a1, d / 2 + .005, .105), P(a0, d / 2 + .005, .105)], stripes[k % 2])
+    for k in range(3):   # goods on the counter
+        q = P(-.03 + k * .03, -.005, .04)
+        tm.blob((q.x, q.y, q.z + .008), .011, ('apple', 'hay', 'oak')[(i + k) % 3])
+
+
+def p_keep(tm, c):
+    """The keep on the square of a big town: a stone block with battlements and four round corner towers."""
+    x, y, z = c
+    s = .22
+    tm.box((x, y, z), s, s, .2, 0, 'stone')
+    for k in range(-2, 3):
+        for (ax, ay) in ((k * s / 5, s / 2), (k * s / 5, -s / 2), (s / 2, k * s / 5), (-s / 2, k * s / 5)):
+            tm.box((x + ax, y + ay, z + .2), .022, .022, .03, 0, 'stone')
+    for sx, sy in ((-1, -1), (1, -1), (1, 1), (-1, 1)):
+        q = (x + sx * s / 2, y + sy * s / 2)
+        tm.cylinder((q[0], q[1], z), .048, .29, 8, 'stone')
+        tm.cone((q[0], q[1], z + .29), .058, .12, 8, 'roof_red')
+    tm.cylinder((x, y, z + .2), .005, .2, 4, 'beam')
+    f0 = Vector((x, y, z + .4))
+    tm.face([f0, f0 + Vector((.09, 0, -.025)), f0 + Vector((0, 0, -.055))], 'flag')
+    tm.face([f0 + Vector((0, 0, -.055)), f0 + Vector((.09, 0, -.025)), f0], 'flag')
+    q = Vector((x, y - s / 2 - .002, z))
+    tm.face([q + Vector((-.03, 0, 0)), q + Vector((.03, 0, 0)), q + Vector((.03, 0, .07)), q + Vector((0, 0, .09)), q + Vector((-.03, 0, .07))], 'door')
+
+
+def p_gazebo(tm, c):
+    x, y, z = c
+    r = .06
+    for k in range(6):
+        a = 2 * math.pi * k / 6
+        tm.box((x + math.cos(a) * r, y + math.sin(a) * r, z), .01, .01, .08, a, 'beam')
+    tm.cylinder((x, y, z), r * 1.05, .012, 6, 'wood')
+    tm.cone((x, y, z + .08), r * 1.45, .08, 8, 'wood')
+    tm.blob((x, y, z + .165), .012, 'gold')
+
+
+def town_layout(t):
+    """Where art.js puts the square, the market and the keep (keep in step with the Town block there)."""
+    city = [d for d in range(4) if t['edges'][d] == 'c']
+    if not city:
+        return None
+    big = len(city) >= 3
+    tc = Vector((0, 0)) if len(city) == 4 else sum((MID[d] for d in city), Vector((0, 0))) / len(city) * .5
+    sq = (30 if big else 18) / 96
+    stall_r = (25 if big else 16) / 96
+    stalls = [(tc + Vector((math.cos(math.radians(a)), -math.sin(math.radians(a)))) * stall_r, math.radians(-a) + math.pi / 2)
+              for a in (45, 135, 225, 315)] if len(city) > 1 else []
+    lanes = []
+    for d in city:
+        side = 1 if d % 2 else -1
+        k2 = (MID[d] + tc) / 2 + Vector((GV[d][1], GV[d][0])) * 6 * side / 96
+        lanes.append(quad_pts(MID[d], k2, tc, 14))
+    return {'city': city, 'big': big, 'tc': tc, 'sq': sq, 'stalls': stalls, 'lanes': lanes}
+
+
+def well(tm, c):
+    """The well on the town square (art.js draws it at the meeting point of the lanes)."""
+    x, y = c.x, c.y
+    tm.cylinder((x, y, H), .07, .06, 10, 'stone')
+    tm.cylinder((x, y, H + .061), .05, .001, 10, 'fall')
+    for dx in (-.06, .06):
+        tm.box((x + dx, y, H + .06), .014, .014, .12, 0, 'wood')
+    tm.box((x, y, H + .18), .16, .1, .012, 0, 'roof_red', taper=.15)
+
+
 def bridge(tm, r):
     """A stone arch over the river where the road crosses it (wBr), as on the banner, with a plank deck."""
     d = (MID[r['to']] - MID[r['from']]).normalized()
@@ -741,15 +890,35 @@ def place(tm, kind, c, rnd, s=1.0):
         PROPS[kind](tm, c, rnd, s)
 
 
-def slab(tm):
-    """The card body: the face on top, a grass lip and earth on the sides, a darker base."""
-    tm.face([(-1, -1, H), (1, -1, H), (1, 1, H), (-1, 1, H)], 'face')
-    C = [(-1, -1), (1, -1), (1, 1), (-1, 1)]
+def slab(tm, y0=-1.0):
+    """The card body: the face on top, a grass lip and earth on the sides, a darker base. y0 > -1 ends it there
+    (the cliff card: art.js leaves its southern half a real hole)."""
+    tm.face([(-1, y0, H), (1, y0, H), (1, 1, H), (-1, 1, H)], 'face')
+    C = [(-1, y0), (1, y0), (1, 1), (-1, 1)]
     for k in range(4):
         (ax, ay), (bx, by) = C[k], C[(k + 1) % 4]
         tm.face([(bx, by, H - LIP), (ax, ay, H - LIP), (ax, ay, H), (bx, by, H)], 'lip')
         tm.face([(bx, by, 0), (ax, ay, 0), (ax, ay, H - LIP), (bx, by, H - LIP)], 'soil')
-    tm.face([(-1, 1, 0), (1, 1, 0), (1, -1, 0), (-1, -1, 0)], 'soil_dark')
+    tm.face([(-1, 1, 0), (1, 1, 0), (1, y0, 0), (-1, y0, 0)], 'soil_dark')
+
+
+def cliff(tm, y0, rnd):
+    """The chasm of the cliff card: a ragged rock face falling from the edge of the meadow into the dark."""
+    n = 12
+    for k in range(n):
+        x0, x1 = -1 + 2 * k / n, -1 + 2 * (k + 1) / n
+        depth = -.04 - rnd.random() * .12
+        out = .01 + rnd.random() * .025
+        band = H - LIP - .07
+        tm.face([(x0, y0 - .004, band), (x1, y0 - .004, band), (x1, y0 - .002, H - LIP), (x0, y0 - .002, H - LIP)], 'rock')
+        tm.face([(x0, y0 - out, depth), (x1, y0 - out, depth), (x1, y0 - .004, band), (x0, y0 - .004, band)], 'soil_dark')
+        tm.face([(x0, y0 - .002, H - LIP), (x1, y0 - .002, H - LIP), (x1, y0 - .002, H), (x0, y0 - .002, H)], 'lip')
+    for k in range(7):   # boulders on the brink and a few down the face
+        x = -.9 + 1.8 * k / 6 + (rnd.random() - .5) * .1
+        tm.blob((x, y0 + .04, H), .045 + rnd.random() * .03, 'rock', sz=.6, jitter=.4, rnd=rnd)
+    for k in range(4):
+        x = -.8 + rnd.random() * 1.6
+        tm.blob((x, y0 - .02, .02 + rnd.random() * .06), .04, 'rock', sz=.7, jitter=.4, rnd=rnd)
 
 
 def waterfall(d):
@@ -776,10 +945,39 @@ def waterfall(d):
 def build_tile(t):
     rnd = random.Random(zlib.crc32(t['id'].encode()))
     tm = TileMesh()
-    slab(tm)
+    y0 = -.01 if 'cliff' in t['features'] else -1.0
+    slab(tm, y0)
+    if y0 > -1:
+        cliff(tm, y0, random.Random(zlib.crc32(('cliff:' + t['id']).encode())))
     poly, walls = city_shape(t['edges'])
     for w in walls:
         wall(tm, w)
+    # towers in the middle of each wall curve; the square with its well or keep, the market, a gazebo — where the
+    # face paints them
+    towers = [w[len(w) // 2] for w in walls]
+    for c in towers:
+        p_tower(tm, (c.x, c.y, H - .01), .62)
+    city = [d for d in range(4) if t['edges'][d] == 'c']
+    lay = town_layout(t)
+    if lay and len(city) > 1:
+        if lay['big']:
+            p_keep(tm, (lay['tc'].x, lay['tc'].y, H))
+        else:
+            well(tm, lay['tc'])
+        for i, (q, yaw) in enumerate(lay['stalls']):
+            p_stall(tm, (q.x, q.y, H), yaw, i)
+    if lay and poly:
+        grng = random.Random(zlib.crc32(('gazebo:' + t['id']).encode()))
+        for _ in range(60):
+            q = Vector(((grng.random() * 2 - 1) * .8, (grng.random() * 2 - 1) * .8))
+            if not inside(q, poly) or any(dist_poly(q, w) < .16 for w in walls) or any(dist_poly(q, ln) < .14 for ln in lay['lanes']):
+                continue
+            if (q - lay['tc']).length < lay['sq'] + .16 or any((q - c).length < .2 for c in towers):
+                continue
+            p_gazebo(tm, (q.x, q.y, H))
+            break
+    if 'fort' in t['features']:
+        p_monastery(tm)
     if 'bridge' in t['features']:
         bridge(tm, next(r for r in t['roads'] if r['to'] is not None))
     # the game rolls the decor per placed card; a model shows one roll, so take the first seed that dresses the field
@@ -795,8 +993,21 @@ def build_tile(t):
         if kind in ('pine', 'oak', 'birch', 'poplar') and rnd.random() < .5:
             extra.append([rnd.choice(('bush', 'rock', 'bush')), gx + (rnd.random() - .5) * .14, gy + .08])
     items += extra
+    sq = lay['tc'] if lay and len(city) > 1 else None
+    sq_r = (lay['sq'] + .12) if sq is not None else 0
     for kind, gx, gy in sorted(items, key=lambda it: -it[2]):
         x, y = max(-.39, min(.39, gx)) * 2, -max(-.39, min(.39, gy)) * 2
+        q = Vector((x, y))
+        if any((q - c).length < .26 for c in towers) or (sq is not None and (q - sq).length < sq_r):
+            continue
+        if kind == 'tower' and lay and lay['big']:
+            continue   # a big town has its keep on the square
+        if y < y0 + .12:
+            continue
+        if 'fort' in t['features'] and kind not in PROPS:
+            continue
+        if 'fort' in t['features'] and max(abs(x), abs(y)) < .55:
+            continue   # nothing inside the monastery yard
         s = .8 if kind == 'tower' and ncity else 1.0
         place(tm, kind, (x, y, H), rnd, s)
     tile = tm.finish(t['id'])
