@@ -42,37 +42,9 @@ jobs:
         run: if [ -f scripts/ci/signing-key.sh ]; then bash scripts/ci/signing-key.sh; fi
       - name: Compute next version code
         id: ver
-        run: |
-          if [ -n "${{ inputs.custom_code }}" ]; then
-            CODE="${{ inputs.custom_code }}"
-          else
-            # Test APK always gets the next version after the latest production release tag (vNNN).
-            REMOTE_LAST=$(git ls-remote --tags origin 'v*' 2>/dev/null | sed -n 's#.*refs/tags/v\([0-9][0-9]*\)$#\1#p' | sort -n | tail -1)
-            LOCAL_LAST=$(git tag -l 'v*' 2>/dev/null | sed -n 's#^v\([0-9][0-9]*\)$#\1#p' | sort -n | tail -1)
-            LAST="${REMOTE_LAST:-$LOCAL_LAST}"
-            PROD_MIN=$(( ${LAST:-260} + 1 ))
-
-            # Monotonically increment staging version code so in-app updater and Android detect the update
-            REPO="${GITHUB_REPOSITORY:-crownfall90-dot/TileTopia}"
-            PREV_STAGING=$(python3 -c "
-import urllib.request, json
-try:
-    req = urllib.request.urlopen('https://github.com/${REPO}/releases/download/staging-latest/latest-staging.json', timeout=5)
-    d = json.loads(req.read().decode('utf-8'))
-    print(int(d.get('code', 0)))
-except Exception:
-    print(0)
-" 2>/dev/null || echo 0)
-
-            if [ -n "$PREV_STAGING" ] && [ "$PREV_STAGING" -ge "$PROD_MIN" ] 2>/dev/null; then
-              CODE=$(( PREV_STAGING + 1 ))
-            else
-              CODE="$PROD_MIN"
-            fi
-          fi
-          echo "code=$CODE" >> "$GITHUB_OUTPUT"
-          echo "version=1.0.${CODE}-test" >> "$GITHUB_OUTPUT"
-          echo "::notice::Test APK version: 1.0.${CODE}-test (previous staging: ${PREV_STAGING:-none}, production latest: v${LAST:-260})"
+        env:
+          CUSTOM_CODE: ${{ inputs.custom_code }}
+        run: python3 scripts/compute-staging-code.py
       - name: Build test APK (staging flavor)
         env:
           KEYSTORE_PASSWORD: ${{ env.KEYSTORE_PASSWORD || secrets.KEYSTORE_PASSWORD }}
@@ -104,7 +76,7 @@ except Exception:
           CODE: ${{ steps.ver.outputs.code }}
           VERSION: ${{ steps.ver.outputs.version }}
         run: |
-          python3 -c 'import json,os; c=int(os.environ["CODE"]); v=os.environ["VERSION"]; r=os.environ["GITHUB_REPOSITORY"]; json.dump({"code": c, "version": v, "notes": "Тестовая сборка " + v, "url": "https://github.com/%s/releases/download/staging-latest/Tiletopia-Test-%s.apk" % (r, v), "package": "app.crownfall.tiletopia.test"}, open("latest-staging.json", "w", encoding="utf-8"), ensure_ascii=False)'
+          python3 -c 'import json,os; c=int(os.environ["CODE"]); v=os.environ["VERSION"]; r=os.environ["GITHUB_REPOSITORY"]; json.dump({"code": c, "version": v, "mandatory": True, "notes": "Тестовая сборка " + v, "url": "https://github.com/%s/releases/download/staging-latest/Tiletopia-Test-%s.apk" % (r, v), "package": "app.crownfall.tiletopia.test"}, open("latest-staging.json", "w", encoding="utf-8"), ensure_ascii=False)'
           gh release delete staging-latest --yes || true
           gh release create staging-latest \
             "Tiletopia-Test-${{ steps.ver.outputs.version }}.apk" \

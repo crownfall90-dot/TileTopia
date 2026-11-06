@@ -7469,7 +7469,9 @@ window.onUpdateAvailable = (info, manual) => {
 
   // If update is optional (not mandatory) and check was automatic (on startup or periodic),
   // do NOT interrupt the player with a blocking popup dialog!
-  if (!manual && !isMandatory) {
+  // Note: On test/staging builds (-test), always prompt the tester immediately so they don't miss builds.
+  const isTestBuild = !!(info && info.version && info.version.includes('-test')) || !!window.IS_STAGING;
+  if (!manual && !isMandatory && !isTestBuild) {
     boot.checked = true;
     bootHide();
     return;

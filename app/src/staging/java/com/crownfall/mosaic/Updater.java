@@ -81,6 +81,7 @@ class Updater {
             info.put("version", f.optString("version", "1.0." + f.getInt("code")));
             info.put("notes", f.optString("notes", ""));
             info.put("url", f.getString("url"));
+            info.put("mandatory", true);
             // "cert": the release is signed with this key; when it is not ours, an in-place update is impossible.
             String cert = f.optString("cert", "").replace(":", "").toLowerCase(java.util.Locale.ROOT);
             String mine = myCert(ctx);
@@ -108,6 +109,7 @@ class Updater {
             info.put("version", rel.optString("name", "1.0." + code));
             info.put("notes", rel.optString("body", ""));
             info.put("url", url);
+            info.put("mandatory", true);
             return info;
         } catch (Exception e) {
             if (saidCurrent) return null; // the file said this build is current and the API could not be asked
