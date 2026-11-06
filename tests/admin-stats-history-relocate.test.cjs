@@ -24,7 +24,7 @@ test('history tab relocated: button in main menu header, profile has 3 tabs, ded
 
   // 2. Profile tabs do NOT contain history tab anymore
   assert.ok(!gameHtml.includes('data-pt="hist"'), 'profile #ptabs does not have data-pt="hist"');
-  assert.ok(gameHtml.includes('<div class="seg ptabs" id="ptabs"><button data-pt="road" aria-pressed="true">Дорога</button><button data-pt="rewards" aria-pressed="false">Задания</button><button data-pt="cols" aria-pressed="false">Коллекции</button></div>'), 'ptabs: the road, the quests and the collections (the rating is in the menu)');
+  assert.ok(gameHtml.includes('<div class="seg ptabs" id="ptabs"><button data-pt="road" aria-pressed="true">Прогресс</button><button data-pt="rewards" aria-pressed="false">Задания</button><button data-pt="cols" aria-pressed="false">Коллекции</button></div>'), 'ptabs: the progress, the quests and the collections (the rating is in the menu)');
 
   // 3. CSS has 3 columns for ptabs
   assert.ok(stylesCss.includes('#ptabs{grid-template-columns:repeat(3,minmax(0,1fr))}'), '#ptabs styles updated to 3 columns');

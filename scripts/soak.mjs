@@ -27,7 +27,7 @@ async function cdp(url) {
 // Watchers installed before the page's own scripts: long tasks and frames.
 const PROBE = `
   window.__soak = {long: [], frames: 0, t0: performance.now(), errors: []};
-  try { new PerformanceObserver(l => l.getEntries().forEach(e => __soak.long.push(Math.round(e.duration)))).observe({type: 'longtask', buffered: true}); } catch (_) {}
+  try { new PerformanceObserver(l => l.getEntries().forEach(e => { __soak.long.push(Math.round(e.duration)); (__soak.at = __soak.at || []).push(Math.round(e.startTime) + 'ms +' + Math.round(e.duration)); })).observe({type: 'longtask', buffered: true}); } catch (_) {}
   (function f() { __soak.frames++; requestAnimationFrame(f); })();
   addEventListener('error', e => __soak.errors.push(String(e.message)));
   addEventListener('unhandledrejection', e => __soak.errors.push('promise: ' + String(e.reason && (e.reason.stack || e.reason.message) || e.reason)));
@@ -64,7 +64,7 @@ const STATE = `(() => {
 const METRICS = `(() => {
   const secs = (performance.now() - __soak.t0) / 1000;
   return {secs: Math.round(secs), fps: Math.round(__soak.frames / secs), long: __soak.long.length, longMax: Math.max(0, ...__soak.long),
-    longOver200: __soak.long.filter(x => x > 200).length, errors: __soak.errors.slice(0, 20),
+    longOver200: __soak.long.filter(x => x > 200).length, longAt: (__soak.at || []).slice(0, 12), errors: __soak.errors.slice(0, 20),
     heapMB: performance.memory ? Math.round(performance.memory.usedJSHeapSize / 1048576) : null,
     dom: document.getElementsByTagName('*').length};
 })()`;

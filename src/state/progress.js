@@ -161,6 +161,19 @@ export function recordGameMode(st, mode, win, score) {
   st.byMode[m].best = Math.max(st.byMode[m].best || 0, score || 0);
 }
 
+/**
+ * Gold on top of a finished game, the habit-forming kind top games use: the first win of the day pays a bonus, and
+ * every further win in a row pays more (capped). A game the player barely played (laid < 6 cards) pays nothing.
+ * stats = PROG.st (streak is already updated for this game), fw = the day of the last first-win bonus.
+ */
+export const FIRST_WIN_GOLD = 30, STREAK_GOLD_STEP = 10, STREAK_GOLD_MAX = 50;
+export function winBonus({win, streak = 0, laid = 0, today = '', fw = ''}) {
+  if (!win || laid < 6) return {gold: 0, first: 0, streakGold: 0};
+  const first = fw !== today ? FIRST_WIN_GOLD : 0;
+  const streakGold = streak >= 2 ? Math.min(STREAK_GOLD_MAX, STREAK_GOLD_STEP * (streak - 1)) : 0;
+  return {gold: first + streakGold, first, streakGold};
+}
+
 export function addXp(prog, xp) {
   prog.xp += xp; let up = 0;
   while (prog.xp >= xpNeed(prog.lvl)) { prog.xp -= xpNeed(prog.lvl); prog.lvl++; up++; }

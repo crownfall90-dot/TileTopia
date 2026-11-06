@@ -54,3 +54,13 @@ test('progress: quest thresholds adjusted for fast 30-card mode', async () => {
   assert.ok(s30, 's30 quest exists');
   assert.ok(s30.t.includes('20 в быстрой'), 's30 mentions 20 points for fast mode');
 });
+
+test('progress: first win of the day and win streak pay extra gold', async () => {
+  const P = await import('../src/state/progress.js');
+  const base = {win: true, laid: 8, today: '2026-11-06', fw: ''};
+  assert.deepEqual(P.winBonus({...base, streak: 1}), {gold: 30, first: 30, streakGold: 0});
+  assert.deepEqual(P.winBonus({...base, streak: 3, fw: '2026-11-06'}), {gold: 20, first: 0, streakGold: 20});
+  assert.equal(P.winBonus({...base, streak: 12, fw: '2026-11-06'}).streakGold, P.STREAK_GOLD_MAX, 'capped');
+  assert.equal(P.winBonus({...base, win: false, streak: 0}).gold, 0, 'a loss pays nothing');
+  assert.equal(P.winBonus({...base, laid: 3}).gold, 0, 'quitting early is not farming');
+});

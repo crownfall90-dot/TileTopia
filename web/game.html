@@ -180,7 +180,7 @@
         <div class="lb">
           <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Задания и Прогресс</b></div>
 
-          <div class="seg ptabs" id="ptabs"><button data-pt="road" aria-pressed="true">Дорога</button><button data-pt="rewards" aria-pressed="false">Задания</button><button data-pt="cols" aria-pressed="false">Коллекции</button></div>
+          <div class="seg ptabs" id="ptabs"><button data-pt="road" aria-pressed="true">Прогресс</button><button data-pt="rewards" aria-pressed="false">Задания</button><button data-pt="cols" aria-pressed="false">Коллекции</button></div>
           <div class="col" id="ptab"></div>
         </div>
       </section>
@@ -4321,6 +4321,12 @@ function gameDone(place, score) {
   const me = players.find(isMe), laid = me && me.stats ? me.stats.t || 0 : 6;
   const xp = laid < 6 ? 0 : Math.round((10 + (place < 0 ? 15 : [30, 20, 10, 5, 5][place] || 5) + Math.min(40, score >> 1)) * (net ? 1.5 : 1));
   const up = PG.state.progress.addXp(PROG, xp); wallet.gold += 20 * up;
+  // first win of the day and wins in a row pay a little extra gold
+  const wb = PG.state.progress.winBonus({win, streak: PROG.st.streak, laid, today: today(), fw: wallet.fwDay});
+  if (wb.gold) {
+    wallet.gold += wb.gold; if (wb.first) wallet.fwDay = today();
+    setTimeout(() => toastAny(`${wb.first ? 'Первая победа дня' : 'Серия побед'}: +${wb.gold} золота${wb.first && wb.streakGold ? ` (серия ×${PROG.st.streak})` : wb.streakGold ? ` · ${PROG.st.streak} подряд` : ''}`), 2600);
+  }
   // Cups: quick online games, and a private room whose creator turned "for cups" on (at most 5 such games a day:
   // nobody can farm cups with a friend). No cups if any bot is in the game.
   const hasBots = players.some(p => !p.human);
@@ -4488,7 +4494,7 @@ function renderProgressRoad() {
   const need = xpNeed(myLvl), pct = Math.max(0, Math.min(100, 100 * PROG.xp / need));
   const unlocked = m => myLvl >= m.lvl || myCups >= m.cups;
   const next = PROGRESS_ROAD_MILESTONES.find(m => !unlocked(m));
-  const head = `<div class="rd-head"><div class="rd-lvl"><b>${myLvl}</b><small>уровень</small></div><div class="rd-info"><b>Дорога прогресса</b>`
+  const head = `<div class="rd-head"><div class="rd-lvl"><b>${myLvl}</b><small>уровень</small></div><div class="rd-info"><b>Прогресс</b>`
     + `<div class="xpbar"><i style="width:${pct.toFixed(1)}%"></i></div><small>${PROG.xp} / ${need} опыта до ${myLvl + 1} уровня · 🏆 ${myCups}</small></div></div>`
     + `<p class="rd-next">${next ? `Следующая награда: <b>${next.title}</b> — ${next.cups ? next.cups + ' 🏆 или ' : ''}${next.lvl} уровень` : 'Вы прошли всю дорогу, дальше — новые сезоны'}</p>`;
   track.innerHTML = head + roadMapHtml(PROGRESS_ROAD_MILESTONES, unlocked, claimed);
