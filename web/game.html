@@ -7128,7 +7128,33 @@ document.addEventListener('click', e => {
 });
 
 /* ---------------- screens ---------------- */
+/* What players use: a counter per screen and per button (src/state/usage.js), kept per day, sent to /usage/{day}/{uid}
+   every few minutes and when the game is closed, and to Firebase Analytics as «feature_use». Counts only, no texts. */
+let usageState = null, usageTimer = 0;
+try { usageState = JSON.parse(localStorage.getItem('usage')); } catch (_) {}
+function useCount(id) {
+  try {
+    if (tut) return;
+    usageState = PG.state.usage.bump(usageState, id, new Date().toISOString().slice(0, 10));
+    localStorage.setItem('usage', JSON.stringify(usageState));
+    if (window.AndroidApp && AndroidApp.logEvent && !id.startsWith('screen:')) AndroidApp.logEvent('feature_use', JSON.stringify({feature: id}));
+    if (!usageTimer) usageTimer = setTimeout(usageFlush, 180000);
+  } catch (_) {}
+}
+async function usageFlush(keepalive) {
+  clearTimeout(usageTimer); usageTimer = 0;
+  try {
+    const body = PG.state.usage.payload(usageState); if (!body) return;
+    if (typeof FBC === 'undefined' || !FBC) return;
+    const tok = await FBC.token(), uid = FBC.session() && FBC.session().uid; if (!uid) return;
+    const r = await fetch(`${FB.dbUrl}/usage/${usageState.d}/${uid}.json?auth=${tok}`, {method: 'PUT', body: JSON.stringify(body), keepalive: !!keepalive});
+    if (r.ok) { usageState.dirty = false; localStorage.setItem('usage', JSON.stringify(usageState)); }
+  } catch (_) { /* the rules may not be published yet, or no network: it is tried again with the next change */ }
+}
+document.addEventListener('click', e => { const f = PG.state.usage.featureOf(e.target); if (f) useCount(f); }, true);
+document.addEventListener('visibilitychange', () => { if (document.hidden) usageFlush(true); });
 function show(name) {
+  useCount('screen:' + name);
   if (typeof recordAction === 'function') recordAction('show:' + name);
   document.querySelectorAll('.screen').forEach(s => s.hidden = s.id !== 'scr-' + name);
   const nav = $('#bnav'), onNav = ['menu', 'progress', 'friends', 'shop'].includes(name);
