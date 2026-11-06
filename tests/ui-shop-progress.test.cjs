@@ -87,8 +87,9 @@ test('ui/shop: renderGiftCard, renderFiguresGrid, renderFramesGrid, renderLocati
 
   // Emotes tab markup
   const {renderItemsEmotesHtml, ALL_EMOTES, ALL_PHRASES, DEFAULT_EMOTES, DEFAULT_PHRASES} = await import('../src/ui/shop.js');
-  assert.equal(DEFAULT_EMOTES.length, 5);
-  assert.equal(DEFAULT_PHRASES.length, 5);
+  // three free of each; the rest are bought in the shop or earned (tests/reactions-shop.test.cjs)
+  assert.equal(DEFAULT_EMOTES.length, 3);
+  assert.equal(DEFAULT_PHRASES.length, 3);
   assert.ok(ALL_EMOTES.length >= 20);
   assert.ok(ALL_PHRASES.length >= 20);
 

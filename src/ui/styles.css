@@ -5067,3 +5067,32 @@ html.app .screen.scroll{--sp:var(--it,0px);padding-top:0}/* the status-bar gap i
   50% { transform: scale(1.18); }
   100% { transform: scale(1.05); }
 }
+
+/* Emoji and phrases for sale (shop «Эмодзи и фразы») and locked ones in «Мои предметы» */
+.rshop{display:flex;flex-direction:column;gap:10px;margin-bottom:18px}
+.rs-head{display:flex;justify-content:space-between;align-items:center;font:700 13px var(--f-body);color:var(--ink)}
+.rs-cnt{font-size:11px;font-weight:700;padding:3px 9px;border-radius:9px;background:rgba(255,255,255,.07);color:var(--muted)}
+.rs-cnt.full{background:linear-gradient(135deg,#f2b84b,#f2994a);color:#1d2233}
+.rs-grid{display:grid;gap:7px}
+.rs-grid.emote{grid-template-columns:repeat(auto-fill,minmax(64px,1fr))}
+.rs-grid.phrase{grid-template-columns:repeat(auto-fill,minmax(150px,1fr))}
+.rs-item{position:relative;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:3px;padding:9px 6px 7px;border-radius:14px;background:linear-gradient(180deg,rgba(255,255,255,.075),rgba(255,255,255,.025));border:1.2px solid rgba(255,255,255,.1);color:var(--ink);cursor:pointer;transition:transform .15s,border-color .15s;min-width:0}
+.rs-item:active{transform:scale(.95)}
+.rs-item .rs-em{font-size:28px;line-height:1.1}
+.rs-item .rs-ph{font:600 12px var(--f-body);line-height:1.25;text-align:center;min-height:30px;display:flex;align-items:center}
+.rs-item .rs-rar{font:700 9px var(--f-body);letter-spacing:.4px;text-transform:uppercase;color:var(--muted)}
+.rs-item .rs-price{font:800 12px var(--f-body);color:#f2b84b;display:flex;align-items:center;gap:3px}
+.rs-item.r-rare{border-color:rgba(76,141,255,.55);box-shadow:inset 0 0 18px rgba(76,141,255,.12)}
+.rs-item.r-rare .rs-rar{color:#8fb6ff}
+.rs-item.r-epic{border-color:rgba(176,108,240,.65);box-shadow:inset 0 0 20px rgba(176,108,240,.16)}
+.rs-item.r-epic .rs-rar{color:#cfa3ff}
+.rs-item.poor{opacity:.55}
+.rs-note{color:var(--muted);font-size:11px}
+.rs-done{padding:12px;border-radius:14px;text-align:center;background:rgba(242,184,75,.1);border:1px solid rgba(242,184,75,.35);color:#f2b84b;font:700 13px var(--f-body)}
+.em-cat-btn.lockd{opacity:.62;filter:saturate(.55)}
+.em-cat-btn.lockd .em-icon{filter:grayscale(.5)}
+.em-cat-btn .em-badge.lock{background:rgba(0,0,0,.45);font-size:8px}
+.em-cat-btn .em-price{position:absolute;bottom:2px;left:0;right:0;text-align:center;font:800 9px var(--f-body);color:#f2b84b}
+.ph-cat-btn.lockd{opacity:.65}
+.ph-cat-btn .ph-badge.lock{color:#f2b84b;display:flex;align-items:center;gap:3px}
+.rs-item .rs-earn{font:600 9px var(--f-body);color:#8fd18a;text-align:center;line-height:1.2}

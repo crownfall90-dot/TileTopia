@@ -110,6 +110,9 @@
           <!-- Daily 6-Item Showcase in Tile Style -->
           <div id="dailyShopWrap"></div>
 
+          <div class="h3">Эмодзи и фразы</div>
+          <div id="reactShop"></div>
+
           <div class="h3">Свой статус</div>
           <div class="stcustom"><input class="field" id="stInput" maxlength="15" placeholder="Свой статус (до 15)" autocomplete="off"><button class="cta" id="stBuy">3000 <i class="coin"></i></button></div>
           
@@ -2182,6 +2185,8 @@ const today = () => new Date().toISOString().slice(0, 10);
 // The wallet's storage lives in src/state/wallet.js.
 // A checksum mismatch is reported, never punished (see walletSig): the gold stays.
 const wallet = PG.state.loadWallet(localStorage, validCol, PALETTE[0].col, info => track('wallet_sig_mismatch', info));
+// Emoji and phrases are bought in the shop now: what an older version let the player pick stays theirs.
+PG.state.reactions.migrate(wallet); PG.state.reactions.sanitizeDeck(wallet);
 // Analytics (Firebase Analytics in the Android app; elsewhere a no-op). Params: flat strings / numbers.
 function track(name, params) {
   try { if (window.AndroidApp && AndroidApp.logEvent) AndroidApp.logEvent(name, JSON.stringify(params || {})); } catch (_) {}
@@ -2691,6 +2696,29 @@ function renderShop() {
   }
 
   $('#locgrid').innerHTML = PG.ui.shop.renderLocationsGrid(LOCS);
+  const rs = $('#reactShop'); if (rs) rs.innerHTML = PG.ui.shop.renderReactionShopHtml({wallet});
+}
+const _rs = $('#reactShop'); if (_rs) _rs.addEventListener('click', e => {
+  const b = e.target.closest('[data-rbuy]'); if (b) buyReaction(b.dataset.rbuy, b.dataset.rid);
+});
+/* Emoji and phrases: bought one by one for gold (asks first, like figures), then they can go into the deck. */
+function buyReaction(kind, id) {
+  const R = PG.state.reactions, p = R.price(kind, id), what = kind === 'emote' ? `эмодзи ${id}` : `фразу «${id}»`;
+  if (R.isOwned(wallet, kind, id)) return;
+  if (wallet.gold < p) return toastAny(`Не хватает ${p - wallet.gold} золота`);
+  confirmBox(`Купить ${what} за ${p} золота? Останется ${wallet.gold - p}.`, 'Купить', () => {
+    const res = R.buy(wallet, kind, id); if (!res.ok) return;
+    beep('coin'); track('spend_virtual_currency', {item_name: kind + '_' + R.ALL_EMOTES.concat(R.ALL_PHRASES).indexOf(id), virtual_currency_name: 'gold', value: res.price});
+    // a bought line goes straight into the deck while there is room
+    const key = kind === 'emote' ? 'emotes' : 'phrases', cur = R.deck(wallet, kind);
+    if (cur.length < 5 && !cur.includes(id)) wallet[key] = [...cur, id];
+    for (const r of R.claimCollections(wallet)) toastAny(`Коллекция ${r.kind === 'emote' ? 'эмодзи' : 'фраз'} собрана! +${r.gold} золота`);
+    saveWallet(); document.querySelectorAll('.goldN').forEach(e => e.textContent = wallet.gold);
+    toastAny(kind === 'emote' ? `Эмодзи ${id} — ваше!` : 'Фраза — ваша!');
+    if (!$('#scr-shop').hidden) renderShop();
+    if (typeof renderItems === 'function' && $('#itemsBody')) renderItems();
+    renderSayBox();
+  });
 }
 const _frg = $('#frgrid'); if (_frg) _frg.addEventListener('click', e => {
   const b = e.target.closest('[data-fr]'); if (!b) return;
@@ -4275,14 +4303,7 @@ $('#mBots').onclick = () => {
 
 /* Quick phrases online: a fixed set of emoji and short lines (no free text, so nothing to
    moderate). They appear as a bubble under the sender's card for a few seconds. */
-const DEFAULT_EMOTES = ['👑', '🧩', '🏰', '⚔️', '🤝'];
-const DEFAULT_PHRASES = [
-  'Отличный ход!',
-  'Мой замок!',
-  'Так и планировал 😎',
-  'Удачи за столом! 🤝',
-  'Спасибо за игру! ❤️'
-];
+const {DEFAULT_EMOTES, DEFAULT_PHRASES} = PG.state.reactions;
 
 const ALL_EMOTES = [
   '👑', '🧩', '🏰', '⚔️', '🛡️', '🌊',
@@ -4324,8 +4345,7 @@ const SAY_MS = 3200, sayUntil = {};
 let sayAt = 0;
 const isText = x => /[а-яёА-ЯЁ]/i.test(x);
 function renderSayBox() {
-  const chosenEm = (wallet.emotes && wallet.emotes.length) ? wallet.emotes.slice(0, 5) : DEFAULT_EMOTES;
-  const chosenTx = (wallet.phrases && wallet.phrases.length) ? wallet.phrases.slice(0, 5) : DEFAULT_PHRASES;
+  const chosenEm = PG.state.reactions.deck(wallet, 'emote'), chosenTx = PG.state.reactions.deck(wallet, 'phrase');
   $('#sayBox').innerHTML = `<div class="sy-lock">Подождите: прошлое сообщение ещё на экране</div>` +
     `<div class="sy-top"><span class="sy-h">Эмоции</span><span class="sy-cnt">${chosenEm.length}/5</span></div>` +
     `<div class="sy-e sy-deck">${chosenEm.map(x => `<button class="e" data-say="${SAYS.indexOf(x)}" title="${x}">${x}</button>`).join('')}</div>` +
@@ -4553,15 +4573,15 @@ function renderMenuQuestBanner() {
 }
 const PROGRESS_ROAD_MILESTONES = [
   { id: 'm1', lvl: 1, cups: 0, title: 'Старт пути', desc: 'Первые шаги', reward: { gold: 30 }, ic: '🌱' },
-  { id: 'm2', lvl: 2, cups: 30, title: 'Новичок', desc: '+50 золота', reward: { gold: 50 }, ic: '💰' },
+  { id: 'm2', lvl: 2, cups: 30, title: 'Новичок', desc: '+50 золота и эмодзи 😎', reward: { gold: 50, emote: '😎' }, ic: '💰' },
   { id: 'm3', lvl: 3, cups: 70, title: 'Следопыт', desc: 'Статус «Следопыт»', reward: { status: 'Следопыт', gold: 50 }, ic: '🧭' },
-  { id: 'm4', lvl: 4, cups: 120, title: 'Зодчий', desc: '+100 золота', reward: { gold: 100 }, ic: '🏰' },
+  { id: 'm4', lvl: 4, cups: 120, title: 'Зодчий', desc: '+100 золота и эмодзи 🏰', reward: { gold: 100, emote: '🏰' }, ic: '🏰' },
   { id: 'm5', lvl: 5, cups: 180, title: 'Изумруд', desc: 'Рамка «Изумруд»', reward: { frame: 'emerald', gold: 50 }, ic: '💎' },
-  { id: 'm6', lvl: 6, cups: 250, title: 'Мастер', desc: '+150 золота', reward: { gold: 150 }, ic: '⭐' },
+  { id: 'm6', lvl: 6, cups: 250, title: 'Мастер', desc: '+150 золота и фраза «Красиво строишь!»', reward: { gold: 150, phrase: 'Красиво строишь!' }, ic: '⭐' },
   { id: 'm7', lvl: 7, cups: 350, title: 'Магистр', desc: 'Фигурка «Магистр»', reward: { fig: 'classic', gold: 100 }, ic: '🧙‍♂️' },
   { id: 'm8', lvl: 8, cups: 500, title: 'Золотой сундук', desc: '+250 золота', reward: { gold: 250 }, ic: '🎁' },
-  { id: 'm9', lvl: 9, cups: 750, title: 'Гроссмейстер', desc: 'Статус «Гроссмейстер»', reward: { status: 'Гроссмейстер', gold: 150 }, ic: '👑' },
-  { id: 'm10', lvl: 10, cups: 1000, title: 'Чемпион', desc: 'Кубок Чемпиона +500 золота', reward: { frame: 'gold', gold: 500 }, ic: '🏆' },
+  { id: 'm9', lvl: 9, cups: 750, title: 'Гроссмейстер', desc: 'Статус «Гроссмейстер» и фраза', reward: { status: 'Гроссмейстер', gold: 150, phrase: 'Ну ты гроссмейстер! 👑' }, ic: '👑' },
+  { id: 'm10', lvl: 10, cups: 1000, title: 'Чемпион', desc: 'Кубок Чемпиона +500 золота и эмодзи 🏆', reward: { frame: 'gold', gold: 500, emote: '🏆' }, ic: '🏆' },
 ];
 
 function renderProgressRoad() {
@@ -4612,6 +4632,15 @@ function claimRoadMilestone(id) {
   }
   if (m.reward.fig && !(wallet.owned || []).includes(m.reward.fig)) {
     wallet.owned = [...(wallet.owned || []), m.reward.fig];
+  }
+  // emoji / phrase rewards: collected, and straight into the deck while it has room
+  for (const kind of ['emote', 'phrase']) {
+    const id = m.reward[kind], R = PG.state.reactions;
+    if (!id || !R.grant(wallet, kind, id)) continue;
+    const key = kind === 'emote' ? 'emotes' : 'phrases', cur = R.deck(wallet, kind);
+    if (cur.length < 5 && !cur.includes(id)) wallet[key] = [...cur, id];
+    R.claimCollections(wallet);
+    renderSayBox();
   }
   beep('coin');
   saveWallet();
@@ -5570,10 +5599,11 @@ function renderItems() {
         ? PG.ui.shop.renderItemsEmotesHtml({
             allEmotes: allE,
             allPhrases: allP,
-            selectedEmotes: wallet.emotes || DEFAULT_EMOTES,
-            selectedPhrases: wallet.phrases || DEFAULT_PHRASES,
+            selectedEmotes: PG.state.reactions.deck(wallet, 'emote'),
+            selectedPhrases: PG.state.reactions.deck(wallet, 'phrase'),
             maxEmotes: 5,
-            maxPhrases: 5
+            maxPhrases: 5,
+            wallet
           })
         : '<p>Загрузка реакций...</p>';
     } else {
@@ -5620,10 +5650,12 @@ $('#itemsBody').addEventListener('click', e => {
     previewFrameKey = null; renderItems(); return;
   }
   if (t.closest('[data-unwear]')) { ST().wearStatus(wallet, null); return afterStatusChange(); }
+  const rb = t.closest('[data-rbuy]'); if (rb) return buyReaction(rb.dataset.rbuy, rb.dataset.rid);
   const te = t.closest('[data-toggle-emote]');
   if (te) {
     const em = te.dataset.toggleEmote;
-    let cur = (wallet.emotes && wallet.emotes.length) ? wallet.emotes.slice() : DEFAULT_EMOTES.slice();
+    if (!PG.state.reactions.isOwned(wallet, 'emote', em)) return buyReaction('emote', em);
+    let cur = PG.state.reactions.deck(wallet, 'emote').slice();
     if (cur.includes(em)) {
       if (cur.length <= 1) { toastAny('В колоде должна остаться хотя бы 1 эмоция'); return; }
       cur = cur.filter(x => x !== em);
@@ -5640,7 +5672,8 @@ $('#itemsBody').addEventListener('click', e => {
   const tp = t.closest('[data-toggle-phrase]');
   if (tp) {
     const ph = tp.dataset.togglePhrase;
-    let cur = (wallet.phrases && wallet.phrases.length) ? wallet.phrases.slice() : DEFAULT_PHRASES.slice();
+    if (!PG.state.reactions.isOwned(wallet, 'phrase', ph)) return buyReaction('phrase', ph);
+    let cur = PG.state.reactions.deck(wallet, 'phrase').slice();
     if (cur.includes(ph)) {
       if (cur.length <= 1) { toastAny('В колоде должна остаться хотя бы 1 фраза'); return; }
       cur = cur.filter(x => x !== ph);
@@ -5660,7 +5693,7 @@ $('#itemsBody').addEventListener('click', e => {
     saveWallet();
     renderItems();
     renderSayBox();
-    toastAny('Сброшено на базовую колоду (5 эмодзи + 5 фраз)');
+    toastAny('Сброшено на базовую колоду (3 эмодзи + 3 фразы)');
     return;
   }
   const w = t.closest('[data-iwear]'); if (w) { ST().wearStatus(wallet, wallet.statusKey === w.dataset.iwear ? null : w.dataset.iwear); return afterStatusChange(); }
@@ -6792,6 +6825,7 @@ function applyCloudWallet(w) {
   const keep = {}; LOCAL_ONLY.forEach(k => { if (k in wallet) keep[k] = wallet[k]; });
   for (const k of Object.keys(wallet)) delete wallet[k];
   Object.assign(wallet, w, keep);
+  PG.state.reactions.migrate(wallet); PG.state.reactions.sanitizeDeck(wallet);
   for (const k of Object.keys(PROG)) delete PROG[k];
   Object.assign(PROG, w.prog || {}); wallet.prog = PROG;
   if (wallet.name) setup.seats[0].name = wallet.name;
