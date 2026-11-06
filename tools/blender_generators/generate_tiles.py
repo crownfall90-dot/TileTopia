@@ -291,7 +291,637 @@ def render_tile_jigsaw_base(out_path):
     bpy.ops.render.render(write_still=True)
     print(f"Rendered {os.path.basename(out_path)}")
 
-if __name__ == "__main__":
+# =====================================================================================================
+# Parametric tile sets: one 3D model per card type (GLB) and 2D sprites rendered from the same scene.
+#   blender -b -P tools/blender_generators/generate_tiles.py -- --set classic [--ids rS,capRS,wBr] [--views top,iso]
+# The card list comes from assets/tiles3d/tiles.json (scripts/gen-tile-defs.mjs, built from TYPES).
+#
+# Look: the top of a tile IS the card face the game already draws (src/render/art.js, exported as
+# assets/tiles/tile_<id>.png), so a 3D tile reads exactly like the one on the table. On it stand modelled versions
+# of the sprites the game puts there (houses, keeps, trees, hay, rocks, the mine), placed by the same rules as
+# generateDecorItems in src/game/world.js, lit warm like the game icon and the store banner.
+# Units: a tile is 2 x 2, origin in the middle of its base, Z up (the GLB is Y-up, as glTF requires). Nothing
+# sticks out past the tile edge, so neighbours join without gaps in any rotation.
+# =====================================================================================================
+import sys
+import json
+import random
+import zlib
+import argparse
+from mathutils import Vector, Matrix
+
+ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
+TEX = os.path.join(ROOT, 'assets', 'tiles3d', 'textures')
+FACES = os.path.join(ROOT, 'assets', 'tiles')
+H = 0.2                      # top of the tile slab
+LIP = 0.035                  # grass lip on the slab sides
+DIRS = [Vector((0, 1)), Vector((1, 0)), Vector((0, -1)), Vector((-1, 0))]   # N E S W
+MID = [d.copy() for d in DIRS]
+CORNER = [Vector((-1, 1)), Vector((1, 1)), Vector((1, -1)), Vector((-1, -1))]  # NW NE SE SW (as in art.js)
+GV = [(0, -1), (1, 0), (0, 1), (-1, 0)]   # the game's direction vectors (screen space, y down)
+
+# Parts of the props all live in one shared atlas (tools/blender_generators/tint_textures.py). A tile model has two
+# materials: "TileFace" (its top, UV 0..1 — the game binds the card face it already draws) and "TileAtlas" (the
+# props). The GLB carries no image, only UVs and the part colour as vertex colour, so a phone keeps one atlas in
+# memory, whatever the board holds.
+ATLAS = json.load(open(os.path.join(TEX, 'atlas.json'), encoding='utf-8'))
+PARTS = ['face'] + list(ATLAS['rects'])
+MAT_IDX = {k: i for i, k in enumerate(PARTS)}
+HOUSES = {   # the four house sprites of art.js: roof, timber frame, chimney
+    'house': ('roof_red', False, True), 'house2': ('roof_brick', True, False),
+    'house3': ('roof_slate', False, True), 'house4': ('roof_gold', True, False),
+}
+
+
+def smoothstep(a, b, x):
+    t = max(0.0, min(1.0, (x - a) / (b - a)))
+    return t * t * (3 - 2 * t)
+
+
+def rot_cw(p, n):
+    """Quarter turns clockwise seen from above (N -> E), like the rotation in art.js."""
+    x, y = p.x, p.y
+    for _ in range(n % 4):
+        x, y = y, -x
+    return Vector((x, y))
+
+
+def quad_pts(a, k, b, n=20):
+    return [(1 - t) ** 2 * a + 2 * (1 - t) * t * k + t * t * b for t in (i / n for i in range(n + 1))]
+
+
+def dist_poly(p, pts):
+    best = 9.0
+    for a, b in zip(pts, pts[1:]):
+        ab = b - a
+        L = ab.length_squared or 1e-9
+        t = max(0.0, min(1.0, (p - a).dot(ab) / L))
+        best = min(best, (a + ab * t - p).length)
+    return best
+
+
+def inside(p, poly):
+    c = False
+    j = len(poly) - 1
+    for i in range(len(poly)):
+        a, b = poly[i], poly[j]
+        if (a.y > p.y) != (b.y > p.y) and p.x < (b.x - a.x) * (p.y - a.y) / ((b.y - a.y) or 1e-9) + a.x:
+            c = not c
+        j = i
+    return c
+
+
+def road_path(r):
+    a, b = r['from'], r['to']
+    if b is None:
+        return [MID[a] * (1 - t) for t in (i / 12 for i in range(13))]
+    return quad_pts(MID[a], Vector((0, 0)), MID[b], 24)
+
+
+def city_shape(e):
+    """The town polygon and its wall curves, ported from cityPaths in src/render/art.js."""
+    city = [d for d in range(4) if e[d] == 'c']
+    if not city:
+        return None, []
+    C = Vector((0, 0))
+    if len(city) == 4:
+        return [c.copy() for c in CORNER], []
+    if len(city) == 1:
+        i = city[0]
+        A, B, K = rot_cw(CORNER[0], i), rot_cw(CORNER[1], i), rot_cw(Vector((0, 1 - 1.28)), i)
+        wall = quad_pts(B, K, A)
+        return [A] + wall, [wall]
+    s = next(d for d in city if e[(d + 3) % 4] != 'c')
+    poly, walls = [CORNER[s].copy()], []
+    i, n = s, 0
+    while n < 4:
+        if e[i] == 'c':
+            poly.append(CORNER[(i + 1) % 4].copy())
+            i, n = (i + 1) % 4, n + 1
+            continue
+        L = 0
+        while e[(i + L) % 4] != 'c':
+            L += 1
+        fr, to = CORNER[i], CORNER[(i + L) % 4]
+        p = MID[i] if L == 1 else CORNER[(i + 1) % 4]
+        f = .88 if L == 1 else .86
+        K = p + (C - p) * f
+        w = quad_pts(fr, K, to)
+        poly += w[1:]
+        walls.append(w)
+        i, n = (i + L) % 4, n + L
+    return poly, walls
+
+
+def decor_items(t, rnd):
+    """generateDecorItems (src/game/world.js) in Python: which sprites stand on this card and where.
+
+    Positions are the game's: tile units from the centre, screen y down; the sprite stands on that point."""
+    E = t['edges']
+    items = []
+    city = [d for d in range(4) if E[d] == 'c']
+    R = rnd.random
+    if len(city) == 1:
+        x, y = GV[city[0]]
+        px, py = -y, x
+        items += [[rnd.choice(list(HOUSES)), x * .36 + px * .17, y * .36 + py * .17],
+                  [rnd.choice(list(HOUSES)), x * .38 - px * .13, y * .38 - py * .13]]
+    elif len(city) > 1:
+        sx = sum(GV[d][0] for d in city)
+        sy = sum(GV[d][1] for d in city)
+        cx, cy = sx * .2, sy * .2
+        pts = [[-.16, -.06], [.14, -.14], [.02, .1], [-.2, .16]]
+        n = 4 if len(city) >= 3 else 3
+        for i in range(n):
+            items.append(['tower' if i == 0 and len(city) >= 3 else rnd.choice(list(HOUSES)), cx + pts[i][0], cy + pts[i][1]])
+    if 'fort' in t['features']:
+        items.append(['tower', 0, .2])
+    end = t.get('roadEnd')
+    if end and end != 'cliff':
+        d = E.index('r')
+        items.append([end, -GV[d][0] * .1, -GV[d][1] * .1 + .06])
+    if 'boulders' in t['features'] and not end:
+        items += [['boulders', -.05, .05], ['rock', .22, -.12], ['rock', -.24, .26]]
+    for a, b, sx, sy in ((0, 3, -1, -1), (0, 1, 1, -1), (1, 2, 1, 1), (2, 3, -1, 1)):
+        if E[a] in 'cb' or E[b] in 'cb':
+            continue
+        if end == 'cliff':
+            dr = E.index('r')
+            if sx * -GV[dr][0] + sy * -GV[dr][1] > 0:
+                continue
+        if R() < .62:
+            k = R()
+            kind = ('pine' if k < .36 else 'oak' if k < .62 else 'birch' if k < .71 else 'poplar' if k < .78
+                    else 'bush' if k < .88 else 'rock' if k < .95 else 'hay')
+            items.append([kind, sx * (.30 + R() * .05) + (R() - .5) * .05, sy * (.30 + R() * .05)])
+    return items, len(city)
+
+
+class TileMesh:
+    """All of one tile in a single bmesh: one object, two draw calls (face + props) in the game."""
+
+    def __init__(self):
+        self.bm = bmesh.new()
+
+    def face(self, cos, mat):
+        f = self.bm.faces.new([self.bm.verts.new(c) for c in cos])
+        f.material_index = MAT_IDX[mat]
+        return f
+
+    def box(self, c, w, d, h, yaw, mat, top=True, taper=1.0):
+        R = Matrix.Rotation(yaw, 3, 'Z')
+        base = [Vector(c) + R @ Vector((sx * w / 2, sy * d / 2, 0)) for sx, sy in ((-1, -1), (1, -1), (1, 1), (-1, 1))]
+        tops = [Vector(c) + R @ Vector((sx * w / 2 * taper, sy * d / 2 * taper, h)) for sx, sy in ((-1, -1), (1, -1), (1, 1), (-1, 1))]
+        for k in range(4):
+            self.face([base[k], base[(k + 1) % 4], tops[(k + 1) % 4], tops[k]], mat)
+        if top:
+            self.face(tops, mat)
+        return base
+
+    def plate(self, c, w, h, yaw, mat, out=.004):
+        """A flat rectangle on a wall facing -Y of a box turned by yaw (windows, doors, beams)."""
+        R = Matrix.Rotation(yaw, 3, 'Z')
+        o = Vector(c)
+        n = R @ Vector((0, -out, 0))
+        a = R @ Vector((w / 2, 0, 0))
+        self.face([o - a + n, o + a + n, o + a + n + Vector((0, 0, h)), o - a + n + Vector((0, 0, h))], mat)
+
+    def prim(self, res, mat):
+        for f in {f for v in res['verts'] for f in v.link_faces}:
+            f.material_index = MAT_IDX[mat]
+
+    def cylinder(self, c, r, h, seg, mat, r2=None, caps=True):
+        M = Matrix.Translation(Vector(c) + Vector((0, 0, h / 2)))
+        self.prim(bmesh.ops.create_cone(self.bm, cap_ends=caps, cap_tris=False, segments=seg,
+                                        radius1=r, radius2=r if r2 is None else r2, depth=h, matrix=M), mat)
+
+    def cone(self, c, r, h, seg, mat):
+        self.cylinder(c, r, h, seg, mat, r2=0.0)
+
+    def blob(self, c, r, mat, sx=1.0, sz=1.0, sub=1, jitter=0.0, rnd=None):
+        M = Matrix.Translation(Vector(c)) @ Matrix.Diagonal((sx, sx, sz, 1.0))
+        res = bmesh.ops.create_icosphere(self.bm, subdivisions=sub, radius=r, matrix=M)
+        if jitter and rnd:
+            for v in res['verts']:
+                v.co += (v.co - Vector(c)).normalized() * (rnd.random() - .5) * jitter * r
+        self.prim(res, mat)
+
+    def finish(self, name, clip=True):
+        bm = self.bm
+        if clip:   # nothing may stick out past the tile: whatever does is cut exactly at the edge
+            for co, no in (((1, 0, 0), (1, 0, 0)), ((-1, 0, 0), (-1, 0, 0)), ((0, 1, 0), (0, 1, 0)), ((0, -1, 0), (0, -1, 0))):
+                bmesh.ops.bisect_plane(bm, geom=bm.verts[:] + bm.edges[:] + bm.faces[:], plane_co=co, plane_no=no,
+                                       clear_outer=True, dist=1e-6)
+        bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-5)
+        bm.normal_update()
+        uv = bm.loops.layers.uv.new('UVMap')
+        col = bm.loops.layers.color.new('Col')
+        rects, colours = ATLAS['rects'], ATLAS['colours']
+        for f in bm.faces:
+            part = PARTS[f.material_index]
+            if part == 'face':
+                for l in f.loops:
+                    l[uv].uv = ((l.vert.co.x + 1) / 2, (l.vert.co.y + 1) / 2)
+                    l[col] = (1, 1, 1, 1)
+                f.material_index = 0
+                continue
+            u0, v0, u1, v1 = rects[part]
+            n = f.normal
+            ax = max(range(3), key=lambda i: abs(n[i]))
+            proj = [((l.vert.co.y, l.vert.co.z) if ax == 0 else (l.vert.co.x, l.vert.co.z) if ax == 1 else (l.vert.co.x, l.vert.co.y)) for l in f.loops]
+            k = 2.0
+            ou, ov = math.floor(min(a for a, _ in proj) * k), math.floor(min(b for _, b in proj) * k)
+            c = (*colours[part], 1.0)
+            for l, (a, b) in zip(f.loops, proj):
+                l[uv].uv = (u0 + (u1 - u0) * min(1.0, a * k - ou), v0 + (v1 - v0) * min(1.0, b * k - ov))
+                l[col] = c
+            f.material_index = 1
+        me = bpy.data.meshes.new(name)
+        bm.to_mesh(me)
+        bm.free()
+        ca = me.color_attributes.get('Col')
+        if ca:
+            me.color_attributes.active_color = ca
+            me.color_attributes.render_color_index = me.color_attributes.find('Col')
+        obj = bpy.data.objects.new(name, me)
+        bpy.context.collection.objects.link(obj)
+        return obj
+
+
+# ---------------- props: the game sprites, modelled (sizes from the sprite pixels: a tile is 88 px = 2 units) ----
+
+def p_house(tm, c, yaw, kind, s=1.0):
+    roof, frame, chimney = HOUSES[kind]
+    w, d, h, ridge = .30 * s, .23 * s, .2 * s, .16 * s
+    x, y, z = c
+    tm.box((x, y, z), w, d, h, yaw, 'plaster', top=False)
+    R = Matrix.Rotation(yaw, 3, 'Z')
+    P = lambda a, b, cz: Vector((x, y, z)) + R @ Vector((a, b, cz))
+    ow, od = w / 2 + .02 * s, d / 2 + .025 * s
+    a1, b1, c1, d1 = P(-ow, -od, h), P(ow, -od, h), P(ow, od, h), P(-ow, od, h)
+    r1, r2 = P(-ow, 0, h + ridge), P(ow, 0, h + ridge)
+    tm.face([a1, b1, r2, r1], roof)
+    tm.face([c1, d1, r1, r2], roof)
+    tm.face([b1, a1, P(-ow, -od, h - .012 * s), P(ow, -od, h - .012 * s)], 'beam')   # eaves
+    tm.face([P(-w / 2, d / 2, h), P(-w / 2, -d / 2, h), P(-w / 2, 0, h + ridge * .9)], 'plaster')
+    tm.face([P(w / 2, -d / 2, h), P(w / 2, d / 2, h), P(w / 2, 0, h + ridge * .9)], 'plaster')
+    front = lambda a, cz: P(a, -d / 2, cz)
+    tm.plate(front(0, 0), .06 * s, .1 * s, yaw, 'door')
+    for a in (-.095, .095):
+        tm.plate(front(a * s, .095 * s), .05 * s, .055 * s, yaw, 'window')
+    side = R @ Vector((1, 0, 0))
+    o = P(w / 2, 0, .095 * s) + side * .004
+    ax = R @ Vector((0, .028 * s, 0))
+    tm.face([o - ax, o + ax, o + ax + Vector((0, 0, .055 * s)), o - ax + Vector((0, 0, .055 * s))], 'window')
+    if frame:   # timber frame: posts, a rail and a cross on the front
+        for a in (-.13, -.045, .045, .13):
+            tm.plate(front(a * s, 0), .016 * s, h, yaw, 'beam', out=.006)
+        tm.plate(front(0, .085 * s), w * .96, .014 * s, yaw, 'beam', out=.006)
+    if chimney:
+        q = P(.07 * s, .05 * s, h + ridge * .45)
+        tm.box((q.x, q.y, q.z), .045 * s, .045 * s, .14 * s, yaw, 'chimney')
+
+
+def p_tower(tm, c, s=1.0):
+    """A round keep with a red cone roof and a flag — the castles of the icon and the banner — on a stone body."""
+    x, y, z = c
+    r, h = .15 * s, .62 * s
+    tm.cylinder((x, y, z), r * 1.08, .05 * s, 10, 'stone')
+    tm.cylinder((x, y, z), r, h, 10, 'stone', caps=False)
+    tm.cylinder((x, y, z + h), r * 1.18, .07 * s, 10, 'stone')
+    for k in range(10):   # battlements
+        if k % 2:
+            continue
+        a = 2 * math.pi * k / 10
+        tm.box((x + math.cos(a) * r * 1.08, y + math.sin(a) * r * 1.08, z + h + .07 * s), .06 * s, .05 * s, .05 * s, a, 'stone')
+    tm.cone((x, y, z + h + .07 * s), r * 1.05, .34 * s, 10, 'roof_red')
+    tm.cylinder((x, y, z + h + .38 * s), .006 * s, .16 * s, 4, 'beam')
+    f0 = Vector((x, y, z + h + .54 * s))
+    tm.face([f0, f0 + Vector((.12 * s, 0, -.03 * s)), f0 + Vector((0, 0, -.07 * s))], 'flag')
+    tm.face([f0 + Vector((0, 0, -.07 * s)), f0 + Vector((.12 * s, 0, -.03 * s)), f0], 'flag')
+    front = Vector((0, -1, 0))
+    for zz in (.28, .46):   # arrow slits and a gate, facing the camera side
+        q = Vector((x, y - r - .003, z + zz * s))
+        tm.face([q + Vector((-.012 * s, 0, 0)), q + Vector((.012 * s, 0, 0)), q + Vector((.012 * s, 0, .07 * s)), q + Vector((-.012 * s, 0, .07 * s))], 'slit')
+    q = Vector((x, y - r - .003, z))
+    tm.face([q + Vector((-.045 * s, 0, 0)), q + Vector((.045 * s, 0, 0)), q + Vector((.045 * s, 0, .1 * s)), q + Vector((0, 0, .13 * s)), q + Vector((-.045 * s, 0, .1 * s))], 'door')
+
+
+def p_pine(tm, c, rnd, s=1.0):
+    x, y, z = c
+    tm.cylinder((x, y, z), .03 * s, .14 * s, 5, 'trunk')
+    for i, (r, zz, hh) in enumerate(((.2, .1, .34), (.16, .3, .3), (.11, .48, .28))):
+        tm.cone((x, y, z + zz * s), r * s, hh * s, 8, 'pine' if i % 2 else 'pine_dark')
+
+
+def p_oak(tm, c, rnd, s=1.0):
+    """The apple tree of the game: a crooked trunk, a cluster of leafy blobs, red apples."""
+    x, y, z = c
+    tm.cylinder((x, y, z), .035 * s, .3 * s, 6, 'trunk', r2=.025 * s)
+    for dx, dy, dz, r, m in ((0, 0, .42, .2, 'oak'), (-.12, .03, .36, .14, 'oak'), (.12, -.02, .37, .14, 'oak'), (-.05, -.04, .54, .14, 'oak_light')):
+        tm.blob((x + dx * s, y + dy * s, z + dz * s), r * s, m, sub=1, jitter=.25, rnd=rnd)
+    for dx, dy, dz in ((.14, -.1, .36), (-.08, -.15, .45), (.04, -.17, .52), (-.17, -.05, .33)):
+        tm.blob((x + dx * s, y + dy * s, z + dz * s), .022 * s, 'apple', sub=1)
+
+
+def p_birch(tm, c, rnd, s=1.0):
+    x, y, z = c
+    tm.cylinder((x, y, z), .022 * s, .48 * s, 6, 'birch_bark')
+    for zz in (.1, .2, .3):
+        q = Vector((x, y - .0225 * s, z + zz * s))
+        tm.face([q + Vector((-.012 * s, 0, 0)), q + Vector((.01 * s, 0, 0)), q + Vector((.01 * s, 0, .012 * s)), q + Vector((-.012 * s, 0, .012 * s))], 'dark')
+    for dx, dz, r in ((0, .52, .14), (-.08, .44, .1), (.08, .46, .1), (0, .64, .1)):
+        tm.blob((x + dx * s, y, z + dz * s), r * s, 'birch_leaf', sz=1.15, jitter=.2, rnd=rnd)
+
+
+def p_poplar(tm, c, rnd, s=1.0):
+    x, y, z = c
+    tm.cylinder((x, y, z), .02 * s, .12 * s, 5, 'trunk')
+    tm.blob((x, y, z + .45 * s), .13 * s, 'oak', sx=1.0, sz=2.9, jitter=.12, rnd=rnd)
+
+
+def p_bush(tm, c, rnd, s=1.0):
+    x, y, z = c
+    for dx, dy, r in ((-.07, 0, .07), (.07, .01, .065), (0, .02, .085)):
+        tm.blob((x + dx * s, y + dy * s, z + r * .6 * s), r * s, 'oak', sz=.8, jitter=.3, rnd=rnd)
+    for dx, dz in ((-.05, .09), (.04, .11), (.09, .06)):
+        tm.blob((x + dx * s, y - .07 * s, z + dz * s), .014 * s, 'apple')
+
+
+def p_rock(tm, c, rnd, s=1.0, big=1.0):
+    x, y, z = c
+    tm.blob((x, y, z + .03 * s * big), .1 * s * big, 'rock', sz=.6, jitter=.45, rnd=rnd)
+    tm.blob((x - .06 * s * big, y - .04 * s * big, z + .01), .045 * s * big, 'moss', sz=.3)
+
+
+def p_hay(tm, c, rnd, s=1.0):
+    x, y, z = c
+    tm.cylinder((x, y, z), .12 * s, .12 * s, 10, 'hay', caps=False)
+    tm.blob((x, y, z + .12 * s), .12 * s, 'hay', sz=.85, sub=2)
+    tm.cylinder((x, y, z + .05 * s), .123 * s, .015 * s, 10, 'beam', caps=False)
+
+
+def p_boulders(tm, c, rnd, s=1.0):
+    x, y, z = c
+    for dx, dy, b in ((-.16, .02, 1.5), (.14, .04, 1.7), (0, -.06, 1.2)):
+        p_rock(tm, (x + dx * s, y + dy * s, z), rnd, s, big=b)
+
+
+def p_mine(tm, c, rnd, s=1.0):
+    """The mine sprite: a rocky hill with a dark timbered entrance, rails and a lantern."""
+    x, y, z = c
+    tm.blob((x, y + .08 * s, z), .38 * s, 'rock', sx=1.0, sz=.75, jitter=.3, rnd=rnd)
+    tm.blob((x - .2 * s, y + .05 * s, z + .2 * s), .06 * s, 'moss', sz=.4)
+    fy = y - .25 * s
+    q = Vector((x, fy - .002, z))
+    tm.face([q + Vector((-.09 * s, 0, 0)), q + Vector((.09 * s, 0, 0)), q + Vector((.09 * s, 0, .17 * s)), q + Vector((-.09 * s, 0, .17 * s))], 'dark')
+    for dx in (-.1, .1):
+        tm.box((x + dx * s, fy, z), .035 * s, .035 * s, .2 * s, 0, 'wood')
+    tm.box((x, fy, z + .2 * s), .26 * s, .045 * s, .04 * s, 0, 'wood')
+    for dx in (-.04, .04):
+        tm.box((x + dx * s, fy - .12 * s, z), .01 * s, .24 * s, .01 * s, 0, 'rail')
+    tm.blob((x + .17 * s, fy - .01, z + .15 * s), .022 * s, 'lantern')
+
+
+def wall(tm, pts):
+    """The town wall the face paints, raised: a low stone parapet with battlements along the curve."""
+    for k, (a, b) in enumerate(zip(pts, pts[1:])):
+        dv = b - a
+        yaw = math.atan2(dv.y, dv.x)
+        m = (a + b) / 2
+        tm.box((m.x, m.y, H), dv.length + .01, .045, .065, yaw, 'stone')
+        if k % 2 == 0:
+            tm.box((m.x, m.y, H + .065), dv.length * .5, .05, .03, yaw, 'stone')
+
+
+def bridge(tm, r):
+    """A stone arch over the river where the road crosses it (wBr), as on the banner, with a plank deck."""
+    d = (MID[r['to']] - MID[r['from']]).normalized()
+    yaw = math.atan2(d.y, d.x)
+    L, W = .44, .18
+    s = Vector((-d.y, d.x))
+    n = 8
+    for side in (-1, 1):   # arched parapets
+        o = s * side * (W / 2)
+        prev = None
+        for k in range(n + 1):
+            t = k / n
+            p = d * (t - .5) * L + o
+            zz = H + .02 + .07 * math.sin(math.pi * t)
+            cur = (Vector((p.x, p.y, zz)), Vector((p.x, p.y, zz + .05)))
+            if prev:
+                tm.face([prev[0], cur[0], cur[1], prev[1]], 'stone')
+            prev = cur
+    prev = None
+    for k in range(n + 1):   # deck
+        t = k / n
+        p = d * (t - .5) * L
+        zz = H + .02 + .07 * math.sin(math.pi * t)
+        cur = (Vector((p.x, p.y, zz)) + Vector((*(s * W / 2), 0)), Vector((p.x, p.y, zz)) - Vector((*(s * W / 2), 0)))
+        if prev:
+            tm.face([prev[0], prev[1], cur[1], cur[0]], 'wood')
+        prev = cur
+    for side in (-1, 1):
+        for along in (-1, 1):
+            q = d * along * L / 2 + s * side * W / 2
+            tm.box((q.x, q.y, H - .01), .05, .05, .1, yaw, 'stone')
+
+
+PROPS = {'pine': p_pine, 'oak': p_oak, 'birch': p_birch, 'poplar': p_poplar, 'bush': p_bush, 'rock': p_rock,
+         'hay': p_hay, 'boulders': p_boulders, 'mine': p_mine}
+
+
+def place(tm, kind, c, rnd, s=1.0):
+    if kind in HOUSES:
+        p_house(tm, c, (rnd.random() - .5) * .5, kind, s)
+    elif kind == 'tower':
+        p_tower(tm, c, s)
+    else:
+        PROPS[kind](tm, c, rnd, s)
+
+
+def slab(tm):
+    """The card body: the face on top, a grass lip and earth on the sides, a darker base."""
+    tm.face([(-1, -1, H), (1, -1, H), (1, 1, H), (-1, 1, H)], 'face')
+    C = [(-1, -1), (1, -1), (1, 1), (-1, 1)]
+    for k in range(4):
+        (ax, ay), (bx, by) = C[k], C[(k + 1) % 4]
+        tm.face([(bx, by, H - LIP), (ax, ay, H - LIP), (ax, ay, H), (bx, by, H)], 'lip')
+        tm.face([(bx, by, 0), (ax, ay, 0), (ax, ay, H - LIP), (bx, by, H - LIP)], 'soil')
+    tm.face([(-1, 1, 0), (1, 1, 0), (1, -1, 0), (-1, -1, 0)], 'soil_dark')
+
+
+def build_tile(t):
+    rnd = random.Random(zlib.crc32(t['id'].encode()))
+    tm = TileMesh()
+    slab(tm)
+    poly, walls = city_shape(t['edges'])
+    for w in walls:
+        wall(tm, w)
+    if 'bridge' in t['features']:
+        bridge(tm, next(r for r in t['roads'] if r['to'] is not None))
+    # the game rolls the decor per placed card; a model shows one roll, so take the first seed that dresses the field
+    # (at least two things where the corners are free), the way the icon and the banner show it
+    free = sum(1 for a, b in ((0, 3), (0, 1), (1, 2), (2, 3)) if t['edges'][a] not in 'cb' and t['edges'][b] not in 'cb')
+    for k in range(24):
+        rnd = random.Random(zlib.crc32((t['id'] + ':' + str(k)).encode()))
+        items, ncity = decor_items(t, rnd)
+        if sum(1 for it in items if it[0] in PROPS) >= min(2, free):
+            break
+    extra = []
+    for kind, gx, gy in items:   # a bush or a stone at the foot of some trees
+        if kind in ('pine', 'oak', 'birch', 'poplar') and rnd.random() < .5:
+            extra.append([rnd.choice(('bush', 'rock', 'bush')), gx + (rnd.random() - .5) * .14, gy + .08])
+    items += extra
+    for kind, gx, gy in sorted(items, key=lambda it: -it[2]):
+        x, y = max(-.39, min(.39, gx)) * 2, -max(-.39, min(.39, gy)) * 2
+        s = .8 if kind == 'tower' and ncity else 1.0
+        place(tm, kind, (x, y, H), rnd, s)
+    return tm.finish(t['id'])
+
+
+def tile_materials(face_png):
+    """TileFace (the card face; in Blender the exported sprite) and TileAtlas (the props)."""
+    face = bpy.data.materials.new('TileFace')
+    nt = face.node_tree
+    bsdf = next(n for n in nt.nodes if n.type == 'BSDF_PRINCIPLED')
+    bsdf.inputs['Roughness'].default_value = 0.9
+    if face_png and os.path.exists(face_png):
+        node = nt.nodes.new('ShaderNodeTexImage')
+        node.image = bpy.data.images.load(face_png, check_existing=True)
+        nt.links.new(node.outputs['Color'], bsdf.inputs['Base Color'])
+    atlas = bpy.data.materials.new('TileAtlas')
+    nt = atlas.node_tree
+    bsdf = next(n for n in nt.nodes if n.type == 'BSDF_PRINCIPLED')
+    bsdf.inputs['Roughness'].default_value = 0.8
+    node = nt.nodes.new('ShaderNodeTexImage')
+    node.image = bpy.data.images.load(os.path.join(TEX, 'atlas.jpg'), check_existing=True)
+    nt.links.new(node.outputs['Color'], bsdf.inputs['Base Color'])
+    return [face, atlas]
+
+
+def tile_scene(samples):
+    """Warm light as on the game icon and the store banner: a low golden sun, a cool sky fill, soft shadows."""
+    clean_scene()
+    for img in list(bpy.data.images):
+        bpy.data.images.remove(img)
+    setup_cycles(samples)
+    sc = bpy.context.scene
+    sc.render.film_transparent = True
+    sc.view_settings.view_transform = 'Standard'   # AgX/Filmic wash the game palette out
+    sc.view_settings.exposure = 0.15
+    world = sc.world or bpy.data.worlds.new('World')
+    sc.world = world
+    bg = next((n for n in world.node_tree.nodes if n.type == 'BACKGROUND'), None)
+    if bg:
+        bg.inputs['Color'].default_value = (0.55, 0.68, 0.95, 1)
+        bg.inputs['Strength'].default_value = 0.85
+    sun = bpy.data.lights.new('Sun', 'SUN')
+    sun.energy = 3.0
+    sun.angle = math.radians(14)
+    sun.color = (1.0, 0.88, 0.70)
+    so = bpy.data.objects.new('Sun', sun)
+    so.rotation_euler = (math.radians(30), 0, math.radians(-38))
+    sc.collection.objects.link(so)
+    cam = bpy.data.cameras.new('TileCam')
+    cam.type = 'ORTHO'
+    co = bpy.data.objects.new('TileCam', cam)
+    sc.collection.objects.link(co)
+    sc.camera = co
+    return co
+
+
+def set_view(co, view):
+    if view == 'top':   # straight down, the frame is exactly the tile: same framing as the old 512 sprites
+        co.data.ortho_scale = 2.0
+        co.location = (0, 0, 6)
+        co.rotation_euler = (0, 0, 0)
+    else:               # isometric, one angle and one light for every tile; room above for the keep
+        co.data.ortho_scale = 3.15
+        co.location = (4.0, -4.0, 4.0 + .42)
+        co.rotation_euler = (math.radians(54.736), 0, math.radians(45))
+
+
+def export_glb(obj, path):
+    bpy.ops.object.select_all(action='DESELECT')
+    obj.select_set(True)
+    bpy.context.view_layer.objects.active = obj
+    kw = dict(filepath=path, export_format='GLB', use_selection=True, export_apply=True)
+    # no image inside (the game binds its own card face and loads the atlas once), one vertex colour (COLOR_0) and
+    # no normals: the models are flat shaded, three.js derives flat normals itself, and vertices are not split per face
+    for extra in (dict(export_image_format='NONE', export_vertex_color='ACTIVE', export_all_vertex_colors=False,
+                       export_normals=False), {}):
+        try:
+            bpy.ops.export_scene.gltf(**kw, **extra)
+            return
+        except TypeError:
+            continue
+
+
+def triangles(obj):
+    return sum(len(p.vertices) - 2 for p in obj.data.polygons)
+
+
+def export_props(out_dir):
+    """Every prop on its own, standing on the origin: the game can keep placing them itself (random per card)."""
+    os.makedirs(out_dir, exist_ok=True)
+    rows = []
+    for kind in list(HOUSES) + ['tower'] + list(PROPS):
+        clean_scene()
+        tm = TileMesh()
+        place(tm, kind, (0, 0, 0), random.Random(zlib.crc32(kind.encode())))
+        obj = tm.finish('prop_' + kind, clip=False)
+        for m in tile_materials(None):
+            obj.data.materials.append(m)
+        export_glb(obj, os.path.join(out_dir, kind + '.glb'))
+        rows.append({'id': kind, 'tris': triangles(obj)})
+    return rows
+
+
+def run_sets(argv):
+    ap = argparse.ArgumentParser(prog='generate_tiles.py')
+    ap.add_argument('--set', default='classic', choices=['classic', 'hex'])
+    ap.add_argument('--ids', default='')
+    ap.add_argument('--views', default='top,iso')
+    ap.add_argument('--samples', type=int, default=48)
+    ap.add_argument('--no-render', action='store_true')
+    ap.add_argument('--props', action='store_true', help='also export the props one by one (assets/tiles3d/props)')
+    a = ap.parse_args(argv)
+    if a.set != 'classic':
+        raise SystemExit('hex set: not built yet (classic first, see docs/design/TILES3D.md)')
+    defs = json.load(open(os.path.join(ROOT, 'assets', 'tiles3d', 'tiles.json'), encoding='utf-8'))['tiles']
+    want = [s for s in a.ids.split(',') if s]
+    tiles = [t for t in defs if not want or t['id'] in want]
+    out3d = os.path.join(ROOT, 'assets', 'tiles3d', a.set)
+    os.makedirs(out3d, exist_ok=True)
+    report = []
+    for t in tiles:
+        co = tile_scene(a.samples)
+        obj = build_tile(t)
+        for m in tile_materials(os.path.join(FACES, t['sprite'])):
+            obj.data.materials.append(m)
+        glb = os.path.join(out3d, t['id'] + '.glb')
+        export_glb(obj, glb)
+        row = {'id': t['id'], 'tris': triangles(obj), 'glb_kb': round(os.path.getsize(glb) / 1024, 1)}
+        if not a.no_render:
+            for view in [v for v in a.views.split(',') if v]:
+                d = os.path.join(ROOT, 'assets', 'tiles3d', 'renders', a.set, view)
+                os.makedirs(d, exist_ok=True)
+                set_view(co, view)
+                bpy.context.scene.render.filepath = os.path.join(d, 'tile_' + t['id'] + '.png')
+                bpy.ops.render.render(write_still=True)
+        report.append(row)
+        print('TILE', json.dumps(row))
+    if a.props:
+        for row in export_props(os.path.join(ROOT, 'assets', 'tiles3d', 'props')):
+            print('PROP', json.dumps(row))
+    with open(os.path.join(out3d, '_report.json'), 'w', encoding='utf-8') as f:
+        json.dump(report, f, indent=1)
+
+
+if __name__ == "__main__" and '--' in sys.argv:
+    run_sets(sys.argv[sys.argv.index('--') + 1:])
+elif __name__ == "__main__":
     out_dir = r"D:\TileTopia\store\blender_tiles"
     os.makedirs(out_dir, exist_ok=True)
     print("=== Rendering 3D Tiles ===")
