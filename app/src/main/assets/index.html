@@ -2479,21 +2479,6 @@ table.bd{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric
   color: #fca5a5;
 }
 
-/* Relic / Mystery discovery */
-.tile-toast.relic {
-  border-color: rgba(245, 175, 25, 0.75);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), 0 0 20px rgba(245, 175, 25, 0.35);
-  background: linear-gradient(135deg, rgba(38, 28, 12, 0.96) 0%, rgba(18, 14, 8, 0.98) 100%);
-}
-.tile-toast.relic .tt-icon {
-  background: linear-gradient(135deg, #f5af19, #e65100);
-  color: #fff;
-}
-.tile-toast.relic .tt-title {
-  color: #ffd54f;
-}
-
-
 /* profile: one card — identity row, level row, account buttons */
 
 #scr-progress #profile{display:flex;flex-direction:column;align-items:stretch;gap:12px;text-align:left}
@@ -3743,86 +3728,7 @@ html.app .screen.scroll{--sp:var(--it,0px);padding-top:0}/* the status-bar gap i
   transition: r .4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ==================== Fog Relics, Biome Particles & Scout ==================== */
-.fog-relic {
-  position: absolute;
-  width: 72px;
-  height: 72px;
-  margin-left: -36px;
-  margin-top: -36px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 15;
-  pointer-events: none;
-  user-select: none;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
-}
-
-.relic-pulse {
-  position: absolute;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(245, 175, 25, 0.45) 0%, rgba(245, 175, 25, 0) 70%);
-  animation: relicAura 2.4s ease-in-out infinite;
-}
-
-@keyframes relicAura {
-  0%, 100% { transform: scale(0.9); opacity: 0.6; }
-  50% { transform: scale(1.4); opacity: 1; }
-}
-
-.relic-ico {
-  position: relative;
-  font-size: 30px;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
-  animation: relicFloat 3s ease-in-out infinite alternate;
-}
-
-@keyframes relicFloat {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-5px); }
-}
-
-.relic-name {
-  position: relative;
-  font-family: var(--f-display, 'Unbounded', sans-serif);
-  font-size: 8px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #ffd875;
-  background: rgba(10, 14, 26, 0.75);
-  padding: 2px 6px;
-  border-radius: 6px;
-  border: 1px solid rgba(245, 175, 25, 0.4);
-  white-space: nowrap;
-  margin-top: 3px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-}
-
-.fog-relic.collected {
-  animation: relicBurst 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes relicBurst {
-  0% { transform: scale(1); opacity: 1; filter: brightness(1); }
-  50% { transform: scale(1.6); opacity: 0.8; filter: brightness(2); }
-  100% { transform: scale(2.2); opacity: 0; filter: brightness(3); }
-}
-
-.fog-relic.scout-beacon .relic-pulse {
-  background: radial-gradient(circle, rgba(94, 234, 212, 0.7) 0%, rgba(94, 234, 212, 0) 70%);
-  animation: beaconPing 1s cubic-bezier(0, 0, 0.2, 1) infinite;
-}
-
-@keyframes beaconPing {
-  0% { transform: scale(0.8); opacity: 1; }
-  100% { transform: scale(2.8); opacity: 0; }
-}
-
+/* ==================== Biome Particles & Scout ==================== */
 /* Biome Particles */
 .fog-particle {
   position: absolute;
@@ -5280,7 +5186,6 @@ html.app .screen.scroll{--sp:var(--it,0px);padding-top:0}/* the status-bar gap i
   50% { transform: scale(1.18); }
   100% { transform: scale(1.05); }
 }
-
 </style>
 
 <div class="page">
@@ -6685,7 +6590,7 @@ async function dropAt(t) {
   ghost.classList.remove('ghost');
   if (!(RM || fast())) await ghost.animate([{transform: 'translateZ(26px)'}, {transform: 'translateZ(0)'}], {duration: 260, easing: 'cubic-bezier(.5,0,.8,.4)'}).finished;
   ghost.remove(); ghost = null; lastPlaced = t;
-  t.el = tileEl(t, true, fast() ? null : .02); world.append(t.el); tiles.set(key(t.x, t.y), t); wallsAround(t); refreshRoadEnds(); markOwn(); updateFog(); checkRelicsAround(t.x, t.y);
+  t.el = tileEl(t, true, fast() ? null : .02); world.append(t.el); tiles.set(key(t.x, t.y), t); wallsAround(t); refreshRoadEnds(); markOwn(); updateFog();
   if (!fast()) beep('place');
   if (!fast()) { const pf = document.createElement('i'); pf.className = 'puff'; t.el.append(pf); setTimeout(() => pf.remove(), 600); }
   if (!fast()) { t.el.classList.add('puzzle-lock'); setTimeout(() => { if (t.el) t.el.classList.remove('puzzle-lock'); }, 350); }
@@ -7047,70 +6952,7 @@ const ranked = () => players.map((p, i) => ({...p, i})).sort((a, b) => {
 
 /* ---------------- setup ---------------- */
 
-/* ==================== 4 Game Evolution Features: Fog, Cartography, Biomes, Relics & Scout ==================== */
-
-let FOG_RELICS = new Map();
-
-const RELIC_POOL = [
-  {id: 'chest', name: 'Сундук золота', icon: '🎁', gold: 40, pts: 2},
-  {id: 'obelisk', name: 'Древний обелиск', icon: '🏛️', gold: 25, pts: 4},
-  {id: 'gem', name: 'Кристалл мудрости', icon: '💎', gold: 50, pts: 3},
-  {id: 'scroll', name: 'Свиток картографа', icon: '📜', gold: 30, pts: 5},
-];
-
-function spawnFogRelics() {
-  document.querySelectorAll('.fog-relic').forEach(el => el.remove());
-  FOG_RELICS = new Map();
-  const coords = [
-    {x: 2, y: 1}, {x: -2, y: 2}, {x: 1, y: -2}, {x: -2, y: -2}, {x: 3, y: -1}
-  ];
-  coords.forEach((c, idx) => {
-    const k = key(c.x, c.y);
-    const item = RELIC_POOL[idx % RELIC_POOL.length];
-    const r = {...item, x: c.x, y: c.y, key: k, collected: false};
-    FOG_RELICS.set(k, r);
-    
-    const el = document.createElement('div');
-    el.className = 'fog-relic';
-    el.id = 'relic-' + k.replace(',', '_');
-    el.style.left = (c.x * T) + 'px';
-    el.style.top = (c.y * T) + 'px';
-    el.innerHTML = `
-      <div class="relic-pulse"></div>
-      <div class="relic-ico">${r.icon}</div>
-      <div class="relic-name">${r.name}</div>
-    `;
-    world.append(el);
-  });
-}
-
-function checkRelicsAround(tx, ty) {
-  if (!FOG_RELICS || !players || !players[turn]) return;
-  for (const [k, r] of FOG_RELICS.entries()) {
-    if (r.collected) continue;
-    const dist = Math.abs(r.x - tx) + Math.abs(r.y - ty);
-    if (dist <= 1) {
-      r.collected = true;
-      const el = document.getElementById('relic-' + k.replace(',', '_'));
-      if (el) {
-        el.classList.add('collected');
-        setTimeout(() => el.remove(), 700);
-      }
-      
-      // Award bonuses
-      if (players[turn]) {
-        players[turn].score += r.pts;
-        if (typeof paintScores === 'function') paintScores();
-      }
-      wallet.gold = (wallet.gold || 0) + r.gold;
-      saveWallet();
-      if (typeof updateGold === 'function') updateGold();
-      if (typeof beep === 'function') beep('fanfare');
-      
-      toastAny(`${r.name}: +${r.gold} 🪙 и +${r.pts} очков!`, 'relic', 'Тайник в тумане');
-    }
-  }
-}
+/* ==================== 4 Game Evolution Features: Cartography, Biomes & Scout ==================== */
 
 function initFog() {
   const old = $('#fogOfWar');
@@ -7243,21 +7085,6 @@ function doScout() {
   const nxt = deck && deck[0];
   const tileName = nxt && TYPES[nxt] ? TYPES[nxt].name : 'Таинственная плитка';
   toastAny(`Следующая плитка в колоде: «${tileName}»`, 'ok', 'Дозорный');
-
-  // Pulse nearest relic
-  let nearest = null, minDist = 999;
-  for (const r of FOG_RELICS.values()) {
-    if (r.collected) continue;
-    const d = Math.abs(r.x) + Math.abs(r.y);
-    if (d < minDist) { minDist = d; nearest = r; }
-  }
-  if (nearest) {
-    const relEl = document.getElementById('relic-' + nearest.key.replace(',', '_'));
-    if (relEl) {
-      relEl.classList.add('scout-beacon');
-      setTimeout(() => relEl.classList.remove('scout-beacon'), 3500);
-    }
-  }
 }
 
 
@@ -7325,7 +7152,7 @@ function startGame(cfg, replay = []) {
   if (meepleResolve) { meepleResolve = null; mrow.hidden = true; prow.hidden = false; }
   // The menu shows a small built-up kingdom; the game itself starts from an empty table.
   buildBoard(); buildMini();
-  world.innerHTML = '<div class="ground"></div>'; try { initFog(); spawnFogRelics(); } catch(_) {}
+  world.innerHTML = '<div class="ground"></div>'; try { initFog(); } catch(_) {}
   ghost = null; slotEls = []; meeples = []; doneFeats = []; turn = 0; phase = 'idle';
   const rules = gameRules = cfg.rules;
   players = cfg.seats.map((s, i) => { const name = clean(s.name) || 'Игрок ' + (i + 1); return {name, init: name[0].toUpperCase(), col: validCol(s.col) ? s.col : PL0[i].col, human: s.human, ghost: !!s.ghost, st: PG.state.status.shownStatus(s.st), owner: s.owner, uid: s.uid || null, fig: FIGS[s.fig] ? s.fig : 'classic', botlvl: s.botlvl || (s.human ? null : (wallet.botlvl || 'normal')), score: 0, stats: {c: 0, r: 0, f: 0, t: 0, m: 0}, meeples: rules.meeples, missed: 0}; });
@@ -8472,8 +8299,8 @@ function toastAny(t, kind, title) {
   d.className = 'tile-toast ' + k;
   d.setAttribute('role', k === 'bad' ? 'alert' : 'status');
 
-  const icon = k === 'bad' ? '!' : k === 'ok' ? '✓' : (k === 'relic' ? '🎁' : 'ℹ');
-  const heading = title || (k === 'bad' ? 'Внимание' : k === 'ok' ? 'Успешно' : (k === 'relic' ? 'Находка' : ''));
+  const icon = k === 'bad' ? '!' : k === 'ok' ? '✓' : 'ℹ';
+  const heading = title || (k === 'bad' ? 'Внимание' : k === 'ok' ? 'Успешно' : '');
 
   d.innerHTML = `
     <div class="tt-icon">${icon}</div>

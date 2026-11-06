@@ -2266,21 +2266,6 @@ table.bd{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric
   color: #fca5a5;
 }
 
-/* Relic / Mystery discovery */
-.tile-toast.relic {
-  border-color: rgba(245, 175, 25, 0.75);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), 0 0 20px rgba(245, 175, 25, 0.35);
-  background: linear-gradient(135deg, rgba(38, 28, 12, 0.96) 0%, rgba(18, 14, 8, 0.98) 100%);
-}
-.tile-toast.relic .tt-icon {
-  background: linear-gradient(135deg, #f5af19, #e65100);
-  color: #fff;
-}
-.tile-toast.relic .tt-title {
-  color: #ffd54f;
-}
-
-
 /* profile: one card — identity row, level row, account buttons */
 
 #scr-progress #profile{display:flex;flex-direction:column;align-items:stretch;gap:12px;text-align:left}
@@ -3530,86 +3515,7 @@ html.app .screen.scroll{--sp:var(--it,0px);padding-top:0}/* the status-bar gap i
   transition: r .4s cubic-bezier(0.16, 1, 0.3, 1);
 }
 
-/* ==================== Fog Relics, Biome Particles & Scout ==================== */
-.fog-relic {
-  position: absolute;
-  width: 72px;
-  height: 72px;
-  margin-left: -36px;
-  margin-top: -36px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  z-index: 15;
-  pointer-events: none;
-  user-select: none;
-  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
-}
-
-.relic-pulse {
-  position: absolute;
-  width: 56px;
-  height: 56px;
-  border-radius: 50%;
-  background: radial-gradient(circle, rgba(245, 175, 25, 0.45) 0%, rgba(245, 175, 25, 0) 70%);
-  animation: relicAura 2.4s ease-in-out infinite;
-}
-
-@keyframes relicAura {
-  0%, 100% { transform: scale(0.9); opacity: 0.6; }
-  50% { transform: scale(1.4); opacity: 1; }
-}
-
-.relic-ico {
-  position: relative;
-  font-size: 30px;
-  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
-  animation: relicFloat 3s ease-in-out infinite alternate;
-}
-
-@keyframes relicFloat {
-  0% { transform: translateY(0); }
-  100% { transform: translateY(-5px); }
-}
-
-.relic-name {
-  position: relative;
-  font-family: var(--f-display, 'Unbounded', sans-serif);
-  font-size: 8px;
-  font-weight: 800;
-  text-transform: uppercase;
-  letter-spacing: 0.5px;
-  color: #ffd875;
-  background: rgba(10, 14, 26, 0.75);
-  padding: 2px 6px;
-  border-radius: 6px;
-  border: 1px solid rgba(245, 175, 25, 0.4);
-  white-space: nowrap;
-  margin-top: 3px;
-  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
-}
-
-.fog-relic.collected {
-  animation: relicBurst 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
-}
-
-@keyframes relicBurst {
-  0% { transform: scale(1); opacity: 1; filter: brightness(1); }
-  50% { transform: scale(1.6); opacity: 0.8; filter: brightness(2); }
-  100% { transform: scale(2.2); opacity: 0; filter: brightness(3); }
-}
-
-.fog-relic.scout-beacon .relic-pulse {
-  background: radial-gradient(circle, rgba(94, 234, 212, 0.7) 0%, rgba(94, 234, 212, 0) 70%);
-  animation: beaconPing 1s cubic-bezier(0, 0, 0.2, 1) infinite;
-}
-
-@keyframes beaconPing {
-  0% { transform: scale(0.8); opacity: 1; }
-  100% { transform: scale(2.8); opacity: 0; }
-}
-
+/* ==================== Biome Particles & Scout ==================== */
 /* Biome Particles */
 .fog-particle {
   position: absolute;

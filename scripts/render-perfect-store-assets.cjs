@@ -3,7 +3,7 @@
  * - 6 Raw Phone Screenshots (1080x1920):
  *   1-menu: Clean Main Page (normal scale, 3D diorama, compact action row, single top menu button)
  *   2-modes: Opened Game Modes Bottom Sheet over main screen
- *   3-game: Harmonious active gameplay (16+ tiles, fog with wind rose, relics, scout HUD)
+ *   3-game: Harmonious active gameplay (16+ tiles, scout HUD)
  *   4-setup: Match Setup (bot levels, seats, rules, NO table location button)
  *   5-results: Season League Leaderboard (Top 3 podium + 20 places, frames, statuses, cups)
  *   6-shop: «Витрина» (Daily 6-item showcase in tile banners, 09:00 countdown timer, gift banner)
