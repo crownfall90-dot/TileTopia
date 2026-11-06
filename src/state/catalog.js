@@ -46,6 +46,8 @@ export const LOCS = [
 
 export const CHEST_SVG = '<svg viewBox="0 0 64 56" width="72" height="63" aria-hidden="true"><rect x="6" y="22" width="52" height="30" rx="4" fill="#9a5b2c"/><rect x="6" y="22" width="52" height="7" fill="#7b4521"/><path d="M6 22 Q32 0 58 22 Z" fill="#b36a32"/><rect x="28" y="14" width="8" height="38" fill="#f2b84b"/><rect x="26" y="26" width="12" height="10" rx="2" fill="#ffd36b" stroke="#8a5a12" stroke-width="1.5"/><rect x="6" y="38" width="52" height="3" fill="#f2b84b"/></svg>';
 
+export const CHEST_OPEN_SVG = '<svg viewBox="0 0 64 56" width="72" height="63" aria-hidden="true"><defs><radialGradient id="chgld" cx="50%" cy="30%" r="50%"><stop offset="0%" stop-color="#fff"/><stop offset="50%" stop-color="#ffd36b"/><stop offset="100%" stop-color="#d48a1c" stop-opacity="0"/></radialGradient></defs><circle cx="32" cy="18" r="22" fill="url(#chgld)" opacity=".7"/><path d="M6 14 Q32 -6 58 14 Q32 2 6 14 Z" fill="#b36a32" stroke="#6d3916" stroke-width="1.2"/><rect x="27" y="1" width="10" height="12" fill="#ffd36b" rx="1"/><rect x="6" y="22" width="52" height="30" rx="4" fill="#9a5b2c"/><rect x="6" y="22" width="52" height="6" fill="#6d3916"/><ellipse cx="32" cy="22" rx="20" ry="4" fill="#ffd36b"/><ellipse cx="32" cy="22" rx="12" ry="2.2" fill="#fff" opacity=".8"/><rect x="28" y="22" width="8" height="30" fill="#f2b84b"/><rect x="26" y="26" width="12" height="9" rx="2" fill="#ffd36b" stroke="#8a5a12" stroke-width="1.3"/><rect x="6" y="38" width="52" height="3" fill="#f2b84b"/></svg>';
+
 /** Collections (R-9): themed sets of figurines and frames with completion rewards. */
 export const COLLECTIONS = [
   {

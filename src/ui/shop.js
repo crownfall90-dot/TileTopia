@@ -2,16 +2,44 @@
 // Renders the shop screens: daily gifts, figures, avatar frames, and game locations.
 
 /** Generates HTML markup for the daily gift chest card. */
-export function renderGiftCard({giftReady, chestSvg, boosts = {}}) {
+export function renderGiftCard({giftReady, chestSvg, boosts = {}, nextGiftTimeStr = ''}) {
   const inv = [
     boosts.double ? `Двойное золото ×${boosts.double}` : '',
     boosts.meeple ? `+1 фигурка ×${boosts.meeple}` : '',
   ].filter(Boolean).join(' · ');
 
+  const statusLabel = giftReady
+    ? '<span class="gstatus-ready">Готов к открытию ✨</span>'
+    : `<span class="gstatus-wait">⏱ ${nextGiftTimeStr || 'Завтра'}</span>`;
+
   return `<div class="chest${giftReady ? ' ready' : ''}">${chestSvg}</div>` +
-    `<div class="gi"><b>Ежедневный подарок</b><small>${giftReady ? 'Золото, бонус на партию или фигурка' : 'Следующий подарок — завтра'}` +
+    `<div class="gi"><b>Ежедневный подарок</b>${statusLabel}<small>${giftReady ? 'Выберите 1 из 3 сундуков удачи!' : 'Следующий подарок — завтра'}` +
     `${inv ? '<br>У вас: ' + inv : ''}</small></div>` +
-    `${giftReady ? '<button class="cta" id="openGift">Открыть</button>' : ''}`;
+    `${giftReady ? '<button class="cta" id="openGift">Открыть</button>' : '<button class="ghostbtn sm" id="openGiftCalendar" title="Календарь наград">Календарь</button>'}`;
+}
+
+/** Generates HTML for the 7-day reward calendar track. */
+export function renderGiftCalendarHtml({streakDays = [15, 25, 'x2', 40, '+1♟', 60, '150👑'], currentDay = 0, isClaimedToday = false}) {
+  const cells = streakDays.map((reward, i) => {
+    const isDone = i < currentDay || (i === currentDay && isClaimedToday);
+    const isCurrent = i === currentDay && !isClaimedToday;
+    const isSpecial = i === 6;
+    let label = '';
+    if (typeof reward === 'number') {
+      label = `<i class="coin"></i>${reward}`;
+    } else if (reward === 'x2') {
+      label = '⚡ ×2';
+    } else if (reward === '+1♟') {
+      label = '♟️ +1';
+    } else {
+      label = `${reward}`;
+    }
+    return `<div class="gcal-day${isDone ? ' done' : ''}${isCurrent ? ' now' : ''}${isSpecial ? ' mega' : ''}">` +
+      `<span class="gcal-num">День ${i + 1}</span>` +
+      `<span class="gcal-rew">${isDone ? '✓' : label}</span>` +
+      `</div>`;
+  }).join('');
+  return `<div class="gcal-track">${cells}</div>`;
 }
 
 /** Generates HTML markup for figure buttons grid. */

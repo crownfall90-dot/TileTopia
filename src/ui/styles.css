@@ -4005,3 +4005,365 @@ html.app .screen.scroll{--sp:var(--it,0px);padding-top:0}/* the status-bar gap i
 #scr-shop .loc > * {
   transform: skewX(8deg);
 }
+
+/* ==========================================================================
+   ЕЖЕДНЕВНЫЙ ПОДАРОК: ТРИ СУНДУКА УДАЧИ, КАЛЕНДАРЬ НА 7 ДНЕЙ И ТАЙМЕР
+   ========================================================================== */
+
+.gstatus-ready {
+  display: inline-block;
+  font: 700 11px var(--f-display);
+  color: #ffd75e;
+  background: rgba(245, 192, 78, 0.18);
+  border: 1px solid rgba(245, 192, 78, 0.45);
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-top: 4px;
+  letter-spacing: 0.3px;
+  text-transform: uppercase;
+  box-shadow: 0 0 10px rgba(245, 192, 78, 0.25);
+}
+
+.gstatus-wait {
+  display: inline-block;
+  font: 600 11px var(--f-display);
+  color: var(--muted);
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  padding: 2px 8px;
+  border-radius: 999px;
+  margin-top: 4px;
+}
+
+/* Модальное окно подарка */
+.ocard.gift-modal {
+  position: relative;
+  max-width: 440px;
+  width: calc(100vw - 32px);
+  padding: 24px 20px 20px;
+  text-align: center;
+  border: 1.5px solid rgba(245, 192, 78, 0.5);
+  background: radial-gradient(circle at 50% 20%, rgba(38, 54, 96, 0.98) 0%, rgba(14, 20, 38, 0.98) 100%);
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.65), 0 0 32px rgba(245, 192, 78, 0.25);
+  overflow: hidden;
+}
+
+.gift-modal-header {
+  margin-bottom: 14px;
+}
+
+.gift-modal-header h3 {
+  font: 800 20px var(--f-title);
+  color: #fff;
+  margin: 0 0 4px;
+  text-shadow: 0 2px 10px rgba(245, 192, 78, 0.4);
+}
+
+.gift-modal-header p {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0;
+}
+
+/* Трио сундуков */
+.gift-trio {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin: 16px 0 20px;
+}
+
+.gift-chest-btn {
+  position: relative;
+  flex: 1;
+  max-width: 120px;
+  background: linear-gradient(180deg, rgba(32, 45, 80, 0.95), rgba(16, 24, 46, 0.98));
+  border: 1.5px solid rgba(255, 255, 255, 0.16);
+  border-radius: 16px;
+  padding: 14px 6px 12px;
+  cursor: pointer;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  transition: transform 0.25s cubic-bezier(0.3, 1.5, 0.5, 1), border-color 0.25s, box-shadow 0.25s;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.35);
+  outline: none;
+}
+
+.gift-chest-btn:hover:not(:disabled),
+.gift-chest-btn:focus-visible:not(:disabled) {
+  transform: translateY(-4px) scale(1.04);
+  border-color: rgba(245, 192, 78, 0.7);
+  box-shadow: 0 10px 24px rgba(245, 192, 78, 0.3);
+}
+
+.gift-chest-btn:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.gift-chest-art {
+  width: 68px;
+  height: 60px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 6px 10px rgba(0, 0, 0, 0.45));
+  transition: transform 0.3s ease;
+}
+
+.gift-chest-art svg {
+  width: 100%;
+  height: 100%;
+}
+
+.gift-chest-btn.idle .gift-chest-art {
+  animation: chestIdleFloat 3s ease-in-out infinite;
+}
+
+.gift-chest-btn:nth-child(2).idle .gift-chest-art {
+  animation-delay: 0.5s;
+}
+
+.gift-chest-btn:nth-child(3).idle .gift-chest-art {
+  animation-delay: 1s;
+}
+
+.gift-chest-name {
+  font: 700 12px var(--f-display);
+  color: #e2e8f5;
+  letter-spacing: 0.3px;
+}
+
+.gift-chest-hint {
+  font-size: 10px;
+  color: var(--muted);
+}
+
+/* Анимация тряски сундука перед открытием */
+.gift-chest-btn.shaking {
+  animation: chestAnticipateShake 0.45s ease-in-out;
+  border-color: #ffd75e;
+  box-shadow: 0 0 20px rgba(245, 192, 78, 0.6);
+}
+
+/* Состояние открытого выбранного сундука */
+.gift-chest-btn.opened {
+  transform: scale(1.08);
+  border-color: #ffd75e;
+  background: linear-gradient(180deg, rgba(50, 70, 120, 0.98), rgba(22, 34, 64, 0.98));
+  box-shadow: 0 12px 32px rgba(245, 192, 78, 0.5), inset 0 0 16px rgba(245, 192, 78, 0.3);
+  z-index: 2;
+}
+
+.gift-chest-btn.opened .gift-chest-art {
+  animation: chestPopOpen 0.5s cubic-bezier(0.3, 1.6, 0.5, 1) forwards;
+}
+
+/* Приз над открытым сундуком */
+.gift-prize-reveal {
+  position: absolute;
+  top: -16px;
+  left: 50%;
+  transform: translateX(-50%);
+  background: linear-gradient(135deg, #ffd75e, #f2a83b);
+  color: #141b2d;
+  font: 800 13px var(--f-display);
+  padding: 4px 10px;
+  border-radius: 999px;
+  white-space: nowrap;
+  box-shadow: 0 4px 14px rgba(245, 192, 78, 0.6);
+  animation: prizePopup 0.4s cubic-bezier(0.3, 1.8, 0.5, 1) forwards;
+  z-index: 3;
+}
+
+/* Состояние других двух сундуков (Ghost Reveal) */
+.gift-chest-btn.ghost {
+  opacity: 0.65;
+  filter: grayscale(0.25);
+  border-color: rgba(255, 255, 255, 0.1);
+  transform: scale(0.96);
+  cursor: default;
+}
+
+.gift-chest-ghost-note {
+  font-size: 10px;
+  line-height: 1.25;
+  color: #b0bcd6;
+  margin-top: 4px;
+}
+
+.gift-chest-ghost-note b {
+  color: #ffd75e;
+  display: block;
+}
+
+/* Дорожка календаря на 7 дней */
+.gcal-track {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 4px;
+  margin: 16px 0 14px;
+  background: rgba(10, 16, 32, 0.7);
+  padding: 8px 6px;
+  border-radius: 14px;
+  border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.gcal-day {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 6px 2px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.04);
+  font-size: 11px;
+  transition: all 0.3s ease;
+  min-height: 48px;
+}
+
+.gcal-day .gcal-num {
+  font: 600 10px var(--f-display);
+  color: var(--muted);
+  margin-bottom: 2px;
+}
+
+.gcal-day .gcal-rew {
+  font: 700 11px var(--f-display);
+  color: #e2e8f5;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+}
+
+.gcal-day.done {
+  background: rgba(62, 175, 124, 0.16);
+  border: 1px solid rgba(62, 175, 124, 0.45);
+}
+
+.gcal-day.done .gcal-rew {
+  color: #5ee6a6;
+  font-weight: 800;
+}
+
+.gcal-day.now {
+  background: linear-gradient(180deg, rgba(245, 192, 78, 0.28), rgba(245, 192, 78, 0.08));
+  border: 1.5px solid #ffd75e;
+  box-shadow: 0 0 14px rgba(245, 192, 78, 0.35);
+  transform: scale(1.06);
+}
+
+.gcal-day.now .gcal-num {
+  color: #ffd75e;
+  font-weight: 700;
+}
+
+.gcal-day.mega {
+  background: linear-gradient(180deg, rgba(255, 215, 94, 0.2), rgba(160, 100, 255, 0.15));
+  border: 1px solid rgba(255, 215, 94, 0.5);
+}
+
+.gcal-day.mega .gcal-num {
+  color: #ffd75e;
+}
+
+/* Таймер обратного отсчёта */
+.gift-timer-card {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  margin: 12px 0 16px;
+  padding: 10px 14px;
+  background: rgba(245, 192, 78, 0.08);
+  border: 1px solid rgba(245, 192, 78, 0.3);
+  border-radius: 12px;
+  font: 600 13px var(--f-display);
+  color: #e2e8f5;
+}
+
+.gift-timer-card b {
+  font: 700 14px var(--f-title);
+  color: #ffd75e;
+  letter-spacing: 0.5px;
+}
+
+/* Главное меню: Плашка подарка */
+.menu-gift-pill {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 100%;
+  padding: 11px 16px;
+  margin: 8px 0;
+  border-radius: 14px;
+  background: linear-gradient(135deg, rgba(245, 192, 78, 0.25) 0%, rgba(220, 140, 20, 0.18) 100%);
+  border: 1.5px solid rgba(245, 192, 78, 0.65);
+  box-shadow: 0 4px 18px rgba(245, 192, 78, 0.3), inset 0 1px 0 rgba(255, 255, 255, 0.25);
+  font: 700 13px var(--f-display);
+  color: #fff;
+  cursor: pointer;
+  animation: giftPillPulse 2.4s ease-in-out infinite;
+  outline: none;
+  transition: transform 0.2s, box-shadow 0.2s;
+}
+
+.menu-gift-pill:hover,
+.menu-gift-pill:active {
+  transform: translateY(-2px) scale(1.02);
+  box-shadow: 0 6px 22px rgba(245, 192, 78, 0.45);
+}
+
+.menu-gift-pill span.mgp-ic {
+  font-size: 18px;
+  filter: drop-shadow(0 2px 4px rgba(0, 0, 0, 0.4));
+}
+
+.menu-gift-pill span.mgp-tx {
+  display: flex;
+  align-items: baseline;
+  gap: 6px;
+}
+
+.menu-gift-pill span.mgp-tx b {
+  font-weight: 700;
+  color: #ffd75e;
+}
+
+.menu-gift-pill span.mgp-tx small {
+  font-size: 11px;
+  color: rgba(255, 255, 255, 0.8);
+}
+
+/* Keyframe-анимации для сундуков */
+@keyframes chestIdleFloat {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-4px); }
+}
+
+@keyframes chestAnticipateShake {
+  0%, 100% { transform: translateX(0) rotate(0); }
+  20% { transform: translateX(-4px) rotate(-3deg); }
+  40% { transform: translateX(4px) rotate(3deg); }
+  60% { transform: translateX(-3px) rotate(-2deg); }
+  80% { transform: translateX(3px) rotate(2deg); }
+}
+
+@keyframes chestPopOpen {
+  0% { transform: scale(0.9); }
+  50% { transform: scale(1.18); }
+  100% { transform: scale(1); }
+}
+
+@keyframes prizePopup {
+  0% { transform: translate(-50%, 12px) scale(0.5); opacity: 0; }
+  100% { transform: translate(-50%, 0) scale(1); opacity: 1; }
+}
+
+@keyframes giftPillPulse {
+  0%, 100% { box-shadow: 0 4px 18px rgba(245, 192, 78, 0.25); border-color: rgba(245, 192, 78, 0.5); }
+  50% { box-shadow: 0 6px 24px rgba(245, 192, 78, 0.5), 0 0 12px rgba(245, 192, 78, 0.4); border-color: rgba(245, 192, 78, 0.85); }
+}
