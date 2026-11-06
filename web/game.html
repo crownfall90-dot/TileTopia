@@ -26,25 +26,41 @@
 
       <nav class="bnav" id="bnav" hidden aria-label="Разделы">
         <button data-nav="menu" aria-label="Главная"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6.5 8 6.5"/><path d="M6 9.5V19a1 1 0 001 1h3.5v-5h3v5H17a1 1 0 001-1V9.5"/></svg><span>Главная</span></button>
-        <button data-nav="progress" id="progBtn" aria-label="Профиль, задания и достижения"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="8" r="3.6"/><path d="M5 20c.8-3.8 3.6-5.8 7-5.8s6.2 2 7 5.8"/></svg><span>Профиль</span></button>
+        <button data-nav="progress" id="progBtn" aria-label="Задания и дорога прогресса"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span class="fnav-label">Задания<i class="fnav-dot" id="progNavDot" hidden></i></span></button>
         <button data-nav="friends" id="friendsBtn" aria-label="Друзья"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 19.5c.6-3.3 3-5 6-5s5.4 1.7 6 5"/><path d="M18 8v6M15 11h6"/></svg><span class="fnav-label">Друзья<i class="fnav-dot" id="fNavDot" hidden></i></span></button>
         <button data-nav="shop" id="navShop" aria-label="Витрина"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16l-1.2 10.2a2 2 0 01-2 1.8H7.2a2 2 0 01-2-1.8z"/><path d="M8.5 9V7a3.5 3.5 0 017 0v2"/></svg><span>Витрина</span></button>
       </nav>
       <section class="screen" id="scr-menu" hidden>
         <div class="mtop">
           <button class="iconbtn" data-go="history" aria-label="История партий" hidden style="display:none"></button>
-          <button class="mprof" id="mprof" data-go="progress" aria-label="Профиль, кубки, уровень и золото"></button>
-          <button class="menu-hub-btn" id="btnMenuHub" aria-label="Меню" title="Меню">
-            <span class="mhub-tilt">
-              <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>
-              <span>Меню</span>
-            </span>
-          </button>
+          <button class="mprof" id="mprof" data-go="profile" aria-label="Профиль, уровень и золото"></button>
+          <div class="mtop-right-group">
+            <button class="mtop-rank-btn" id="btnMenuRating" data-go="rating" aria-label="Рейтинг игроков" title="Рейтинг игроков"><span style="font-size:18px">🏆</span></button>
+            <button class="menu-hub-btn" id="btnMenuHub" aria-label="Меню" title="Меню">
+              <span class="mhub-tilt">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="1.5"/><circle cx="19" cy="12" r="1.5"/><circle cx="5" cy="12" r="1.5"/></svg>
+                <span>Меню</span>
+              </span>
+            </button>
+          </div>
         </div>
         <div class="hero"><div class="mini" id="mini"></div></div>
         <div class="mbody">
           <h2 class="logo">Tile<span>topia</span></h2>
           <p class="tag">Стройте города, дороги и крепости</p>
+          <button class="menu-rating-card" id="btnMenuRatingCard" data-go="rating" aria-label="Рейтинг игроков">
+            <div class="mrc-left">
+              <span class="mrc-icon">🏆</span>
+              <div class="mrc-info">
+                <b class="mrc-title">Рейтинг игроков</b>
+                <small class="mrc-sub" id="menuRatingSub">Лига · Сезон 1 · Топ-20</small>
+              </div>
+            </div>
+            <div class="mrc-right">
+              <span class="mrc-badge" id="menuRatingBadge">🏆 <b class="cupsN">0</b></span>
+              <i class="tgo">›</i>
+            </div>
+          </button>
           <button class="menu-gift-pill" id="menuGiftPill" aria-label="Открыть ежедневный подарок" hidden>
             <span class="mgp-ic">🎁</span>
             <span class="mgp-tx"><b>Подарок готов!</b><small>Три сундука удачи</small></span>
@@ -141,15 +157,48 @@
         </div>
       </section>
 
-      <section class="screen scroll" id="scr-progress" hidden>
+      <section class="screen scroll" id="scr-profile" hidden>
         <div class="lb">
           <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Профиль</b></div>
           <div class="profile" id="profile"></div>
           <div class="sgroup prof" id="acct"></div>
           <button class="tutcard itemsentry" id="itemsBtn"><span>🎒</span><span><b>Мои предметы</b><small id="itemsSub">Статусы, рамки, фигурки, локации</small></span><i class="tgo">›</i></button>
           <div class="pstats" id="stats"></div>
+          <button class="tutcard historyentry" data-go="history" style="margin-top:8px"><span>📜</span><span><b>История партий</b><small>Результаты последних матчей</small></span><i class="tgo">›</i></button>
+        </div>
+      </section>
+
+      <section class="screen scroll" id="scr-progress" hidden>
+        <div class="lb">
+          <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Задания и Прогресс</b></div>
+
+          <div class="road-container" id="progressRoadWrap">
+            <div class="road-header">
+              <div class="road-title-row">
+                <span class="road-badge-ic">⭐</span>
+                <div>
+                  <b class="road-title">Дорога прогресса</b>
+                  <small class="road-sub" id="roadSub">Побеждайте и забирайте награды</small>
+                </div>
+              </div>
+              <div class="road-stat-chip">
+                <span id="roadCurrentRank">🏆 0</span>
+              </div>
+            </div>
+            <div class="road-track-scroll">
+              <div class="road-track" id="roadTrack"></div>
+            </div>
+          </div>
+
           <div class="seg ptabs" id="ptabs"><button data-pt="rewards" aria-pressed="true">Награды</button><button data-pt="cols" aria-pressed="false">Коллекции</button><button data-pt="top" aria-pressed="false">Рейтинг</button></div>
           <div class="col" id="ptab"></div>
+        </div>
+      </section>
+
+      <section class="screen scroll" id="scr-rating" hidden>
+        <div class="lb">
+          <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Рейтинг игроков</b></div>
+          <div class="col" id="ratingContent"></div>
         </div>
       </section>
 
@@ -162,7 +211,7 @@
 
       <section class="screen scroll" id="scr-items" hidden>
         <div class="lb">
-          <div class="ltop"><button class="iconbtn" data-go="progress" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Мои предметы</b></div>
+          <div class="ltop"><button class="iconbtn" data-go="profile" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Мои предметы</b></div>
           <div class="seg itabs" id="itabs"><button data-it="st" aria-pressed="true">Статусы</button><button data-it="fr" aria-pressed="false">Рамки</button><button data-it="fg" aria-pressed="false">Фигурки</button><button data-it="em" aria-pressed="false">Эмоции</button><button data-it="lc" aria-pressed="false">Локации</button></div>
           <div class="col" id="itemsBody"></div>
         </div>
@@ -223,7 +272,7 @@
             <div class="hitem"><span class="hic">💤</span><div><b>Игра свёрнута</b><p>Если игра свёрнута больше минуты, вас выводит из онлайн-партии. Вернуться можно.</p></div></div>
           </div>
 
-          <button class="ghostbtn" data-mode="bots">Сыграть с ботами</button>
+          
         </div>
       </section>
 
@@ -4426,7 +4475,17 @@ function ptabsDot() {
     b.classList.toggle('hasdot', pt === 'rewards' ? (qDot || wqDot || aDot) : pt === 'cols' ? cDot : pt === 'top' ? tDot : false);
   });
 }
-function progressDot() { const b = $('#progBtn'); if (b) b.classList.toggle('hasdot', rewardReady()); ptabsDot(); }
+function progressDot() {
+  const b = $('#progBtn');
+  const myLvl = PROG.lvl || 1, myCups = PROG.cups || 0;
+  const claimed = wallet.roadClaimed || [];
+  const roadReady = PROGRESS_ROAD_MILESTONES.some(m => (myLvl >= m.lvl || myCups >= m.cups) && !claimed.includes(m.id));
+  const hasDot = rewardReady() || roadReady;
+  if (b) b.classList.toggle('hasdot', hasDot);
+  const dotEl = $('#progNavDot');
+  if (dotEl) dotEl.hidden = !hasDot;
+  ptabsDot();
+}
 let ptab = 'rewards';
 function ring(frac) { return PG.ui.progress.ringSvg(frac); }
 // The profile plate on the menu: avatar, nickname, level with its bar, gold. Taps open the profile.
@@ -4452,6 +4511,76 @@ function renderMenuQuestBanner() {
     else sEl.textContent = 'Задания';
   }
 }
+const PROGRESS_ROAD_MILESTONES = [
+  { id: 'm1', lvl: 1, cups: 0, title: 'Старт пути', desc: 'Первые шаги', reward: { gold: 30 }, ic: '🌱' },
+  { id: 'm2', lvl: 2, cups: 30, title: 'Новичок', desc: '+50 золота', reward: { gold: 50 }, ic: '💰' },
+  { id: 'm3', lvl: 3, cups: 70, title: 'Следопыт', desc: 'Статус «Следопыт»', reward: { status: 'Следопыт', gold: 50 }, ic: '🧭' },
+  { id: 'm4', lvl: 4, cups: 120, title: 'Зодчий', desc: '+100 золота', reward: { gold: 100 }, ic: '🏰' },
+  { id: 'm5', lvl: 5, cups: 180, title: 'Изумруд', desc: 'Рамка «Изумруд»', reward: { frame: 'emerald', gold: 50 }, ic: '💎' },
+  { id: 'm6', lvl: 6, cups: 250, title: 'Мастер', desc: '+150 золота', reward: { gold: 150 }, ic: '⭐' },
+  { id: 'm7', lvl: 7, cups: 350, title: 'Магистр', desc: 'Фигурка «Магистр»', reward: { fig: 'classic', gold: 100 }, ic: '🧙‍♂️' },
+  { id: 'm8', lvl: 8, cups: 500, title: 'Золотой сундук', desc: '+250 золота', reward: { gold: 250 }, ic: '🎁' },
+  { id: 'm9', lvl: 9, cups: 750, title: 'Гроссмейстер', desc: 'Статус «Гроссмейстер»', reward: { status: 'Гроссмейстер', gold: 150 }, ic: '👑' },
+  { id: 'm10', lvl: 10, cups: 1000, title: 'Чемпион', desc: 'Кубок Чемпиона +500 золота', reward: { frame: 'gold', gold: 500 }, ic: '🏆' },
+];
+
+function renderProgressRoad() {
+  const track = $('#roadTrack');
+  if (!track) return;
+  const rankEl = $('#roadCurrentRank');
+  if (rankEl) rankEl.textContent = `🏆 ${PROG.cups || 0}`;
+  const myLvl = PROG.lvl || 1, myCups = PROG.cups || 0;
+  const claimed = wallet.roadClaimed || [];
+
+  track.innerHTML = PROGRESS_ROAD_MILESTONES.map(m => {
+    const isUnlocked = myLvl >= m.lvl || myCups >= m.cups;
+    const isClaimed = claimed.includes(m.id);
+    const cls = isClaimed ? 'claimed' : isUnlocked ? 'unlocked' : 'locked';
+    const btn = isClaimed
+      ? '<span class="road-node-tag">✅ Получено</span>'
+      : isUnlocked
+        ? `<button class="chip pri road-node-btn" data-claimroad="${m.id}">Забрать</button>`
+        : `<span class="road-node-tag">🔒 ${m.cups ? m.cups + ' 🏆' : 'Ур. ' + m.lvl}</span>`;
+    return `
+      <div class="road-node ${cls}">
+        <span class="road-node-ic">${m.ic}</span>
+        <div class="road-node-card">
+          <b class="road-node-title">${m.title}</b>
+          <small class="road-node-reward">${m.desc}</small>
+          ${btn}
+        </div>
+      </div>
+    `;
+  }).join('');
+}
+
+function claimRoadMilestone(id) {
+  const m = PROGRESS_ROAD_MILESTONES.find(x => x.id === id);
+  if (!m) return;
+  const myLvl = PROG.lvl || 1, myCups = PROG.cups || 0;
+  const isUnlocked = myLvl >= m.lvl || myCups >= m.cups;
+  wallet.roadClaimed = wallet.roadClaimed || [];
+  if (!isUnlocked || wallet.roadClaimed.includes(id)) return;
+  wallet.roadClaimed.push(id);
+  if (m.reward.gold) wallet.gold += m.reward.gold;
+  if (m.reward.status) {
+    if (!wallet.statuses) wallet.statuses = [];
+    if (!wallet.statuses.includes(m.reward.status)) wallet.statuses.push(m.reward.status);
+  }
+  if (m.reward.frame && !(wallet.frames || []).includes(m.reward.frame)) {
+    wallet.frames = [...(wallet.frames || []), m.reward.frame];
+  }
+  if (m.reward.fig && !(wallet.owned || []).includes(m.reward.fig)) {
+    wallet.owned = [...(wallet.owned || []), m.reward.fig];
+  }
+  beep('coin');
+  saveWallet();
+  toastAny(`Награда «${m.title}» получена! 🎉`);
+  renderProgressRoad();
+  renderMenuProfile();
+  progressDot();
+}
+
 function renderMenuProfile() {
   const el = $('#mprof'); if (!el) return;
   try { earnedCheck(); } catch (_) {}
@@ -4459,16 +4588,16 @@ function renderMenuProfile() {
   el.innerHTML = `<span class="av${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${name[0] || '?'}</span><span class="mpi"><b>${name}</b><span class="mpl"><em>Ур. ${PROG.lvl}</em><i class="mxp"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></i></span></span><div class="mp-badges"><span class="mpc" title="Кубки рейтинга">🏆 <b class="cupsN">${PROG.cups || 0}</b></span><span class="mpg" title="Золото"><i class="coin"></i><b class="goldN">${wallet.gold}</b></span></div>`;
   renderMenuQuestBanner();
 }
-function renderProgress() {
-  questsToday();
+function renderProfile() {
   const need = xpNeed(PROG.lvl), name = profileName();
-  // One card: avatar, nickname and e-mail with the edit button, then level and experience; the account buttons
-  // (#acct, below) join it.
   const mail = fbAuth && fbAuth.email ? String(fbAuth.email).replace(/[<>&"]/g, '') : 'Профиль не сохранён';
-  $('#profile').innerHTML = `<div class="pctop"><span class="av big${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${(name[0] || '?').toUpperCase()}</span><span class="pwho"><b>${name}</b>${myStatus() ? `<em class="fst">${myStatus()}</em>` : ''}<small class="pmail">${mail}</small></span><button class="iconbtn" id="profEdit" aria-label="Редактировать профиль"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button></div><div class="pclvl"><div class="lvl">${ring(PROG.xp / need)}<b>${PROG.lvl}</b></div><div class="pi"><b class="pl1">Уровень ${PROG.lvl}</b><div class="xpbar"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></div><small>${PROG.xp} / ${need} опыта до ${PROG.lvl + 1} уровня</small></div></div><div class="pchips"><span>🏆 <b>${PROG.cups}</b> кубков</span><span><i class="coin"></i> <b>${wallet.gold}</b> золота</span><span>🏅 <b>${ACH.filter(a => PROG.ach[a.id] === 'got').length}</b>/${ACH.length} наград</span></div>${FB ? `<div class="pacts">${fbAuth && fbAuth.email ? '<button class="chip" data-hacct="out">Выйти из аккаунта</button>' : '<button class="chip pri" data-hacct="in">Войти или создать профиль</button>'}</div>` : ''}`;
-  $('#profEdit').onclick = editProfile;
-  // the buttons live in the profile card; the account block below it keeps the handlers (renderAccount)
-  document.querySelectorAll('#profile [data-hacct]').forEach(b => { b.onclick = () => { const t = $(b.dataset.hacct === 'out' ? '#acLogout' : '#acLogin'); if (t) t.click(); }; });
+  const profEl = $('#profile');
+  if (profEl) {
+    profEl.innerHTML = `<div class="pctop"><span class="av big${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${(name[0] || '?').toUpperCase()}</span><span class="pwho"><b>${name}</b>${myStatus() ? `<em class="fst">${myStatus()}</em>` : ''}<small class="pmail">${mail}</small></span><button class="iconbtn" id="profEdit" aria-label="Редактировать профиль"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button></div><div class="pclvl"><div class="lvl">${ring(PROG.xp / need)}<b>${PROG.lvl}</b></div><div class="pi"><b class="pl1">Уровень ${PROG.lvl}</b><div class="xpbar"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></div><small>${PROG.xp} / ${need} опыта до ${PROG.lvl + 1} уровня</small></div></div><div class="pchips"><span>🏆 <b>${PROG.cups}</b> кубков</span><span><i class="coin"></i> <b>${wallet.gold}</b> золота</span><span>🏅 <b>${ACH.filter(a => PROG.ach[a.id] === 'got').length}</b>/${ACH.length} наград</span></div>${FB ? `<div class="pacts">${fbAuth && fbAuth.email ? '<button class="chip" data-hacct="out">Выйти из аккаунта</button>' : '<button class="chip pri" data-hacct="in">Войти или создать профиль</button>'}</div>` : ''}`;
+    const pe = $('#profEdit');
+    if (pe) pe.onclick = editProfile;
+    profEl.querySelectorAll('[data-hacct]').forEach(b => { b.onclick = () => { const t = $(b.dataset.hacct === 'out' ? '#acLogout' : '#acLogin'); if (t) t.click(); }; });
+  }
   const st = PROG.st = normalizeStats(PROG.st);
   const rate = st.games ? Math.round(100 * st.wins / st.games) : 0;
   const bm = st.byMode || {};
@@ -4476,7 +4605,15 @@ function renderProgress() {
   const fRate = bm.friends && bm.friends.games ? Math.round(100 * bm.friends.wins / bm.friends.games) : 0;
   const oRate = bm.online && bm.online.games ? Math.round(100 * bm.online.wins / bm.online.games) : 0;
   const dRate = bm.duel && bm.duel.games ? Math.round(100 * bm.duel.wins / bm.duel.games) : 0;
-  $('#stats').innerHTML = `<div class="sbig">${[[st.games, 'партий'], [st.wins, 'побед'], [rate + '%', '% побед'], [st.best, 'рекорд очков']].map(([v, l]) => `<div><b>${v}</b><small>${l}</small></div>`).join('')}</div><div class="smastery"><div class="h3 sec">Мастерство по режимам</div>${PG.ui.progress.renderMasteryGrid(bm)}</div>${PG.ui.progress.renderBuildingStats(st)}`;
+  const statsEl = $('#stats');
+  if (statsEl) {
+    statsEl.innerHTML = `<div class="sbig">${[[st.games, 'партий'], [st.wins, 'побед'], [rate + '%', '% побед'], [st.best, 'рекорд очков']].map(([v, l]) => `<div><b>${v}</b><small>${l}</small></div>`).join('')}</div><div class="smastery"><div class="h3 sec">Мастерство по режимам</div>${PG.ui.progress.renderMasteryGrid(bm)}</div>${PG.ui.progress.renderBuildingStats(st)}`;
+  }
+}
+
+function renderTasks() {
+  questsToday();
+  renderProgressRoad();
   document.querySelectorAll('#ptabs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.pt === ptab));
   ptabsDot();
   const el = $('#ptab');
@@ -4655,7 +4792,28 @@ $('#rtabs').onclick = e => {
   document.querySelectorAll('#scr-rules .rpane').forEach(p => { p.hidden = p.dataset.rp !== b.dataset.rt; });
   $('#scr-rules').scrollTop = 0;
 };
-$('#ptabs').onclick = e => { const b = e.target.closest('[data-pt]'); if (!b) return; ptab = b.dataset.pt; if (ptab === 'top' && PROG.inTop10) { PROG.inTop10 = false; PROG.topSeen = true; saveWallet(); progressDot(); } renderProgress(); };
+function renderProgress() {
+  renderProfile();
+  renderTasks();
+}
+$('#ptabs').onclick = e => {
+  const b = e.target.closest('[data-pt]'); if (!b) return;
+  ptab = b.dataset.pt;
+  if (ptab === 'top') {
+    if (PROG.inTop10) { PROG.inTop10 = false; PROG.topSeen = true; saveWallet(); progressDot(); }
+    show('rating');
+    return;
+  }
+  renderTasks();
+};
+const roadWrap = $('#progressRoadWrap');
+if (roadWrap) {
+  roadWrap.addEventListener('click', e => {
+    const btn = e.target.closest('[data-claimroad]');
+    if (btn) claimRoadMilestone(btn.dataset.claimroad);
+  });
+}
+
 $('#ptab').addEventListener('click', e => {
   const q = e.target.closest('[data-claimq]'), a = e.target.closest('[data-claima]'), wq = e.target.closest('[data-claimwq]'), wch = e.target.closest('[data-claimwchest]'), cl = e.target.closest('[data-claimcol]');
   if (q) { const it = PROG.q.find(x => x.id === q.dataset.claimq), Q = QUESTS.find(x => x.id === it.id); if (it.got || it.n < Q.n) return; it.got = true; wallet.gold += Q.g; }
@@ -4722,8 +4880,8 @@ const DEFAULT_LEADERS = [
   { uid: 'u20', n: 'Кирпич Судьбы', st: 'Кирпич судьбы', r: 865, fr: 'none', c: '#8d6e63' },
 ];
 
-async function renderTop() {
-  const el = $('#ptab');
+async function renderTop(customEl) {
+  const el = customEl || $('#ratingContent') || $('#ptab');
   if (!el) return;
   const me = (fbAuth && fbAuth.uid) ? fbAuth.uid : 'me_player';
   const myName = profileName();
@@ -6943,7 +7101,9 @@ function show(name) {
   if (name === 'shop') renderShop();
   if (name === 'settings') renderPrefs();
   if (name === 'menu') { renderResume(); saveWallet(); presenceCount(); progressDot(); renderMenuProfile(); }
-  if (name === 'progress') { renderProgress(); renderAccount(); }
+  if (name === 'progress') { renderTasks(); }
+  if (name === 'profile') { renderProfile(); renderAccount(); }
+  if (name === 'rating') { renderTop(); }
   track('screen_view', {screen_name: name});
   if (typeof PG !== 'undefined' && PG.app && PG.app.telegram) {
     PG.app.telegram.updateTelegramBackButton(name !== 'menu', () => show('menu'));
@@ -7494,10 +7654,7 @@ function initMenuHub() {
     closeDrawer();
     setTimeout(() => {
       if (act === 'rating') {
-        ptab = 'top';
-        show('progress');
-        const topBtn = document.querySelector('#ptabs button[data-pt="top"]');
-        if (topBtn) topBtn.click();
+        show('rating');
       } else if (act === 'rules') {
         show('rules');
       } else if (act === 'history') {
@@ -7637,12 +7794,9 @@ initMenuHub();
     }
 
     // Top menu leaderboard button
-    const rankBtn = e.target.closest('#btnMenuLeaderboard');
+    const rankBtn = e.target.closest('#btnMenuLeaderboard, #btnMenuRating, #btnMenuRatingCard');
     if (rankBtn) {
-      ptab = 'top';
-      show('progress');
-      const topBtn = document.querySelector('#ptabs button[data-pt="top"]');
-      if (topBtn) topBtn.click();
+      show('rating');
     }
   });
 })();
