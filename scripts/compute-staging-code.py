@@ -1,61 +1,44 @@
-import os, sys, json, urllib.request, subprocess
+#!/usr/bin/env python3
+import json
+import os
+import subprocess
+import urllib.request
 
-def get_last_prod_code():
+custom_code = os.environ.get('CUSTOM_CODE', '').strip()
+if custom_code:
+    code = int(custom_code)
+    version = f"1.0.{code}-test"
+else:
+    repo = os.environ.get('GITHUB_REPOSITORY', 'crownfall90-dot/TileTopia')
+    prev_staging = 0
     try:
-        remote = subprocess.check_output(
-            ["git", "ls-remote", "--tags", "origin", "v*"],
-            text=True, stderr=subprocess.DEVNULL
-        )
-        codes = [int(line.split('refs/tags/v')[-1]) for line in remote.splitlines() if 'refs/tags/v' in line and line.split('refs/tags/v')[-1].isdigit()]
-        if codes:
-            return max(codes)
-    except Exception:
-        pass
-    try:
-        local = subprocess.check_output(
-            ["git", "tag", "-l", "v*"],
-            text=True, stderr=subprocess.DEVNULL
-        )
-        codes = [int(t[1:]) for t in local.splitlines() if t.startswith('v') and t[1:].isdigit()]
-        if codes:
-            return max(codes)
-    except Exception:
-        pass
-    return 260
-
-def get_prev_staging_code(repo):
-    url = f"https://github.com/{repo}/releases/download/staging-latest/latest-staging.json"
-    try:
-        req = urllib.request.Request(url, headers={'User-Agent': 'TileTopia-CI'})
+        url = f"https://github.com/{repo}/releases/download/staging-latest/latest-staging.json"
+        req = urllib.request.Request(url, headers={'User-Agent': 'Mozilla/5.0'})
         with urllib.request.urlopen(req, timeout=5) as resp:
             data = json.loads(resp.read().decode('utf-8'))
-            return int(data.get('code', 0))
+            prev_staging = int(data.get('code', 0))
     except Exception:
-        return 0
+        prev_staging = 0
 
-def main():
-    custom = sys.argv[1] if len(sys.argv) > 1 and sys.argv[1].strip() else os.environ.get('CUSTOM_CODE', '').strip()
-    if custom and custom.isdigit():
-        code = int(custom)
-    else:
-        last_prod = get_last_prod_code()
-        prod_min = last_prod + 1
-        repo = os.environ.get('GITHUB_REPOSITORY', 'crownfall90-dot/TileTopia')
-        prev_staging = get_prev_staging_code(repo)
-        code = (prev_staging + 1) if prev_staging >= prod_min else prod_min
+    prod_max = 260
+    try:
+        res = subprocess.run(['git', 'ls-remote', '--tags', 'origin', 'v*'], capture_output=True, text=True, timeout=5)
+        for line in res.stdout.splitlines():
+            parts = line.strip().split('refs/tags/v')
+            if len(parts) == 2 and parts[1].isdigit():
+                num = int(parts[1])
+                if num > prod_max:
+                    prod_max = num
+    except Exception:
+        pass
 
+    base_code = prod_max + 1
+    code = max(base_code, prev_staging + 1)
     version = f"1.0.{code}-test"
-    print(f"code={code}")
-    print(f"version={version}")
 
-    github_output = os.environ.get('GITHUB_OUTPUT')
-    if github_output:
-        try:
-            with open(github_output, 'a', encoding='utf-8') as f:
-                f.write(f"code={code}\n")
-                f.write(f"version={version}\n")
-        except Exception as e:
-            sys.stderr.write(f"Warning: could not write to GITHUB_OUTPUT: {e}\n")
-
-if __name__ == '__main__':
-    main()
+print(f"::notice::Computed Test APK code={code}, version={version}")
+gh_out = os.environ.get('GITHUB_OUTPUT')
+if gh_out:
+    with open(gh_out, 'a', encoding='utf-8') as f:
+        f.write(f"code={code}\n")
+        f.write(f"version={version}\n")
