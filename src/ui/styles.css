@@ -4481,3 +4481,33 @@ html.app .screen.scroll{--sp:var(--it,0px);padding-top:0}/* the status-bar gap i
 /* High-res Sparks Animation */
 .spark{position:fixed;z-index:35;font-size:24px;pointer-events:none;filter:drop-shadow(0 4px 8px rgba(0,0,0,.45));animation:sparkFly 1.8s cubic-bezier(.2,.8,.2,1) forwards}
 @keyframes sparkFly{0%{opacity:1;transform:translate(0,0) scale(1) rotate(0deg)}100%{opacity:0;transform:translate(var(--dx),var(--dy)) scale(1.4) rotate(var(--rt))}}
+
+
+/* === CLEAN HARMONIOUS BOARD BACKGROUND (FOG COMPLETELY REMOVED) === */
+.fog,
+#fogOfWar,
+.fog-svg,
+.fog-particle,
+.fog-antique-cartography {
+  display: none !important;
+  opacity: 0 !important;
+  pointer-events: none !important;
+  visibility: hidden !important;
+}
+
+.board {
+  background: radial-gradient(ellipse 85% 65% at 50% 45%, #162344 0%, #10182e 50%, #0a0f1e 100%) !important;
+}
+
+.board::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(circle at 50% 42%, rgba(80, 135, 230, 0.07) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 1;
+}
+
+.ground {
+  background: radial-gradient(closest-side, rgba(65, 108, 62, 0.36) 0%, rgba(34, 58, 48, 0.15) 50%, transparent 80%) !important;
+}

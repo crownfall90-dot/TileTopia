@@ -1765,6 +1765,7 @@ function initFog() {
   const old = $('#fogOfWar');
   if (old) old.remove();
   document.querySelectorAll('.fog-particle').forEach(p => p.remove());
+  return; // Fog of war removed as requested: clean harmonious board background
 
   const curLoc = (typeof G !== 'undefined' && G.cfg && G.cfg.loc) || wallet.loc || 'village';
   const BIOME_FOG = {
