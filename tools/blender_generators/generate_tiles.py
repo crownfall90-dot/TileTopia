@@ -296,8 +296,9 @@ def render_tile_jigsaw_base(out_path):
 #   blender -b -P tools/blender_generators/generate_tiles.py -- --set classic [--ids rS,capRS,wBr] [--views top,iso]
 # The card list comes from assets/tiles3d/tiles.json (scripts/gen-tile-defs.mjs, built from TYPES).
 #
-# Look: the top of a tile IS the card face the game already draws (src/render/art.js, exported as
-# assets/tiles/tile_<id>.png), so a 3D tile reads exactly like the one on the table. On it stand modelled versions
+# Look: the top of a tile IS the card face the game already draws (src/render/art.js, exported by
+# scripts/export-faces.mjs to assets/tiles3d/faces), so a 3D tile reads exactly like the one on the table:
+# winding rivers, lakes, curved roads. Where a river leaves the tile, a waterfall runs down its side. On it stand modelled versions
 # of the sprites the game puts there (houses, keeps, trees, hay, rocks, the mine), placed by the same rules as
 # generateDecorItems in src/game/world.js, lit warm like the game icon and the store banner.
 # Units: a tile is 2 x 2, origin in the middle of its base, Z up (the GLB is Y-up, as glTF requires). Nothing
@@ -312,7 +313,7 @@ from mathutils import Vector, Matrix
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
 TEX = os.path.join(ROOT, 'assets', 'tiles3d', 'textures')
-FACES = os.path.join(ROOT, 'assets', 'tiles')
+FACES = os.path.join(ROOT, 'assets', 'tiles3d', 'faces')   # scripts/export-faces.mjs: drawTile of art.js, 576 px
 H = 0.2                      # top of the tile slab
 LIP = 0.035                  # grass lip on the slab sides
 DIRS = [Vector((0, 1)), Vector((1, 0)), Vector((0, -1)), Vector((-1, 0))]   # N E S W
@@ -751,6 +752,27 @@ def slab(tm):
     tm.face([(-1, 1, 0), (1, 1, 0), (1, -1, 0), (-1, -1, 0)], 'soil_dark')
 
 
+def waterfall(d):
+    """The game's waterfall (.sd.fall in styles.css) on side d: water down the slab, light streaks, foam at the foot.
+    Its own object, so the game shows it only where the river has no neighbour."""
+    tm = TileMesh()
+    n, a = DIRS[d], Vector((DIRS[d].y, -DIRS[d].x))
+    o = n * 1.004
+    w = .15
+    def sheet(off, half, z0, z1, mat, out=0.0):
+        c = o + n * out + a * off
+        p = [c - a * half, c + a * half]
+        tm.face([(p[0].x, p[0].y, z0), (p[1].x, p[1].y, z0), (p[1].x, p[1].y, z1), (p[0].x, p[0].y, z1)], mat)
+    sheet(0, w, -.02, H, 'fall')
+    for off, z0, z1 in ((-.07, .03, H - .02), (.02, -.01, H - .05), (.08, .06, H - .01)):
+        sheet(off, .012, z0, z1, 'fall_light', out=.003)
+    f = o + n * .05
+    tm.blob((f.x, f.y, .0), .13, 'foam', sx=1.0, sz=.25)
+    tm.blob((f.x + a.x * .1, f.y + a.y * .1, .0), .07, 'foam', sz=.3)
+    tm.blob((f.x - a.x * .1, f.y - a.y * .1, .0), .07, 'foam', sz=.3)
+    return tm.finish('fall_' + 'NESW'[d], clip=False)
+
+
 def build_tile(t):
     rnd = random.Random(zlib.crc32(t['id'].encode()))
     tm = TileMesh()
@@ -777,7 +799,9 @@ def build_tile(t):
         x, y = max(-.39, min(.39, gx)) * 2, -max(-.39, min(.39, gy)) * 2
         s = .8 if kind == 'tower' and ncity else 1.0
         place(tm, kind, (x, y, H), rnd, s)
-    return tm.finish(t['id'])
+    tile = tm.finish(t['id'])
+    falls = [waterfall(d) for d in range(4) if t['edges'][d] == 'w']
+    return tile, falls
 
 
 def tile_materials(face_png):
@@ -790,6 +814,8 @@ def tile_materials(face_png):
         node = nt.nodes.new('ShaderNodeTexImage')
         node.image = bpy.data.images.load(face_png, check_existing=True)
         nt.links.new(node.outputs['Color'], bsdf.inputs['Base Color'])
+        if face_png.endswith('.png'):   # the cliff card has a real hole
+            nt.links.new(node.outputs['Alpha'], bsdf.inputs['Alpha'])
     atlas = bpy.data.materials.new('TileAtlas')
     nt = atlas.node_tree
     bsdf = next(n for n in nt.nodes if n.type == 'BSDF_PRINCIPLED')
@@ -842,9 +868,10 @@ def set_view(co, view):
         co.rotation_euler = (math.radians(54.736), 0, math.radians(45))
 
 
-def export_glb(obj, path):
+def export_glb(obj, path, extra_objs=()):
     bpy.ops.object.select_all(action='DESELECT')
-    obj.select_set(True)
+    for o in (obj, *extra_objs):
+        o.select_set(True)
     bpy.context.view_layer.objects.active = obj
     kw = dict(filepath=path, export_format='GLB', use_selection=True, export_apply=True)
     # no image inside (the game binds its own card face and loads the atlas once), one vertex colour (COLOR_0) and
@@ -862,12 +889,14 @@ def triangles(obj):
     return sum(len(p.vertices) - 2 for p in obj.data.polygons)
 
 
-def export_props(out_dir):
-    """Every prop on its own, standing on the origin: the game can keep placing them itself (random per card)."""
+def export_props(out_dir, samples=48, render=True):
+    """Every prop on its own, standing on the origin: the game can keep placing them itself (random per card).
+    With render, also a 256 px isometric preview of each (assets/tiles3d/renders/props/<kind>.png)."""
     os.makedirs(out_dir, exist_ok=True)
+    rdir = os.path.join(ROOT, 'assets', 'tiles3d', 'renders', 'props')
     rows = []
     for kind in list(HOUSES) + ['tower'] + list(PROPS):
-        clean_scene()
+        co = tile_scene(samples)
         tm = TileMesh()
         place(tm, kind, (0, 0, 0), random.Random(zlib.crc32(kind.encode())))
         obj = tm.finish('prop_' + kind, clip=False)
@@ -875,6 +904,16 @@ def export_props(out_dir):
             obj.data.materials.append(m)
         export_glb(obj, os.path.join(out_dir, kind + '.glb'))
         rows.append({'id': kind, 'tris': triangles(obj)})
+        if render:
+            os.makedirs(rdir, exist_ok=True)
+            sc = bpy.context.scene
+            sc.render.resolution_x = sc.render.resolution_y = 256
+            top = max(v.co.z for v in obj.data.vertices)
+            co.data.ortho_scale = max(0.75, top * 1.25 + 0.15)
+            co.location = (4.0, -4.0, 4.0 + top * 0.45)
+            co.rotation_euler = (math.radians(54.736), 0, math.radians(45))
+            sc.render.filepath = os.path.join(rdir, kind + '.png')
+            bpy.ops.render.render(write_still=True)
     return rows
 
 
@@ -897,12 +936,16 @@ def run_sets(argv):
     report = []
     for t in tiles:
         co = tile_scene(a.samples)
-        obj = build_tile(t)
-        for m in tile_materials(os.path.join(FACES, t['sprite'])):
-            obj.data.materials.append(m)
+        obj, falls = build_tile(t)
+        face = next((os.path.join(FACES, t['id'] + ext) for ext in ('.jpg', '.png') if os.path.exists(os.path.join(FACES, t['id'] + ext))), None)
+        mats = tile_materials(face)
+        for o in (obj, *falls):
+            for m in mats:
+                o.data.materials.append(m)
         glb = os.path.join(out3d, t['id'] + '.glb')
-        export_glb(obj, glb)
-        row = {'id': t['id'], 'tris': triangles(obj), 'glb_kb': round(os.path.getsize(glb) / 1024, 1)}
+        export_glb(obj, glb, falls)
+        row = {'id': t['id'], 'tris': triangles(obj), 'fall_tris': sum(triangles(f) for f in falls),
+               'glb_kb': round(os.path.getsize(glb) / 1024, 1)}
         if not a.no_render:
             for view in [v for v in a.views.split(',') if v]:
                 d = os.path.join(ROOT, 'assets', 'tiles3d', 'renders', a.set, view)
@@ -913,7 +956,7 @@ def run_sets(argv):
         report.append(row)
         print('TILE', json.dumps(row))
     if a.props:
-        for row in export_props(os.path.join(ROOT, 'assets', 'tiles3d', 'props')):
+        for row in export_props(os.path.join(ROOT, 'assets', 'tiles3d', 'props'), a.samples, not a.no_render):
             print('PROP', json.dumps(row))
     with open(os.path.join(out3d, '_report.json'), 'w', encoding='utf-8') as f:
         json.dump(report, f, indent=1)

@@ -2,16 +2,37 @@
  {
   "id": "capRS",
   "tris": 604,
+  "fall_tris": 0,
   "glb_kb": 35.8
  },
  {
   "id": "rS",
   "tris": 416,
+  "fall_tris": 0,
   "glb_kb": 22.1
+ },
+ {
+  "id": "rC",
+  "tris": 598,
+  "fall_tris": 0,
+  "glb_kb": 32.5
+ },
+ {
+  "id": "wC",
+  "tris": 356,
+  "fall_tris": 136,
+  "glb_kb": 29.8
  },
  {
   "id": "wBr",
   "tris": 706,
-  "glb_kb": 35.2
+  "fall_tris": 136,
+  "glb_kb": 44.3
+ },
+ {
+  "id": "wLake",
+  "tris": 398,
+  "fall_tris": 272,
+  "glb_kb": 39.5
  }
 ]

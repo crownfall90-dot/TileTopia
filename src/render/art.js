@@ -4,8 +4,9 @@
 import {TYPES} from '../engine/tiles.js';
 import {rng, hash} from '../engine/rng.js';
 
-/** S: tile art size in px; V: direction vectors; PL0: default seats (figure colours); MEEPLE_D: figure outline. */
-export function createArt({S, V, PL0, MEEPLE_D}) {
+/** S: tile art size in px; V: direction vectors; PL0: default seats (figure colours); MEEPLE_D: figure outline.
+ *  K: pixels per art pixel of the card faces (1 in the game; the 3D tile export draws them sharper). */
+export function createArt({S, V, PL0, MEEPLE_D, K = 1}) {
 function cv(w, h, k = 2) { const c = document.createElement('canvas'); c.width = Math.round(w * k); c.height = Math.round(h * k); const g = c.getContext('2d'); g.scale(k, k); return [c, g]; }
 
 function cityPaths(E) {
@@ -40,7 +41,7 @@ function cityPaths(E) {
 
 function drawTile(id) {
   const def = TYPES[id], E = def.e, R = rng(hash(id));
-  const [c, g] = cv(S, S, 1);
+  const [c, g] = cv(S, S, K);
   const gr = g.createLinearGradient(0, 0, S, S); gr.addColorStop(0, '#80be56'); gr.addColorStop(1, '#62a242');
   g.fillStyle = gr; g.fillRect(0, 0, S, S);
   for (let i = 0; i < 14; i++) { const x = R()*S, y = R()*S, r = 18 + R()*30, rg = g.createRadialGradient(x, y, 0, x, y, r); rg.addColorStop(0, R() < .5 ? 'rgba(40,90,25,.2)' : 'rgba(200,230,120,.16)'); rg.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = rg; g.fillRect(x - r, y - r, 2*r, 2*r); }
@@ -74,10 +75,11 @@ function drawTile(id) {
   const along = (segs, fn) => segs.forEach((q, i) => { for (let t = .06; t < .96; t += .08) { const [pt, d] = cub(...q, t), L = Math.hypot(...d) || 1; fn(pt, [-d[1] / L, d[0] / L], (i + t) / segs.length); } });
   // Something drawn sharp, then laid down soft: shrunk and blown back up (works on every WebView, unlike ctx.filter).
   const soft = (draw, k = 4) => {
-    const [t, tg] = cv(S, S, 1); tg.setTransform(g.getTransform()); draw(tg);
-    const [m, mg] = cv(S / 2, S / 2, 1); mg.drawImage(t, 0, 0, S / 2, S / 2);
-    const [n, ng] = cv(S / k, S / k, 1); ng.drawImage(m, 0, 0, S / k, S / k);
-    g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingQuality = 'high'; g.drawImage(n, 0, 0, S, S); g.restore();
+    const P = g.canvas.width; // S at K = 1
+    const [t, tg] = cv(P, P, 1); tg.setTransform(g.getTransform()); draw(tg);
+    const [m, mg] = cv(P / 2, P / 2, 1); mg.drawImage(t, 0, 0, P / 2, P / 2);
+    const [n, ng] = cv(P / k, P / k, 1); ng.drawImage(m, 0, 0, P / k, P / k);
+    g.save(); g.setTransform(1, 0, 0, 1, 0, 0); g.imageSmoothingQuality = 'high'; g.drawImage(n, 0, 0, P, P); g.restore();
   };
   // A river: grass darkened by the damp, a sandy bank, a thin line of foam, clear shallows by the banks and a deep
   // channel in the middle; glints run with the current, reeds and stones line the banks.
@@ -141,7 +143,7 @@ function drawTile(id) {
     // A lake over the whole card: water to the very edges, open on every river side; only the corners (and the closed
     // side of the three-way lake) stay as land with a sandy shore, reeds and stones. Flow streaks run out to every
     // river, lily pads and lotuses float on the water.
-    const base = document.createElement('canvas'); base.width = S; base.height = S; base.getContext('2d').drawImage(c, 0, 0);
+    const base = document.createElement('canvas'); base.width = c.width; base.height = c.height; base.getContext('2d').drawImage(c, 0, 0);
     const dead = [0, 1, 2, 3].filter(d => E[d] !== 'w'), RR = 50, MOUTH = 20, LIP = 24, rot = dead.length ? dead[0] * Math.PI / 2 : 0;
     const deep = g.createRadialGradient(C[0] - 10, C[1] - 12, 6, C[0], C[1], 120); deep.addColorStop(0, '#1b5c9c'); deep.addColorStop(.45, '#2276b8'); deep.addColorStop(.8, '#2f93c8'); deep.addColorStop(1, '#46b3d3');
     g.fillStyle = deep; g.fillRect(0, 0, S, S);
