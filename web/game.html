@@ -7521,15 +7521,15 @@ window.onUpdateAvailable = (info, manual) => {
   lastUpd = info;
   if (typeof updateSettingsUpdateBtn === 'function') updateSettingsUpdateBtn(info);
 
-  // Determine whether this update is mandatory (breaking protocol, desync fix, or admin enforced)
-  const isMandatory = (typeof PG !== 'undefined' && PG.app && PG.app.update && PG.app.update.isUpdateMandatory)
-    ? PG.app.update.isUpdateMandatory(info, window.MIN_REQUIRED_CODE || 0)
-    : !!(info && (info.mandatory === true || info.force === true || (window.MIN_REQUIRED_CODE && info.code <= window.MIN_REQUIRED_CODE)));
-
-  // If update is optional (not mandatory) and check was automatic (on startup or periodic),
-  // do NOT interrupt the player with a blocking popup dialog!
-  // Note: On test/staging builds (-test), always prompt the tester immediately so they don't miss builds.
+  const curCode = appCode();
+  const minCode = window.MIN_REQUIRED_CODE || (info && info.minRequiredCode) || 0;
   const isTestBuild = !!(info && info.version && info.version.includes('-test')) || !!window.IS_STAGING;
+
+  // Determine whether this update is mandatory:
+  // Production builds: ALL updates are mandatory by default! Test builds: NOT mandatory (unless force: true).
+  const isMandatory = (typeof PG !== 'undefined' && PG.app && PG.app.update && PG.app.update.isUpdateMandatory)
+    ? PG.app.update.isUpdateMandatory(info, minCode, curCode)
+    : (isTestBuild ? Boolean(info && info.force === true) : Boolean(!info || info.mandatory !== false));
   if (!manual && !isMandatory && !isTestBuild) {
     boot.checked = true;
     bootHide();

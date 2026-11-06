@@ -76,7 +76,7 @@ jobs:
           CODE: ${{ steps.ver.outputs.code }}
           VERSION: ${{ steps.ver.outputs.version }}
         run: |
-          python3 -c 'import json,os; c=int(os.environ["CODE"]); v=os.environ["VERSION"]; r=os.environ["GITHUB_REPOSITORY"]; json.dump({"code": c, "version": v, "mandatory": True, "notes": "Тестовая сборка " + v, "url": "https://github.com/%s/releases/download/staging-latest/Tiletopia-Test-%s.apk" % (r, v), "package": "app.crownfall.tiletopia.test"}, open("latest-staging.json", "w", encoding="utf-8"), ensure_ascii=False)'
+          python3 -c 'import json,os; c=int(os.environ["CODE"]); v=os.environ["VERSION"]; r=os.environ["GITHUB_REPOSITORY"]; json.dump({"code": c, "version": v, "mandatory": False, "notes": "Тестовая сборка " + v, "url": "https://github.com/%s/releases/download/staging-latest/Tiletopia-Test-%s.apk" % (r, v), "package": "app.crownfall.tiletopia.test"}, open("latest-staging.json", "w", encoding="utf-8"), ensure_ascii=False)'
           gh release delete staging-latest --yes || true
           gh release create staging-latest \
             "Tiletopia-Test-${{ steps.ver.outputs.version }}.apk" \

@@ -49,17 +49,28 @@ export function formatUpdCountdown(secondsLeft) {
   return `Само продолжится через ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 }
 
-export function isUpdateMandatory(info, minRequiredCode = 0) {
+export function isUpdateMandatory(info, minRequiredCode = 0, currentCode = 0) {
   if (!info) return false;
-  if (info.mandatory === true || info.force === true) return true;
-  if (minRequiredCode && typeof info.code === 'number' && info.code <= minRequiredCode) return true;
-  return false;
+  // Test / staging builds (-test) are NOT mandatory by default (testers can postpone)
+  const isTest = (info.version && info.version.includes('-test')) || (info.package && info.package.endsWith('.test'));
+  if (isTest) return Boolean(info.force === true);
+
+  // Production build: ALL updates are mandatory by default unless explicitly disabled
+  if (info.mandatory === false) {
+    const minCode = Number(minRequiredCode) || Number(info.minRequiredCode) || 0;
+    const curCode = Number(currentCode) || 0;
+    if (minCode > 0 && curCode > 0 && curCode < minCode) return true;
+    return false;
+  }
+  return true;
 }
 
-export function shouldPromptUpdate(info, {manual = false, minRequiredCode = 0} = {}) {
+export function shouldPromptUpdate(info, {manual = false, minRequiredCode = 0, currentCode = 0} = {}) {
   if (!info) return false;
   if (manual) return true;
-  return isUpdateMandatory(info, minRequiredCode);
+  // Test builds always notify testers of new builds so they can choose to update or postpone
+  if (info.version && info.version.includes('-test')) return true;
+  return isUpdateMandatory(info, minRequiredCode, currentCode);
 }
 
 export function formatUpdateSettingsBadge(info) {

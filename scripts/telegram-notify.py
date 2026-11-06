@@ -229,10 +229,7 @@ def build(version: str, notes: str, web_url: str = '', apk_url: str = '', bot_ur
     else:
         text += '• <b>Telegram:</b> мини-приложение прямо в боте без установки\n\n'
 
-    # 5. Опрос / вопрос для поддержания статистики и общения
-    text += '📊 <b>Вопрос для игроков и тестеров:</b>\n'
-    text += f'<i>{html.escape(parsed["poll_question"])}</i>\n'
-    text += '💬 <i>Делитесь впечатлениями и идеями в комментариях! 👇</i>'
+    text += '💬 <i>Приятной игры в Tiletopia! Делитесь впечатлениями в комментариях! 👇</i>'
 
     return text[:4000]
 

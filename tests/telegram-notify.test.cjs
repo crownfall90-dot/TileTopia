@@ -69,7 +69,7 @@ test('telegram: formats new items with quotes, separates changes and removals, f
   assert.match(r.stdout, /Все устройства.*сайт в браузере/);
   assert.match(r.stdout, /Telegram:.*мини-приложение/);
 
-  // 6. Interactive poll / question for players
-  assert.match(r.stdout, /📊 <b>Вопрос для игроков и тестеров:<\/b>/);
-  assert.match(r.stdout, /Как вам обновленный профиль с кубками/);
+  // 6. Friendly ending without intrusive questions
+  assert.match(r.stdout, /Приятной игры в Tiletopia!/);
+  assert.doesNotMatch(r.stdout, /Вопрос для игроков и тестеров/);
 });

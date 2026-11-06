@@ -75,7 +75,7 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
-          python3 -c 'import json,os; c=int(os.environ["CODE"]); r=os.environ["GITHUB_REPOSITORY"]; json.dump({"code": c, "version": "1.0.%d" % c, "notes": open("release-notes.md", encoding="utf-8").read().strip(), "url": "https://github.com/%s/releases/download/v%d/Tiletopia-1.0.%d.apk" % (r, c, c), "cert": os.environ.get("SIGNING_CERT_SHA256") or "d4409cee878c4142c7d28039571023d693071fd8c88bfdd72b73aa52f2154d76", "package": "app.crownfall.tiletopia"}, open("latest.json", "w", encoding="utf-8"), ensure_ascii=False)'
+          python3 -c 'import json,os; c=int(os.environ["CODE"]); r=os.environ["GITHUB_REPOSITORY"]; json.dump({"code": c, "version": "1.0.%d" % c, "mandatory": True, "notes": open("release-notes.md", encoding="utf-8").read().strip(), "url": "https://github.com/%s/releases/download/v%d/Tiletopia-1.0.%d.apk" % (r, c, c), "cert": os.environ.get("SIGNING_CERT_SHA256") or "d4409cee878c4142c7d28039571023d693071fd8c88bfdd72b73aa52f2154d76", "package": "app.crownfall.tiletopia"}, open("latest.json", "w", encoding="utf-8"), ensure_ascii=False)'
           cp "Tiletopia-1.0.$CODE.apk" Tiletopia.apk
           gh release create "v$CODE" "Tiletopia-1.0.$CODE.apk" Tiletopia.apk "Tiletopia-1.0.$CODE-google-play.aab" latest.json \
             --target "$(git rev-parse HEAD)" --title "1.0.$CODE" --notes-file release-notes.md --latest
