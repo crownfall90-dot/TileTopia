@@ -163,7 +163,7 @@
       <section class="screen scroll" id="scr-items" hidden>
         <div class="lb">
           <div class="ltop"><button class="iconbtn" data-go="progress" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Мои предметы</b></div>
-          <div class="seg itabs" id="itabs"><button data-it="st" aria-pressed="true">Статусы</button><button data-it="fr" aria-pressed="false">Рамки</button><button data-it="fg" aria-pressed="false">Фигурки</button><button data-it="lc" aria-pressed="false">Локации</button></div>
+          <div class="seg itabs" id="itabs"><button data-it="st" aria-pressed="true">Статусы</button><button data-it="fr" aria-pressed="false">Рамки</button><button data-it="fg" aria-pressed="false">Фигурки</button><button data-it="em" aria-pressed="false">Эмоции</button><button data-it="lc" aria-pressed="false">Локации</button></div>
           <div class="col" id="itemsBody"></div>
         </div>
       </section>
@@ -4186,21 +4186,65 @@ $('#mBots').onclick = () => {
 
 /* Quick phrases online: a fixed set of emoji and short lines (no free text, so nothing to
    moderate). They appear as a bubble under the sender's card for a few seconds. */
-const SAYS = [
-  '👍', '😄', '😮', '😅', '🔥', '👏', '😎', '🤔', '😢', '🎉', '❤️', '🤝', '👑', '⚔️', '🎯', '💪', '🤯', '☕',
-  'Привет!', 'Хороший ход!', 'Ой!', 'Ну ты даёшь!', 'Удачи!', 'Спасибо за игру!',
-  'Красиво построено!', 'Вот это поворот!', 'Моя очередь?', 'Ещё партию?',
-  'Я думал иначе...', 'Всё идёт по плану!', 'Неожиданно!', 'Красивая партия!',
-  'Ура!', 'Почти получилось!', 'Секунду, думаю...', 'Отличная игра!'
+const DEFAULT_EMOTES = ['👑', '🧩', '🏰', '⚔️', '🤝'];
+const DEFAULT_PHRASES = [
+  'Отличный ход!',
+  'Мой замок!',
+  'Так и планировал 😎',
+  'Удачи за столом! 🤝',
+  'Спасибо за игру! ❤️'
 ];
+
+const ALL_EMOTES = [
+  '👑', '🧩', '🏰', '⚔️', '🛡️', '🌊',
+  '🌉', '🌲', '🎲', '🏆', '💡', '🧐',
+  '🍵', '🔥', '🤝', '🎯', '⏳', '😱',
+  '🧱', '🥳', '😎', '😅', '👏', '❤️'
+];
+
+const ALL_PHRASES = [
+  'Отличный ход!',
+  'Мой замок!',
+  'Так и планировал 😎',
+  'Вот это поворот!',
+  'Красивая карта!',
+  'Удачи за столом! 🤝',
+  'Секунду, считаю очки... ⏳',
+  'Дзен превыше всего 🍵',
+  'Неожиданный стык! 🧩',
+  'Защищай границы! ⚔️',
+  'Река к победе 🌊',
+  'Почти получилось!',
+  'Ну ты гроссмейстер! 👑',
+  'Тут моя дорога 🛤️',
+  'Ловушка захлопнулась 🏰',
+  'Ещё партию? 🎮',
+  'Рискнём на удачу! 🎲',
+  'Красиво строишь!',
+  'Я думал иначе... 🤔',
+  'Всё под контролем!',
+  'Спасибо за игру! ❤️',
+  'Каждый тайл на счету 🎯',
+  'Партия века! 🔥',
+  'Приветствую в TileTopia! 👋'
+];
+
+const SAYS = [...ALL_EMOTES, ...ALL_PHRASES];
 // A message stays on screen SAY_MS; its author cannot send the next one before it is gone (everyone ignores a faster one).
 const SAY_MS = 3200, sayUntil = {};
 let sayAt = 0;
 const isText = x => /[а-яёА-ЯЁ]/i.test(x);
 function renderSayBox() {
-  const em = SAYS.filter(x => !isText(x)), tx = SAYS.filter(isText);
-  $('#sayBox').innerHTML = `<div class="sy-lock">Подождите: прошлое сообщение ещё на экране</div><div class="sy-h">Эмоции</div><div class="sy-e">${em.map(x => `<button class="e" data-say="${SAYS.indexOf(x)}">${x}</button>`).join('')}</div>` +
-    `<div class="sy-h">Фразы</div><div class="sy-t">${tx.map(x => `<button data-say="${SAYS.indexOf(x)}">${x}</button>`).join('')}</div>`;
+  const chosenEm = (wallet.emotes && wallet.emotes.length) ? wallet.emotes.slice(0, 5) : DEFAULT_EMOTES;
+  const chosenTx = (wallet.phrases && wallet.phrases.length) ? wallet.phrases.slice(0, 5) : DEFAULT_PHRASES;
+  $('#sayBox').innerHTML = `<div class="sy-lock">Подождите: прошлое сообщение ещё на экране</div>` +
+    `<div class="sy-top"><span class="sy-h">Эмоции</span><span class="sy-cnt">${chosenEm.length}/5</span></div>` +
+    `<div class="sy-e sy-deck">${chosenEm.map(x => `<button class="e" data-say="${SAYS.indexOf(x)}" title="${x}">${x}</button>`).join('')}</div>` +
+    `<div class="sy-top" style="margin-top:10px"><span class="sy-h">Фразы</span><span class="sy-cnt">${chosenTx.length}/5</span></div>` +
+    `<div class="sy-t sy-deck">${chosenTx.map(x => `<button data-say="${SAYS.indexOf(x)}" title="${x}">${x}</button>`).join('')}</div>` +
+    `<div class="sy-footer"><button type="button" class="sy-deck-btn" id="syDeckBtn">⚙️ Выбрать реакции в «Моих предметах»</button></div>`;
+  const sdb = document.getElementById('syDeckBtn');
+  if (sdb) sdb.onclick = () => { $('#sayBox').hidden = true; show('items'); itab = 'em'; renderItems(); };
 }
 renderSayBox();
 const sayLocked = () => Date.now() < sayAt;
@@ -4236,7 +4280,7 @@ function showSay(p, i) {
   b.className = 'bubble' + (isText(txt) ? '' : ' e'); b.textContent = txt; b.style.setProperty('--c', players[p].col);
   b.style.left = cx + 'px'; b.style.top = cy + 'px';
   document.body.append(b); setTimeout(() => b.remove(), SAY_MS + 100);
-  if (!isText(txt) && ['🔥', '🎉', '❤️', '👏', '👑', '⚔️', '🎯', '💪', '🤯'].includes(txt) && !RM) for (let k = 0; k < 7; k++) {
+  if (!isText(txt) && !RM) for (let k = 0; k < 8; k++) {
     const sp = document.createElement('i'); sp.className = 'spark'; sp.textContent = txt;
     sp.style.cssText = `left:${cx - 8}px;top:${cy + 10}px;--dx:${((k - 3) * 16 + (Math.random() - .5) * 14) | 0}px;--dy:${(-30 - Math.random() * 50) | 0}px;--rt:${((Math.random() - .5) * 90) | 0}deg;animation-delay:${k * 70}ms`;
     document.body.append(sp); setTimeout(() => sp.remove(), 1900 + k * 70);
@@ -4925,6 +4969,13 @@ function askProfile() {
   const inp = box.querySelector('#profName'), ok = box.querySelector('#profOk'), av = box.querySelector('#pav'), dice = box.querySelector('#profDice');
   colorPick(box.querySelector('#profColorLabel') || inp, av);
   inp.oninput = () => { const n = clean(inp.value); ok.disabled = n.length < 2 || n === 'Вы'; av.textContent = (n[0] || '?').toUpperCase(); };
+  if (!inp.value) {
+    const initName = (typeof PG !== 'undefined' && PG.account && PG.account.auth && PG.account.auth.generateRandomNickname)
+      ? PG.account.auth.generateRandomNickname()
+      : 'Nova';
+    inp.value = initName;
+    inp.dispatchEvent(new Event('input'));
+  }
   if (dice) {
     dice.onclick = () => {
       const gen = (typeof PG !== 'undefined' && PG.account && PG.account.auth && PG.account.auth.generateRandomNickname)
@@ -5313,6 +5364,19 @@ function renderItems() {
       tabContent = PG.ui.shop.renderItemsFramesHtml({frames: FRAMES, ownedFrames: wallet.frames || [], wornFrame: wallet.frame, previewFrame: previewFrameKey, color: wallet.color, profileInitial: profileName()[0]});
     } else if (itab === 'fg') {
       tabContent = PG.ui.shop.renderItemsFigsHtml({figs: FIGS, ownedFigs: wallet.owned, selectedFig: wallet.fig, figPreviewFn: figPreview});
+    } else if (itab === 'em') {
+      const allE = (typeof PG !== 'undefined' && PG.ui && PG.ui.shop && PG.ui.shop.ALL_EMOTES) ? PG.ui.shop.ALL_EMOTES : ALL_EMOTES;
+      const allP = (typeof PG !== 'undefined' && PG.ui && PG.ui.shop && PG.ui.shop.ALL_PHRASES) ? PG.ui.shop.ALL_PHRASES : ALL_PHRASES;
+      tabContent = (typeof PG !== 'undefined' && PG.ui && PG.ui.shop && PG.ui.shop.renderItemsEmotesHtml)
+        ? PG.ui.shop.renderItemsEmotesHtml({
+            allEmotes: allE,
+            allPhrases: allP,
+            selectedEmotes: wallet.emotes || DEFAULT_EMOTES,
+            selectedPhrases: wallet.phrases || DEFAULT_PHRASES,
+            maxEmotes: 5,
+            maxPhrases: 5
+          })
+        : '<p>Загрузка реакций...</p>';
     } else {
       tabContent = PG.ui.shop.renderItemsLocsHtml(LOCS);
     }
@@ -5357,6 +5421,49 @@ $('#itemsBody').addEventListener('click', e => {
     previewFrameKey = null; renderItems(); return;
   }
   if (t.closest('[data-unwear]')) { ST().wearStatus(wallet, null); return afterStatusChange(); }
+  const te = t.closest('[data-toggle-emote]');
+  if (te) {
+    const em = te.dataset.toggleEmote;
+    let cur = (wallet.emotes && wallet.emotes.length) ? wallet.emotes.slice() : DEFAULT_EMOTES.slice();
+    if (cur.includes(em)) {
+      if (cur.length <= 1) { toastAny('В колоде должна остаться хотя бы 1 эмоция'); return; }
+      cur = cur.filter(x => x !== em);
+    } else {
+      if (cur.length >= 5) { toastAny('В колоде максимум 5 эмодзи. Снимите один, чтобы взять другой'); return; }
+      cur.push(em);
+    }
+    wallet.emotes = cur;
+    saveWallet();
+    renderItems();
+    renderSayBox();
+    return;
+  }
+  const tp = t.closest('[data-toggle-phrase]');
+  if (tp) {
+    const ph = tp.dataset.togglePhrase;
+    let cur = (wallet.phrases && wallet.phrases.length) ? wallet.phrases.slice() : DEFAULT_PHRASES.slice();
+    if (cur.includes(ph)) {
+      if (cur.length <= 1) { toastAny('В колоде должна остаться хотя бы 1 фраза'); return; }
+      cur = cur.filter(x => x !== ph);
+    } else {
+      if (cur.length >= 5) { toastAny('В колоде максимум 5 фраз. Снимите одну, чтобы взять другую'); return; }
+      cur.push(ph);
+    }
+    wallet.phrases = cur;
+    saveWallet();
+    renderItems();
+    renderSayBox();
+    return;
+  }
+  if (t.closest('[data-reset-deck]')) {
+    wallet.emotes = DEFAULT_EMOTES.slice();
+    wallet.phrases = DEFAULT_PHRASES.slice();
+    saveWallet();
+    renderItems();
+    renderSayBox();
+    toastAny('Сброшено на базовую колоду (5 эмодзи + 5 фраз)');
+    return;
+  }
   const w = t.closest('[data-iwear]'); if (w) { ST().wearStatus(wallet, wallet.statusKey === w.dataset.iwear ? null : w.dataset.iwear); return afterStatusChange(); }
   const pf = t.closest('[data-pfr]');
   if (pf) {
