@@ -2688,7 +2688,7 @@ function renderShop() {
   // Render Daily 6-Item Showcase in tile format
   const dailyWrap = $('#dailyShopWrap');
   if (dailyWrap && PG.ui.shop.renderDailyShopShowcase) {
-    const dailyItems = PG.ui.shop.getDailyShopItems(FIGS, FRAMES, PG.state.status.SHOP_STATUSES);
+    const dailyItems = PG.ui.shop.getDailyShopItems(FIGS, FRAMES, PG.state.status.SHOP_STATUSES, new Date(), wallet);
     dailyWrap.innerHTML = PG.ui.shop.renderDailyShopShowcase({
       items: dailyItems,
       wallet,
@@ -7935,8 +7935,9 @@ initMenuHub();
   document.addEventListener('click', e => {
     const buyBtn = e.target.closest('[data-daily-buy]');
     if (buyBtn) {
-      const parts = buyBtn.dataset.dailyBuy.split(':');
-      const kind = parts[0], key = parts[1], price = +parts[2];
+      const parts = buyBtn.dataset.dailyBuy.split('|');
+      const kind = parts[0], key = kind === 'status' ? parts[1].replace(/^sh:/, '') : parts[1], price = +parts[2];
+      if (kind === 'emote') return buyReaction('emote', key);
       if (wallet.gold < price) return toastAny(`Не хватает ${price - wallet.gold} золота`);
 
       if (kind === 'fig') {
@@ -7973,7 +7974,7 @@ initMenuHub();
 
     const pickBtn = e.target.closest('[data-daily-pick]');
     if (pickBtn) {
-      const [kind, key] = pickBtn.dataset.dailyPick.split(':');
+      const [kind, key] = pickBtn.dataset.dailyPick.split('|');
       if (kind === 'fig') {
         pickFig(key);
       } else if (kind === 'frame') {

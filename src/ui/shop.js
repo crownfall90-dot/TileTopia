@@ -177,8 +177,15 @@ export function getTimeUntilNext9AM(now = new Date()) {
   return `${hours} ч. ${mins} мин.`;
 }
 
-/** Deterministically selects 6 gold-only items for the day: 2 figures, 2 frames, 2 statuses. */
-export function getDailyShopItems(figs = {}, frames = {}, statuses = [], date = new Date()) {
+/** How many of each kind the daily showcase offers. */
+export const DAILY_COUNTS = {fig: 2, frame: 2, status: 4, emote: 4};
+
+/**
+ * The daily showcase: 2 figures, 2 frames, 4 statuses and 4 emoji for gold, a new set at 09:00. The order is the same
+ * for everyone that day; a player sees only what they do not own yet (wallet), so what they bought gives its place
+ * to the next item of the day's order.
+ */
+export function getDailyShopItems(figs = {}, frames = {}, statuses = [], date = new Date(), wallet = null) {
   const key = getDailyShopKey(date);
   let seed = 0;
   for (let i = 0; i < key.length; i++) {
@@ -209,11 +216,20 @@ export function getDailyShopItems(figs = {}, frames = {}, statuses = [], date = 
     .filter(s => s.price > 0)
     .map(s => ({ kind: 'status', key: 'sh:' + s.id, id: s.id, name: s.text, price: s.price }));
 
-  const pickedFigs = shuffle(figList).slice(0, 2);
-  const pickedFrames = shuffle(frameList).slice(0, 2);
-  const pickedStatuses = shuffle(statusList).slice(0, 2);
+  const emoteList = R.ALL_EMOTES
+    .filter(e => R.price('emote', e) > 0)
+    .map(e => ({ kind: 'emote', key: e, name: R.RARITY[R.rarity('emote', e)].name, price: R.price('emote', e), rarity: R.rarity('emote', e) }));
 
-  return [...pickedFigs, ...pickedFrames, ...pickedStatuses];
+  const w = wallet || {};
+  const owned = {
+    fig: it => (w.owned || []).includes(it.key),
+    frame: it => (w.frames || []).includes(it.key),
+    status: it => (w.statuses || []).includes(it.key),
+    emote: it => R.isOwned(w, 'emote', it.key),
+  };
+  // shuffled first (the same order for everyone that day), then what this player owns is skipped
+  const pick = (list, kind) => shuffle(list).filter(it => !wallet || !owned[kind](it)).slice(0, DAILY_COUNTS[kind]);
+  return [...pick(figList, 'fig'), ...pick(frameList, 'frame'), ...pick(statusList, 'status'), ...pick(emoteList, 'emote')];
 }
 
 /** Generates HTML markup for the 6-item daily shop showcase. */
@@ -249,6 +265,11 @@ export function renderDailyShopShowcase({ items = [], wallet = {}, figPreview = 
       isOwned = (wallet.statuses || []).includes(k);
       isEquipped = (wallet.statusKey === k) || (wallet.status && wallet.status === item.name);
       previewHtml = `<div class="dsh-visual"><span class="stchip dsh-chip">${item.name}</span></div>`;
+    } else if (item.kind === 'emote') {
+      kindLabel = 'Эмодзи';
+      kindClass = 'k-emote' + (item.rarity ? ' r-' + item.rarity : '');
+      isOwned = R.isOwned(wallet, 'emote', item.key);
+      previewHtml = `<div class="dsh-visual"><span class="dsh-emote">${item.key}</span></div>`;
     }
 
     const canAfford = gold >= item.price;
@@ -256,9 +277,10 @@ export function renderDailyShopShowcase({ items = [], wallet = {}, figPreview = 
     if (isEquipped) {
       btnHtml = `<button class="dsh-btn equipped" disabled>Надето</button>`;
     } else if (isOwned) {
-      btnHtml = `<button class="dsh-btn select" data-daily-pick="${item.kind}:${item.key}">Выбрать</button>`;
+      btnHtml = `<button class="dsh-btn select" data-daily-pick="${item.kind}|${item.key}">Выбрать</button>`;
     } else {
-      btnHtml = `<button class="dsh-btn buy${!canAfford ? ' poor' : ''}" data-daily-buy="${item.kind}:${item.key}:${item.price}"><i class="coin"></i><b>${item.price}</b></button>`;
+      // '|' between the parts: a status key has a ':' of its own (sh:id)
+      btnHtml = `<button class="dsh-btn buy${!canAfford ? ' poor' : ''}" data-daily-buy="${item.kind}|${item.key}|${item.price}"><i class="coin"></i><b>${item.price}</b></button>`;
     }
 
     return `
@@ -285,16 +307,14 @@ export function renderDailyShopShowcase({ items = [], wallet = {}, figPreview = 
         <div class="dsh-title-box">
           <div class="dsh-badge"><span>⭐ Ежедневная витрина</span></div>
           <h3>Товары дня</h3>
-          <p>6 товаров · Обновление в 09:00</p>
+          <p>${items.length ? `${items.length} ${items.length % 10 === 1 && items.length % 100 !== 11 ? 'товар' : items.length % 10 >= 2 && items.length % 10 <= 4 && (items.length % 100 < 12 || items.length % 100 > 14) ? 'товара' : 'товаров'} · ` : ''}Обновление в 09:00</p>
         </div>
         <div class="dsh-timer-box">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="9"/><polyline points="12 6 12 12 15 15"/></svg>
           <span>До смены: <b>${timeStr}</b></span>
         </div>
       </div>
-      <div class="daily-shop-grid">
-        ${cardsHtml}
-      </div>
+      ${cardsHtml ? `<div class="daily-shop-grid">${cardsHtml}</div>` : '<div class="dsh-empty">Всё из сегодняшней витрины уже ваше. Новые товары — в 09:00</div>'}
     </div>
   `;
 }

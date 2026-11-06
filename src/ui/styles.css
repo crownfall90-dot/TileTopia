@@ -5187,3 +5187,10 @@ html body .quest[class*="tier-"] .qi::after{content:"";position:absolute;right:-
 html body .quest.tier-bronze .qi::after{background:linear-gradient(135deg,#f0b48a,#b06a3b)}
 html body .quest.tier-silver .qi::after{background:linear-gradient(135deg,#ffffff,#a9b4c6)}
 html body .quest.tier-gold .qi::after{background:linear-gradient(135deg,#fff1b8,#e0a52f)}
+
+/* daily showcase: emoji cards and the «all bought» note */
+html body .dsh-emote{display:block;font-size:40px;line-height:1.15;text-align:center}
+html body .dsh-tag.k-emote{background:rgba(242,184,75,.16);color:var(--m-gold)}
+html body .dsh-tile-card.k-emote.r-rare{border-color:rgba(76,141,255,.5)}
+html body .dsh-tile-card.k-emote.r-epic{border-color:rgba(176,108,240,.6)}
+html body .dsh-empty{padding:18px 14px;border-radius:14px;text-align:center;color:var(--muted);background:var(--m-surface);border:1px dashed var(--m-line)}
