@@ -152,7 +152,16 @@ class Updater {
         }
     }
 
+    /** The page can call startUpdate(url): only a release asset of this repository over https may be downloaded. */
+    static boolean trustedUrl(String url) {
+        return url != null && url.startsWith("https://github.com/" + BuildConfig.UPDATE_REPO + "/releases/") && !url.contains("@");
+    }
+
     void download(String url) {
+        if (!trustedUrl(url)) {
+            activity.js("window.onUpdateError && window.onUpdateError('Недопустимый адрес обновления')");
+            return;
+        }
         new Thread(() -> {
             try {
                 File dir = new File(activity.getCacheDir(), "updates");

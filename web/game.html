@@ -7302,7 +7302,7 @@ function openLink() {
   // In an Android browser: first offer to open the game app, the browser stays an option.
   if (/Android/i.test(navigator.userAgent) && !standalone() && !(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData)) {
     const qs = l.friend ? 'friend=' + l.friend : 'room=' + l.room, what = l.friend ? 'Приглашение в друзья' : 'Приглашение в комнату';
-    const intent = `intent://${location.host}${location.pathname}?${qs}#Intent;scheme=https;package=com.crownfall.mosaic;S.browser_fallback_url=${encodeURIComponent(APK_URL)};end`;
+    const intent = `intent://${location.host}${location.pathname}?${qs}#Intent;scheme=https;package=app.crownfall.tiletopia;S.browser_fallback_url=${encodeURIComponent(APK_URL)};end`;
     const box = document.createElement('div'); box.className = 'over'; box.style.position = 'fixed';
     box.innerHTML = `<div class="ocard"><div style="font-size:44px">${l.friend ? '🤝' : '🎲'}</div><h3>${what}</h3><p>Откройте игру в приложении или продолжите прямо в браузере</p><a class="cta wide" id="lkApp" href="${intent}" style="text-decoration:none;display:grid;place-items:center">Открыть в приложении</a><button class="ghostbtn" id="lkWeb">Продолжить в браузере</button><a class="linkbtn" href="${APK_URL}" target="_blank" rel="noopener">Нет приложения? Скачать для Android</a></div>`;
     document.body.append(box);

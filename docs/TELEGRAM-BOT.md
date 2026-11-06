@@ -34,8 +34,8 @@ TELEGRAM_BOT_TOKEN="ВАШ_ТОКЕН" python3 scripts/telegram-bot.py
 Файл `workers/telegram-bot-worker.js`:
 1. Создайте бесплатный воркер в Cloudflare.
 2. Вставьте содержимое `workers/telegram-bot-worker.js`.
-3. Добавьте переменную `TELEGRAM_BOT_TOKEN` в Secrets.
-4. Привяжите вебхук:
+3. Добавьте `TELEGRAM_BOT_TOKEN` и `TELEGRAM_WEBHOOK_SECRET` (случайная строка из латиницы, цифр, `_` и `-`) в Secrets. Без секрета воркер отвечает 500, а запросы без верного секрета получают 403.
+4. Привяжите вебхук (Telegram будет присылать секрет в заголовке `X-Telegram-Bot-Api-Secret-Token`):
 ```bash
-curl -F "url=https://<your-worker-subdomain>.workers.dev" https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/setWebhook
+curl -F "url=https://<your-worker-subdomain>.workers.dev" -F "secret_token=<TELEGRAM_WEBHOOK_SECRET>" https://api.telegram.org/bot<TELEGRAM_BOT_TOKEN>/setWebhook
 ```
