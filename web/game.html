@@ -707,7 +707,7 @@ const meepleSvg = col => `<svg viewBox="0 0 100 110"><path d="${MEEPLE_D}" fill=
 
 /* ---------------- art ---------------- */
 // Tile and sprite art live in src/render/art.js.
-const {cv, SPR, sprite, TILE_URL, injectArt} = PG.render.createArt({S, V, PL0, MEEPLE_D});
+const {cv, SPR, sprite, TILE_URL, injectArt, injectHexArt} = PG.render.createArt({S, V, PL0, MEEPLE_D});
 /* ---------------- rules ---------------- */
 const G = (PG.game && PG.game.createGameState) ? PG.game.createGameState() : {
   tiles: new Map(), deck: [], meeples: [], players: [], turn: 0, phase: 'idle', current: null, sel: null
@@ -715,7 +715,23 @@ const G = (PG.game && PG.game.createGameState) ? PG.game.createGameState() : {
 let tiles = G.tiles, deck = G.deck, meeples = G.meeples, players = G.players, turn = G.turn, phase = G.phase, current = G.current, sel = G.sel;
 let ghost = G.ghost, ghostDeg = G.ghostDeg, trayDeg = G.trayDeg, slotEls = G.slotEls, token = G.token, gameVisible = G.gameVisible, pendingStart = G.pendingStart;
 // Board rules live in src/engine/board.js; these wrappers pass it the current game state.
-const B = PG.engine.board, key = B.key, edgeAt = B.edgeAt, groupsOf = B.groupsOf, gid = B.gid;
+// Classic 2.0 (rules.mode 'hex') plays on six-sided tiles: src/engine/hex.js has the same API as board.js and
+// scoring.js, so useGeo() switches the rules, the bots and the drawing for one game; the square game is untouched.
+const HX = PG.engine.hex, HW = T * HX.WIDTH;   // HW: a six-sided tile's width on the table (its height is T)
+let HEX = false, B = PG.engine.board, SC = PG.engine.scoring, BOTS = PG.engine.bots, edgeAt = B.edgeAt, groupsOf = B.groupsOf, gid = B.gid;
+const key = B.key;
+function useGeo(hex) {
+  HEX = !!hex; B = HEX ? HX : PG.engine.board; SC = HEX ? HX : PG.engine.scoring; BOTS = HEX ? PG.engine.bots.hex : PG.engine.bots;
+  edgeAt = B.edgeAt; groupsOf = B.groupsOf; gid = B.gid; boundsCache = null;
+  document.documentElement.classList.toggle('hexg', HEX);
+  if (HEX) injectHexArt();
+}
+const TY = id => TYPES[id] || HX.TYPES[id];
+const NDIR = () => HEX ? 6 : 4, ROT = () => HEX ? 60 : 90, VV = () => HEX ? HX.V : V;
+const nbXY = (x, y, d) => HEX ? [x + HX.DX[d], y + HX.DY[d]] : [x + DX[d], y + DY[d]];
+/** Centre of a cell on the table, in tile heights; and the left/top of a tile or slot there, in px. */
+const cellXY = (x, y) => HEX ? HX.cellXY(x, y) : [x, y];
+const cellLT = (x, y) => { const [X, Y] = cellXY(x, y); return [X * T - (HEX ? HW : T) / 2, Y * T - T / 2]; };
 const at = (x, y) => tiles.get(key(x, y));
 const fits = (type, r, x, y) => B.fits(tiles, type, r, x, y);
 const emptyCells = () => B.emptyCells(tiles);
@@ -725,6 +741,7 @@ const hasPlacement = type => B.hasPlacement(tiles, type);
 const fortComp = t => B.fortComp(tiles, meeples, t);
 const component = (t, g) => B.component(tiles, meeples, t, g);
 function groupPos(t, g) {
+  if (HEX) return hexGroupPos(g);
   if (PG.game && PG.game.world) return PG.game.world.groupPos(t, g);
   if (g.kind === 'f') return [0.24, 0.18];
   if (g.kind === 'c') {
@@ -736,17 +753,26 @@ function groupPos(t, g) {
   if (g.edges.length === 2) { const b = V[g.edges[1]]; return [(a[0]*.4225 + b[0]*.1225) * .5, (a[1]*.4225 + b[1]*.1225) * .5]; }
   return [a[0] * .3, a[1] * .3];
 }
+// Where a figure stands on a six-sided tile: in its town, on its road, by the monastery.
+function hexGroupPos(g) {
+  const v = HX.V;
+  if (g.kind === 'f') return [.2, .16];
+  if (g.kind === 'c') { let sx = 0, sy = 0; g.edges.forEach(d => { sx += v[d][0]; sy += v[d][1]; }); const L = Math.hypot(sx, sy); return L < .01 ? [.14, .12] : [sx / L * .27, sy / L * .27]; }
+  const a = v[g.edges[0]];
+  if (g.edges.length === 2) { const b = v[g.edges[1]]; return [(a[0] + b[0]) * .18 + a[0] * .14, (a[1] + b[1]) * .18 + a[1] * .14]; }
+  return [a[0] * .3, a[1] * .3];
+}
 // Rules v2 (rv = 2): a player may add figures to an object held only by their own figures; equal figures are decided by cards laid.
 const rules2 = () => !!(gameRules && gameRules.rv === 2);
 const claimable = (t, p) => B.claimable(tiles, meeples, t, p, rules2());
 const claimableAll = p => B.claimableAll(tiles, meeples, p, rules2());
-const label = g => g.kind === 'r' && g.edges.length === 1 ? 'Дорога ' + ARROW[g.edges[0]] : KIND[g.kind];
+const label = g => g.kind === 'r' && g.edges.length === 1 ? 'Дорога ' + (HEX ? HX.ARROW : ARROW)[g.edges[0]] : KIND[g.kind];
 
 /* ---------------- dom: world ---------------- */
 const world = $('#world'), board = $('#board');
 function addSprite(parent, kind, x, y, cls, delay, scale = 1) {
   const d = SPR && SPR[kind]; if (!d) return null;
-  const L = (0.5 + x) * T, Tp = (0.5 + y) * T;
+  const L = (HEX ? HW / 2 : T / 2) + x * T, Tp = (0.5 + y) * T;
   const b = document.createElement('i'); b.className = 'bb s-' + kind + (cls ? ' ' + cls : '');
   b.style.cssText = `left:${L}px;top:${Tp}px;width:${d.w * scale}px;height:${d.h * scale}px`;
   if (delay != null) { b.classList.add('pop'); b.style.setProperty('--d', delay + 's'); }
@@ -757,7 +783,8 @@ const lowGfx = () => document.documentElement.classList.contains('lowgfx');
 const HOUSES = ['house', 'house2', 'house3', 'house4'];
 function addDecor(el, t, delay) {
   let items, cityCount;
-  if (typeof PG !== 'undefined' && PG.game && PG.game.world && PG.game.world.generateDecorItems) {
+  if (HEX) ({items, cityCount} = hexDecor(t));
+  else if (typeof PG !== 'undefined' && PG.game && PG.game.world && PG.game.world.generateDecorItems) {
     const res = PG.game.world.generateDecorItems(t, edgeAt, rng, lowGfx(), TYPES);
     items = res.items;
     cityCount = res.cityCount;
@@ -792,11 +819,42 @@ function addDecor(el, t, delay) {
   items.forEach((it, i) => addSprite(box, it[0], it[1], it[2], 'dc', delay == null ? null : delay + i * .05, (it[0] === 'tower' && cityCount ? .8 : 1) * (it[3] && /^house|^tower/.test(it[0]) ? .85 : 1)));
   el.querySelector('.face').after(box);
 }
+// Houses by the town, the monastery's tower, boulders at a dead end and trees in the free corners of a six-sided tile.
+function hexDecor(t) {
+  const E = [0, 1, 2, 3, 4, 5].map(d => edgeAt(t, d)), R = rng(t.seed), v = HX.V, def = TY(t.type), items = [];
+  const city = [0, 1, 2, 3, 4, 5].filter(d => E[d] === 'c');
+  if (city.length) {
+    let sx = 0, sy = 0; city.forEach(d => { sx += v[d][0]; sy += v[d][1]; });
+    const L = Math.hypot(sx, sy), ux = L < .01 ? 0 : sx / L, uy = L < .01 ? -1 : sy / L, px = -uy, py = ux, f = city.length === 1 ? .34 : .2;
+    const n = city.length >= 4 ? 4 : city.length >= 2 ? 3 : 2;
+    for (let i = 0; i < n; i++) { const o = (i - (n - 1) / 2) * .17; items.push([i === 0 && city.length >= 3 ? 'tower' : HOUSES[(R() * 4) | 0], ux * f + px * o + (R() - .5) * .04, uy * f + py * o + (i % 2 ? .07 : -.03)]); }
+  }
+  if (def.fort) items.push(['tower', 0, .18]);
+  if (def.end) { const d = E.indexOf('r'); items.push([def.end, -v[d][0] * .1, -v[d][1] * .1 + .06]); }
+  if (def.rocks) items.push(['boulders', -.05, .05], ['rock', .22, -.12], ['rock', -.24, .2]);
+  if (!lowGfx()) for (let k = 0; k < 6; k++) {   // corner k lies between sides k - 1 and k
+    if (E[k] === 'c' || E[(k + 5) % 6] === 'c' || R() >= .55) continue;
+    const a = (-120 + 60 * k) * Math.PI / 180, kk = R();
+    items.push([kk < .36 ? 'pine' : kk < .62 ? 'oak' : kk < .71 ? 'birch' : kk < .78 ? 'poplar' : kk < .9 ? 'bush' : 'rock', Math.cos(a) * (.38 + R() * .05), Math.sin(a) * (.33 + R() * .04)]);
+  }
+  items.forEach(it => { if (it[2] < -.2 && !['rock', 'boulders', 'hay', 'bush'].includes(it[0])) { it[2] = -.2 + (it[2] + .2) * .35; it[3] = 1; } });
+  items.sort((p, q) => p[2] - q[2]);
+  return {items, cityCount: city.length};
+}
 // Switching graphics redraws the decor of the cards already on the table; the game itself stays as it is.
 function redecorate() {
   for (const t of tiles.values()) if (t.el) { t.el.querySelectorAll('.bb.dc').forEach(b => b.remove()); addDecor(t.el, t, null); }
 }
+// The six walls of a six-sided tile: side k runs from corner k to corner k + 1 and hangs down from it.
+const HEX_SIDES = [0, 1, 2, 3, 4, 5].map(k => { const a = (-120 + 60 * k) * Math.PI / 180; return `<i class="sd h${k}" style="left:${(HW / 2 + Math.cos(a) * HW / 2).toFixed(2)}px;top:${(T / 2 + Math.sin(a) * HW / 2).toFixed(2)}px;width:${(HW / 2 + .6).toFixed(2)}px;transform:rotateZ(${60 * k}deg) rotateX(-90deg)"></i>`; }).join('');
 function tileEl(t, decor, delay) {
+  if (HEX) {
+    const el = document.createElement('div'); el.className = 'tile hex';
+    const [l, tp] = cellLT(t.x, t.y); el.style.left = l + 'px'; el.style.top = tp + 'px';
+    el.innerHTML = HEX_SIDES + `<div class="face t-${t.type}" style="--r:${t.r * 60}deg"></div>`;
+    if (decor) addDecor(el, t, delay);
+    return el;
+  }
   const el = document.createElement('div'); el.className = 'tile';
   el.style.left = (t.x * T - T / 2) + 'px'; el.style.top = (t.y * T - T / 2) + 'px';
   el.innerHTML = `<i class="sd n"></i><i class="sd e"></i><i class="sd s"></i><i class="sd w"></i><div class="face t-${t.type}" style="--r:${t.r * 90}deg"></div>`;
@@ -820,6 +878,10 @@ function tileEl(t, decor, delay) {
 function walls(t, has = (x, y) => tiles.has(key(x, y))) {
   if (!t.el) return;
   const sd = t.el.querySelectorAll('.sd');
+  if (HEX) {
+    for (let d = 0; d < 6; d++) { const [x, y] = nbXY(t.x, t.y, d); sd[d].hidden = has(x, y); sd[d].classList.toggle('fall', !sd[d].hidden && edgeAt(t, d) === 'w'); }
+    return;
+  }
   if (typeof PG !== 'undefined' && PG.game && PG.game.world) {
     const list = PG.game.world.calcWallVisibility(t, has, edgeAt);
     list.forEach(({d, hidden, fall}) => {
@@ -839,14 +901,14 @@ function refreshRoadEnds() {
   for (const t of tiles.values()) {
     if (!t.el) continue;
     t.rw = t.rw || {};
-    for (let d = 0; d < 4; d++) {
-      const open = edgeAt(t, d) === 'r' && !at(t.x + DX[d], t.y + DY[d]);
-      if (open && !t.rw[d]) t.rw[d] = addSprite(t.el, 'gravel', V[d][0] * .4, V[d][1] * .4, '', fast() ? null : .05);
+    for (let d = 0; d < NDIR(); d++) {
+      const open = edgeAt(t, d) === 'r' && !at(...nbXY(t.x, t.y, d));
+      if (open && !t.rw[d]) t.rw[d] = addSprite(t.el, 'gravel', VV()[d][0] * .4, VV()[d][1] * .4, '', fast() ? null : .05);
       else if (!open && t.rw[d]) { t.rw[d].remove(); delete t.rw[d]; }
     }
   }
 }
-function wallsAround(t) { walls(t); for (let d = 0; d < 4; d++) { const n = at(t.x + DX[d], t.y + DY[d]); if (n) walls(n); } }
+function wallsAround(t) { walls(t); for (let d = 0; d < NDIR(); d++) { const n = at(...nbXY(t.x, t.y, d)); if (n) walls(n); } }
 function placeMeeple(t, g, p, anim) {
   const [x, y] = groupPos(t, g);
   const el = addSprite(t.el, 'm' + p, x, y, '', anim && !fast() ? 0 : null);
@@ -862,7 +924,7 @@ function removeMeeple(m) {
 function floatText(t, [x, y], txt, col) {
   if (fast()) return;
   const f = document.createElement('i'); f.className = 'fl'; f.textContent = txt;
-  f.style.cssText = `left:${(0.5 + x) * T}px;top:${(0.5 + y) * T - 20}px;--c:${col}`;
+  f.style.cssText = `left:${(HEX ? HW / 2 : T / 2) + x * T}px;top:${(0.5 + y) * T - 20}px;--c:${col}`;
   t.el.append(f); setTimeout(() => f.remove(), 1600);
 }
 
@@ -886,6 +948,11 @@ function applyCam() {
 let boundsCache = null;
 function bounds() { if (boundsCache && boundsCache.n === tiles.size) return boundsCache; boundsCache = calcBounds(); boundsCache.n = tiles.size; return boundsCache; }
 function calcBounds() {
+  if (HEX) {
+    let x0 = 0, x1 = 0, y0 = 0, y1 = 0;
+    for (const t of tiles.values()) { const [X, Y] = HX.cellXY(t.x, t.y); x0 = Math.min(x0, X); x1 = Math.max(x1, X); y0 = Math.min(y0, Y); y1 = Math.max(y1, Y); }
+    return {x0, x1, y0, y1};
+  }
   if (PG.game && PG.game.camera) return PG.game.camera.calcBounds(tiles);
   let x0 = 0, x1 = 0, y0 = 0, y1 = 0;
   for (const t of tiles.values()) { x0 = Math.min(x0, t.x); x1 = Math.max(x1, t.x); y0 = Math.min(y0, t.y); y1 = Math.max(y1, t.y); }
@@ -922,6 +989,7 @@ function centerCam(anim) {
   Object.assign(cam, to); applyCam();
 }
 function ensureVisible(x, y) {
+  [x, y] = cellXY(x, y);
   const vw = board.clientWidth, vh = board.clientHeight;
   if (!vw) return;
   const to = (typeof PG !== 'undefined' && PG.game && PG.game.camera)
@@ -1010,7 +1078,7 @@ $('#view').onclick = e => {
   e.currentTarget.textContent = TILTS[i][1];
   tweenCam({tilt: TILTS[i][0]}, 500);
 };
-$('#turnL').onclick = () => tweenCam({rot: Math.round((cam.rot - 90) / 90) * 90}, 450);
+$('#turnL').onclick = () => tweenCam({rot: Math.round((cam.rot - ROT()) / ROT()) * ROT()}, 450);
 
 /* ---------------- hud ---------------- */
 const playersEl = $('#players'), statusEl = $('#status'), toastEl = $('#toast'), okBtn = $('#ok'), rotBtn = $('#rot');
@@ -1044,6 +1112,7 @@ function cityD(E, S) {
   return {fill: fill + 'Z', wall};
 }
 function ownSvg(t, list) {
+  if (HEX) return hexOwnSvg(t, list);
   if (PG.ui && PG.ui.hud) return PG.ui.hud.ownSvg(t, list, TYPES[t.type] ? TYPES[t.type].e : null);
   const mid = [[50,0],[100,50],[50,100],[0,50]];
   let out = '';
@@ -1066,6 +1135,50 @@ function ownSvg(t, list) {
     }
   }
   return 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${out}</svg>`);
+}
+// The owner colours on a six-sided tile, drawn in the tile type's own frame (the picture turns with the face), on the
+// same paths as its art (src/render/art.js drawHexTile): roads through the middle, the town's wall curves, the monastery.
+function hexOwnSvg(t, list) {
+  const W = 100 * HX.WIDTH, C = [W / 2, 50], HV = HX.V, mid = HV.map(([x, y]) => [C[0] + x * 50, C[1] + y * 50]);
+  const corner = k => { const a = (-120 + 60 * k) * Math.PI / 180; return [C[0] + Math.cos(a) * W / 2, C[1] + Math.sin(a) * W / 2]; };
+  const P = p => p[0].toFixed(1) + ' ' + p[1].toFixed(1);
+  const strokes = (d, cols, w) => cols.map((c, i) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="${cols.length > 1 ? 'butt' : 'round'}"${cols.length > 1 ? ` stroke-dasharray="7 ${7 * (cols.length - 1)}" stroke-dashoffset="${-7 * i}"` : ''}/>`).join('');
+  const E = HX.TYPES[t.type].e;
+  let out = '';
+  for (const it of list) {
+    const base = it.edges.map(d => (d - t.r + 6) % 6);
+    if (it.kind === 'r') {
+      let d;
+      if (base.length === 2) {
+        const [a, b] = base, turn = Math.min((b - a + 6) % 6, (a - b + 6) % 6), m = [(mid[a][0] + mid[b][0]) / 2, (mid[a][1] + mid[b][1]) / 2], k = [0, .62, .3, 0][turn];
+        d = `M${P(mid[a])}Q${P([C[0] + (m[0] - C[0]) * k, C[1] + (m[1] - C[1]) * k])} ${P(mid[b])}`;
+      } else d = `M${P(mid[base[0]])}L${P(C)}`;
+      out += `<path d="${d}" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="10" stroke-linecap="round"/>` + strokes(d, it.cols, 6.5);
+    } else if (it.kind === 'c') {
+      const city = [0, 1, 2, 3, 4, 5].filter(d => E[d] === 'c');
+      let fill = '', wall = '';
+      if (city.length === 6) fill = `M${[0, 1, 2, 3, 4, 5].map(k => P(corner(k))).join('L')}Z`;
+      else {
+        const s0 = city.find(d => E[(d + 5) % 6] !== 'c');
+        fill = `M${P(corner(s0))}`;
+        for (let i = s0, n = 0; n < 6;) {
+          if (E[i % 6] === 'c') { fill += `L${P(corner((i + 1) % 6))}`; i++; n++; continue; }
+          let L = 0; while (E[(i + L) % 6] !== 'c') L++;
+          let ux = 0, uy = 0; for (let k = 0; k < L; k++) { ux += HV[(i + k) % 6][0]; uy += HV[(i + k) % 6][1]; }
+          const ul = Math.hypot(ux, uy) || 1, dep = [0, .06, .1, .13, .16, .2][L] * 100, K = [C[0] + ux / ul * dep, C[1] + uy / ul * dep];
+          fill += `Q${P(K)} ${P(corner((i + L) % 6))}`; wall += `M${P(corner(i % 6))}Q${P(K)} ${P(corner((i + L) % 6))}`;
+          i += L; n += L;
+        }
+        fill += 'Z';
+      }
+      out += `<path d="${fill}" fill="${it.cols[0]}" fill-opacity="${it.cols.length > 1 ? .12 : .22}"/>`;
+      out += wall ? `<path d="${wall}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="7" stroke-linecap="round"/>` + strokes(wall, it.cols, 4.5) : strokes(fill, it.cols, 4.5);
+    } else if (it.kind === 'f') {
+      const d = `M${C[0]} 22A28 28 0 1 1 ${C[0] - .1} 22Z`;
+      out += `<path d="${d}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="7"/>` + strokes(d, it.cols, 4.5);
+    }
+  }
+  return 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W.toFixed(2)} 100" preserveAspectRatio="none">${out}</svg>`);
 }
 /* Finished and scored features stay in their owners' colours and get little banners of
    those colours on a few of their pieces (around the keep for a fortress). */
@@ -1090,7 +1203,7 @@ function markDone(c, cols) {
   let spots = [];
   if (c.kind === 'f') {
     const center = c.tiles.find(t => c.ids.has(key(t.x, t.y) + '|f'));
-    if (center) spots = [[-.36, -.36], [.36, -.36], [.36, .36], [-.36, .36]].map(p => [center, p]);
+    if (center) spots = (HEX ? [[-.3, -.26], [.3, -.26], [.3, .26], [-.3, .26]] : [[-.36, -.36], [.36, -.36], [.36, .36], [-.36, .36]]).map(p => [center, p]);
   } else {
     const ts = c.tiles, step = Math.max(1, Math.ceil(ts.length / 6));
     for (let i = 0; i < ts.length; i += step) {
@@ -1176,18 +1289,18 @@ let deckMax = 0;
 function renderDeck() { if (deck.length > deckMax || !phase || phase === 'idle') deckMax = Math.max(deck.length, deckMax); $('#deckN').textContent = deck.length; const bar = $('#deckBar'); if (bar) bar.style.width = (deckMax ? 100 * deck.length / deckMax : 0) + '%'; }
 function renderTray() {
   if (!current) { tface.className = 'face'; cname.innerHTML = ''; return; }
-  tface.style.transition = 'none'; trayDeg = current.r * 90; tface.style.setProperty('--r', (trayDeg + cam.rot) + 'deg');
+  tface.style.transition = 'none'; trayDeg = current.r * ROT(); tface.style.setProperty('--r', (trayDeg + cam.rot) + 'deg');
   tface.className = 'face t-' + current.type; void tface.offsetWidth; tface.style.transition = '';
   const solo = isLocal(turn) && localHumans() === 1;
   ct.style.setProperty('--c', solo ? 'transparent' : players[turn].col);
-  cname.innerHTML = `<b>${TYPES[current.type].name}</b><small>${solo ? 'Ваша карта' : 'Карта: ' + players[turn].name}</small>`;
+  cname.innerHTML = `<b>${TY(current.type).name}</b><small>${solo ? 'Ваша карта' : 'Карта: ' + players[turn].name}</small>`;
   // whose turn it is, big on the left: that player's own figure in their colour
   const tf = $('#turnFig'); tf.style.setProperty('--c', players[turn].col); tf.innerHTML = `${meepleImg(turn)}<small>${players[turn].name}</small>`;
   if (!RM) ct.animate([{transform: 'rotateX(26deg) translateY(26px) scale(.7)', opacity: 0}, {transform: 'rotateX(26deg)', opacity: 1}], {duration: 320, easing: 'cubic-bezier(.3,1.4,.5,1)'});
 }
 function setRot(nr) {
-  const delta = ((nr - current.r) + 4) % 4;
-  trayDeg += delta * 90; ghostDeg += delta * 90; current.r = nr;
+  const delta = ((nr - current.r) + NDIR()) % NDIR();
+  trayDeg += delta * ROT(); ghostDeg += delta * ROT(); current.r = nr;
   tface.style.setProperty('--r', (trayDeg + cam.rot) + 'deg');
   if (ghost) ghost.querySelector('.face').style.setProperty('--r', ghostDeg + 'deg');
   peekSend();
@@ -1200,16 +1313,16 @@ function renderSlots() {
   clearSlots();
   for (const c of emptyCells()) {
     if (!legalRots(current.type, c.x, c.y).length || (tut && !tutAllows(c.x, c.y))) continue;
-    const el = document.createElement('div'); el.className = 'slot' + (tut ? ' tutpulse' : ''); el.dataset.x = c.x; el.dataset.y = c.y;
+    const el = document.createElement('div'); el.className = 'slot' + (HEX ? ' hex' : '') + (tut ? ' tutpulse' : ''); el.dataset.x = c.x; el.dataset.y = c.y;
     if (players[turn]) el.style.setProperty('--pc', players[turn].col);
-    el.style.left = (c.x * T - T / 2) + 'px'; el.style.top = (c.y * T - T / 2) + 'px';
+    const [l, tp] = cellLT(c.x, c.y); el.style.left = l + 'px'; el.style.top = tp + 'px';
     world.append(el); slotEls.push(el);
   }
 }
 function placeGhost() {
-  if (!ghost) { ghostDeg = current.r * 90; ghost = tileEl({x: sel.x, y: sel.y, type: current.type, r: current.r}, false); ghost.classList.add('ghost'); world.append(ghost); }
+  if (!ghost) { ghostDeg = current.r * ROT(); ghost = tileEl({x: sel.x, y: sel.y, type: current.type, r: current.r}, false); ghost.classList.add('ghost'); world.append(ghost); }
   ghost.style.setProperty('--pc', players[turn].col);
-  ghost.style.left = (sel.x * T - T / 2) + 'px'; ghost.style.top = (sel.y * T - T / 2) + 'px';
+  const [gl, gt] = cellLT(sel.x, sel.y); ghost.style.left = gl + 'px'; ghost.style.top = gt + 'px';
 }
 function selectSlot(x, y) {
   if (tut && !tutAllows(x, y)) return;
@@ -1224,7 +1337,7 @@ function selectSlot(x, y) {
 function rotate() {
   if (phase !== 'place' || !current) return;
   beep('rotate'); tutEvent('rotate');
-  if (!sel) return setRot((current.r + 1) % 4);
+  if (!sel) return setRot((current.r + 1) % NDIR());
   const rots = legalRots(current.type, sel.x, sel.y);
   if (rots.length < 2) { toast('Другие повороты не сходятся с соседями'); if (ghost) { ghost.classList.remove('shake'); void ghost.offsetWidth; ghost.classList.add('shake'); setTimeout(() => ghost && ghost.classList.remove('shake'), 360); } return; }
   setRot(rots[(rots.indexOf(current.r) + 1) % rots.length]);
@@ -1237,16 +1350,16 @@ function helpWindow(tab = 'pts') {
   const r = gameRules, mode = (MODES[r.mode] || MODES.classic).label, tie = r.tie === 'split' ? 'очки делятся поровну' : 'очки получает каждый из них';
   const item = (cls, ttl, todo, pts) => `<div class="hitem"><span class="rimg ${cls}"></span><div><b>${ttl}</b><p>${todo}</p><em>${pts}</em></div></div>`;
   const pts = `<div class="hnow">В этой партии: <b>${mode}</b> · фишек у игрока: <b>${r.meeples}</b> · если фишек поровну — ${tie}${net && !players.some(p => !p.human) && (net.quick || r.cups) ? ' · <b>игра на кубки</b>' : ''}</div>
-    ${item('t-c2', '🏰 Город', 'Закройте картами все края города — чтобы со всех сторон он был окружён.', '2 очка за каждую карту города · недостроенный в конце игры — 1 за карту')}
-    ${item('t-rS', '🛤 Дорога', 'Доведите дорогу до конца с обеих сторон: до города, перекрёстка, тупика или замкните её в кольцо.', '1 очко за каждую карту дороги · с целым большим мостом ×2')}
-    ${item('t-fort', '⛪ Монастырь', 'Окружите монастырь картами со всех 8 сторон, включая углы.', '9 очков · недостроенный в конце — 1 за каждую карту рядом')}
-    ${item('t-brHalf', '🌉 Большой мост', 'Соедините две половины моста друг с другом — дорога через него становится ценнее.', 'каждая карта дороги вокруг — вдвое, сами половины — по 1')}
+    ${item(HEX ? 't-hC2' : 't-c2', '🏰 Город', 'Закройте картами все края города — чтобы со всех сторон он был окружён.', '2 очка за каждую карту города · недостроенный в конце игры — 1 за карту')}
+    ${item(HEX ? 't-hRB' : 't-rS', '🛤 Дорога', 'Доведите дорогу до конца с обеих сторон: до города, перекрёстка, тупика или замкните её в кольцо.', '1 очко за каждую карту дороги · с целым большим мостом ×2')}
+    ${item(HEX ? 't-hF' : 't-fort', '⛪ Монастырь', HEX ? 'Окружите монастырь шестью плитками — со всех его сторон.' : 'Окружите монастырь картами со всех 8 сторон, включая углы.', '9 очков · недостроенный в конце — 1 за каждую карту рядом')}
+    ${HEX ? '' : item('t-brHalf', '🌉 Большой мост', 'Соедините две половины моста друг с другом — дорога через него становится ценнее.', 'каждая карта дороги вокруг — вдвое, сами половины — по 1')}
     <div class="hitem"><span class="hic">🧍</span><div><b>Фишка</b><p>Поставьте её на город, дорогу или монастырь на только что положенной карте, пока объект ещё ничей или на нём стоят только ваши фишки: так можно усилить свой объект. Очки получает тот, у кого на объекте больше фишек; если фишек поровну — у кого больше своих карт на объекте; если и так поровну — очки каждому лидеру. После очков фишка возвращается.</p><em>Одна фишка за ход, по желанию</em></div></div>
     <div class="hitem"><span class="hic">🤝</span><div><b>Респект</b><p>Достроили объект, на котором стоят только чужие фишки.</p><em>+1 очко вам</em></div></div>`;
   const rules = `<div class="hitem"><span class="hic">🎯</span><div><b>Цель</b><p>Стройте королевство из общей стопки. Когда стопка кончилась — больше очков значит победа.</p></div></div>
     <div class="hitem"><span class="hic">🃏</span><div><b>Ваш ход</b><p>Возьмите карту, приложите её к полю так, чтобы края совпали (город с городом, дорога с дорогой, река с рекой), поверните при необходимости и по желанию поставьте фишку.</p></div></div>
-    <div class="hitem"><span class="hic">🌊</span><div><b>Реки и озёра</b><p>Река должна продолжаться рекой. Озеро занимает всю карту и впадает во все стороны реки. Исток — начало реки.</p></div></div>
-    <div class="hitem"><span class="hic">🚧</span><div><b>Обрыв и мосты</b><p>У обрыва дорога обрывается: за ним можно ставить только обрыв. Половина большого моста стыкуется только с другой половиной.</p></div></div>
+    ${HEX ? '<div class="hitem"><span class="hic">🌊</span><div><b>Реки</b><p>Река должна продолжаться рекой. Исток — начало реки, по мосту дорога пересекает реку.</p></div></div>' : `<div class="hitem"><span class="hic">🌊</span><div><b>Реки и озёра</b><p>Река должна продолжаться рекой. Озеро занимает всю карту и впадает во все стороны реки. Исток — начало реки.</p></div></div>
+    <div class="hitem"><span class="hic">🚧</span><div><b>Обрыв и мосты</b><p>У обрыва дорога обрывается: за ним можно ставить только обрыв. Половина большого моста стыкуется только с другой половиной.</p></div></div>`}
     <div class="hitem"><span class="hic">⏱</span><div><b>Время хода</b><p>${r.timer || net ? `На ход — ${r.timer || 60} секунд. Когда время выходит, ход делает бот.` : 'В этой партии время хода не ограничено.'}</p></div></div>
     <div class="hitem"><span class="hic">🏁</span><div><b>Конец игры</b><p>Недостроенные объекты приносят по 1 очку за карту. Побеждает набравший больше всех очков.</p></div></div>`;
   const box = document.createElement('div'); box.className = 'over'; box.id = 'helpBox'; box.style.position = 'fixed';
@@ -1264,7 +1377,7 @@ $('#helpBtn').onclick = () => helpWindow();
 const tipBtn = $('#tip');
 const coachOn = () => !net && !tut && gameRules.hints !== false && wallet.coach !== 'off';
 const tipOk = () => phase === 'place' && !!current && coachOn() && isLocal(turn) && !(players[turn].missed >= 1);
-const tipFor = () => PG.engine.bots.hintPick(tiles, meeples, current.type, turn, players.length, players[turn].meeples > 0);
+const tipFor = () => BOTS.hintPick(tiles, meeples, current.type, turn, players.length, players[turn].meeples > 0);
 // "Always" coach: at the start of your turn the best spot glows and the reason is written above the card;
 // nothing is chosen for you.
 function coachTurn() {
@@ -1312,7 +1425,7 @@ async function dropAt(t) {
   if (!fast()) beep('place');
   if (!fast()) { const pf = document.createElement('i'); pf.className = 'puff'; t.el.append(pf); setTimeout(() => pf.remove(), 600); }
   if (!fast()) { t.el.classList.add('puzzle-lock'); setTimeout(() => { if (t.el) t.el.classList.remove('puzzle-lock'); }, 350); }
-  if (!fast() && gameRules && gameRules.mode === 'epic' && TYPES[t.type] && TYPES[t.type].rare) toastAny(`✨ Редкая карта на поле: ${TYPES[t.type].name}!`);
+  if (!fast() && gameRules && gameRules.mode === 'epic' && TY(t.type) && TY(t.type).rare) toastAny(`✨ Редкая карта на поле: ${TY(t.type).name}!`);
   current = null; sel = null; renderDeck();
 }
 let meepleResolve = null, meepleOpts = [];
@@ -1324,7 +1437,7 @@ function askMeeple(mainTile, opts, p) {
     mrow.innerHTML = '<button class="chip skip" data-i="-1">Без фишки</button>';
     setStatus(`Фишка вернулась! Нажмите на место на поле или «Без фишки». Осталось <b>${players[p].meeples}</b>`);
   } else {
-    const note = o => coachOn() && isLocal(p) ? PG.engine.bots.featureNote(tiles, meeples, o.t, o.g) : '';
+    const note = o => coachOn() && isLocal(p) ? BOTS.featureNote(tiles, meeples, o.t, o.g) : '';
     mrow.innerHTML = opts.map((o, i) => `<button class="chip" data-i="${i}">${meepleImg(p)}${label(o.g)}${o.done ? ' · очки сразу' : ''}${note(o) && !o.done ? `<small class="cnote">${note(o)}</small>` : ''}</button>`).join('') + '<button class="chip skip" data-i="-1">Без фишки</button>';
     setStatus(`Поставить фишку? Осталось <b>${players[p].meeples}</b>. Очки придут, когда объект достроят`);
   }
@@ -1382,7 +1495,7 @@ async function afterPlace(t, p, forced) {
       // Bot: always use placed tile only, even in anyMode.
       // Bots never reinforce their own object (only free ones), so their play stays as it was.
       const botOpts = (anyMode ? claimable(t, p).map(g => ({t, g})) : opts).filter(o => o.done || !o.g || B.component(tiles, meeples, o.t, o.g).meeples.length === 0);
-      choice = PG.engine.bots.figurePick(tiles, meeples, botOpts, players[p].meeples, Math.random, playerBotLevel(p), players[p] && players[p].persona);
+      choice = BOTS.figurePick(tiles, meeples, botOpts, players[p].meeples, Math.random, playerBotLevel(p), players[p] && players[p].persona);
     }
   }
   if (my !== token) return;
@@ -1423,7 +1536,6 @@ async function afterPlace(t, p, forced) {
 // Objects this move completed with no figures on them and built only by this player: a free figure
 // may still be put on them, and then they score for that player at once.
 // Scoring rules live in src/engine/scoring.js.
-const SC = PG.engine.scoring;
 const doneMine = (t, p) => SC.doneMine(tiles, meeples, t, p);
 const roadPoints = c => SC.roadPoints(tiles, c);
 async function scoreAfter(t, p, skip) {
@@ -1453,7 +1565,7 @@ async function resolveFeature(c, final, placer) {
     const n = c.tiles.length;
     win.forEach(i => { if (meCounted() && isMe(players[i])) progress({[c.kind]: 1, pts: each, cityTiles: c.kind === 'c' ? n : 0, roadTiles: c.kind === 'r' ? n : 0, bigc: c.kind === 'c' && n >= 5 ? 1 : 0, longr: c.kind === 'r' && n >= 4 ? 1 : 0}); });
     if (win.length && c.tiles && c.tiles[0]) featureConfetti(c.tiles[0], players[win[0]].col);
-    if (gameRules && gameRules.mode === 'epic' && (c.tiles.length >= 5 || c.tiles.some(x => TYPES[x.type] && TYPES[x.type].rare))) {
+    if (gameRules && gameRules.mode === 'epic' && (c.tiles.length >= 5 || c.tiles.some(x => TY(x.type) && TY(x.type).rare))) {
       setTimeout(() => toastAny(`🌟 Событие в Большой игре: ${KIND[c.kind]} завершён! (${c.tiles.length} карт)`), 500);
     }
   }
@@ -1592,8 +1704,8 @@ function handOver() { $('#over').hidden = true; beginHumanTurn(); }
 const softStart = () => (PG.game && PG.game.turns) ? PG.game.turns.isSoftStart(wallet.botlvl, PROG.st.games) : (wallet.botlvl === 'normal' && PROG.st.games < 3);
 const botLevel = () => (PG.game && PG.game.turns) ? PG.game.turns.resolveBotLevel(wallet.botlvl, PROG.st.games, PG.engine.bots.BOT_LEVELS) : (softStart() ? 'easy' : PG.engine.bots.BOT_LEVELS.includes(wallet.botlvl) ? wallet.botlvl : 'normal');
 const playerBotLevel = p => (players[p] && players[p].botlvl) || botLevel();
-const botPick = (type, p) => PG.engine.bots.levelPick(tiles, meeples, type, p, players.length, Math.random, playerBotLevel(p), players[p] && players[p].persona);
-const helperPick = (type, p) => PG.engine.bots.helperPick(tiles, meeples, type, p, players.length, Math.random);
+const botPick = (type, p) => BOTS.levelPick(tiles, meeples, type, p, players.length, Math.random, playerBotLevel(p), players[p] && players[p].persona);
+const helperPick = (type, p) => BOTS.helperPick(tiles, meeples, type, p, players.length, Math.random);
 async function aiTurn() {
   const p = turn, my = token, tt = turnTok;
   setStatus(`Ходит <b>${players[p].name}</b>…`);
@@ -1809,7 +1921,7 @@ function buildBoard() {
   return R;
 }
 function makeDeck(rules) {
-  const d = deckList(rules);
+  const d = rules.mode === 'hex' ? HX.deckList(rules) : deckList(rules);
   for (let i = d.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [d[i], d[j]] = [d[j], d[i]]; }
   return rules.deck ? d.slice(0, rules.deck) : d;
 }
@@ -1850,7 +1962,7 @@ function startGame(cfg, replay = []) {
   gameLog = {cfg, moves: replay.slice()};
   if (meepleResolve) { meepleResolve = null; mrow.hidden = true; prow.hidden = false; }
   // The menu shows a small built-up kingdom; the game itself starts from an empty table.
-  buildBoard(); buildMini();
+  useGeo(false); buildBoard(); buildMini(); useGeo(cfg.rules && cfg.rules.mode === 'hex');
   world.innerHTML = '<div class="ground"></div>'; try { initFog(); } catch(_) {}
   ghost = null; slotEls = []; meeples = []; doneFeats = []; turn = 0; phase = 'idle';
   const rules = gameRules = cfg.rules;
@@ -1881,9 +1993,9 @@ function startGame(cfg, replay = []) {
   Object.assign(cam, {px: 0, py: 0, z: Math.max(.7, Math.min(1.05, (document.documentElement.clientWidth / 2 - 54) / 136)), tilt: wallet.view === 'top' ? 22 : 55}); applyCam();
   $('#view').textContent = wallet.view === 'top' ? '2D' : '3D';
   renderPlayers(); renderResults(false);
-  if (replay.length || cfg.noIntro) { toast(`Первая карта из стопки: ${TYPES[first.type].name}`); return startTurn(); }
+  if (replay.length || cfg.noIntro) { toast(`Первая карта из стопки: ${TY(first.type).name}`); return startTurn(); }
   const my = token;
-  introThen(first, () => { if (my !== token) return; toast(`Первая карта из стопки: ${TYPES[first.type].name}`); startTurn(); });
+  introThen(first, () => { if (my !== token) return; toast(`Первая карта из стопки: ${TY(first.type).name}`); startTurn(); });
 }
 /* Opening of a new game: the stack is shuffled in the middle of the table, then its top card
    flies to the centre and becomes the first piece. Purely visual: the order is in cfg.deck. */
@@ -3443,12 +3555,12 @@ function peekSend() {
 }
 function peekClear() { if (peekEl) { peekEl.remove(); peekEl = null; } clearTimeout(peekT); peekT = 0; peekLast = ''; }
 function showPeek(m) {
-  if (phase !== 'remote' || !current || m.n !== applied || m.p !== turn || isLocal(m.p) || !Number.isInteger(m.x) || !Number.isInteger(m.y) || !(m.r >= 0 && m.r < 4)) return;
+  if (phase !== 'remote' || !current || m.n !== applied || m.p !== turn || isLocal(m.p) || !Number.isInteger(m.x) || !Number.isInteger(m.y) || !(m.r >= 0 && m.r < NDIR())) return;
   if (tiles.has(key(m.x, m.y)) || Math.abs(m.x) > 80 || Math.abs(m.y) > 80) return;
-  if (!peekEl) { peekDeg = m.r * 90; peekEl = tileEl({x: m.x, y: m.y, type: current.type, r: m.r}, false); peekEl.classList.add('ghost', 'peek'); world.append(peekEl); }
-  else peekDeg += (((m.r * 90 - peekDeg) % 360) + 540) % 360 - 180; // turn the short way
+  if (!peekEl) { peekDeg = m.r * ROT(); peekEl = tileEl({x: m.x, y: m.y, type: current.type, r: m.r}, false); peekEl.classList.add('ghost', 'peek'); world.append(peekEl); }
+  else peekDeg += (((m.r * ROT() - peekDeg) % 360) + 540) % 360 - 180; // turn the short way
   peekEl.style.setProperty('--pc', players[m.p].col);
-  peekEl.style.left = (m.x * T - T / 2) + 'px'; peekEl.style.top = (m.y * T - T / 2) + 'px';
+  const [pl, pt] = cellLT(m.x, m.y); peekEl.style.left = pl + 'px'; peekEl.style.top = pt + 'px';
   const f = peekEl.querySelector('.face'); if (f) f.style.setProperty('--r', peekDeg + 'deg');
 }
 function onMove(m) {

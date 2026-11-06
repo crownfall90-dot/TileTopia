@@ -4,6 +4,7 @@ import {TYPES, normEdge, rareName, deckList, isRareTile} from './engine/tiles.js
 import * as board from './engine/board.js';
 import * as scoring from './engine/scoring.js';
 import * as bots from './engine/bots.js';
+import * as hex from './engine/hex.js';
 import {createSound} from './audio/sound.js';
 import {walletSig, loadWallet, storeWallet} from './state/wallet.js';
 import * as progress from './state/progress.js';
@@ -41,7 +42,7 @@ import * as turns from './game/turns.js';
 import * as timers from './game/timers.js';
 import * as tutorial from './game/tutorial.js';
 
-export const engine = {rng, hash, TYPES, normEdge, rareName, deckList, isRareTile, board, scoring, bots};
+export const engine = {rng, hash, TYPES, normEdge, rareName, deckList, isRareTile, board, scoring, bots, hex};
 
 export const audio = {createSound};
 export const state = {walletSig, loadWallet, storeWallet, progress, catalog, config, status, save, reactions, usage};

@@ -1201,7 +1201,7 @@ html.tutoring #mrow .skip{display:none}
 
 .goldrow{display:grid;grid-template-columns:repeat(5,1fr);gap:6px}.goldrow span{display:flex;flex-direction:column;align-items:center;padding:8px 2px;border-radius:12px;background:rgba(255,255,255,.05);border:1px solid var(--line);font-size:16px}.goldrow b{font:800 13px var(--f-display);color:var(--brass)}
 
-.modecards{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.modecards{display:grid;grid-template-columns:repeat(2,1fr);gap:8px}
 
 .mcard{display:flex;flex-direction:column;align-items:center;gap:3px;padding:12px 6px;border-radius:16px;border:1.5px solid var(--line);background:rgba(255,255,255,.04);color:var(--ink);cursor:pointer;text-align:center}
 
@@ -5310,3 +5310,23 @@ html body .ocard details.more{margin:2px 0 12px;text-align:left}
 html body .ocard details.more summary{cursor:pointer;color:#8db4ff;font:600 13px var(--f-body);text-align:center;list-style:none}
 html body .ocard details.more p{margin:8px 0 0;font-size:12.5px;line-height:1.45;color:var(--muted)}
 html body .ocard details.more a{color:#8db4ff}
+
+/* ---- Classic 2.0: six-sided tiles (rules.mode 'hex', html.hexg while such a game is on). A tile is 101.6 x 88 px
+   (corner to corner x side to side, T = 88); the face is clipped to the hexagon, six walls hang from its sides. ---- */
+.tile.hex{width:101.61px;height:88px}
+.tile.hex .face{inset:0;border-radius:0;box-shadow:none;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)}
+.tile.hex .sd{position:absolute;height:14px;transform-origin:0 0;background:linear-gradient(#5f9a3e 0,#5f9a3e 2.5px,#8a6a40 3px,#6f5232 55%,#4a3520 100%)}
+.tile.hex .sd.h0,.tile.hex .sd.h1,.tile.hex .sd.h5{filter:brightness(1.12)}
+.tile.hex .sd.h2,.tile.hex .sd.h4{filter:brightness(.9)}
+.tile.hex .sd.fall::before{left:calc(50% - 6.5px);width:13px;top:0;bottom:0;right:auto;height:auto}
+.tile.hex .sd.fall::after{left:calc(50% - 11px);width:22px;bottom:-4px;height:8px;top:auto;right:auto}
+html.lowgfx .tile.hex .sd.h0,html.lowgfx .tile.hex .sd.h1,html.lowgfx .tile.hex .sd.h5{display:none}
+.tile.hex.ghost .face,.tile.hex.peek .face{box-shadow:none}
+.tile.hex.ghost::before,.tile.hex.peek::before{content:"";position:absolute;inset:-4px -4.6px;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);background:var(--pc,var(--brass));opacity:.85}
+.tile.hex.glow .face{box-shadow:none;filter:brightness(1.3) saturate(1.15) drop-shadow(0 0 6px #ffe08a)}
+.slot.hex{width:101.61px;border:none;border-radius:0;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);background:color-mix(in srgb,var(--pc,#f2b84b) 22%,rgba(0,0,0,.2))}
+.slot.hex::before{inset:4px;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);border-radius:0;opacity:.18}
+.slot.hex.tip{border:none;background:rgba(255,215,94,.4)}
+html.hexg .ct{width:84px;height:73px;border-radius:0;box-shadow:none;filter:drop-shadow(0 0 2px var(--c,transparent)) drop-shadow(0 10px 8px rgba(0,0,0,.5))}
+html.hexg .ct .face{border-radius:0;box-shadow:none;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)}
+html.hexg .ct::after{display:none}

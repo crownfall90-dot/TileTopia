@@ -58,7 +58,7 @@ test('G-5: Big game mode (epic) includes rare cards and triggers event celebrati
   assert.equal(fastDeck.filter(t => isRareTile(t)).length, 0);
 
   // In game.html: rare tile placement and big feature completion toasts
-  assert.match(html, /gameRules\.mode === 'epic' && TYPES\[t\.type\] && TYPES\[t\.type\]\.rare/);
+  assert.match(html, /gameRules\.mode === 'epic' && TY\(t\.type\) && TY\(t\.type\)\.rare/);
   assert.match(html, /🌟 Событие в Большой игре/);
 });
 
@@ -66,7 +66,7 @@ test('G-6: the duel mode is gone — no setting, no card, no counters', async ()
   const {MODES} = await import('../src/state/config.js');
   const {normalizeStats, recordGameMode, QUESTS, ACH} = await import('../src/state/progress.js');
   const html = fs.readFileSync(GAME_PATH, 'utf8');
-  assert.deepEqual(Object.keys(MODES), ['fast', 'classic', 'epic']);
+  assert.deepEqual(Object.keys(MODES), ['fast', 'classic', 'epic', 'hex']);
   const st = normalizeStats({byMode: {duel: {games: 5, wins: 4, best: 55}}, duelwin: 3});
   assert.ok(!('duel' in st.byMode) && !('duelwin' in st), 'old duel numbers are dropped');
   recordGameMode(st, 'duel', true, 45);

@@ -4,7 +4,8 @@
 export const SETUP_ICONS = {
   fast: '⚡',
   classic: '⚖️',
-  epic: '🏰'
+  epic: '🏰',
+  hex: '⬢'
 };
 
 export function renderModeCardsHtml(modes, selectedMode, locked = false) {

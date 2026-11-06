@@ -37,6 +37,20 @@ const SCENES = {
   setup: `await boot(); document.getElementById('btnMainPlay').click(); await wait(900); clear();`,
   game: `await boot(); document.getElementById('btnMainPlay').click(); await wait(900); clear();
     byText(/Начать партию/).click(); await wait(4500); clear(); await wait(300);`,
+  // Classic 2.0: six-sided tiles; a few turns on the first free slot so the board has more than one tile
+  hex: `await boot(); document.getElementById('btnMainPlay').click(); await wait(900); clear();
+    document.querySelector('[data-setmode="hex"]').click(); await wait(300);
+    byText(/Начать партию/).click(); await wait(4500); clear();
+    const board = document.getElementById('board'), ok = document.getElementById('ok');
+    for (let k = 0; k < 4; k++) {
+      for (let i = 0; i < 60 && !document.querySelector('.slot'); i++) await wait(500);
+      const s = document.querySelector('.slot'); if (!s) break;
+      const r = s.getBoundingClientRect(), at = {bubbles: true, clientX: r.x + r.width / 2, clientY: r.y + r.height / 2, pointerId: 1};
+      board.dispatchEvent(new PointerEvent('pointerdown', at)); board.dispatchEvent(new PointerEvent('pointerup', at)); await wait(400);
+      if (!ok.disabled) ok.click(); await wait(1500);
+      const skip = byText(/Без фишки/); if (skip) skip.click(); await wait(500);
+    }
+    await wait(6000); clear();`,
 };
 
 async function cdpConnect(url) {

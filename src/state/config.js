@@ -18,6 +18,8 @@ export const MODES = {
   fast: {label: 'Быстрая', desc: '30 плиток · ~8 мин · 4 мипла', set: {deck: 30, meeples: 4}},
   classic: {label: 'Классика', desc: '50 плиток · ~15 мин · 6 миплов', set: {deck: 50, meeples: 6}},
   epic: {label: 'Большая', desc: '100 плиток · ~30 мин · 8 миплов', set: {deck: 100, meeples: 8}},
+  // Classic 2.0: the same rules on six-sided tiles (src/engine/hex.js)
+  hex: {label: 'Классика 2.0', desc: 'Шестиугольные плитки · 50 плиток · 6 миплов', set: {deck: 50, meeples: 6}},
 };
 
 export const RULES = [
