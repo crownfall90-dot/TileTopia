@@ -101,7 +101,7 @@
 
       <section class="screen scroll" id="scr-shop" hidden>
         <div class="lb">
-          <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Витрина</b><span class="goldchip static"><i class="coin"></i><b class="goldN">0</b></span></div>
+          <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Витрина</b><span class="goldchip static coin3"><span><i class="coin copper"></i><b data-coin="copper">0</b></span><span><i class="coin silver"></i><b data-coin="silver">0</b></span><span><i class="coin gold"></i><b data-coin="gold">0</b></span></span></div>
           <div class="gift" id="gift"></div>
           <div class="exch" id="exch"></div>
           
@@ -213,7 +213,7 @@
 
       <section class="screen scroll" id="scr-achievements" hidden>
         <div class="lb">
-          <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Достижения</b><span class="goldchip static"><i class="coin"></i><b class="goldN">0</b></span></div>
+          <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Достижения</b><span class="goldchip static coin3"><span><i class="coin copper"></i><b data-coin="copper">0</b></span><span><i class="coin silver"></i><b data-coin="silver">0</b></span><span><i class="coin gold"></i><b data-coin="gold">0</b></span></span></div>
           <div class="col" id="achievementsContent"></div>
         </div>
       </section>
@@ -2184,6 +2184,7 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) logFl
 function saveWallet() {
   PG.state.storeWallet(localStorage, wallet);
   document.querySelectorAll('.goldN').forEach(e => e.textContent = wallet.gold);
+  document.querySelectorAll('[data-coin]').forEach(e => e.textContent = COINS.balance(wallet, e.dataset.coin));
   if (typeof cloudSaveSoon === 'function') cloudSaveSoon();
 }
 function timeUntilMidnightStr() {
@@ -2469,7 +2470,10 @@ function paintFigures() {
   figStyle.textContent = css;
 }
 const meepleImg = i => SPR['m' + i] ? `<img src="${SPR['m' + i].url}" alt="">` : meepleSvg(players[i].col);
-const figPreview = (() => { const cache = {}; return fig => cache[fig] || (cache[fig] = (() => { const [c, g] = cv(40, 52, 3); drawFigure(g, 40, 52, '#ef5350', fig); return c.toDataURL(); })()); })();
+// The shop shows each figure as a little 3D character (tools/blender_generators/generate_figurines.py, assets/figs);
+// a figure without one is drawn as on the board.
+const FIG_ART = ['classic', 'peasant', 'monk', 'knight', 'archer', 'wizard', 'ninja', 'paladin', 'king', 'queen'];
+const figPreview = (() => { const cache = {}; return fig => FIG_ART.includes(fig) ? `figs/${fig}.webp` : cache[fig] || (cache[fig] = (() => { const [c, g] = cv(40, 52, 3); drawFigure(g, 40, 52, '#ef5350', fig); return c.toDataURL(); })()); })();
 
 async function redeemPromo(code) {
   code = (code || '').trim().toUpperCase();
@@ -4730,14 +4734,15 @@ function renderMenuProfile() {
   const silver = (typeof wallet.silver === 'number') ? wallet.silver : 0;
   const goldCoins = (typeof wallet.goldCoins === 'number') ? wallet.goldCoins : ((typeof wallet.gold_rare === 'number') ? wallet.gold_rare : 0);
 
-  if (st) st.innerHTML = `<button class="mpc" data-go="rating" title="Рейтинг игроков" aria-label="Кубки: ${PROG.cups || 0}. Открыть рейтинг"><svg class="cup-svg-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffd875" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M6 9H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2"/><path d="M18 9h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2"/><path d="M6 3h12v7a6 6 0 0 1-12 0V3z"/><path d="M12 16v4"/><path d="M8 20h8"/></svg> <b class="cupsN">${PROG.cups || 0}</b><small>кубков</small><i>›</i></button>`
-    + `<button class="mpg menu-cur-trio" data-go="shop" title="Витрина и кошелёк" aria-label="Медь: ${copper}, Серебро: ${silver}, Золото: ${goldCoins}">`
+  // Under the plate: the three coins, plain (to the shop), then the trophies (to the rating).
+  if (st) st.innerHTML = `<button class="mpg menu-cur-trio" data-go="shop" title="Витрина и кошелёк" aria-label="Медь: ${copper}, Серебро: ${silver}, Золото: ${goldCoins}">`
     + `<span class="mcur-item copper" title="Медные монеты"><i class="coin copper"></i><b>${copper}</b></span>`
     + `<span class="mcur-sep"></span>`
     + `<span class="mcur-item silver" title="Серебряные монеты"><i class="coin silver"></i><b>${silver}</b></span>`
     + `<span class="mcur-sep"></span>`
     + `<span class="mcur-item gold" title="Золотые монеты"><i class="coin gold"></i><b>${goldCoins}</b></span>`
-    + `</button>`;
+    + `</button>`
+    + `<button class="mpc" data-go="rating" title="Рейтинг игроков" aria-label="Кубки: ${PROG.cups || 0}. Открыть рейтинг"><svg class="cup-svg-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffd875" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M6 9H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2"/><path d="M18 9h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2"/><path d="M6 3h12v7a6 6 0 0 1-12 0V3z"/><path d="M12 16v4"/><path d="M8 20h8"/></svg> <b class="cupsN">${PROG.cups || 0}</b><small>кубков</small><i>›</i></button>`;
   renderMenuQuestBanner();
 }
 function renderProfile() {

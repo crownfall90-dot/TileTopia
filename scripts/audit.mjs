@@ -61,7 +61,7 @@ const SCENES = {
   settings: go('settings'),
   shopStalls: go('shop') + ` document.getElementById('dailyShopWrap').scrollIntoView(); await wait(300);`,
   shopStalls2: go('shop') + ` const w = document.getElementById('dailyShopWrap'); w.scrollIntoView(); document.getElementById('scr-shop').scrollTop += 700; await wait(300);`,
-  quests: go('progress') + ` const q = document.getElementById('btnRoadQuests'); if (!q) throw new Error('no quests button'); q.click(); await wait(900);`,
+  quests: go('progress') + ` clear(); const q = document.getElementById('btnRoadQuests'); if (!q) throw new Error('no quests button'); const r = q.getBoundingClientRect(), top = document.elementFromPoint(r.x + r.width / 2, r.y + r.height / 2); if (!q.contains(top)) console.error('quests button covered by ' + (top && (top.id || top.className))); q.click(); await wait(900); clear();`,
   menuQuests: `await boot(); const b = document.querySelector('[data-nav="progress"], .tile-quest, #btnMenuQuests'); if (b) b.click(); await wait(900);`,
   setup: `await boot(); openSetup('bots'); await wait(900); clear();`,
   game: `await boot(); openSetup('bots'); await wait(900); clear(); byText(/Начать партию/).click(); await wait(5000); clear();`,
