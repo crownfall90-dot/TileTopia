@@ -6630,7 +6630,7 @@ html body #btnMenuNotif .nb-icon svg {
   width: 100vw !important;
   max-width: 100vw !important;
   overflow-x: hidden;
-  position: relative;
+  /* a screen keeps .screen's position: absolute; inset: 0, so it is as tall as the phone and the road scrolls inside */
   background: linear-gradient(160deg, #78b84e 0%, #5a963b 100%);
 }
 
@@ -6639,7 +6639,9 @@ html body #btnMenuNotif .nb-icon svg {
   max-width: 540px;
   margin: 0 auto;
   position: relative;
+  padding: calc(var(--it, 0px) + 64px) 0 96px;   /* room for the floating Back / Quests buttons and the bottom bar */
 }
+#scr-progress.scr-road-fullscreen .rd-head, #scr-progress.scr-road-fullscreen .rd-next { margin-left: 14px; margin-right: 14px; }
 
 #scr-progress.scr-road-fullscreen .rd-map {
   width: 100% !important;
@@ -6650,7 +6652,7 @@ html body #btnMenuNotif .nb-icon svg {
 
 .road-floating-hud {
   position: fixed;
-  top: 14px;
+  top: calc(var(--it, 0px) + 14px);
   left: 12px;
   right: 12px;
   display: flex;
@@ -7182,6 +7184,9 @@ html body #btnMenuNotif .nb-icon svg {
   height: 44px;
   color: #fff;
 }
+
+/* achievement icons: the emoji stays inside its 40 px tile */
+html body .ach-card .qi{overflow:hidden;font-size:20px;line-height:1}
 </style>
 
 <div class="page">
@@ -8689,7 +8694,9 @@ async function afterPlace(t, p, forced) {
     : []).concat(players[p].meeples > 0 ? mine.map(m => ({t: m.t, g: m.g, done: true})) : []);
   let choice = null; // {t, g} or null
   if (forced !== undefined) {
-    choice = forced; // already {t, g} or null from caller
+    // a move from the network or the history: its figure counts only where the rules allow one (a changed client could
+    // otherwise stand on a taken object, on any card, or with no figures left)
+    choice = forced && forced.g && opts.some(o => gid(o.t, o.g) === gid(forced.t, forced.g)) ? forced : null;
   } else if (opts.length) {
     if (isLocal(p) && !(autoMove && autoAway)) {
       // Time ran out: the card was put down for you; 10 more seconds to place a figure.
@@ -11786,22 +11793,16 @@ function toggleRoadQuestsSheet(open) {
 
 function renderRoadQuestsInSheet() {
   const body = $('#roadQuestsSheetBody');
-  if (!body) return;
-  if (PG.ui.progress && PG.ui.progress.renderRewardsTabHtml) {
-    body.innerHTML = PG.ui.progress.renderRewardsTabHtml({
-      dailyQuests: getDailyQuests(today()),
-      progQuests: PROG.q || {},
-      weeklyGoals: WEEKLY_GOALS,
-      progWeekly: PROG.wq || {},
-      freeSwapUsed: Boolean(wallet.freeSwapDay === today()),
-      nextQuestTimeStr: timeUntil9AMStr(),
-      weeklyChestReady: Boolean((PROG.wq && PROG.wq.c3 && PROG.wq.c3.claimed) && (!wallet.weeklyChestClaimed || wallet.weeklyChestClaimed !== curWeekId())),
-      weeklyChestClaimed: Boolean(wallet.weeklyChestClaimed && wallet.weeklyChestClaimed === curWeekId()),
-      claimedQuests: wallet.claimedQuests || [],
-      claimedGoals: wallet.claimedGoals || []
-    });
-    wireRewardsTabEvents(body);
-  }
+  if (body) body.innerHTML = rewardsHtml();
+}
+// Daily quests, weekly goals with the big chest, achievements: the list in the quests sheet of the progress screen.
+function rewardsHtml() {
+  questsWeekly();
+  return PG.ui.progress.renderRewardsTabHtml({
+    progQuests: PROG.q || [], questDefs: QUESTS, canReroll: PROG.qre !== PROG.day,
+    progWeekly: PROG.wq || [], weeklyDefs: WEEKLY_ALL, weeklyChestGold: WEEKLY_CHEST_GOLD || 100, weeklyChestClaimed: !!PROG.wchest,
+    achDefs: ACH, progAch: PROG.ach || {}, progStats: PROG.st || {}, progLvl: PROG.lvl || 1, rewardReady: rewardReady()
+  });
 }
 
 setTimeout(() => {
@@ -11924,6 +11925,7 @@ function renderProfile() {
 
 function renderTasks() {
   questsToday();
+  if (ptab !== 'road') { ptab = 'road'; setTimeout(() => toggleRoadQuestsSheet(true)); }
   document.querySelectorAll('#ptabs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.pt === ptab));
   ptabsDot();
   const el = $('#ptab');
@@ -12256,6 +12258,7 @@ $('#rtabs').onclick = e => {
 function renderProgress() {
   renderProfile();
   renderTasks();
+  const sheet = $('#roadQuestsSheet'); if (sheet && !sheet.hidden) renderRoadQuestsInSheet();
 }
 // The progress screen may have no tabs (the full-screen road): a missing element must not stop the game from starting.
 if ($('#ptabs')) $('#ptabs').onclick = e => {
@@ -12264,7 +12267,7 @@ if ($('#ptabs')) $('#ptabs').onclick = e => {
   renderTasks();
 };
 
-$('#ptab').addEventListener('click', e => {
+function onProgressClick(e) {
   const road = e.target.closest('[data-claimroad]');
   if (road) return claimRoadMilestone(road.dataset.claimroad);
   const q = e.target.closest('[data-claimq]'), a = e.target.closest('[data-claima]'), wq = e.target.closest('[data-claimwq]'), wch = e.target.closest('[data-claimwchest]'), cl = e.target.closest('[data-claimcol]');
@@ -12291,7 +12294,9 @@ $('#ptab').addEventListener('click', e => {
   }
   else return;
   beep('coin'); saveWallet(); progressDot(); renderProgress(); if (typeof renderAchievements === 'function' && !$('#scr-achievements').hidden) renderAchievements(); renderMenuProfile();
-});
+}
+$('#ptab').addEventListener('click', onProgressClick);
+if ($('#roadQuestsSheetBody')) $('#roadQuestsSheetBody').addEventListener('click', onProgressClick);
 /* Rating: cups from online games (1st +30, 2nd +15, 3rd +5, draw +10) in /leaders, top 50.
    The database rules let a player raise their own score by at most 30 a minute, so a big
    backlog goes up in steps. */
