@@ -10,6 +10,10 @@ on:
         description: 'Release notes (leave empty to use release-notes.md)'
         type: string
         default: ''
+      announce:
+        description: 'Post the release in the Telegram channel'
+        type: boolean
+        default: false
 
 permissions:
   contents: write
@@ -74,10 +78,12 @@ jobs:
       - name: Publish GitHub Release
         env:
           GH_TOKEN: ${{ github.token }}
+          OTA_SIGNING_KEY: ${{ secrets.OTA_SIGNING_KEY }}
         run: |
           python3 -c 'import json,os; c=int(os.environ["CODE"]); r=os.environ["GITHUB_REPOSITORY"]; json.dump({"code": c, "version": "1.0.%d" % c, "mandatory": True, "notes": open("release-notes.md", encoding="utf-8").read().strip(), "url": "https://github.com/%s/releases/download/v%d/Tiletopia-1.0.%d.apk" % (r, c, c), "cert": os.environ.get("SIGNING_CERT_SHA256") or "d4409cee878c4142c7d28039571023d693071fd8c88bfdd72b73aa52f2154d76", "package": "app.crownfall.tiletopia"}, open("latest.json", "w", encoding="utf-8"), ensure_ascii=False)'
           cp "Tiletopia-1.0.$CODE.apk" Tiletopia.apk
-          gh release create "v$CODE" "Tiletopia-1.0.$CODE.apk" Tiletopia.apk "Tiletopia-1.0.$CODE-google-play.aab" latest.json \
+          python3 scripts/ci/make-web-ota.py "$CODE" "v$CODE" web
+          gh release create "v$CODE" "Tiletopia-1.0.$CODE.apk" Tiletopia.apk "Tiletopia-1.0.$CODE-google-play.aab" latest.json $(ls web.html web.json 2>/dev/null) \
             --target "$(git rev-parse HEAD)" --title "1.0.$CODE" --notes-file release-notes.md --latest
 
       - name: Build and deploy Web to GitHub Pages
@@ -98,7 +104,8 @@ jobs:
           python3 scripts/fcm-send.py updates-github "$CODE" "1.0.$CODE" release-notes.md
 
       - name: Announce in Telegram
-        # Optional: runs only when the secrets exist; a Telegram failure never fails the release.
+        # Only when asked for (the announce input); a Telegram failure never fails the release.
+        if: inputs.announce
         continue-on-error: true
         env:
           TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}

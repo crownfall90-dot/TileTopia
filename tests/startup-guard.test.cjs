@@ -25,3 +25,20 @@ test('start-up: the game says it is ready only at the end of its start-up, and t
   assert.match(guard, /startUpdate\(u\.url\)/);
   assert.equal((wrap.match(/cat web\/boot-guard\.js/g) || []).length, 2, 'both the app and the site get the guard');
 });
+
+test('updates over the air: the page reports its start, the app checks a signature, CI signs with the secret', () => {
+  const ready = html.indexOf('window.__ready = true;');
+  assert.ok(html.indexOf('AndroidApp.contentReady()', ready) > ready, 'the page tells the app it started, after __ready');
+  const cu = fs.readFileSync('app/src/main/java/com/crownfall/mosaic/ContentUpdater.java', 'utf8');
+  assert.match(cu, /PUBLIC_KEY = "MFkw[A-Za-z0-9+/=]+"/, 'a P-256 public key is built in');
+  assert.match(cu, /SHA256withECDSA/);
+  assert.match(cu, /markBad/);
+  const act = fs.readFileSync('app/src/main/java/com/crownfall/mosaic/MainActivity.java', 'utf8');
+  assert.match(act, /loadDataWithBaseURL\(ContentUpdater\.BUNDLED/, 'a downloaded page runs at the bundled address (same saves)');
+  for (const w of ['staging.yml', 'promote-production.yml']) {
+    const y = fs.readFileSync('.github/workflows/' + w, 'utf8');
+    assert.match(y, /OTA_SIGNING_KEY: \$\{\{ secrets\.OTA_SIGNING_KEY \}\}/, w);
+    assert.match(y, /scripts\/ci\/make-web-ota\.py/, w);
+  }
+  assert.match(fs.readFileSync('.github/workflows/promote-production.yml', 'utf8'), /if: inputs\.announce/, 'Telegram only on request');
+});

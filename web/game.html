@@ -8070,6 +8070,8 @@ const loaderReady = Promise.all(Object.keys(TYPES).map(k => new Promise(res => {
   });
 });
 window.__ready = true;
+// tell the app the page started: a game update downloaded over the air is then kept (ContentUpdater.java)
+try { if (window.AndroidApp && AndroidApp.contentReady) AndroidApp.contentReady(); } catch (_) {}
 // In the app the loader stays a moment as a splash, long enough to see a few tiles land.
 // On app start the splash lays one full fitting 3x3 (restarted once the real pieces are in).
 { const el = $('#boot'); if (el) {

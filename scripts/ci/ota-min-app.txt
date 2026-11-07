@@ -1,0 +1,1 @@
+1  the oldest APK version code whose native side (AndroidApp) the game page needs; see scripts/ci/make-web-ota.py
