@@ -34,6 +34,10 @@ if [ "$target" = web ]; then
   rm -rf "$site"; mkdir -p "$site/staging"
   cp -r app/src/main/assets/fonts "$site/fonts"
   cp -r app/src/main/assets/fonts "$site/staging/fonts"
+  if [ -d app/src/main/assets/hex ]; then              # Classic 2.0 cards (tools/blender_generators/generate_hex_tiles.py)
+    cp -r app/src/main/assets/hex "$site/hex"
+    cp -r app/src/main/assets/hex "$site/staging/hex"
+  fi
   cp -r web/icons "$site/icons"
   cp -r web/icons "$site/staging/icons"
   cp web/manifest.webmanifest "$site/"
