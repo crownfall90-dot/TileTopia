@@ -46,11 +46,24 @@ public class MainActivity extends Activity {
     private boolean pageReady;
     /** An invite link the game was opened with; handed to the page once it has loaded. */
     private String pendingLink;
+    /** Game updates over the air (ContentUpdater): the downloaded page, its start watchdog. */
+    private ContentUpdater ota;
+    private boolean contentStarted;
+    private final Runnable otaWatch = () -> {
+        // the downloaded page did not start in time: drop it and start the APK's own
+        if (contentStarted || ota == null || ota.loaded == 0 || web == null) return;
+        report(new IllegalStateException("OTA page " + ota.loaded + " did not start"));
+        ota.markBad(ota.loaded);
+        ota.loaded = 0;
+        pageReady = false;
+        web.loadUrl(ContentUpdater.BUNDLED);
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         updater = new Updater(this);
+        ota = new ContentUpdater(this);
         // Background helpers must never stop the game from opening.
         try {
             UpdateNotifier.schedule(this);
@@ -255,7 +268,19 @@ public class MainActivity extends Activity {
             }
         });
         root.addView(web, new FrameLayout.LayoutParams(-1, -1));
-        web.loadUrl("file:///android_asset/index.html");
+        // the newest good game page downloaded over the air, else the APK's own (same address: same saves and storage)
+        contentStarted = false;
+        handler.removeCallbacks(otaWatch);
+        String page = null;
+        try {
+            page = ota.pageToLoad();
+        } catch (Exception e) {
+            report(e);
+        }
+        if (page != null) {
+            web.loadDataWithBaseURL(ContentUpdater.BUNDLED, page, "text/html", "utf-8", null);
+            handler.postDelayed(otaWatch, ContentUpdater.READY_MS);
+        } else web.loadUrl(ContentUpdater.BUNDLED);
     }
 
     @Override
@@ -291,6 +316,7 @@ public class MainActivity extends Activity {
     void checkSoon() {
         handler.removeCallbacks(recheck);
         try {
+            ota.checkInBackground();
             updater.check(false);
         } catch (Exception e) {
             report(e);
@@ -348,6 +374,22 @@ public class MainActivity extends Activity {
     }
 
     private class Bridge {
+        /** The game has started (end of its start-up): a page downloaded over the air is good. */
+        @JavascriptInterface
+        public void contentReady() {
+            runOnUiThread(() -> {
+                contentStarted = true;
+                handler.removeCallbacks(otaWatch);
+                if (ota != null) ota.ready();
+            });
+        }
+
+        /** The version of the game page running now: 0 for the APK's own, else the downloaded one's release code. */
+        @JavascriptInterface
+        public int contentCode() {
+            return ota == null ? 0 : ota.loaded;
+        }
+
         /** The system page of this app (with its "Uninstall" button): used for the one-time reinstall after a key change. */
         @JavascriptInterface
         public void openAppSettings() {

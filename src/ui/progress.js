@@ -99,11 +99,71 @@ export function renderRewardsTabHtml({
   const chestRow = `<div class="quest weekly-chest${weeklyChestClaimed ? ' got' : allWqGot ? ' done' : ''}"><span class="qi">🎁</span><span class="qt"><b>Большой сундук недели</b><small>${weeklyChestClaimed ? 'Сундук недели открыт' : allWqGot ? 'Все цели недели достигнуты!' : 'Выполните все ${progWeekly.length} цели недели'} · <i class="coin"></i> ${weeklyChestGold}</small></span>${weeklyChestClaimed ? '<span class="pill">Получено</span>' : allWqGot ? '<button class="chip pri" data-claimwchest="1">Забрать +100</button>' : '<span class="pill lock">Заперт</span>'}</div>`;
   const wqGot = progWeekly.filter(q => q.got).length;
 
-  const qGot = progQuests.filter(q => q.got).length, aGot = achDefs.filter(a => progAch[a.id] === 'got').length;
+  const qGot = progQuests.filter(q => q.got).length;
   const nearQ = progQuests.filter(q => !q.got).map(q => ({q, Q: questDefs.find(x => x.id === q.id)})).filter(x => x.Q).sort((a, b) => (a.Q.n - a.q.n) / a.Q.n - (b.Q.n - b.q.n) / b.Q.n)[0];
   const goalLine = rewardReady ? '<div class="goalline ready">🎁 Есть награды: заберите их ниже</div>' : nearQ ? `<div class="goalline">🎯 Ближайшая цель: <b>${nearQ.Q.t}</b> · ${nearQ.q.n}/${nearQ.Q.n}</div>` : '<div class="goalline">✅ Все задания на сегодня выполнены</div>';
 
-  return `${goalLine}<div class="h3 sec">Задания на сегодня<em>${qGot} / ${progQuests.length}</em></div>${qRows}<div class="h3 sec">Недельные цели<em>${wqGot} / ${progWeekly.length}</em></div>${wqRows}${chestRow}<div class="h3 sec">Достижения<em>${aGot} / ${achDefs.length}</em></div>${aRows}`;
+  return `${goalLine}<div class="h3 sec">Задания на сегодня<em>${qGot} / ${progQuests.length}</em></div>${qRows}<div class="h3 sec">Недельные цели<em>${wqGot} / ${progWeekly.length}</em></div>${wqRows}${chestRow}`;
+}
+
+/** Generates HTML markup for the dedicated Achievements screen. */
+export function renderAchievementsHtml({
+  achDefs = [],
+  progAch = {},
+  progStats = {},
+  progLvl = 1,
+} = {}) {
+  const rank = (done, got) => got ? 2 : done ? 0 : 1;
+  const readyCount = achDefs.filter(a => !progAch[a.id] && a.ok(progStats, progLvl)).length;
+  const gotCount = achDefs.filter(a => progAch[a.id] === 'got').length;
+  const totalCount = achDefs.length;
+
+  const tierNames = { 1: 'Бронза', 2: 'Серебро', 3: 'Золото', 4: 'Платина' };
+
+  const aRows = [...achDefs].sort((a, b) => {
+    const rA = rank(a.ok(progStats, progLvl), progAch[a.id] === 'got');
+    const rB = rank(b.ok(progStats, progLvl), progAch[b.id] === 'got');
+    if (rA !== rB) return rA - rB;
+    return (a.tier || 1) - (b.tier || 1);
+  }).map(a => {
+    const ok = a.ok(progStats, progLvl), got = progAch[a.id] === 'got';
+    const tierName = tierNames[a.tier] || '';
+    const tierTag = tierName ? `<span class="ach-tier-tag tier-${a.tier}">${tierName}</span>` : '';
+    const statusPill = got
+      ? '<span class="pill ach-done-pill">Получено ✓</span>'
+      : ok
+      ? `<button class="chip pri ach-claim-btn" data-claima="${a.id}">Забрать +${a.g} <i class="coin"></i></button>`
+      : '<span class="pill lock">В процессе</span>';
+
+    return `
+      <div class="quest ach-card${got ? ' got' : ok ? ' done ready-glow' : ' lock'}${a.tier ? ' tier-' + a.tier : ''}">
+        <span class="qi ach-qi">${a.ic}</span>
+        <span class="qt ach-qt">
+          <div class="ach-row-head">
+            <b>${a.t}</b>
+            ${tierTag}
+          </div>
+          <small class="ach-desc">${a.d}</small>
+          <div class="ach-reward-val"><i class="coin"></i> +${a.g} монет</div>
+        </span>
+        <div class="ach-action-wrap">
+          ${statusPill}
+        </div>
+      </div>`;
+  }).join('');
+
+  const summaryHeader = `
+    <div class="ach-header-card">
+      <div class="ach-header-left">
+        <span class="ach-trophy-icon">🎖️</span>
+        <div>
+          <h3>Достижения</h3>
+          <p>Собрано <b>${gotCount}</b> из <b>${totalCount}</b> достижений${readyCount ? ` · <b class="ach-ready-notice">${readyCount} готово к получению!</b>` : ''}</p>
+        </div>
+      </div>
+    </div>`;
+
+  return `${summaryHeader}<div class="ach-list">${aRows}</div>`;
 }
 
 /** Generates HTML markup for match history tab. */

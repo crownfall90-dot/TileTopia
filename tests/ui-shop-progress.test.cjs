@@ -4,7 +4,7 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 
 test('ui/shop: renderGiftCard, renderFiguresGrid, renderFramesGrid, renderLocationsGrid', async () => {
-  const {renderGiftCard, renderFiguresGrid, renderFramesGrid, renderLocationsGrid} = await import('../src/ui/shop.js');
+  const {renderGiftCard, renderGiftTrioShowcase, renderFiguresGrid, renderFramesGrid, renderLocationsGrid} = await import('../src/ui/shop.js');
 
   // Gift card markup
   const readyCard = renderGiftCard({giftReady: true, chestSvg: '<svg>chest</svg>', boosts: {double: 2}});
@@ -15,6 +15,34 @@ test('ui/shop: renderGiftCard, renderFiguresGrid, renderFramesGrid, renderLocati
   const waitingCard = renderGiftCard({giftReady: false, chestSvg: '<svg>chest</svg>', boosts: {}});
   assert.ok(!waitingCard.includes('ready'));
   assert.ok(!waitingCard.includes('id="openGift"'));
+
+  // Trio showcase ready markup
+  const trioReady = renderGiftTrioShowcase({
+    giftReady: true,
+    day: 1,
+    streakDays: [15, 25, 40, 60],
+    chestSvg: '<svg>chest</svg>',
+    boosts: {double: 1}
+  });
+  assert.ok(trioReady.includes('Три сундука удачи'));
+  assert.ok(trioReady.includes('Выбрать 👆'));
+  assert.ok(trioReady.includes('data-gidx="0"'));
+  assert.ok(trioReady.includes('data-gidx="1"'));
+  assert.ok(trioReady.includes('data-gidx="2"'));
+
+  // Trio showcase claimed markup: single opened chest with return tomorrow message
+  const trioClaimed = renderGiftTrioShowcase({
+    giftReady: false,
+    options: [{title: '+35 золота'}, {title: '×2 золото'}, {title: '+1 фигурка'}],
+    chosenIdx: 0,
+    nextGiftTimeStr: '08:15:30',
+    chestSvg: '<svg>chest</svg>',
+    chestOpenedSvg: '<svg>open</svg>'
+  });
+  assert.ok(trioClaimed.includes('Подарок уже забран'));
+  assert.ok(trioClaimed.includes('Возвращайтесь завтра'));
+  assert.ok(trioClaimed.includes('08:15:30'));
+  assert.ok(trioClaimed.includes('gift-claimed-art'));
 
   // Figures grid markup
   const figs = {
@@ -197,4 +225,57 @@ test('ui/progress: ringSvg, renderMasteryGrid, renderBuildingStats, renderCollec
   assert.ok(historyHtml.includes('Победа'));
   assert.ok(historyHtml.includes('онлайн'));
   assert.ok(historyHtml.includes('data-pl="u2"'));
+
+  // Dedicated achievements screen markup
+  const {renderAchievementsHtml} = await import('../src/ui/progress.js');
+  const achHtml = renderAchievementsHtml({
+    achDefs: [
+      {id: 'a1', ic: '🥇', t: 'Первая победа', d: 'Выиграйте матч', ok: () => true, g: 30, tier: 1},
+      {id: 'a2', ic: '👑', t: 'Король стола', d: 'Наберите 100 очков', ok: () => false, g: 50, tier: 3}
+    ],
+    progAch: {a1: 'got'},
+    progStats: {wins: 1},
+    progLvl: 2
+  });
+  assert.ok(achHtml.includes('Достижения'));
+  assert.ok(achHtml.includes('Первая победа'));
+  assert.ok(achHtml.includes('Король стола'));
+  assert.ok(achHtml.includes('Получено ✓'));
+  assert.ok(achHtml.includes('В процессе'));
+  assert.ok(achHtml.includes('tier-1'));
+
+  // Separate shop stalls showcase (5 stalls: figures, frames, statuses, emotes, phrases)
+  const {renderShopStallsShowcase, getStallUnownedItems} = await import('../src/ui/shop.js');
+  const unownedSample = [
+    {key: '1', price: 10}, {key: '2', price: 20}, {key: '3', price: 30},
+    {key: '4', price: 40}, {key: '5', price: 50}, {key: '6', price: 60},
+    {key: '7', price: 70}, {key: '8', price: 80}
+  ];
+  const picked6 = getStallUnownedItems(unownedSample, '2026-11-07:test', 6);
+  assert.equal(picked6.length, 6, 'max 6 items per stall');
+
+  const stallsHtml = renderShopStallsShowcase({
+    figs: {
+      guard: {name: 'Стражник', price: 100},
+      merchant: {name: 'Купец', price: 150}
+    },
+    frames: {
+      silver: {name: 'Серебряная', price: 80, ring: 'silver'}
+    },
+    statuses: [
+      {id: 'st1', text: 'Барон', price: 50}
+    ],
+    wallet: {gold: 500, owned: ['classic'], frames: [], statuses: []},
+    figPreview: k => `img/${k}.png`,
+    initial: 'П',
+    date: new Date('2026-11-07T12:00:00Z')
+  });
+
+  assert.ok(stallsHtml.includes('Прилавок фигурок'));
+  assert.ok(stallsHtml.includes('Прилавок рамок'));
+  assert.ok(stallsHtml.includes('Прилавок статусов'));
+  assert.ok(stallsHtml.includes('Прилавок эмодзи'));
+  assert.ok(stallsHtml.includes('Прилавок фраз'));
+  assert.ok(stallsHtml.includes('fig-pedestal-wrap'));
+  assert.ok(stallsHtml.includes('stall-3x2'));
 });

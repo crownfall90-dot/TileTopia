@@ -15,31 +15,77 @@ export function renderGiftCard({giftReady, chestSvg, boosts = {}, nextGiftTimeSt
   return `<div class="chest${giftReady ? ' ready' : ''}">${chestSvg}</div>` +
     `<div class="gi"><b>Ежедневный подарок</b>${statusLabel}<small>${giftReady ? 'Выберите 1 из 3 сундуков удачи!' : 'Следующий подарок — завтра'}` +
     `${inv ? '<br>У вас: ' + inv : ''}</small></div>` +
-    `${giftReady ? '<button class="cta" id="openGift">Открыть</button>' : '<button class="ghostbtn sm" id="openGiftCalendar" title="Календарь наград">Календарь</button>'}`;
+    `${giftReady ? '<button class="cta" id="openGift">Открыть</button>' : ''}`;
 }
 
-/** Generates HTML for the 7-day reward calendar track. */
-export function renderGiftCalendarHtml({streakDays = [15, 25, 'x2', 40, '+1♟', 60, '150👑'], currentDay = 0, isClaimedToday = false}) {
-  const cells = streakDays.map((reward, i) => {
-    const isDone = i < currentDay || (i === currentDay && isClaimedToday);
-    const isCurrent = i === currentDay && !isClaimedToday;
-    const isSpecial = i === 6;
-    let label = '';
-    if (typeof reward === 'number') {
-      label = `<i class="coin"></i>${reward}`;
-    } else if (reward === 'x2') {
-      label = '⚡ ×2';
-    } else if (reward === '+1♟') {
-      label = '♟️ +1';
-    } else {
-      label = `${reward}`;
-    }
-    return `<div class="gcal-day${isDone ? ' done' : ''}${isCurrent ? ' now' : ''}${isSpecial ? ' mega' : ''}">` +
-      `<span class="gcal-num">День ${i + 1}</span>` +
-      `<span class="gcal-rew">${isDone ? '✓' : label}</span>` +
-      `</div>`;
+/** Generates HTML markup for the 3 Chests of Luck directly in the showcase. */
+export function renderGiftTrioShowcase({
+  giftReady = true,
+  options = [],
+  chosenIdx = null,
+  nextGiftTimeStr = '',
+  chestSvg = '',
+  chestOpenedSvg = '',
+  boosts = {}
+} = {}) {
+  const inv = [
+    boosts.double ? `Двойное золото ×${boosts.double}` : '',
+    boosts.meeple ? `+1 фигурка ×${boosts.meeple}` : '',
+  ].filter(Boolean).join(' · ');
+
+  const footerHtml = inv ? `
+    <div class="gift-showcase-footer">
+      <small class="gift-inv-badge">У вас в запасе: ${inv}</small>
+    </div>` : '';
+
+  // Если подарок уже получен сегодня: показываем открытый сундук с понятной надписью "Возвращайтесь завтра"
+  if (!giftReady) {
+    const chosenOpt = (chosenIdx !== null && options && options[chosenIdx]) ? options[chosenIdx] : null;
+    return `
+      <div class="gift-showcase-card claimed-today">
+        <div class="gift-showcase-header">
+          <div class="gift-badge-pill done">✓ ПОДАРОК ПОЛУЧЕН</div>
+          <h3>Подарок уже забран</h3>
+          <p class="gift-showcase-sub">Вы уже забрали сегодняшний подарок${chosenOpt ? ` (<b>${chosenOpt.title}</b>)` : ''}. Возвращайтесь завтра за новым сундуком!</p>
+        </div>
+        <div class="gift-claimed-single">
+          <div class="gift-claimed-art">${chestOpenedSvg || chestSvg}</div>
+          <div class="gift-claimed-info">
+            <span class="gift-claimed-status">Открыто на сегодня</span>
+            <span class="gift-claimed-timer">Следующий подарок через: <b id="giftCountdown" class="countdown-gold">${nextGiftTimeStr || 'завтра'}</b></span>
+          </div>
+        </div>
+        ${footerHtml}
+      </div>`;
+  }
+
+  // Когда подарок готов к открытию: 3 сундука удачи на выбор
+  const chestsHtml = [0, 1, 2].map(idx => {
+    return `
+      <button class="gift-chest-btn idle" data-gidx="${idx}" aria-label="Сундук ${idx + 1}">
+        <div class="gift-chest-art">${chestSvg}</div>
+        <span class="gift-chest-name">Сундук ${idx + 1}</span>
+        <span class="gift-chest-hint choose-hint">Выбрать 👆</span>
+      </button>`;
   }).join('');
-  return `<div class="gcal-track">${cells}</div>`;
+
+  return `
+    <div class="gift-showcase-card">
+      <div class="gift-showcase-header">
+        <div class="gift-badge-pill">✨ ЕЖЕДНЕВНЫЙ ПОДАРОК ✨</div>
+        <h3>Три сундука удачи</h3>
+        <p class="gift-showcase-sub">Выберите один из трёх сундуков, чтобы забрать подарок дня!</p>
+      </div>
+      <div class="gift-trio" id="giftTrio">
+        ${chestsHtml}
+      </div>
+      ${footerHtml}
+    </div>`;
+}
+
+/** Legacy calendar track stub - visit streak is removed */
+export function renderGiftCalendarHtml() {
+  return '';
 }
 
 /** Generates HTML markup for figure buttons grid. */
@@ -137,7 +183,7 @@ export function renderItemsFigsHtml({figs = {}, ownedFigs = [], selectedFig = 'c
 export function renderItemsLocsHtml(locs = []) {
   const openCount = locs.filter(l => l.open).length;
   return `<div class="icount">Открыто <b>${openCount}</b> из ${locs.length}</div>
-    <p class="shint" style="margin:-2px 0 10px">Локации меняют оформление игрового поля, архитектуру городов и атмосферу королевства.</p>
+    <p class="shint" style="margin:-2px 0 10px">Локации меняют оформление игрового поля, архитектуру городов и атмосферу игры.</p>
     <div class="locgrid">${locs.map(l => `
       <div class="loccard${l.open ? ' active' : ' locked'}">
         <div class="locart">
@@ -450,4 +496,257 @@ export function renderItemsEmotesHtml({
   `;
 
   return summaryHtml + emotesGridHtml + phrasesGridHtml;
+}
+
+/** Deterministically picks up to `cap` items from a list using a daily seed. */
+export function getStallUnownedItems(list, seedKey, cap = 6) {
+  if (!Array.isArray(list) || !list.length) return [];
+  let seed = 0;
+  for (let i = 0; i < seedKey.length; i++) {
+    seed = (seed * 31 + seedKey.charCodeAt(i)) >>> 0;
+  }
+  const rng = () => {
+    seed = (seed * 1664525 + 1013904223) >>> 0;
+    return seed / 4294967296;
+  };
+  const arr = [...list];
+  for (let i = arr.length - 1; i > 0; i--) {
+    const j = Math.floor(rng() * (i + 1));
+    [arr[i], arr[j]] = [arr[j], arr[i]];
+  }
+  return arr.slice(0, cap);
+}
+
+/**
+ * Renders the 5 separate counters (stalls) in the shop:
+ * figures, frames, statuses, emojis, and phrases (max 6 items per counter, 3 on top and 3 on bottom).
+ */
+export function renderShopStallsShowcase({
+  figs = {},
+  frames = {},
+  statuses = [],
+  wallet = {},
+  figPreview = () => '',
+  initial = '?',
+  date = new Date()
+} = {}) {
+  const dateKey = getDailyShopKey(date);
+  const gold = wallet.gold || 0;
+  const fname = (initial || '?').toUpperCase();
+  const w = wallet || {};
+
+  // 1. Фигурки: некупленные
+  const figPool = Object.entries(figs)
+    .filter(([k, v]) => v.price > 0 && !(w.owned || []).includes(k))
+    .map(([k, v]) => ({ kind: 'fig', key: k, name: v.name, price: v.price }));
+  const figItems = getStallUnownedItems(figPool, dateKey + ':fig', 6);
+
+  // 2. Рамки: некупленные
+  const framePool = Object.entries(frames)
+    .filter(([k, v]) => v.price > 0 && !v.earn && !(w.frames || []).includes(k))
+    .map(([k, v]) => ({ kind: 'frame', key: k, name: v.name, price: v.price, ring: v.ring }));
+  const frameItems = getStallUnownedItems(framePool, dateKey + ':frame', 6);
+
+  // 3. Статусы: некупленные
+  const statusPool = (statuses || [])
+    .filter(s => s.price > 0 && !(w.statuses || []).includes('sh:' + s.id))
+    .map(s => ({ kind: 'status', key: 'sh:' + s.id, id: s.id, name: s.text, price: s.price }));
+  const statusItems = getStallUnownedItems(statusPool, dateKey + ':status', 6);
+
+  // 4. Эмодзи: некупленные
+  const emotePool = R.ALL_EMOTES
+    .filter(e => R.price('emote', e) > 0 && !R.isOwned(w, 'emote', e))
+    .map(e => ({ kind: 'emote', key: e, name: R.RARITY[R.rarity('emote', e)].name, price: R.price('emote', e), rarity: R.rarity('emote', e) }));
+  const emoteItems = getStallUnownedItems(emotePool, dateKey + ':emote', 6);
+
+  // 5. Фразы: некупленные
+  const phrasePool = R.ALL_PHRASES
+    .filter(p => R.price('phrase', p) > 0 && !R.isOwned(w, 'phrase', p))
+    .map(p => ({ kind: 'phrase', key: p, name: R.RARITY[R.rarity('phrase', p)].name, price: R.price('phrase', p), rarity: R.rarity('phrase', p) }));
+  const phraseItems = getStallUnownedItems(phrasePool, dateKey + ':phrase', 6);
+
+  const renderSingleStall = ({
+    stallClass,
+    icon,
+    title,
+    sub,
+    items,
+    emptyText,
+    renderCardFn
+  }) => {
+    let cardsHtml = '';
+    if (items.length) {
+      cardsHtml = `<div class="stall-grid stall-3x2">${items.map(renderCardFn).join('')}</div>`;
+    } else {
+      cardsHtml = `<div class="stall-empty-sign"><span>🏆</span><p>${emptyText}</p></div>`;
+    }
+
+    return `
+      <div class="shop-stall ${stallClass}">
+        <div class="stall-roof">
+          <div class="stall-awning">
+            <div class="stall-awning-stripes"></div>
+            <div class="stall-valance"></div>
+          </div>
+          <div class="stall-sign-wrap">
+            <div class="stall-post-left"></div>
+            <div class="stall-signboard">
+              <span class="stall-icon">${icon}</span>
+              <div class="stall-titles">
+                <h3 class="stall-title">${title}</h3>
+                <p class="stall-sub">${sub}</p>
+              </div>
+            </div>
+            <div class="stall-post-right"></div>
+          </div>
+        </div>
+        <div class="stall-counter">
+          <div class="stall-shelf-edge"></div>
+          ${cardsHtml}
+        </div>
+        <div class="stall-facade-base">
+          <div class="stall-planks"></div>
+        </div>
+      </div>
+    `;
+  };
+
+  // 1. Прилавок резных фигурок
+  const figStallHtml = renderSingleStall({
+    stallClass: 'stall-figures',
+    icon: '<svg class="stall-svg-ic" viewBox="0 0 24 24" width="26" height="26" fill="none"><circle cx="12" cy="5" r="3" fill="#ffd875"/><path d="M7 11c0-1.1.9-2 2-2h6a2 2 0 012 2v2a1 1 0 01-1 1h-1v5a2 2 0 01-2 2h-2a2 2 0 01-2-2v-5H8a1 1 0 01-1-1v-2z" fill="#f59e0b"/></svg>',
+    title: 'Прилавок фигурок',
+    sub: 'Персонажи для партий',
+    items: figItems,
+    totalPoolSize: figPool.length,
+    emptyText: 'Все фигурки в вашей коллекции! Новые персонажи появятся в обновлениях.',
+    renderCardFn: item => {
+      const canAfford = gold >= item.price;
+      return `
+        <div class="stall-item fig-stall-card">
+          <div class="fig-pedestal-wrap">
+            <div class="fig-shadow"></div>
+            <img class="fig-art" src="${figPreview(item.key)}" alt="${item.name}">
+            <div class="fig-pedestal-wood"></div>
+          </div>
+          <b class="stall-item-name">${item.name}</b>
+          <button class="stall-buy-btn${!canAfford ? ' poor' : ''}" data-daily-buy="fig|${item.key}|${item.price}">
+            <i class="coin"></i> <b>${item.price}</b>
+          </button>
+        </div>
+      `;
+    }
+  });
+
+  // 2. Прилавок рамок мастера
+  const frameStallHtml = renderSingleStall({
+    stallClass: 'stall-frames',
+    icon: '<svg class="stall-svg-ic" viewBox="0 0 24 24" width="26" height="26" fill="none"><rect x="3" y="3" width="18" height="18" rx="4" stroke="#60a5fa" stroke-width="2.5"/><rect x="6.5" y="6.5" width="11" height="11" rx="2" stroke="#93c5fd" stroke-width="1.5"/><circle cx="12" cy="12" r="2.5" fill="#ffd700"/></svg>',
+    title: 'Прилавок рамок',
+    sub: 'Оправы для аватара профиля',
+    items: frameItems,
+    totalPoolSize: framePool.length,
+    emptyText: 'Все рамки собраны! Примеряйте в профиле.',
+    renderCardFn: item => {
+      const canAfford = gold >= item.price;
+      const ring = item.ring || (frames[item.key] && frames[item.key].ring) || '';
+      return `
+        <div class="stall-item frame-stall-card">
+          <div class="frame-cushion-wrap">
+            <span class="av${ring ? ' fr' : ''}" style="--c:${wallet.color || '#3a7bd5'};${ring ? `--fr:${ring}` : ''};width:46px;height:46px;font-size:18px">${fname}</span>
+          </div>
+          <b class="stall-item-name">${item.name}</b>
+          <button class="stall-buy-btn${!canAfford ? ' poor' : ''}" data-daily-buy="frame|${item.key}|${item.price}">
+            <i class="coin"></i> <b>${item.price}</b>
+          </button>
+        </div>
+      `;
+    }
+  });
+
+  // 3. Прилавок благородных статусов
+  const statusStallHtml = renderSingleStall({
+    stallClass: 'stall-statuses',
+    icon: '<svg class="stall-svg-ic" viewBox="0 0 24 24" width="26" height="26" fill="none"><path d="M4 6a2 2 0 012-2h12a2 2 0 012 2v3H4V6zm0 5h16v7a2 2 0 01-2 2H6a2 2 0 01-2-2v-7zm5 3h6" stroke="#34d399" stroke-width="2.2" stroke-linecap="round"/></svg>',
+    title: 'Прилавок статусов',
+    sub: 'Статусы и подписи для профиля',
+    items: statusItems,
+    totalPoolSize: statusPool.length,
+    emptyText: 'Все статусы из лавки уже у вас! Примеряйте в профиле.',
+    renderCardFn: item => {
+      const canAfford = gold >= item.price;
+      return `
+        <div class="stall-item status-stall-card">
+          <div class="status-plate-wrap">
+            <span class="stchip stall-chip">${item.name}</span>
+          </div>
+          <button class="stall-buy-btn${!canAfford ? ' poor' : ''}" data-daily-buy="status|${item.key}|${item.price}">
+            <i class="coin"></i> <b>${item.price}</b>
+          </button>
+        </div>
+      `;
+    }
+  });
+
+  // 4. Прилавок живых эмоций
+  const emoteStallHtml = renderSingleStall({
+    stallClass: 'stall-emotes',
+    icon: '<svg class="stall-svg-ic" viewBox="0 0 24 24" width="26" height="26" fill="none"><circle cx="12" cy="12" r="9" fill="rgba(245, 158, 11, 0.2)" stroke="#f59e0b" stroke-width="2"/><circle cx="9" cy="10" r="1.3" fill="#f59e0b"/><circle cx="15" cy="10" r="1.3" fill="#f59e0b"/><path d="M8.5 14c1 1.5 4 1.5 7 0" stroke="#f59e0b" stroke-width="2" stroke-linecap="round"/></svg>',
+    title: 'Прилавок эмодзи',
+    sub: 'Быстрые эмодзи для реакций в партиях',
+    items: emoteItems,
+    totalPoolSize: emotePool.length,
+    emptyText: 'Все эмодзи собраны! Полный набор реакций в вашем распоряжении.',
+    renderCardFn: item => {
+      const canAfford = gold >= item.price;
+      const rarClass = item.rarity ? ' r-' + item.rarity : '';
+      return `
+        <div class="stall-item emote-stall-card${rarClass}">
+          <div class="emote-token-wrap">
+            <span class="stall-emote-icon">${item.key}</span>
+            <small class="stall-rar-tag">${item.name}</small>
+          </div>
+          <button class="stall-buy-btn${!canAfford ? ' poor' : ''}" data-daily-buy="emote|${item.key}|${item.price}">
+            <i class="coin"></i> <b>${item.price}</b>
+          </button>
+        </div>
+      `;
+    }
+  });
+
+  // 5. Прилавок крылатых фраз
+  const phraseStallHtml = renderSingleStall({
+    stallClass: 'stall-phrases',
+    icon: '<svg class="stall-svg-ic" viewBox="0 0 24 24" width="26" height="26" fill="none"><path d="M21 11.5a8.38 8.38 0 01-.9 3.8 8.5 8.5 0 01-7.6 4.7 8.38 8.38 0 01-3.8-.9L3 21l1.9-5.7a8.38 8.38 0 01-.9-3.8 8.5 8.5 0 014.7-7.6 8.38 8.38 0 013.8-.9h.5a8.5 8.5 0 018 8.5z" stroke="#c084fc" stroke-width="2.2" fill="rgba(192, 132, 252, 0.15)"/><circle cx="9" cy="11.5" r="1" fill="#e9d5ff"/><circle cx="12" cy="11.5" r="1" fill="#e9d5ff"/><circle cx="15" cy="11.5" r="1" fill="#e9d5ff"/></svg>',
+    title: 'Прилавок фраз',
+    sub: 'Реплики для чата в партиях',
+    items: phraseItems,
+    totalPoolSize: phrasePool.length,
+    emptyText: 'Все фразы открыты!',
+    renderCardFn: item => {
+      const canAfford = gold >= item.price;
+      const rarClass = item.rarity ? ' r-' + item.rarity : '';
+      return `
+        <div class="stall-item phrase-stall-card${rarClass}">
+          <div class="phrase-scroll-wrap">
+            <span class="stall-phrase-text">«${item.key}»</span>
+            <small class="stall-rar-tag">${item.name}</small>
+          </div>
+          <button class="stall-buy-btn${!canAfford ? ' poor' : ''}" data-daily-buy="phrase|${item.key}|${item.price}">
+            <i class="coin"></i> <b>${item.price}</b>
+          </button>
+        </div>
+      `;
+    }
+  });
+
+  return `
+    <div class="shop-stalls-container">
+      ${figStallHtml}
+      ${frameStallHtml}
+      ${statusStallHtml}
+      ${emoteStallHtml}
+      ${phraseStallHtml}
+    </div>
+  `;
 }

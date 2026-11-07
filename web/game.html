@@ -56,6 +56,7 @@
               </button>
               <div class="mhub-pop" id="mhubPop" role="menu" hidden>
                 <button role="menuitem" data-hub-action="rating"><span>🏆</span><b>Рейтинг игроков</b><i id="mhubCups"></i></button>
+                <button role="menuitem" data-hub-action="achievements"><span>🎖️</span><b>Достижения</b><i id="mhubAch"></i></button>
                 <button role="menuitem" data-hub-action="rules"><span>📖</span><b>Как играть</b></button>
                 <button role="menuitem" data-hub-action="history"><span>📜</span><b>История партий</b></button>
                 <button role="menuitem" data-hub-action="settings"><span>⚙️</span><b>Настройки</b></button>
@@ -103,11 +104,8 @@
           <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Витрина</b><span class="goldchip static"><i class="coin"></i><b class="goldN">0</b></span></div>
           <div class="gift" id="gift"></div>
           
-          <!-- Daily 6-Item Showcase in Tile Style -->
+          <!-- 5 Medieval Market Stalls (max 6 items per stall: 3 top, 3 bottom) -->
           <div id="dailyShopWrap"></div>
-
-          <div class="h3">Эмодзи и фразы</div>
-          <div id="reactShop"></div>
 
           <div class="h3">Свой статус</div>
           <div class="stcustom"><input class="field" id="stInput" maxlength="15" placeholder="Свой статус (до 15)" autocomplete="off"><button class="cta" id="stBuy">3000 <i class="coin"></i></button></div>
@@ -178,12 +176,44 @@
         </div>
       </section>
 
-      <section class="screen scroll" id="scr-progress" hidden>
-        <div class="lb">
-          <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Задания и Прогресс</b></div>
+      <section class="screen scroll scr-road-fullscreen" id="scr-progress" hidden>
+        <!-- Floating HUD: Back button & Quests button (SVG icons, no standard emojis) -->
+        <div class="road-floating-hud">
+          <button class="road-float-btn road-back-btn" data-go="menu" aria-label="Назад в меню">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg>
+            <span>Назад</span>
+          </button>
+          <button class="road-float-btn road-quests-btn" id="btnRoadQuests" aria-label="Задания">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/><line x1="9" y1="7" x2="15" y2="7"/><line x1="9" y1="11" x2="15" y2="11"/></svg>
+            <span>Задания</span>
+            <i class="road-dot" id="roadQuestsDot" hidden></i>
+          </button>
+        </div>
 
-          <div class="seg ptabs" id="ptabs"><button data-pt="road" aria-pressed="true">Прогресс</button><button data-pt="rewards" aria-pressed="false">Задания</button><button data-pt="cols" aria-pressed="false">Коллекции</button></div>
+        <!-- Fullscreen Road Container -->
+        <div class="road-fullscreen-wrap">
           <div class="col" id="ptab"></div>
+        </div>
+
+        <!-- Quests Slide-over Sheet (opens on tapping "Задания") -->
+        <div id="roadQuestsSheet" class="road-quests-sheet" hidden>
+          <div class="road-sheet-card">
+            <div class="road-sheet-header">
+              <button class="road-float-btn sm" id="btnCloseRoadQuests" aria-label="К дороге">
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg>
+                <span>К дороге</span>
+              </button>
+              <h3>Задания</h3>
+            </div>
+            <div class="road-sheet-body" id="roadQuestsSheetBody"></div>
+          </div>
+        </div>
+      </section>
+
+      <section class="screen scroll" id="scr-achievements" hidden>
+        <div class="lb">
+          <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Достижения</b><span class="goldchip static"><i class="coin"></i><b class="goldN">0</b></span></div>
+          <div class="col" id="achievementsContent"></div>
         </div>
       </section>
 
@@ -527,7 +557,7 @@
     <aside class="notes">
       <h2>Как пощупать макет</h2>
       <ul>
-        <li><b>Свайп по полю</b> — осмотреть королевство</li>
+        <li><b>Свайп по полю</b> — осмотреть карту</li>
         <li><b>Щипок</b> или колесо мыши — масштаб</li>
         <li><b>Тап по жёлтой рамке</b> — примерить карту</li>
         <li><b>Тап по карте</b> или кнопка поворота — повернуть</li>
@@ -623,6 +653,7 @@
 <script>
 (() => {
 'use strict';
+var inbox = {}, friends = [];
 if (typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp) {
   try { window.Telegram.WebApp.ready(); window.Telegram.WebApp.expand(); } catch(_) {}
 }
@@ -1316,7 +1347,7 @@ function helpWindow(tab = 'pts') {
     ${HEX ? '' : item('t-brHalf', '🌉 Большой мост', 'Соедините две половины моста друг с другом — дорога через него становится ценнее.', 'каждая карта дороги вокруг — вдвое, сами половины — по 1')}
     <div class="hitem"><span class="hic">🧍</span><div><b>Фишка</b><p>Поставьте её на город, дорогу или монастырь на только что положенной карте, пока объект ещё ничей или на нём стоят только ваши фишки: так можно усилить свой объект. Очки получает тот, у кого на объекте больше фишек; если фишек поровну — у кого больше своих карт на объекте; если и так поровну — очки каждому лидеру. После очков фишка возвращается.</p><em>Одна фишка за ход, по желанию</em></div></div>
     <div class="hitem"><span class="hic">🤝</span><div><b>Респект</b><p>Достроили объект, на котором стоят только чужие фишки.</p><em>+1 очко вам</em></div></div>`;
-  const rules = `<div class="hitem"><span class="hic">🎯</span><div><b>Цель</b><p>Стройте королевство из общей стопки. Когда стопка кончилась — больше очков значит победа.</p></div></div>
+  const rules = `<div class="hitem"><span class="hic">🎯</span><div><b>Цель</b><p>Стройте карту из общей стопки. Когда стопка кончилась — больше очков значит победа.</p></div></div>
     <div class="hitem"><span class="hic">🃏</span><div><b>Ваш ход</b><p>Возьмите карту, приложите её к полю так, чтобы края совпали (город с городом, дорога с дорогой, река с рекой), поверните при необходимости и по желанию поставьте фишку.</p></div></div>
     ${HEX ? '<div class="hitem"><span class="hic">🌊</span><div><b>Реки</b><p>Река должна продолжаться рекой. Исток — начало реки, по мосту дорога пересекает реку.</p></div></div>' : `<div class="hitem"><span class="hic">🌊</span><div><b>Реки и озёра</b><p>Река должна продолжаться рекой. Озеро занимает всю карту и впадает во все стороны реки. Исток — начало реки.</p></div></div>
     <div class="hitem"><span class="hic">🚧</span><div><b>Обрыв и мосты</b><p>У обрыва дорога обрывается: за ним можно ставить только обрыв. Половина большого моста стыкуется только с другой половиной.</p></div></div>`}
@@ -2130,208 +2161,137 @@ function dailyBonus() {
   if (isReady && wallet.daily !== today()) { wallet.daily = today(); saveWallet(); }
 }
 
-function openGift(forceCalendar = false) {
-  const isReady = giftReady() && !forceCalendar;
-  const {st, next, day, usedFreeze, freezeAvail} = streakState();
-  const streakGold = (typeof STREAK_GOLD !== 'undefined' && STREAK_GOLD[day]) ? STREAK_GOLD[day] : 15;
-  const chestArtSvg = CHEST_SVG;
-  const chestOpenedSvg = (typeof CHEST_OPEN_SVG !== 'undefined') ? CHEST_OPEN_SVG : CHEST_SVG;
-
-  if (!isReady) {
-    // Режим просмотра календаря наград и таймера
-    const box = document.createElement('div');
-    box.className = 'over';
-    box.style.position = 'fixed';
-    const calTrack = (PG.ui.shop && PG.ui.shop.renderGiftCalendarHtml)
-      ? PG.ui.shop.renderGiftCalendarHtml({streakDays: STREAK_GOLD, currentDay: day, isClaimedToday: !giftReady()})
-      : '';
-
-    box.innerHTML = `
-      <div class="ocard gift-modal">
-        <div class="gift-modal-header">
-          <h3>Ежедневный подарок</h3>
-          <p>Заходите каждый день — награды растут!</p>
-        </div>
-        <div class="gift-timer-card">
-          <span>Следующий сундук через:</span>
-          <b id="giftCountdown">${timeUntilMidnightStr()}</b>
-        </div>
-        ${calTrack}
-        <button class="cta wide" id="giftCloseBtn" style="margin-top:14px">Понятно</button>
-      </div>`;
-
-    document.body.append(box);
-    const timerInterval = setInterval(() => {
-      const el = box.querySelector('#giftCountdown');
-      if (el) el.textContent = timeUntilMidnightStr();
-      else clearInterval(timerInterval);
-    }, 1000);
-
-    box.querySelector('#giftCloseBtn').onclick = () => {
-      clearInterval(timerInterval);
-      box.remove();
-    };
-    return;
+function getDailyTrioOptions() {
+  if (wallet.dailyTrio && wallet.dailyTrio.date === today() && Array.isArray(wallet.dailyTrio.options) && wallet.dailyTrio.options.length === 3) {
+    return wallet.dailyTrio;
   }
-
-  // --- ИНТЕРАКТИВНЫЙ ВЫБОР ИЗ 3 СУНДУКОВ УДАЧИ ---
-  const box = document.createElement('div');
-  box.className = 'over';
-  box.style.position = 'fixed';
-
-  // Генерируем 3 разных ценных приза
   const notOwned = Object.keys(FIGS).filter(k => !wallet.owned.includes(k));
   const options = [];
 
-  // 1. Золотой куш (база дня + бонус)
-  const g1 = streakGold + (day === 6 ? 50 : 20);
-  options.push({ type: 'gold', amount: g1, title: `+${g1} золота`, sub: 'Золотой куш' });
+  // 1. Золотой куш (35-50 монет)
+  const g1 = 35 + ((Math.random() * 4) | 0) * 5;
+  options.push({ type: 'gold', amount: g1, title: `+${g1} монет`, sub: 'Золотой куш' });
 
-  // 2. Буст удвоения золота + золото дня
-  const g2 = streakGold;
+  // 2. Буст удвоения золота + 25 монет
+  const g2 = 25;
   options.push({ type: 'boost_double', amount: g2, title: `+${g2} 💰 и ×2 золото`, sub: 'Двойное золото' });
 
   // 3. Буст фигурки или редкая фигурка
-  if (notOwned.length && (Math.random() < 0.15 || day === 6)) {
+  if (notOwned.length && Math.random() < 0.2) {
     const figKey = notOwned[(Math.random() * notOwned.length) | 0];
     options.push({ type: 'fig', figKey, title: `Фигурка «${FIGS[figKey].name}»!`, sub: 'Новая фигурка' });
   } else {
-    const g3 = streakGold + 10;
+    const g3 = 25;
     options.push({ type: 'boost_meeple', amount: g3, title: `+${g3} 💰 и +1 фигурка`, sub: 'Запасная фигурка' });
   }
 
   // Перемешиваем по 3 сундукам
   options.sort(() => Math.random() - 0.5);
+  const data = { date: today(), options, chosenIdx: null };
+  wallet.dailyTrio = data;
+  saveWallet();
+  return data;
+}
 
-  const calTrack = (PG.ui.shop && PG.ui.shop.renderGiftCalendarHtml)
-    ? PG.ui.shop.renderGiftCalendarHtml({streakDays: STREAK_GOLD, currentDay: day, isClaimedToday: false})
-    : '';
+let openingTrioChest = false;
+let giftCountdownInterval = null;
+function startGiftCountdownTimer() {
+  if (giftCountdownInterval) return;
+  giftCountdownInterval = setInterval(() => {
+    const el = document.getElementById('giftCountdown');
+    if (el) el.textContent = timeUntilMidnightStr();
+  }, 1000);
+}
 
-  box.innerHTML = `
-    <div class="ocard gift-modal">
-      <div class="gift-modal-header">
-        <h3>✨ Три сундука удачи ✨</h3>
-        <p>Выберите любой сундук, чтобы забрать подарок дня</p>
-      </div>
-      <div class="gift-trio" id="giftTrio">
-        <button class="gift-chest-btn idle" data-idx="0">
-          <div class="gift-chest-art">${chestArtSvg}</div>
-          <span class="gift-chest-name">Сундук 1</span>
-          <span class="gift-chest-hint">Открыть</span>
-        </button>
-        <button class="gift-chest-btn idle" data-idx="1">
-          <div class="gift-chest-art">${chestArtSvg}</div>
-          <span class="gift-chest-name">Сундук 2</span>
-          <span class="gift-chest-hint">Открыть</span>
-        </button>
-        <button class="gift-chest-btn idle" data-idx="2">
-          <div class="gift-chest-art">${chestArtSvg}</div>
-          <span class="gift-chest-name">Сундук 3</span>
-          <span class="gift-chest-hint">Открыть</span>
-        </button>
-      </div>
-      <div id="giftCalWrap">${calTrack}</div>
-      <div id="giftActionWrap" style="display:none;margin-top:14px">
-        <button class="cta wide" id="giftCollectBtn">Забрать награду ✨</button>
-      </div>
-    </div>`;
+function pickDailyChest(idx, trioData, btn, container) {
+  if (openingTrioChest || !giftReady() || !trioData || !trioData.options) return;
+  const chosen = trioData.options[idx];
+  if (!chosen) return;
+  openingTrioChest = true;
 
-  document.body.append(box);
+  // streak logic removed
 
-  let opened = false;
-  box.querySelectorAll('.gift-chest-btn').forEach(btn => {
-    btn.onclick = () => {
-      if (opened) return;
-      opened = true;
-      const idx = parseInt(btn.dataset.idx, 10);
-      const chosen = options[idx];
+  // 1. Снимаем idle анимацию со всех сундуков
+  container.querySelectorAll('.gift-chest-btn').forEach(b => b.classList.remove('idle'));
 
-      // Снимаем idle анимацию со всех
-      box.querySelectorAll('.gift-chest-btn').forEach(b => b.classList.remove('idle'));
+  // 2. Тряска выбранного сундука (предвкушение)
+  btn.classList.add('shaking');
+  beep('click');
+  try { if (typeof telegramHaptic === 'function') telegramHaptic('impact', 'medium'); } catch(_) {}
 
-      // Тряска выбранного сундука (предвкушение)
-      btn.classList.add('shaking');
-      beep('click');
-      try { if (typeof telegramHaptic === 'function') telegramHaptic('impact', 'medium'); } catch(_) {}
+  setTimeout(() => {
+    btn.classList.remove('shaking');
+    btn.classList.add('opened', 'chosen');
+    const art = btn.querySelector('.gift-chest-art');
+    if (art) art.innerHTML = (typeof CHEST_OPEN_SVG !== 'undefined') ? CHEST_OPEN_SVG : CHEST_SVG;
+    const hint = btn.querySelector('.gift-chest-hint');
+    if (hint) {
+      hint.className = 'gift-chest-hint chosen-hint';
+      hint.textContent = 'Ваш выбор 🏆';
+    }
 
-      setTimeout(() => {
-        btn.classList.remove('shaking');
-        btn.classList.add('opened');
-        btn.querySelector('.gift-chest-art').innerHTML = chestOpenedSvg;
-        btn.querySelector('.gift-chest-hint').textContent = 'Ваш приз!';
+    // Всплывающий бейдж награды над сундуком
+    const badge = document.createElement('div');
+    badge.className = 'gift-prize-reveal';
+    badge.innerHTML = chosen.title;
+    btn.prepend(badge);
 
-        // Бейдж награды над сундуком
-        const badge = document.createElement('div');
-        badge.className = 'gift-prize-reveal';
-        badge.innerHTML = chosen.title;
-        btn.prepend(badge);
+    beep('win');
+    setTimeout(() => beep('coin'), 180);
+    try { if (typeof telegramHaptic === 'function') telegramHaptic('notification', 'success'); } catch(_) {}
 
-        beep('win');
-        setTimeout(() => beep('coin'), 180);
-        try { if (typeof telegramHaptic === 'function') telegramHaptic('notification', 'success'); } catch(_) {}
+    // Начисляем награду
+    if (chosen.type === 'gold') {
+      wallet.gold += chosen.amount;
+    } else if (chosen.type === 'boost_double') {
+      wallet.gold += chosen.amount;
+      wallet.boosts.double = (wallet.boosts.double || 0) + 1;
+    } else if (chosen.type === 'boost_meeple') {
+      wallet.gold += chosen.amount;
+      wallet.boosts.meeple = (wallet.boosts.meeple || 0) + 1;
+    } else if (chosen.type === 'fig') {
+      if (!wallet.owned.includes(chosen.figKey)) wallet.owned.push(chosen.figKey);
+    }
 
-        // Начисляем награду
-        if (chosen.type === 'gold') {
-          wallet.gold += chosen.amount;
-        } else if (chosen.type === 'boost_double') {
-          wallet.gold += chosen.amount;
-          wallet.boosts.double = (wallet.boosts.double || 0) + 1;
-        } else if (chosen.type === 'boost_meeple') {
-          wallet.gold += chosen.amount;
-          wallet.boosts.meeple = (wallet.boosts.meeple || 0) + 1;
-        } else if (chosen.type === 'fig') {
-          if (!wallet.owned.includes(chosen.figKey)) wallet.owned.push(chosen.figKey);
-        }
+    wallet.dailyBox = today();
+    trioData.chosenIdx = idx;
+    wallet.dailyTrio = trioData;
+    saveWallet();
+    dailyBonus();
+    document.querySelectorAll('.goldN').forEach(e => e.textContent = wallet.gold);
+    toastAny(`🎉 Получено: ${chosen.title}!`);
 
-        // Помечаем открытие сегодня
-        wallet.dailyBox = today();
-
-        // Обновляем серию посещений
-        const curWeek = (PG.state.progress && PG.state.progress.weekId) ? PG.state.progress.weekId() : 'w1';
-        wallet.streak = {
-          n: next,
-          last: localDay(),
-          best: Math.max(next, (wallet.streak && wallet.streak.best) || 0),
-          freezeWeek: usedFreeze ? curWeek : ((wallet.streak && wallet.streak.freezeWeek) || '')
-        };
-
-        saveWallet();
-        dailyBonus();
-        renderShop();
-        document.querySelectorAll('.goldN').forEach(e => e.textContent = wallet.gold);
-
-        // Вскрываем два других сундука в ghost-режиме
-        setTimeout(() => {
-          box.querySelectorAll('.gift-chest-btn').forEach(otherBtn => {
-            const oIdx = parseInt(otherBtn.dataset.idx, 10);
-            if (oIdx !== idx) {
-              const otherPrize = options[oIdx];
-              otherBtn.classList.add('ghost');
-              otherBtn.querySelector('.gift-chest-art').innerHTML = chestOpenedSvg;
-              otherBtn.querySelector('.gift-chest-hint').innerHTML = `<span class="gift-chest-ghost-note">А здесь:<b>\${otherPrize.title}</b></span>`;
-            }
-          });
-
-          // Обновляем календарь (сегодня зачеркнуто)
-          const updatedCal = (PG.ui.shop && PG.ui.shop.renderGiftCalendarHtml)
-            ? PG.ui.shop.renderGiftCalendarHtml({streakDays: STREAK_GOLD, currentDay: day, isClaimedToday: true})
-            : '';
-          const calWrap = box.querySelector('#giftCalWrap');
-          if (calWrap) calWrap.innerHTML = updatedCal;
-
-          // Показываем кнопку сбора
-          const actWrap = box.querySelector('#giftActionWrap');
-          if (actWrap) {
-            actWrap.style.display = 'block';
-            actWrap.querySelector('#giftCollectBtn').onclick = () => {
-              box.remove();
-              toastAny(`Награда получена: ${chosen.title}!`);
-            };
+    // 3. Вскрываем два других сундука в ghost-режиме, наглядно отображая что было в каждом!
+    setTimeout(() => {
+      container.querySelectorAll('.gift-chest-btn[data-gidx]').forEach(otherBtn => {
+        const oIdx = parseInt(otherBtn.dataset.gidx, 10);
+        if (oIdx !== idx) {
+          const otherPrize = trioData.options[oIdx];
+          otherBtn.classList.add('ghost');
+          const oArt = otherBtn.querySelector('.gift-chest-art');
+          if (oArt) oArt.innerHTML = (typeof CHEST_OPEN_SVG !== 'undefined') ? CHEST_OPEN_SVG : CHEST_SVG;
+          const oHint = otherBtn.querySelector('.gift-chest-hint');
+          if (oHint) {
+            oHint.innerHTML = `<span class="gift-chest-ghost-note">А здесь было:<br><b>${otherPrize ? otherPrize.title : '...'}</b></span>`;
           }
-        }, 400);
-      }, 450);
-    };
-  });
+        }
+      });
+
+      // Обновляем подзаголовок на таймер
+      const sub = container.querySelector('.gift-showcase-sub');
+      if (sub) {
+        sub.innerHTML = `Подарок на сегодня получен ✓ Следующий сундук через: <b id="giftCountdown" class="countdown-gold">${timeUntilMidnightStr()}</b>`;
+      }
+      startGiftCountdownTimer();
+      openingTrioChest = false;
+    }, 400);
+  }, 450);
+}
+
+function openGift(forceCalendar = false) {
+  show('shop');
+  const g = $('#gift');
+  if (g) g.scrollIntoView({behavior: 'smooth', block: 'start'});
 }
 /* Daily streak: the first visit of each day pays gold that grows day by day for a week
    (10 → 100), then the week starts again. Missing a day starts the streak over. Days are
@@ -2354,7 +2314,7 @@ function streakState() {
   return {st, ready: st.last !== localDay(), next, day: (next - 1) % 7, usedFreeze, freezeAvail};
 }
 function streakCheck() {
-  if (!isApp || (typeof tut !== 'undefined' && tut) || !(wallet.tut || wallet.tutAsked) || document.querySelector('body > .over')) return;
+  return;
   const {st, ready, next, day, usedFreeze, freezeAvail} = streakState();
   if (!ready) return;
   const lost = st.n > 1 && next === 1;
@@ -2542,34 +2502,64 @@ function renderShop() {
   if (promoInp) promoInp.onkeydown = (e) => {
     if (e.key === 'Enter') redeemPromo(promoInp.value);
   };
-  $('#gift').innerHTML = PG.ui.shop.renderGiftCard({
-    giftReady: giftReady(),
-    chestSvg: CHEST_SVG,
-    boosts: wallet.boosts,
-    nextGiftTimeStr: timeUntilMidnightStr()
-  });
-  if (giftReady()) {
-    $('#openGift').onclick = () => openGift();
-  } else {
-    const ob = $('#openGiftCalendar');
-    if (ob) ob.onclick = () => openGift(true);
-  }
-  $('#gift').onclick = (e) => {
-    if (e.target.closest('#openGift')) return;
-    if (!giftReady()) openGift(true);
-  };
+  const isReady = giftReady();
+  const chestArtSvg = CHEST_SVG;
+  const chestOpenedSvg = (typeof CHEST_OPEN_SVG !== 'undefined') ? CHEST_OPEN_SVG : CHEST_SVG;
 
-  // Render Daily 6-Item Showcase in tile format
+  let trioData = (wallet.dailyTrio && wallet.dailyTrio.date === today()) ? wallet.dailyTrio : null;
+  if (!trioData && isReady) {
+    trioData = getDailyTrioOptions();
+  }
+
+  const giftEl = $('#gift');
+  if (giftEl) {
+    if (PG.ui.shop && PG.ui.shop.renderGiftTrioShowcase) {
+      giftEl.innerHTML = PG.ui.shop.renderGiftTrioShowcase({
+        giftReady: isReady,
+        options: trioData ? trioData.options : [],
+        chosenIdx: trioData ? trioData.chosenIdx : null,
+        nextGiftTimeStr: timeUntilMidnightStr(),
+        chestSvg: chestArtSvg,
+        chestOpenedSvg: chestOpenedSvg,
+        boosts: wallet.boosts
+      });
+    }
+
+    if (isReady && trioData) {
+      giftEl.querySelectorAll('.gift-chest-btn[data-gidx]').forEach(btn => {
+        btn.onclick = () => {
+          const idx = parseInt(btn.dataset.gidx, 10);
+          pickDailyChest(idx, trioData, btn, giftEl);
+        };
+      });
+    } else {
+      startGiftCountdownTimer();
+    }
+  }
+
+  // Render 5 Medieval Market Stalls: figures, frames, statuses, emotes, phrases (max 6 unowned, 3 top, 3 bottom)
   const dailyWrap = $('#dailyShopWrap');
-  if (dailyWrap && PG.ui.shop.renderDailyShopShowcase) {
-    const dailyItems = PG.ui.shop.getDailyShopItems(FIGS, FRAMES, PG.state.status.SHOP_STATUSES, new Date(), wallet);
-    dailyWrap.innerHTML = PG.ui.shop.renderDailyShopShowcase({
-      items: dailyItems,
-      wallet,
-      figPreview,
-      initial: profileName()[0],
-      frames: FRAMES
-    });
+  if (dailyWrap) {
+    if (PG.ui.shop.renderShopStallsShowcase) {
+      dailyWrap.innerHTML = PG.ui.shop.renderShopStallsShowcase({
+        figs: FIGS,
+        frames: FRAMES,
+        statuses: (PG.state.status && PG.state.status.SHOP_STATUSES) || [],
+        wallet,
+        figPreview,
+        initial: profileName()[0],
+        date: new Date()
+      });
+    } else if (PG.ui.shop.renderDailyShopShowcase) {
+      const dailyItems = PG.ui.shop.getDailyShopItems(FIGS, FRAMES, PG.state.status.SHOP_STATUSES, new Date(), wallet);
+      dailyWrap.innerHTML = PG.ui.shop.renderDailyShopShowcase({
+        items: dailyItems,
+        wallet,
+        figPreview,
+        initial: profileName()[0],
+        frames: FRAMES
+      });
+    }
   }
 
   $('#locgrid').innerHTML = PG.ui.shop.renderLocationsGrid(LOCS);
@@ -4428,6 +4418,19 @@ function ptabsDot() {
     b.classList.toggle('hasdot', pt === 'rewards' ? (qDot || wqDot || aDot) : pt === 'cols' ? cDot : pt === 'top' ? tDot : false);
   });
 }
+const PROGRESS_ROAD_MILESTONES = [
+  { id: 'm5', lvl: 5, cups: 50, title: 'Новичок', desc: '+50 монет и эмодзи 😎', reward: { gold: 50, emote: '😎' }, ic: '🌱' },
+  { id: 'm10', lvl: 10, cups: 150, title: 'Следопыт', desc: 'Статус «Следопыт» и +80 монет', reward: { status: 'Следопыт', gold: 80 }, ic: '🧭' },
+  { id: 'm15', lvl: 15, cups: 300, title: 'Зодчий', desc: '+120 монет и эмодзи 🏰', reward: { gold: 120, emote: '🏰' }, ic: '🏰' },
+  { id: 'm20', lvl: 20, cups: 500, title: 'Изумруд', desc: 'Рамка «Изумруд» и +150 монет', reward: { frame: 'emerald', gold: 150 }, ic: '💎' },
+  { id: 'm25', lvl: 25, cups: 800, title: 'Мастер', desc: '+200 монет и фраза «Красиво строишь!»', reward: { gold: 200, phrase: 'Красиво строишь!' }, ic: '⭐' },
+  { id: 'm30', lvl: 30, cups: 1200, title: 'Магистр', desc: 'Фигурка и +250 монет', reward: { fig: 'classic', gold: 250 }, ic: '🧙‍♂️' },
+  { id: 'm35', lvl: 35, cups: 1700, title: 'Золотой сундук', desc: '+350 монет', reward: { gold: 350 }, ic: '🎁' },
+  { id: 'm40', lvl: 40, cups: 2300, title: 'Гроссмейстер', desc: 'Статус «Гроссмейстер» и фраза', reward: { status: 'Гроссмейстер', gold: 300, phrase: 'Ну ты гроссмейстер! 👑' }, ic: '👑' },
+  { id: 'm45', lvl: 45, cups: 3000, title: 'Легенда', desc: '+400 монет и статус «Легенда»', reward: { status: 'Легенда', gold: 400 }, ic: '⚔️' },
+  { id: 'm50', lvl: 50, cups: 4000, title: 'Чемпион', desc: 'Кубок Чемпиона, рамка, +600 монет и 🏆', reward: { frame: 'gold', gold: 600, emote: '🏆' }, ic: '🏆' },
+];
+
 function progressDot() {
   const b = $('#progBtn');
   const myLvl = PROG.lvl || 1, myCups = PROG.cups || 0;
@@ -4465,19 +4468,6 @@ function renderMenuQuestBanner() {
     else sEl.textContent = 'Задания';
   }
 }
-const PROGRESS_ROAD_MILESTONES = [
-  { id: 'm1', lvl: 1, cups: 0, title: 'Старт пути', desc: 'Первые шаги', reward: { gold: 30 }, ic: '🌱' },
-  { id: 'm2', lvl: 2, cups: 30, title: 'Новичок', desc: '+50 золота и эмодзи 😎', reward: { gold: 50, emote: '😎' }, ic: '💰' },
-  { id: 'm3', lvl: 3, cups: 70, title: 'Следопыт', desc: 'Статус «Следопыт»', reward: { status: 'Следопыт', gold: 50 }, ic: '🧭' },
-  { id: 'm4', lvl: 4, cups: 120, title: 'Зодчий', desc: '+100 золота и эмодзи 🏰', reward: { gold: 100, emote: '🏰' }, ic: '🏰' },
-  { id: 'm5', lvl: 5, cups: 180, title: 'Изумруд', desc: 'Рамка «Изумруд»', reward: { frame: 'emerald', gold: 50 }, ic: '💎' },
-  { id: 'm6', lvl: 6, cups: 250, title: 'Мастер', desc: '+150 золота и фраза «Красиво строишь!»', reward: { gold: 150, phrase: 'Красиво строишь!' }, ic: '⭐' },
-  { id: 'm7', lvl: 7, cups: 350, title: 'Магистр', desc: 'Фигурка «Магистр»', reward: { fig: 'classic', gold: 100 }, ic: '🧙‍♂️' },
-  { id: 'm8', lvl: 8, cups: 500, title: 'Золотой сундук', desc: '+250 золота', reward: { gold: 250 }, ic: '🎁' },
-  { id: 'm9', lvl: 9, cups: 750, title: 'Гроссмейстер', desc: 'Статус «Гроссмейстер» и фраза', reward: { status: 'Гроссмейстер', gold: 150, phrase: 'Ну ты гроссмейстер! 👑' }, ic: '👑' },
-  { id: 'm10', lvl: 10, cups: 1000, title: 'Чемпион', desc: 'Кубок Чемпиона +500 золота и эмодзи 🏆', reward: { frame: 'gold', gold: 500, emote: '🏆' }, ic: '🏆' },
-];
-
 /* The progress road as a map in the game's own style: level 1 top left, level 2 at the right edge, level 3 left again...
    a cobbled road winds from one to the next, rivers cross it under little bridges, villages, woods and a castle stand
    between. Everything is placed from a fixed seed, so the map is the same every time it is opened. */
@@ -4552,6 +4542,57 @@ function roadMapHtml(ms, unlockedFn, claimed) {
   return `<div class="rd-map" style="height:${H}px">${svg}${bridges}${sprHtml}${nodes}</div>`;
 }
 let roadScroll = false;
+function renderAchievements() {
+  const el = $('#achievementsContent');
+  if (!el || !PG.ui.progress || !PG.ui.progress.renderAchievementsHtml) return;
+  el.innerHTML = PG.ui.progress.renderAchievementsHtml({
+    achDefs: ACH,
+    progAch: PROG.ach || {},
+    progStats: PROG.st || {},
+    progLvl: PROG.lvl || 1
+  });
+}
+
+// Wiring for Road Quests Sheet and Quests Dot
+function toggleRoadQuestsSheet(open) {
+  const sheet = $('#roadQuestsSheet');
+  if (!sheet) return;
+  if (open) {
+    sheet.hidden = false;
+    renderRoadQuestsInSheet();
+  } else {
+    sheet.hidden = true;
+    renderProgressRoad();
+  }
+}
+
+function renderRoadQuestsInSheet() {
+  const body = $('#roadQuestsSheetBody');
+  if (!body) return;
+  if (PG.ui.progress && PG.ui.progress.renderRewardsTabHtml) {
+    body.innerHTML = PG.ui.progress.renderRewardsTabHtml({
+      dailyQuests: getDailyQuests(today()),
+      progQuests: PROG.q || {},
+      weeklyGoals: WEEKLY_GOALS,
+      progWeekly: PROG.wq || {},
+      freeSwapUsed: Boolean(wallet.freeSwapDay === today()),
+      nextQuestTimeStr: timeUntil9AMStr(),
+      weeklyChestReady: Boolean((PROG.wq && PROG.wq.c3 && PROG.wq.c3.claimed) && (!wallet.weeklyChestClaimed || wallet.weeklyChestClaimed !== curWeekId())),
+      weeklyChestClaimed: Boolean(wallet.weeklyChestClaimed && wallet.weeklyChestClaimed === curWeekId()),
+      claimedQuests: wallet.claimedQuests || [],
+      claimedGoals: wallet.claimedGoals || []
+    });
+    wireRewardsTabEvents(body);
+  }
+}
+
+setTimeout(() => {
+  const bRoadQ = document.getElementById('btnRoadQuests');
+  if (bRoadQ) bRoadQ.onclick = () => toggleRoadQuestsSheet(true);
+  const bCloseRoadQ = document.getElementById('btnCloseRoadQuests');
+  if (bCloseRoadQ) bCloseRoadQ.onclick = () => toggleRoadQuestsSheet(false);
+}, 100);
+
 function renderProgressRoad() {
   const track = $('#ptab');
   if (!track || ptab !== 'road') return;
@@ -4627,8 +4668,18 @@ function renderMenuProfile() {
   fitNick(el.querySelector('.mpi b'));
   // Under the plate: trophies (to the rating) and gold (to the shop).
   const st = $('#mstat');
-  if (st) st.innerHTML = `<button class="mpc" data-go="rating" title="Рейтинг игроков" aria-label="Кубки: ${PROG.cups || 0}. Открыть рейтинг">🏆 <b class="cupsN">${PROG.cups || 0}</b><small>кубков</small><i>›</i></button>`
-    + `<button class="mpg" data-go="shop" title="Витрина" aria-label="Золото: ${wallet.gold}"><i class="coin"></i><b class="goldN">${wallet.gold}</b></button>`;
+  const copper = (typeof wallet.copper === 'number') ? wallet.copper : (wallet.gold || 0);
+  const silver = (typeof wallet.silver === 'number') ? wallet.silver : 0;
+  const goldCoins = (typeof wallet.goldCoins === 'number') ? wallet.goldCoins : ((typeof wallet.gold_rare === 'number') ? wallet.gold_rare : 0);
+
+  if (st) st.innerHTML = `<button class="mpc" data-go="rating" title="Рейтинг игроков" aria-label="Кубки: ${PROG.cups || 0}. Открыть рейтинг"><svg class="cup-svg-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffd875" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M6 9H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2"/><path d="M18 9h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2"/><path d="M6 3h12v7a6 6 0 0 1-12 0V3z"/><path d="M12 16v4"/><path d="M8 20h8"/></svg> <b class="cupsN">${PROG.cups || 0}</b><small>кубков</small><i>›</i></button>`
+    + `<button class="mpg menu-cur-trio" data-go="shop" title="Витрина и кошелёк" aria-label="Медь: ${copper}, Серебро: ${silver}, Золото: ${goldCoins}">`
+    + `<span class="mcur-item copper" title="Медные монеты"><i class="coin copper"></i><b>${copper}</b></span>`
+    + `<span class="mcur-sep"></span>`
+    + `<span class="mcur-item silver" title="Серебряные монеты"><i class="coin silver"></i><b>${silver}</b></span>`
+    + `<span class="mcur-sep"></span>`
+    + `<span class="mcur-item gold" title="Золотые монеты"><i class="coin gold"></i><b>${goldCoins}</b></span>`
+    + `</button>`;
   renderMenuQuestBanner();
 }
 function renderProfile() {
@@ -4704,7 +4755,7 @@ function renderTasks() {
           const goalLine = rewardReady() ? '<div class="goalline ready">🎁 Есть награды: заберите их ниже</div>' : nearQ ? `<div class="goalline">🎯 Ближайшая цель: <b>${nearQ.Q.t}</b> · ${nearQ.q.n}/${nearQ.Q.n}</div>` : '<div class="goalline">✅ Все задания на сегодня выполнены</div>';
           return `${goalLine}<div class="h3 sec">Задания на сегодня<em>${qGot} / ${PROG.q.length}</em></div>${qRows}<div class="h3 sec">Недельные цели<em>${wqGot} / ${wqList.length}</em></div>${wqRows}${chestRow}<div class="h3 sec">Достижения<em>${aGot} / ${ACH.length}</em></div>${aRows}`;
         })();
-  } else if (ptab === 'cols') renderCollections(el);
+  } else if (ptab === 'rewards') { renderProgressRoad(); toggleRoadQuestsSheet(true); }
   else if (ptab === 'hist') renderHistory(el);
   else { ptab = 'road'; renderProgressRoad(); }
 }
@@ -4721,75 +4772,224 @@ function renderCollections(el) {
 // can be added as friends from here.
 // Another player's card: name, colour, cups and when seen, with "add friend". Opened from the history, the room and
 // the players at a table. Only public data: the name, /leaders and /presence (no e-mail, no profile contents).
-async function openPlayer(uid, name, col) {
+async function invitePlayerToRoom(targetUid, targetName) {
+  if (net && !net.quick && !(net.gameId && phase !== 'end') && net.code) {
+    inviteFriend(targetUid);
+    toastAny(`Приглашение отправлено игроку «${targetName}»`);
+    show('lobby');
+    return;
+  }
+  if (!(await serverReachable())) return noServer(() => invitePlayerToRoom(targetUid, targetName));
+  const newRoomCode = newCode();
+  connect(newRoomCode, true);
+  net.max = Math.max(2, setup.onN || 2);
+  friendsBack = 'lobby';
+  show('lobby');
+  toastAny(`Создана комната ${newRoomCode}. Отправляем приглашение…`);
+  try {
+    await fbPut(`inbox/${targetUid}/${myUid()}_r`, {
+      k: 'r',
+      code: newRoomCode,
+      n: profileName(),
+      t: {'.sv': 'timestamp'}
+    });
+    if (invited.code !== newRoomCode) invited = {code: newRoomCode, uids: new Set(), joined: new Set(), at: {}};
+    invited.uids.add(targetUid);
+    (invited.at = invited.at || {})[targetUid] = Date.now();
+    toastAny(`Приглашение отправлено игроку «${targetName}»! Настройте комнату`);
+  } catch (_) {
+    toastAny('Не удалось отправить приглашение — проверьте интернет');
+  }
+  renderLobby();
+}
+
+function openReportDialog(uid, name) {
+  const old = document.getElementById('reportBox'); if (old) old.remove();
+  const box = document.createElement('div'); box.className = 'over'; box.id = 'reportBox'; box.style.position = 'fixed';
+  if (PG.ui.playerCard && PG.ui.playerCard.renderReportDialogHtml) {
+    box.innerHTML = PG.ui.playerCard.renderReportDialogHtml({ uid, name });
+  } else {
+    box.innerHTML = `<div class="ocard"><h3>Жалоба на игрока «${clean(name)}»</h3><button class="cta wide" id="btnSubmitReport">Отправить жалобу</button><button class="ghostbtn" id="btnCancelReport">Отмена</button></div>`;
+  }
+  document.body.append(box);
+  box.onclick = e => { if (e.target === box || e.target.id === 'btnCancelReport') box.remove(); };
+
+  const submitBtn = box.querySelector('#btnSubmitReport');
+  if (submitBtn) {
+    submitBtn.onclick = async () => {
+      const selectedRadio = box.querySelector('input[name="repReasonChoice"]:checked');
+      const reasonKey = selectedRadio ? selectedRadio.value : 'other';
+      const commentInput = box.querySelector('#repCommentInput');
+      const comment = commentInput ? commentInput.value.trim() : '';
+
+      submitBtn.disabled = true;
+      submitBtn.textContent = 'Отправка…';
+
+      try {
+        const pres = await fbGet('presence/' + uid).catch(() => null);
+        const reportPayload = {
+          k: 'report_v2',
+          targetUid: uid,
+          targetName: clean(name),
+          reason: reasonKey,
+          comment: comment.slice(0, 300),
+          st: (pres && pres.st) || '',
+          byUid: myUid(),
+          byName: profileName(),
+          t: {'.sv': 'timestamp'}
+        };
+        await fbPut(`feedback/${myUid()}/rep_${Date.now().toString(36)}`, reportPayload);
+        toastAny('Жалоба отправлена на рассмотрение. Спасибо за помощь!');
+        track('player_report');
+        box.remove();
+      } catch (_) {
+        toastAny('Не удалось отправить жалобу — проверьте интернет');
+        submitBtn.disabled = false;
+        submitBtn.textContent = 'Отправить жалобу';
+      }
+    };
+  }
+}
+
+async function openPlayer(uid, name, col, meta = {}) {
   if (!uid || !FB) return;
   const old = document.getElementById('plBox'); if (old) old.remove();
   const box = document.createElement('div'); box.className = 'over'; box.id = 'plBox'; box.style.position = 'fixed';
-  const me = uid === myUid(), n = clean(name) || 'Игрок', c = validCol(col) ? col : '#5b6684';
+  const me = uid === myUid(), n = clean(name) || 'Игрок';
+  const c = validCol(col) ? col : (meta && meta.c && validCol(meta.c) ? meta.c : '#5b6684');
   const room = net && !net.quick && !(net.gameId && phase !== 'end') ? net.code : null;
   const isFr = isFriend(uid);
-  box.innerHTML = `<div class="ocard prof pcard pl-dialog">
-    <div class="pl-header">
-      <span class="av big" style="--c:${c}">${n[0].toUpperCase()}</span>
-      <div class="pl-titles">
-        <h3 class="pl-name">${n}</h3>
-        <span class="pl-online-badge off" id="plBadge">Загрузка данных…</span>
-      </div>
-    </div>
-    <div class="pl-stats-grid" id="plStatsGrid">
-      <div class="pl-stat-item"><span class="pl-stat-val" id="plCups">…</span><span class="pl-stat-lbl">Кубки</span></div>
-      <div class="pl-stat-item"><span class="pl-stat-val" id="plWins">…</span><span class="pl-stat-lbl">Победы</span></div>
-      <div class="pl-stat-item"><span class="pl-stat-val" id="plState">…</span><span class="pl-stat-lbl">Статус</span></div>
-    </div>
-    <div class="pl-actions">
-      ${me ? '' : isFr && room ? `<button class="cta wide" id="plInvite">🎮 Позвать в комнату ${room}</button>` : ''}
-      ${me ? '' : !isFr ? `<button class="cta wide" id="plAdd">+ Добавить в друзья</button>` : `<button class="ghostbtn" id="plDel">Удалить из друзей</button>`}
-      ${me ? '' : '<button class="ghostbtn muted-btn" id="plReport">⚠️ Пожаловаться на игрока</button>'}
-      <button class="ghostbtn" id="plNo">Закрыть</button>
-    </div>
-  </div>`;
-  document.body.append(box);
-  box.onclick = e => { if (e.target === box || e.target.id === 'plNo') box.remove(); };
-  const del = box.querySelector('#plDel');
-  if (del) del.onclick = () => {
-    box.remove();
-    confirmBox(`Удалить ${n} из друзей?`, 'Удалить', () => removeFriend(uid));
-  };
-  const inv = box.querySelector('#plInvite');
-  if (inv) inv.onclick = () => {
-    inviteFriend(uid);
-    inv.disabled = true;
-    inv.textContent = '✓ Приглашение отправлено';
-  };
-  // Report a nickname or a status (user-generated text): goes to the developer's feedback inbox.
-  const rep = box.querySelector('#plReport'); if (rep) rep.onclick = () => confirmBox(`Пожаловаться на игрока «${n}»?<br><small style="font-weight:500;color:var(--muted)">Мы проверим никнейм и статус и примем меры.</small>`, 'Пожаловаться', async () => {
-    try {
-      const pres = await fbGet('presence/' + uid).catch(() => null);
-      await fbPut(`feedback/${myUid()}/rep_${Date.now().toString(36)}`, {k: 'report', m: `Жалоба на игрока ${uid}: ник «${n}», статус «${PG.state.status.shownStatus(pres && pres.st) || ''}»`.slice(0, 1400), t: {'.sv': 'timestamp'}});
-      toastAny('Жалоба отправлена. Спасибо!'); track('player_report'); rep.disabled = true; rep.textContent = 'Жалоба отправлена';
-    } catch (_) { toastAny('Не получилось отправить жалобу: проверьте интернет'); }
-  });
-  const add = box.querySelector('#plAdd'); if (add) add.onclick = () => { add.disabled = true; add.textContent = '✓ Заявка отправлена'; addFriend(uid, n, 'profile'); };
-  const [lead, pres] = await Promise.all([fbGet('leaders/' + uid).catch(() => null), fbGet('presence/' + uid).catch(() => null)]);
-  const lastT = (pres && pres.t) || (lead && lead.t) || 0;
-  const ago = lastT ? Math.round((Date.now() - lastT) / 60000) : null;
-  const isOnline = pres && pres.s && pres.s !== 'off' && (ago == null || ago < 3);
-  const seenText = ago == null ? 'Офлайн' : isOnline ? 'В сети' : ago < 60 ? `был(а) ${ago} мин назад` : ago < 1440 ? `был(а) ${Math.round(ago / 60)} ч назад` : Math.round(ago / 1440) === 1 ? 'был(а) вчера' : `был(а) ${Math.round(ago / 1440)} дн назад`;
-  const sv = PG.state.status.shownStatus((pres && pres.st) || (lead && lead.st));
 
-  const badgeEl = box.querySelector('#plBadge');
-  if (badgeEl) {
-    badgeEl.className = 'pl-online-badge ' + (isOnline ? 'on' : 'off');
-    badgeEl.innerHTML = (isOnline ? '<i>●</i> В сети' : '<i>○</i> ' + seenText) + (sv ? ` · <em class="fst">${sv}</em>` : '');
-  }
-  const cupsEl = box.querySelector('#plCups');
-  if (cupsEl) cupsEl.textContent = `🏆 ${lead && +lead.r || 0}`;
-  const winsEl = box.querySelector('#plWins');
-  if (winsEl) winsEl.textContent = `${lead && +lead.w || 0}`;
-  const stateEl = box.querySelector('#plState');
-  if (stateEl) stateEl.textContent = isOnline ? (STATE_TEXT[pres.s] || 'в игре') : seenText;
+  let cups = (meta && meta.cups) ? +meta.cups : 0;
+  let wins = 0;
+  let games = 0;
+  let statusText = (meta && meta.st) ? meta.st : '';
+  let frame = (meta && meta.fr) ? meta.fr : '';
+
+  const renderCard = (pData = {}) => {
+    if (PG.ui.playerCard && PG.ui.playerCard.renderPlayerCardHtml) {
+      box.innerHTML = PG.ui.playerCard.renderPlayerCardHtml({
+        uid,
+        name: n,
+        col: pData.col || c,
+        frame: pData.frame || frame,
+        statusText: pData.statusText || statusText,
+        cups: pData.cups != null ? pData.cups : cups,
+        wins: pData.wins != null ? pData.wins : wins,
+        games: pData.games != null ? pData.games : games,
+        isOnline: pData.isOnline || false,
+        seenText: pData.seenText || 'Офлайн',
+        isFriend: isFr,
+        isMe: me,
+        pendingInvite: Boolean(invited && invited.uids && invited.uids.has(uid)),
+        incomingRequest: Boolean(inbox && inbox[uid + '_f']),
+        hasActiveRoom: Boolean(room),
+        roomCode: room || ''
+      });
+      wireCardEvents();
+    } else {
+      box.innerHTML = `<div class="ocard prof pcard"><button id="plReport">Пожаловаться</button></div>`;
+      wireCardEvents();
+    }
+  };
+
+  const wireCardEvents = () => {
+    const closeBtn = box.querySelector('#plCloseBtn') || box.querySelector('#plNo');
+    if (closeBtn) closeBtn.onclick = () => box.remove();
+
+    const inv = box.querySelector('#plInviteRoom');
+    if (inv) {
+      inv.onclick = async () => {
+        box.remove();
+        await invitePlayerToRoom(uid, n);
+      };
+    }
+
+    const add = box.querySelector('#plAdd');
+    if (add) {
+      add.onclick = () => {
+        add.disabled = true;
+        add.innerHTML = '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M20 6L9 17l-5-5"/></svg><span>Заявка отправлена</span>';
+        addFriend(uid, n, 'profile');
+      };
+    }
+
+    const acc = box.querySelector('#plAcceptFriend');
+    if (acc) {
+      acc.onclick = () => {
+        box.remove();
+        acceptFriend(uid);
+      };
+    }
+
+    const del = box.querySelector('#plDel');
+    if (del) {
+      del.onclick = () => {
+        box.remove();
+        confirmBox(`Удалить ${n} из друзей?`, 'Удалить', () => removeFriend(uid));
+      };
+    }
+
+    const cp = box.querySelector('#plCopyId');
+    if (cp) {
+      cp.onclick = () => {
+        try {
+          if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(uid);
+          toastAny('ID игрока скопирован');
+        } catch (_) {
+          toastAny(`ID: ${uid}`);
+        }
+      };
+    }
+
+    const rep = box.querySelector('#plReport');
+    if (rep) {
+      rep.onclick = () => {
+        box.remove();
+        openReportDialog(uid, n);
+      };
+    }
+
+    const ed = box.querySelector('#plEditSelf');
+    if (ed) {
+      ed.onclick = () => {
+        box.remove();
+        editProfile();
+      };
+    }
+  };
+
+  renderCard();
+  document.body.append(box);
+  box.onclick = e => { if (e.target === box) box.remove(); };
+
+  try {
+    const [lead, pres] = await Promise.all([
+      fbGet('leaders/' + uid).catch(() => null),
+      fbGet('presence/' + uid).catch(() => null)
+    ]);
+    const details = (PG.ui.playerCard && PG.ui.playerCard.formatPresenceDetails)
+      ? PG.ui.playerCard.formatPresenceDetails(pres, lead, STATE_TEXT)
+      : { isOnline: false, seenText: 'Офлайн' };
+
+    cups = (lead && +lead.r) ? +lead.r : cups;
+    wins = (lead && +lead.w) ? +lead.w : (lead && +lead.owins ? +lead.owins : 0);
+    games = (lead && +lead.games) ? +lead.games : (lead && +lead.g ? +lead.g : (wins > 0 ? wins : 0));
+    statusText = PG.state.status.shownStatus((pres && pres.st) || (lead && lead.st) || statusText);
+    frame = (lead && lead.fr) || (pres && pres.fr) || frame;
+
+    renderCard({
+      cups,
+      wins,
+      games,
+      statusText,
+      frame,
+      isOnline: details.isOnline,
+      seenText: details.seenText
+    });
+  } catch (_) {}
 }
-document.addEventListener('click', e => { const b = e.target.closest('[data-pl]'); if (b && !e.target.closest('button.chip')) openPlayer(b.dataset.pl, b.dataset.n, b.dataset.c); });
+document.addEventListener('click', e => { const b = e.target.closest('[data-pl]'); if (b && !e.target.closest('button.chip')) openPlayer(b.dataset.pl, b.dataset.n, b.dataset.c, b.dataset); });
 // Edit the profile: colour (free, any time) and nickname (the usual rename).
 function editProfile() {
   const box = document.createElement('div'); box.className = 'over'; box.style.position = 'fixed';
@@ -4839,7 +5039,8 @@ function renderProgress() {
   renderProfile();
   renderTasks();
 }
-$('#ptabs').onclick = e => {
+// The progress screen may have no tabs (the full-screen road): a missing element must not stop the game from starting.
+if ($('#ptabs')) $('#ptabs').onclick = e => {
   const b = e.target.closest('[data-pt]'); if (!b) return;
   ptab = b.dataset.pt; roadScroll = ptab === 'road';
   renderTasks();
@@ -4871,7 +5072,7 @@ $('#ptab').addEventListener('click', e => {
     toastAny(`Коллекция «${col.name}» собрана! +${col.reward} золота 🎉`);
   }
   else return;
-  beep('coin'); saveWallet(); progressDot(); renderProgress(); renderMenuProfile();
+  beep('coin'); saveWallet(); progressDot(); renderProgress(); if (typeof renderAchievements === 'function' && !$('#scr-achievements').hidden) renderAchievements(); renderMenuProfile();
 });
 /* Rating: cups from online games (1st +30, 2nd +15, 3rd +5, draw +10) in /leaders, top 50.
    The database rules let a player raise their own score by at most 30 a minute, so a big
@@ -5210,7 +5411,7 @@ document.querySelectorAll('.onlineN').forEach(b => b.addEventListener('click', s
    both lists hold each other. A room invite is /inbox/{uid}/{from}_r with the room code.
    Online / offline comes from /presence. Rules: docs/firebase-rules.json. */
 const FRIEND_MAX = 50, INVITE_TTL = 15 * 60000;
-let friends = [], inbox = {}, inboxEs = null, invited = {code: null, uids: new Set(), joined: new Set(), at: {}}, friendsBack = 'menu';
+var inboxEs = null, invited = {code: null, uids: new Set(), joined: new Set(), at: {}}, friendsBack = 'menu'; inbox = inbox || {}; friends = friends || [];
 function fbUrl(path) { return FBC.url(path); }
 function fbGet(path) { return FBC.get(path); }
 function fbPut(path, v) { return FBC.put(path, v); }
@@ -5344,7 +5545,7 @@ async function acceptFriend(from) {
     await fbPut(`inbox/${from}/${me}_f`, {k: 'ok', n: profileName(), t: {'.sv': 'timestamp'}});
   } catch (_) { return toastAny('Не получилось — проверьте интернет'); }
   delete inbox[from + '_f']; fbDel(`inbox/${me}/${from}_f`);
-  toastAny(`${clean(x.n)} теперь ваш друг`); await loadFriends(); renderFriends(); friendsDot();
+  toastAny(`${clean(x.n)} теперь ваш друг`); await loadFriends(); renderFriends(); friendsDot(); updateNotifBadge(); if (!$('#scr-inbox').hidden) renderInbox();
 }
 // "Not now" / dismissing a room invitation tells the inviter (a note in their inbox under my key: no new rules needed).
 function declineInvite(key) {
@@ -5352,7 +5553,7 @@ function declineInvite(key) {
   const x = inbox[key], from = key.slice(0, -2); if (!x || x.k !== 'r') return;
   fbPut(`inbox/${from}/${myUid()}_r`, {k: 'no', code: String(x.code || ''), n: profileName(), t: {'.sv': 'timestamp'}}).catch(() => {});
 }
-function dropInbox(key) { delete inbox[key]; fbDel(`inbox/${myUid()}/${key}`); renderFriends(); friendsDot(); }
+function dropInbox(key) { delete inbox[key]; fbDel(`inbox/${myUid()}/${key}`); renderFriends(); friendsDot(); updateNotifBadge(); if (!$('#scr-inbox').hidden) renderInbox(); }
 async function removeFriend(uid) { await fbDel(`friends/${myUid()}/${uid}`); friends = friends.filter(f => f.uid !== uid); renderFriends(); }
 // A room to invite into: the current one, or a new private room (a search for opponents is dropped).
 function ensureRoom() {
@@ -5400,10 +5601,51 @@ function onInbox(all) {
     inbox[k] = v;
     if (!inboxShown.has(k + v.t)) { inboxShown.add(k + v.t); popInbox(k, v); }
   }
-  friendsDot(); renderFriends();
+  friendsDot(); renderFriends(); updateNotifBadge(); if (!$('#scr-inbox').hidden) renderInbox();
 }
 function popInbox(k, v) {
-  if (v.k === 'f') return toastAny(`${clean(v.n)} хочет добавить вас в друзья`);
+  if (v.k === 'f') {
+    const fromUid = k.slice(0, -2);
+    const safeName = clean(v.n) || 'Игрок';
+    document.querySelectorAll('.over.friend-req-pop').forEach(x => x.remove());
+    const box = document.createElement('div');
+    box.className = 'over friend-req-pop';
+    box.style.position = 'fixed';
+    box.innerHTML = `
+      <div class="ocard" style="max-width:340px;text-align:center;padding:24px 20px">
+        <div style="margin:0 auto 12px;width:56px;height:56px;border-radius:50%;background:rgba(96,165,250,0.15);border:1.5px solid rgba(96,165,250,0.4);display:flex;align-items:center;justify-content:center">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>
+          </svg>
+        </div>
+        <h3 style="margin:0 0 6px;font-size:18px">${safeName} хочет дружить</h3>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 18px;line-height:1.4">Игрок отправил вам заявку в друзья. Примите, чтобы видеть статус в сети и играть вместе.</p>
+        <button class="cta wide" data-fpop="acc" style="margin-bottom:8px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" style="vertical-align:-2px;margin-right:4px"><path d="M20 6L9 17l-5-5"/></svg>
+          Принять дружбу
+        </button>
+        <button class="ghostbtn wide" data-fpop="later">Позже</button>
+      </div>
+    `;
+    box.onclick = e => {
+      const b = e.target.closest('[data-fpop]');
+      if (!b) {
+        if (e.target === box) box.remove();
+        return;
+      }
+      box.remove();
+      if (b.dataset.fpop === 'acc') {
+        acceptFriend(fromUid).then(() => {
+          updateNotifBadge();
+          if (!$('#scr-inbox').hidden) renderInbox();
+        });
+      }
+    };
+    document.body.append(box);
+    beep('turn');
+    updateNotifBadge();
+    return;
+  }
   if (v.k !== 'r') return;
   const busy = (gameVisible && phase !== 'end' && players.length) || tut;
   if (busy) return toastAny(`${clean(v.n)} зовёт в комнату — загляните в «Друзья»`);
@@ -5701,9 +5943,13 @@ function renderFriends() {
   $('#fErr').hidden = has || !fcodeErr; $('#fCopy').hidden = !has; $('#fTap').hidden = !has;
   if (!has && fcodeErr) $('#fErr').firstChild.textContent = fcodeErr === 'rules' ? 'Друзья пока недоступны: сервер игры ещё не обновлён. Скоро заработает.' : 'Нет связи с сервером — проверьте интернет.';
   const room = net && !net.quick && !(net.gameId && phase !== 'end') ? net.code : null;
-  $('#fRoom').hidden = false;
-  if (room) $('#fRoom').innerHTML = `<span>Ваша комната <b>${room}</b>. Друзьям, которых вы позовёте, придёт приглашение</span><button class="chip go" data-froom>Открыть комнату</button>`;
-  else $('#fRoom').innerHTML = `<span>Создайте комнату для совместной игры с друзьями</span><button class="chip go" data-fcreate>🎮 Создать комнату</button>`;
+  if (room) {
+    $('#fRoom').hidden = false;
+    $('#fRoom').innerHTML = `<span>Ваша комната <b>${room}</b></span><button class="chip go" data-froom>В комнату</button>`;
+  } else {
+    $('#fRoom').hidden = true;
+    $('#fRoom').innerHTML = '';
+  }
   const reqs = Object.entries(inbox).filter(([, v]) => v.k === 'f'), invs = Object.entries(inbox).filter(([, v]) => v.k === 'r');
   const on = friends.filter(f => f.on), off = friends.filter(f => f.mutual && !f.on), wait = friends.filter(f => !f.mutual);
   box.innerHTML = (typeof PG !== 'undefined' && PG.net && PG.net.friends && PG.net.friends.renderFriendsListHtml)
@@ -7110,11 +7356,13 @@ function renderInbox() {
   wallet.inbox = wallet.inbox || { claimed: [], read: [] };
   const claimed = Array.isArray(wallet.inbox.claimed) ? wallet.inbox.claimed : [];
   const listEl = $('#notifList');
+  const friendRequests = Object.entries(inbox || {}).filter(([, v]) => v && v.k === 'f');
   if (listEl && typeof PG !== 'undefined' && PG.ui && PG.ui.inbox && PG.ui.inbox.renderInboxHtml) {
     listEl.innerHTML = PG.ui.inbox.renderInboxHtml({
       items: PG.ui.inbox.INBOX_ITEMS,
       claimed: claimed,
-      filter: ntab
+      filter: ntab,
+      friendRequests: friendRequests
     });
   }
   document.querySelectorAll('#ntabs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.nt === ntab));
@@ -7125,8 +7373,9 @@ function updateNotifBadge() {
   wallet.inbox = wallet.inbox || { claimed: [], read: [] };
   const claimed = Array.isArray(wallet.inbox.claimed) ? wallet.inbox.claimed : [];
   const read = Array.isArray(wallet.inbox.read) ? wallet.inbox.read : [];
+  const friendRequests = Object.entries(inbox || {}).filter(([, v]) => v && v.k === 'f');
   const count = (typeof PG !== 'undefined' && PG.ui && PG.ui.inbox && PG.ui.inbox.unreadInboxCount)
-    ? PG.ui.inbox.unreadInboxCount(claimed, read)
+    ? PG.ui.inbox.unreadInboxCount(claimed, read, friendRequests)
     : 0;
   const dot = $('#notifDot');
   if (dot) {
@@ -7180,6 +7429,25 @@ document.addEventListener('click', e => {
 
     saveWallet();
     renderInbox();
+    return;
+  }
+
+  const faccBtn = e.target.closest('[data-facc]');
+  if (faccBtn) {
+    const fromUid = faccBtn.dataset.facc;
+    acceptFriend(fromUid).then(() => {
+      renderInbox();
+      updateNotifBadge();
+    });
+    return;
+  }
+
+  const fdropBtn = e.target.closest('[data-fdrop]');
+  if (fdropBtn) {
+    const key = fdropBtn.dataset.fdrop;
+    dropInbox(key);
+    renderInbox();
+    updateNotifBadge();
     return;
   }
 
@@ -7250,6 +7518,7 @@ function show(name) {
   if (name === 'settings') renderPrefs();
   if (name === 'menu') { saveWallet(); presenceCount(); progressDot(); renderMenuProfile(); updateNotifBadge(); }
   if (name === 'progress') { roadScroll = true; renderTasks(); }
+  if (name === 'achievements') { renderAchievements(); }
   if (name === 'profile') { renderProfile(); renderAccount(); }
   if (name === 'rating') { renderTop(); }
   track('screen_view', {screen_name: name});
@@ -7257,7 +7526,7 @@ function show(name) {
     PG.app.telegram.updateTelegramBackButton(name !== 'menu', () => show('menu'));
   }
   if (name === 'friends') openFriends();
-  if (name === 'menu') { friendsDot(); (typeof bootReady === 'undefined' ? Promise.resolve() : bootReady).then(() => { (typeof syncStart === 'undefined' ? Promise.resolve() : syncStart).then(() => { setTimeout(streakCheck, 300); setTimeout(checkNameProposal, 800); }); setTimeout(notifNudge, 1600); }); }
+  if (name === 'menu') { friendsDot(); (typeof bootReady === 'undefined' ? Promise.resolve() : bootReady).then(() => { (typeof syncStart === 'undefined' ? Promise.resolve() : syncStart).then(() => { setTimeout(checkNameProposal, 800); }); setTimeout(notifNudge, 1600); }); }
   clearTimeout(presenceSoon); presenceSoon = setTimeout(() => presenceMark(true), 1500);
 }
 let historyReturn = 'menu';
@@ -7481,15 +7750,15 @@ window.onUpdateAvailable = (info, manual) => {
   lastUpd = info;
   if (typeof updateSettingsUpdateBtn === 'function') updateSettingsUpdateBtn(info);
 
-  // Determine whether this update is mandatory (breaking protocol, desync fix, or admin enforced)
-  const isMandatory = (typeof PG !== 'undefined' && PG.app && PG.app.update && PG.app.update.isUpdateMandatory)
-    ? PG.app.update.isUpdateMandatory(info, window.MIN_REQUIRED_CODE || 0)
-    : !!(info && (info.mandatory === true || info.force === true || (window.MIN_REQUIRED_CODE && info.code <= window.MIN_REQUIRED_CODE)));
-
-  // If update is optional (not mandatory) and check was automatic (on startup or periodic),
-  // do NOT interrupt the player with a blocking popup dialog!
-  // Note: On test/staging builds (-test), always prompt the tester immediately so they don't miss builds.
+  const curCode = appCode();
+  const minCode = window.MIN_REQUIRED_CODE || (info && info.minRequiredCode) || 0;
   const isTestBuild = !!(info && info.version && info.version.includes('-test')) || !!window.IS_STAGING;
+
+  // Determine whether this update is mandatory:
+  // Production builds: ALL updates are mandatory by default! Test builds: NOT mandatory (unless force: true).
+  const isMandatory = (typeof PG !== 'undefined' && PG.app && PG.app.update && PG.app.update.isUpdateMandatory)
+    ? PG.app.update.isUpdateMandatory(info, minCode, curCode)
+    : (isTestBuild ? Boolean(info && info.force === true) : Boolean(!info || info.mandatory !== false));
   if (!manual && !isMandatory && !isTestBuild) {
     boot.checked = true;
     bootHide();
@@ -7526,7 +7795,9 @@ window.onUpdateAvailable = (info, manual) => {
     box.querySelector('.prog').hidden = true; const m = box.querySelector('#manual'); m.hidden = false; m.textContent = 'Скачать новую версию вручную'; m.href = info.url; m.className = 'cta wide';
     toastAny(msg);
   };
-};
+};// An update the app found before this script ran (web/boot-guard.js kept it).
+if (window.__upd) setTimeout(() => window.onUpdateAvailable(window.__upd, false));
+
 
 /* ---------------- update pause ---------------- */
 // When a new version comes out during an online game, the game waits for everyone: the clocks and the
@@ -7696,8 +7967,12 @@ window.addEventListener('keydown', e => {
   }
 });
 
-injectArt();
-dailyBonus(); renderPrefs(); checkMaintenance(); checkUpdatePolicy(); applyStatsConsent();
+try { injectArt(); } catch (e) { plog('error', 'injectArt: ' + (e.message || e)); }
+try { dailyBonus(); } catch (_) {}
+try { renderPrefs(); } catch (_) {}
+try { checkMaintenance(); } catch (_) {}
+try { checkUpdatePolicy(); } catch (_) {}
+try { applyStatsConsent(); } catch (_) {}
 // the start: once the splash is gone, a game that was going comes back by itself
 bootReady.then(() => setTimeout(() => { try { if (wallet.name) askStats(); } catch (_) {} }, 2500));
 bootReady.then(() => setTimeout(() => { try { autoResume(); } catch (e) { plog('error', 'autoResume ' + e.message); } }, 450));
@@ -7755,6 +8030,8 @@ const loaderReady = Promise.all(Object.keys(TYPES).map(k => new Promise(res => {
   });
 });
 window.__ready = true;
+// tell the app the page started: a game update downloaded over the air is then kept (ContentUpdater.java)
+try { if (window.AndroidApp && AndroidApp.contentReady) AndroidApp.contentReady(); } catch (_) {}
 // In the app the loader stays a moment as a splash, long enough to see a few tiles land.
 // On app start the splash lays one full fitting 3x3 (restarted once the real pieces are in).
 { const el = $('#boot'); if (el) {
@@ -7785,6 +8062,13 @@ function initMenuHub() {
   const close = () => { pop.classList.remove('open'); btn.setAttribute('aria-expanded', 'false'); setTimeout(() => { if (!pop.classList.contains('open')) pop.hidden = true; }, 160); };
   const open = () => {
     const c = $('#mhubCups'); if (c) c.textContent = '🏆 ' + ((PROG && PROG.cups) || 0);
+    const a = $('#mhubAch');
+    if (a && typeof ACH !== 'undefined' && PROG && PROG.st) {
+      const ready = ACH.filter(x => !PROG.ach[x.id] && x.ok(PROG.st, PROG.lvl)).length;
+      a.textContent = ready ? `+${ready}` : `${ACH.filter(x => PROG.ach[x.id] === 'got').length}/${ACH.length}`;
+      if (ready) a.style.color = '#7fe0a8';
+      else a.style.color = '';
+    }
     pop.hidden = false; btn.setAttribute('aria-expanded', 'true');
     requestAnimationFrame(() => pop.classList.add('open'));
   };
@@ -7797,6 +8081,7 @@ function initMenuHub() {
     const act = it.dataset.hubAction;
     close();
     if (act === 'rating') { if (PROG.inTop10) { PROG.inTop10 = false; PROG.topSeen = true; saveWallet(); progressDot(); } show('rating'); }
+    else if (act === 'achievements') show('achievements');
     else if (act === 'rules') show('rules');
     else if (act === 'history') show('history');
     else if (act === 'settings') { settingsReturn = 'menu'; show('settings'); }
@@ -7874,7 +8159,7 @@ initMenuHub();
     if (buyBtn) {
       const parts = buyBtn.dataset.dailyBuy.split('|');
       const kind = parts[0], key = kind === 'status' ? parts[1].replace(/^sh:/, '') : parts[1], price = +parts[2];
-      if (kind === 'emote') return buyReaction('emote', key);
+      if (kind === 'emote' || kind === 'phrase') return buyReaction(kind, key);
       if (wallet.gold < price) return toastAny(`Не хватает ${price - wallet.gold} золота`);
 
       if (kind === 'fig') {

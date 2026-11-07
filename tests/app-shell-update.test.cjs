@@ -79,3 +79,34 @@ test('app/update: UPD_WAIT and appCode', async () => {
 
   assert.equal(U.formatUpdCountdown(125), 'Само продолжится через 2:05');
 });
+
+test('app/update: isUpdateMandatory, shouldPromptUpdate, and formatUpdateSettingsBadge', async () => {
+  const U = await import('../src/app/update.js');
+
+  assert.equal(U.isUpdateMandatory(null), false);
+  assert.equal(U.shouldPromptUpdate(null), false);
+
+  // Production build: ALL updates are mandatory by default
+  assert.equal(U.isUpdateMandatory({code: 264, version: '1.0.264', package: 'app.crownfall.tiletopia'}), true);
+  assert.equal(U.isUpdateMandatory({code: 264, version: '1.0.264'}), true);
+  assert.equal(U.isUpdateMandatory({code: 264, version: '1.0.264', mandatory: false}), false);
+
+  // Test / staging build: updates are NOT mandatory by default (tester can postpone)
+  assert.equal(U.isUpdateMandatory({code: 275, version: '1.0.275-test', package: 'app.crownfall.tiletopia.test'}), false);
+  assert.equal(U.isUpdateMandatory({code: 275, version: '1.0.275-test'}), false);
+  assert.equal(U.isUpdateMandatory({code: 275, version: '1.0.275-test', force: true}), true);
+
+  // shouldPromptUpdate: manual check always prompts
+  assert.equal(U.shouldPromptUpdate({code: 264, mandatory: false}, {manual: true}), true);
+
+  // shouldPromptUpdate: test builds always prompt testers with option to update or postpone
+  assert.equal(U.shouldPromptUpdate({code: 275, version: '1.0.275-test', mandatory: false}, {manual: false}), true);
+
+  // shouldPromptUpdate: production build is mandatory by default, so it prompts
+  assert.equal(U.shouldPromptUpdate({code: 264, version: '1.0.264'}, {manual: false}), true);
+
+  // formatUpdateSettingsBadge:
+  assert.equal(U.formatUpdateSettingsBadge(null), 'Проверить обновления');
+  assert.equal(U.formatUpdateSettingsBadge({version: '1.0.264', mandatory: false}), 'Обновить до 1.0.264 (по желанию)');
+  assert.equal(U.formatUpdateSettingsBadge({version: '1.0.264', mandatory: true}), 'Обновить до 1.0.264 (важно!)');
+});

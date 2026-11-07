@@ -135,15 +135,8 @@ build_page() {
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Tiletopia">
 <meta property="og:title" content="Tiletopia — настольная игра с плитками"><meta property="og:description" content="Стройте города, дороги и монастыри — играйте с друзьями онлайн. Бесплатно, без рекламы."><meta property="og:image" content="https://crownfall90-dot.github.io/TileTopia/icons/icon-512.png">
-<script>
-(function () {
-  setTimeout(function () {
-    if (window.__ready) return;
-    document.body.innerHTML = '<div style="font:16px sans-serif;color:#eef1f8;background:#101729;position:fixed;inset:0;padding:32px;line-height:1.5"><h2 style="margin:0 0 12px">Не удалось запустить игру</h2><p>Обновите браузер (Safari, Chrome) до последней версии и откройте страницу снова.</p></div>';
-  }, 10000);
-})();
-</script>
 HEAD
+      printf '<script>'; cat web/boot-guard.js; printf '</script>\n'
       if [ "$staging" = "true" ]; then
         printf '<script>window.WEBAPP = true; window.IS_STAGING = true; window.WEB_VERSION = "%s";</script>\n' "$vstring"
         printf '<meta name="robots" content="noindex,nofollow">\n'
@@ -151,21 +144,7 @@ HEAD
         printf '<script>window.WEBAPP = true; window.IS_STAGING = false; window.WEB_VERSION = "%s";</script>\n' "$vstring"
       fi
     else
-      cat <<'BOOT'
-<script>
-/* If the game cannot start (usually an outdated Android System WebView), say how to fix it instead of a blank screen. */
-(function () {
-  var m = /Chrome\/(\d+)/.exec(navigator.userAgent), old = m && +m[1] < 80;
-  function fail() {
-    if (window.__ready) return;
-    document.body.innerHTML = '<div style="font:16px sans-serif;color:#eef1f8;background:#101729;position:fixed;top:0;left:0;right:0;bottom:0;padding:32px;line-height:1.5">' +
-      '<h2 style="margin:0 0 12px">Не удалось запустить игру</h2><p>Обновите приложения «Android System WebView» и «Chrome» в Google Play и откройте игру снова.</p>' +
-      '<p><a style="color:#f2b84b" href="https://play.google.com/store/apps/details?id=com.google.android.webview">Открыть Android System WebView в Google Play</a></p></div>';
-  }
-  if (old) document.addEventListener('DOMContentLoaded', fail); else setTimeout(fail, 8000);
-})();
-</script>
-BOOT
+      printf '<script>'; cat web/boot-guard.js; printf '</script>\n'
     fi
     printf '<script>window.RELEASE_NOTES = %s; window.FIREBASE = %s;</script>\n' "$notes" "$firebase"
     printf '<script>'; cat build/bundle/pg.js; printf '</script>\n'

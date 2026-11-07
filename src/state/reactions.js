@@ -59,8 +59,8 @@ const PHRASE_RARITY = {
 };
 /** Reactions that can also be earned, and where (shown next to the price). */
 export const EARN = {
-  emote: {'😎': 'Дорога прогресса · ур. 2', '🏰': 'Дорога прогресса · ур. 4', '🏆': 'Дорога прогресса · ур. 10'},
-  phrase: {'Красиво строишь!': 'Дорога прогресса · ур. 6', 'Ну ты гроссмейстер! 👑': 'Дорога прогресса · ур. 9'},
+  emote: {'😎': 'Дорога прогресса · ур. 5', '🏰': 'Дорога прогресса · ур. 15', '🏆': 'Дорога прогресса · ур. 50'},
+  phrase: {'Красиво строишь!': 'Дорога прогресса · ур. 25', 'Ну ты гроссмейстер! 👑': 'Дорога прогресса · ур. 40'},
 };
 /** Gold for collecting every emoji / every phrase, given once. */
 export const COLLECTION_REWARD = {emote: 150, phrase: 200};

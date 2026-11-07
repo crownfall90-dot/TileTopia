@@ -1,0 +1,57 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64" width="64" height="64">
+  <defs>
+    <filter id="g-shadow" x="-20%" y="-20%" width="140%" height="140%">
+      <feDropShadow dx="0" dy="3" stdDeviation="2.5" flood-color="#000000" flood-opacity="0.45"/>
+    </filter>
+    <linearGradient id="g-edge" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#b37d14"/>
+      <stop offset="100%" stop-color="#543802"/>
+    </linearGradient>
+    <linearGradient id="g-rim" x1="0.2" y1="0.1" x2="0.8" y2="0.9">
+      <stop offset="0%" stop-color="#fff8db"/>
+      <stop offset="35%" stop-color="#f5b82e"/>
+      <stop offset="100%" stop-color="#694503"/>
+    </linearGradient>
+    <radialGradient id="g-field" cx="38%" cy="32%" r="65%">
+      <stop offset="0%" stop-color="#fed766"/>
+      <stop offset="55%" stop-color="#e59819"/>
+      <stop offset="100%" stop-color="#8a5302"/>
+    </radialGradient>
+    <linearGradient id="g-emboss" x1="0" y1="0" x2="0" y2="1">
+      <stop offset="0%" stop-color="#fffbeb"/>
+      <stop offset="100%" stop-color="#664103"/>
+    </linearGradient>
+    <linearGradient id="g-glare" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#ffffff" stop-opacity="0.55"/>
+      <stop offset="45%" stop-color="#ffffff" stop-opacity="0.0"/>
+    </linearGradient>
+  </defs>
+
+  <g filter="url(#g-shadow)">
+    <!-- Bottom 3D thickness lip -->
+    <ellipse cx="32" cy="34" rx="27" ry="27" fill="url(#g-edge)"/>
+    <!-- Main coin face -->
+    <circle cx="32" cy="31" r="27" fill="url(#g-rim)"/>
+    <!-- Outer rim inner shadow -->
+    <circle cx="32" cy="31" r="24.5" fill="#523402"/>
+    <!-- Recessed coin field -->
+    <circle cx="32" cy="31" r="23" fill="url(#g-field)"/>
+    <!-- Beaded / dashed milled ring -->
+    <circle cx="32" cy="31" r="21" fill="none" stroke="#fff1b8" stroke-width="1.2" stroke-dasharray="2 2" opacity="0.8"/>
+    
+    <!-- EMBOSSED SYMBOL: Royal Imperial Crown -->
+    <!-- Shadow underneath emboss -->
+    <path d="M20 40h24v-4l-3-13-6 7-3-10-3 10-6-7-3 13v4zm3-2l2-9 4 5 3-9 3 9 4-5 2 9h-18z" fill="#3b2301" transform="translate(0, 1.2)"/>
+    <!-- Highlighted emboss body -->
+    <path d="M20 39h24v-4l-3-13-6 7-3-10-3 10-6-7-3 13v4zm3-2l2-9 4 5 3-9 3 9 4-5 2 9h-18z" fill="url(#g-emboss)"/>
+    <!-- Crown gems / pearls -->
+    <circle cx="32" cy="19" r="1.8" fill="#ffffff"/>
+    <circle cx="23" cy="22" r="1.5" fill="#ffffff"/>
+    <circle cx="41" cy="22" r="1.5" fill="#ffffff"/>
+    <!-- Base ribbon band -->
+    <rect x="22" y="36.5" width="20" height="2" rx="1" fill="#fff8db" opacity="0.85"/>
+    
+    <!-- Diagonal metallic coin sheen -->
+    <path d="M12 25 Q 32 10 46 14 A 23 23 0 0 0 16 16 Z" fill="url(#g-glare)"/>
+  </g>
+</svg>
