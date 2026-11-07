@@ -651,8 +651,10 @@
 </div>
 
 <script>
+window.__ready = true;
 (() => {
 'use strict';
+var inbox = {}, friends = [];
 if (typeof window !== 'undefined' && window.Telegram && window.Telegram.WebApp) {
   try { window.Telegram.WebApp.ready(); window.Telegram.WebApp.expand(); } catch(_) {}
 }
@@ -4457,6 +4459,19 @@ function ptabsDot() {
     b.classList.toggle('hasdot', pt === 'rewards' ? (qDot || wqDot || aDot) : pt === 'cols' ? cDot : pt === 'top' ? tDot : false);
   });
 }
+const PROGRESS_ROAD_MILESTONES = [
+  { id: 'm5', lvl: 5, cups: 50, title: 'Новичок', desc: '+50 монет и эмодзи 😎', reward: { gold: 50, emote: '😎' }, ic: '🌱' },
+  { id: 'm10', lvl: 10, cups: 150, title: 'Следопыт', desc: 'Статус «Следопыт» и +80 монет', reward: { status: 'Следопыт', gold: 80 }, ic: '🧭' },
+  { id: 'm15', lvl: 15, cups: 300, title: 'Зодчий', desc: '+120 монет и эмодзи 🏰', reward: { gold: 120, emote: '🏰' }, ic: '🏰' },
+  { id: 'm20', lvl: 20, cups: 500, title: 'Изумруд', desc: 'Рамка «Изумруд» и +150 монет', reward: { frame: 'emerald', gold: 150 }, ic: '💎' },
+  { id: 'm25', lvl: 25, cups: 800, title: 'Мастер', desc: '+200 монет и фраза «Красиво строишь!»', reward: { gold: 200, phrase: 'Красиво строишь!' }, ic: '⭐' },
+  { id: 'm30', lvl: 30, cups: 1200, title: 'Магистр', desc: 'Фигурка и +250 монет', reward: { fig: 'classic', gold: 250 }, ic: '🧙‍♂️' },
+  { id: 'm35', lvl: 35, cups: 1700, title: 'Золотой сундук', desc: '+350 монет', reward: { gold: 350 }, ic: '🎁' },
+  { id: 'm40', lvl: 40, cups: 2300, title: 'Гроссмейстер', desc: 'Статус «Гроссмейстер» и фраза', reward: { status: 'Гроссмейстер', gold: 300, phrase: 'Ну ты гроссмейстер! 👑' }, ic: '👑' },
+  { id: 'm45', lvl: 45, cups: 3000, title: 'Легенда', desc: '+400 монет и статус «Легенда»', reward: { status: 'Легенда', gold: 400 }, ic: '⚔️' },
+  { id: 'm50', lvl: 50, cups: 4000, title: 'Чемпион', desc: 'Кубок Чемпиона, рамка, +600 монет и 🏆', reward: { frame: 'gold', gold: 600, emote: '🏆' }, ic: '🏆' },
+];
+
 function progressDot() {
   const b = $('#progBtn');
   const myLvl = PROG.lvl || 1, myCups = PROG.cups || 0;
@@ -4494,19 +4509,6 @@ function renderMenuQuestBanner() {
     else sEl.textContent = 'Задания';
   }
 }
-const PROGRESS_ROAD_MILESTONES = [
-  { id: 'm5', lvl: 5, cups: 50, title: 'Новичок', desc: '+50 монет и эмодзи 😎', reward: { gold: 50, emote: '😎' }, ic: '🌱' },
-  { id: 'm10', lvl: 10, cups: 150, title: 'Следопыт', desc: 'Статус «Следопыт» и +80 монет', reward: { status: 'Следопыт', gold: 80 }, ic: '🧭' },
-  { id: 'm15', lvl: 15, cups: 300, title: 'Зодчий', desc: '+120 монет и эмодзи 🏰', reward: { gold: 120, emote: '🏰' }, ic: '🏰' },
-  { id: 'm20', lvl: 20, cups: 500, title: 'Изумруд', desc: 'Рамка «Изумруд» и +150 монет', reward: { frame: 'emerald', gold: 150 }, ic: '💎' },
-  { id: 'm25', lvl: 25, cups: 800, title: 'Мастер', desc: '+200 монет и фраза «Красиво строишь!»', reward: { gold: 200, phrase: 'Красиво строишь!' }, ic: '⭐' },
-  { id: 'm30', lvl: 30, cups: 1200, title: 'Магистр', desc: 'Фигурка и +250 монет', reward: { fig: 'classic', gold: 250 }, ic: '🧙‍♂️' },
-  { id: 'm35', lvl: 35, cups: 1700, title: 'Золотой сундук', desc: '+350 монет', reward: { gold: 350 }, ic: '🎁' },
-  { id: 'm40', lvl: 40, cups: 2300, title: 'Гроссмейстер', desc: 'Статус «Гроссмейстер» и фраза', reward: { status: 'Гроссмейстер', gold: 300, phrase: 'Ну ты гроссмейстер! 👑' }, ic: '👑' },
-  { id: 'm45', lvl: 45, cups: 3000, title: 'Легенда', desc: '+400 монет и статус «Легенда»', reward: { status: 'Легенда', gold: 400 }, ic: '⚔️' },
-  { id: 'm50', lvl: 50, cups: 4000, title: 'Чемпион', desc: 'Кубок Чемпиона, рамка, +600 монет и 🏆', reward: { frame: 'gold', gold: 600, emote: '🏆' }, ic: '🏆' },
-];
-
 /* The progress road as a map in the game's own style: level 1 top left, level 2 at the right edge, level 3 left again...
    a cobbled road winds from one to the next, rivers cross it under little bridges, villages, woods and a castle stand
    between. Everything is placed from a fixed seed, so the map is the same every time it is opened. */
@@ -5449,7 +5451,7 @@ document.querySelectorAll('.onlineN').forEach(b => b.addEventListener('click', s
    both lists hold each other. A room invite is /inbox/{uid}/{from}_r with the room code.
    Online / offline comes from /presence. Rules: docs/firebase-rules.json. */
 const FRIEND_MAX = 50, INVITE_TTL = 15 * 60000;
-let friends = [], inbox = {}, inboxEs = null, invited = {code: null, uids: new Set(), joined: new Set(), at: {}}, friendsBack = 'menu';
+var inboxEs = null, invited = {code: null, uids: new Set(), joined: new Set(), at: {}}, friendsBack = 'menu'; inbox = inbox || {}; friends = friends || [];
 function fbUrl(path) { return FBC.url(path); }
 function fbGet(path) { return FBC.get(path); }
 function fbPut(path, v) { return FBC.put(path, v); }
@@ -5583,7 +5585,7 @@ async function acceptFriend(from) {
     await fbPut(`inbox/${from}/${me}_f`, {k: 'ok', n: profileName(), t: {'.sv': 'timestamp'}});
   } catch (_) { return toastAny('Не получилось — проверьте интернет'); }
   delete inbox[from + '_f']; fbDel(`inbox/${me}/${from}_f`);
-  toastAny(`${clean(x.n)} теперь ваш друг`); await loadFriends(); renderFriends(); friendsDot();
+  toastAny(`${clean(x.n)} теперь ваш друг`); await loadFriends(); renderFriends(); friendsDot(); updateNotifBadge(); if (!$('#scr-inbox').hidden) renderInbox();
 }
 // "Not now" / dismissing a room invitation tells the inviter (a note in their inbox under my key: no new rules needed).
 function declineInvite(key) {
@@ -5591,7 +5593,7 @@ function declineInvite(key) {
   const x = inbox[key], from = key.slice(0, -2); if (!x || x.k !== 'r') return;
   fbPut(`inbox/${from}/${myUid()}_r`, {k: 'no', code: String(x.code || ''), n: profileName(), t: {'.sv': 'timestamp'}}).catch(() => {});
 }
-function dropInbox(key) { delete inbox[key]; fbDel(`inbox/${myUid()}/${key}`); renderFriends(); friendsDot(); }
+function dropInbox(key) { delete inbox[key]; fbDel(`inbox/${myUid()}/${key}`); renderFriends(); friendsDot(); updateNotifBadge(); if (!$('#scr-inbox').hidden) renderInbox(); }
 async function removeFriend(uid) { await fbDel(`friends/${myUid()}/${uid}`); friends = friends.filter(f => f.uid !== uid); renderFriends(); }
 // A room to invite into: the current one, or a new private room (a search for opponents is dropped).
 function ensureRoom() {
@@ -5639,10 +5641,51 @@ function onInbox(all) {
     inbox[k] = v;
     if (!inboxShown.has(k + v.t)) { inboxShown.add(k + v.t); popInbox(k, v); }
   }
-  friendsDot(); renderFriends();
+  friendsDot(); renderFriends(); updateNotifBadge(); if (!$('#scr-inbox').hidden) renderInbox();
 }
 function popInbox(k, v) {
-  if (v.k === 'f') return toastAny(`${clean(v.n)} хочет добавить вас в друзья`);
+  if (v.k === 'f') {
+    const fromUid = k.slice(0, -2);
+    const safeName = clean(v.n) || 'Игрок';
+    document.querySelectorAll('.over.friend-req-pop').forEach(x => x.remove());
+    const box = document.createElement('div');
+    box.className = 'over friend-req-pop';
+    box.style.position = 'fixed';
+    box.innerHTML = `
+      <div class="ocard" style="max-width:340px;text-align:center;padding:24px 20px">
+        <div style="margin:0 auto 12px;width:56px;height:56px;border-radius:50%;background:rgba(96,165,250,0.15);border:1.5px solid rgba(96,165,250,0.4);display:flex;align-items:center;justify-content:center">
+          <svg width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="#60a5fa" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="8.5" cy="7" r="4"/><line x1="20" y1="8" x2="20" y2="14"/><line x1="23" y1="11" x2="17" y2="11"/>
+          </svg>
+        </div>
+        <h3 style="margin:0 0 6px;font-size:18px">${safeName} хочет дружить</h3>
+        <p style="font-size:13px;color:var(--muted);margin:0 0 18px;line-height:1.4">Игрок отправил вам заявку в друзья. Примите, чтобы видеть статус в сети и играть вместе.</p>
+        <button class="cta wide" data-fpop="acc" style="margin-bottom:8px">
+          <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" style="vertical-align:-2px;margin-right:4px"><path d="M20 6L9 17l-5-5"/></svg>
+          Принять дружбу
+        </button>
+        <button class="ghostbtn wide" data-fpop="later">Позже</button>
+      </div>
+    `;
+    box.onclick = e => {
+      const b = e.target.closest('[data-fpop]');
+      if (!b) {
+        if (e.target === box) box.remove();
+        return;
+      }
+      box.remove();
+      if (b.dataset.fpop === 'acc') {
+        acceptFriend(fromUid).then(() => {
+          updateNotifBadge();
+          if (!$('#scr-inbox').hidden) renderInbox();
+        });
+      }
+    };
+    document.body.append(box);
+    beep('turn');
+    updateNotifBadge();
+    return;
+  }
   if (v.k !== 'r') return;
   const busy = (gameVisible && phase !== 'end' && players.length) || tut;
   if (busy) return toastAny(`${clean(v.n)} зовёт в комнату — загляните в «Друзья»`);
@@ -7353,11 +7396,13 @@ function renderInbox() {
   wallet.inbox = wallet.inbox || { claimed: [], read: [] };
   const claimed = Array.isArray(wallet.inbox.claimed) ? wallet.inbox.claimed : [];
   const listEl = $('#notifList');
+  const friendRequests = Object.entries(inbox || {}).filter(([, v]) => v && v.k === 'f');
   if (listEl && typeof PG !== 'undefined' && PG.ui && PG.ui.inbox && PG.ui.inbox.renderInboxHtml) {
     listEl.innerHTML = PG.ui.inbox.renderInboxHtml({
       items: PG.ui.inbox.INBOX_ITEMS,
       claimed: claimed,
-      filter: ntab
+      filter: ntab,
+      friendRequests: friendRequests
     });
   }
   document.querySelectorAll('#ntabs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.nt === ntab));
@@ -7368,8 +7413,9 @@ function updateNotifBadge() {
   wallet.inbox = wallet.inbox || { claimed: [], read: [] };
   const claimed = Array.isArray(wallet.inbox.claimed) ? wallet.inbox.claimed : [];
   const read = Array.isArray(wallet.inbox.read) ? wallet.inbox.read : [];
+  const friendRequests = Object.entries(inbox || {}).filter(([, v]) => v && v.k === 'f');
   const count = (typeof PG !== 'undefined' && PG.ui && PG.ui.inbox && PG.ui.inbox.unreadInboxCount)
-    ? PG.ui.inbox.unreadInboxCount(claimed, read)
+    ? PG.ui.inbox.unreadInboxCount(claimed, read, friendRequests)
     : 0;
   const dot = $('#notifDot');
   if (dot) {
@@ -7423,6 +7469,25 @@ document.addEventListener('click', e => {
 
     saveWallet();
     renderInbox();
+    return;
+  }
+
+  const faccBtn = e.target.closest('[data-facc]');
+  if (faccBtn) {
+    const fromUid = faccBtn.dataset.facc;
+    acceptFriend(fromUid).then(() => {
+      renderInbox();
+      updateNotifBadge();
+    });
+    return;
+  }
+
+  const fdropBtn = e.target.closest('[data-fdrop]');
+  if (fdropBtn) {
+    const key = fdropBtn.dataset.fdrop;
+    dropInbox(key);
+    renderInbox();
+    updateNotifBadge();
     return;
   }
 
@@ -7940,8 +8005,12 @@ window.addEventListener('keydown', e => {
   }
 });
 
-injectArt();
-dailyBonus(); renderPrefs(); checkMaintenance(); checkUpdatePolicy(); applyStatsConsent();
+try { injectArt(); } catch (e) { plog('error', 'injectArt: ' + (e.message || e)); }
+try { dailyBonus(); } catch (_) {}
+try { renderPrefs(); } catch (_) {}
+try { checkMaintenance(); } catch (_) {}
+try { checkUpdatePolicy(); } catch (_) {}
+try { applyStatsConsent(); } catch (_) {}
 // the start: once the splash is gone, a game that was going comes back by itself
 bootReady.then(() => setTimeout(() => { try { if (wallet.name) askStats(); } catch (_) {} }, 2500));
 bootReady.then(() => setTimeout(() => { try { autoResume(); } catch (e) { plog('error', 'autoResume ' + e.message); } }, 450));

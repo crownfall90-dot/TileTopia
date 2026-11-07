@@ -29,8 +29,23 @@ test('ui/inbox: items definition, unread count and rendering', async () => {
   );
   assert.equal(unreadNone, 0, 'Unread is 0 when all claimed & read');
 
+  // Unread with friend requests
+  const unreadWithFriend = inbox.unreadInboxCount(
+    inbox.INBOX_ITEMS.map(i => i.id),
+    inbox.INBOX_ITEMS.map(i => i.id),
+    [['u123_f', { n: 'Алексей', k: 'f' }]]
+  );
+  assert.equal(unreadWithFriend, 1, 'Unread includes pending friend requests');
+
   // HTML rendering
-  const html = inbox.renderInboxHtml({items: inbox.INBOX_ITEMS, claimed: []});
+  const html = inbox.renderInboxHtml({
+    items: inbox.INBOX_ITEMS,
+    claimed: [],
+    friendRequests: [['u123_f', { n: 'Алексей', k: 'f' }]]
+  });
   assert.ok(html.includes('notif-card'), 'Renders notif-card');
   assert.ok(html.includes('data-claim-notif="notif_old_status"'), 'Renders claim button for old status');
+  assert.ok(html.includes('data-facc="u123"'), 'Renders accept button for friend request');
+  assert.ok(html.includes('data-fdrop="u123_f"'), 'Renders decline button for friend request');
+  assert.ok(html.includes('Алексей'), 'Renders friend request sender name');
 });

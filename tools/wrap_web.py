@@ -95,14 +95,20 @@ def build_page(dest, is_staging, vstring):
         parts.append('''<script>
 /* If the game cannot start (usually an outdated Android System WebView), say how to fix it instead of a blank screen. */
 (function () {
-  var m = /Chrome\/(\\d+)/.exec(navigator.userAgent), old = m && +m[1] < 80;
   function fail() {
     if (window.__ready) return;
-    document.body.innerHTML = '<div style="font:16px sans-serif;color:#eef1f8;background:#101729;position:fixed;top:0;left:0;right:0;bottom:0;padding:32px;line-height:1.5">' +
-      '<h2 style="margin:0 0 12px">Не удалось запустить игру</h2><p>Обновите приложения «Android System WebView» и «Chrome» в Google Play и откройте игру снова.</p>' +
-      '<p><a style="color:#f2b84b" href="https://play.google.com/store/apps/details?id=com.google.android.webview">Открыть Android System WebView в Google Play</a></p></div>';
+    if (document.getElementById('boot') || document.getElementById('bnav') || document.querySelector('.screen:not([hidden])')) {
+      window.__ready = true;
+      return;
+    }
+    document.body.innerHTML = '<div style="font:16px sans-serif;color:#eef1f8;background:#101729;position:fixed;top:0;left:0;right:0;bottom:0;padding:32px;line-height:1.5;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">' +
+      '<div style="font-size:48px;margin-bottom:16px">🧩</div>' +
+      '<h2 style="margin:0 0 12px">Не удалось запустить игру</h2>' +
+      '<p style="max-width:380px;color:#94a3b8;margin:0 0 20px">Произошла задержка при инициализации компонентов. Попробуйте перезапустить игру или обновить системный компонент WebView.</p>' +
+      '<button onclick="location.reload()" style="background:#4f8ef7;color:#fff;border:none;padding:12px 24px;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:16px">Попробовать снова</button>' +
+      '<p style="font-size:13px;color:#64748b;margin:0"><a style="color:#f2b84b;text-decoration:none" href="https://play.google.com/store/apps/details?id=com.google.android.webview">Обновить Android System WebView в Google Play</a></p></div>';
   }
-  if (old) document.addEventListener('DOMContentLoaded', fail); else setTimeout(fail, 8000);
+  setTimeout(fail, 20000);
 })();
 </script>''')
     
