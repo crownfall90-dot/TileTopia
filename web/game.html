@@ -651,7 +651,6 @@
 </div>
 
 <script>
-window.__ready = true;
 (() => {
 'use strict';
 var inbox = {}, friends = [];
@@ -5080,7 +5079,8 @@ function renderProgress() {
   renderProfile();
   renderTasks();
 }
-$('#ptabs').onclick = e => {
+// The progress screen may have no tabs (the full-screen road): a missing element must not stop the game from starting.
+if ($('#ptabs')) $('#ptabs').onclick = e => {
   const b = e.target.closest('[data-pt]'); if (!b) return;
   ptab = b.dataset.pt; roadScroll = ptab === 'road';
   renderTasks();
@@ -7835,7 +7835,9 @@ window.onUpdateAvailable = (info, manual) => {
     box.querySelector('.prog').hidden = true; const m = box.querySelector('#manual'); m.hidden = false; m.textContent = 'Скачать новую версию вручную'; m.href = info.url; m.className = 'cta wide';
     toastAny(msg);
   };
-};
+};// An update the app found before this script ran (web/boot-guard.js kept it).
+if (window.__upd) setTimeout(() => window.onUpdateAvailable(window.__upd, false));
+
 
 /* ---------------- update pause ---------------- */
 // When a new version comes out during an online game, the game waits for everyone: the clocks and the

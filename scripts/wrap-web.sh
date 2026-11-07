@@ -131,15 +131,8 @@ build_page() {
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Tiletopia">
 <meta property="og:title" content="Tiletopia — настольная игра с плитками"><meta property="og:description" content="Стройте города, дороги и монастыри — играйте с друзьями онлайн. Бесплатно, без рекламы."><meta property="og:image" content="https://crownfall90-dot.github.io/TileTopia/icons/icon-512.png">
-<script>
-(function () {
-  setTimeout(function () {
-    if (window.__ready) return;
-    document.body.innerHTML = '<div style="font:16px sans-serif;color:#eef1f8;background:#101729;position:fixed;inset:0;padding:32px;line-height:1.5"><h2 style="margin:0 0 12px">Не удалось запустить игру</h2><p>Обновите браузер (Safari, Chrome) до последней версии и откройте страницу снова.</p></div>';
-  }, 10000);
-})();
-</script>
 HEAD
+      printf '<script>'; cat web/boot-guard.js; printf '</script>\n'
       if [ "$staging" = "true" ]; then
         printf '<script>window.WEBAPP = true; window.IS_STAGING = true; window.WEB_VERSION = "%s";</script>\n' "$vstring"
         printf '<meta name="robots" content="noindex,nofollow">\n'
@@ -147,27 +140,7 @@ HEAD
         printf '<script>window.WEBAPP = true; window.IS_STAGING = false; window.WEB_VERSION = "%s";</script>\n' "$vstring"
       fi
     else
-      cat <<'BOOT'
-<script>
-/* If the game cannot start (usually an outdated Android System WebView), say how to fix it instead of a blank screen. */
-(function () {
-  function fail() {
-    if (window.__ready) return;
-    if (document.getElementById('boot') || document.getElementById('bnav') || document.querySelector('.screen:not([hidden])')) {
-      window.__ready = true;
-      return;
-    }
-    document.body.innerHTML = '<div style="font:16px sans-serif;color:#eef1f8;background:#101729;position:fixed;top:0;left:0;right:0;bottom:0;padding:32px;line-height:1.5;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">' +
-      '<div style="font-size:48px;margin-bottom:16px">🧩</div>' +
-      '<h2 style="margin:0 0 12px">Не удалось запустить игру</h2>' +
-      '<p style="max-width:380px;color:#94a3b8;margin:0 0 20px">Произошла задержка при инициализации компонентов. Попробуйте перезапустить игру или обновить системный компонент WebView.</p>' +
-      '<button onclick="location.reload()" style="background:#4f8ef7;color:#fff;border:none;padding:12px 24px;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:16px">Попробовать снова</button>' +
-      '<p style="font-size:13px;color:#64748b;margin:0"><a style="color:#f2b84b;text-decoration:none" href="https://play.google.com/store/apps/details?id=com.google.android.webview">Обновить Android System WebView в Google Play</a></p></div>';
-  }
-  setTimeout(fail, 20000);
-})();
-</script>
-BOOT
+      printf '<script>'; cat web/boot-guard.js; printf '</script>\n'
     fi
     printf '<script>window.RELEASE_NOTES = %s; window.FIREBASE = %s;</script>\n' "$notes" "$firebase"
     printf '<script>'; cat build/bundle/pg.js; printf '</script>\n'
