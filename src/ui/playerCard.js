@@ -44,6 +44,10 @@ export function renderPlayerCardHtml({
   incomingRequest = false,
   hasActiveRoom = false,
   roomCode = '',
+  frameRing = '',
+  achievements = null,
+  achTotal = 0,
+  level = null,
 }) {
   const cleanName = String(name || 'Игрок').replace(/[<>&"']/g, '').slice(0, 20);
   const initial = (cleanName[0] || '?').toUpperCase();
@@ -118,13 +122,9 @@ export function renderPlayerCardHtml({
       `;
     }
 
-    // 3. Secondary row actions (Copy ID and Report)
+    // 3. Secondary row action: report
     const secondaryActions = `
       <div class="pl-v2-sub-row">
-        <button class="chip pl-v2-chip" id="plCopyId" aria-label="Скопировать ID">
-          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><rect x="9" y="9" width="13" height="13" rx="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg>
-          <span>Скопировать ID</span>
-        </button>
         <button class="chip pl-v2-chip danger-chip" id="plReport" aria-label="Пожаловаться на игрока">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2.2" stroke-linecap="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
           <span>Пожаловаться</span>
@@ -144,7 +144,7 @@ export function renderPlayerCardHtml({
       <!-- Player Identity Header -->
       <div class="pl-v2-header">
         <div class="pl-v2-av-box" style="--pl-c:${safeCol}">
-          <span class="pl-v2-av ${safeFrame ? 'fr-' + safeFrame : ''}">${initial}</span>
+          <span class="pl-v2-av${frameRing ? ' fr' : ''}" style="--c:${safeCol}${frameRing ? ';--fr:' + String(frameRing).replace(/[;"<>]/g, '') : ''}">${initial}</span>${level != null ? `<span class="pl-v2-lvl">${+level || 1}</span>` : ''}
         </div>
         <div class="pl-v2-identity">
           <h3 class="pl-v2-name">${cleanName}</h3>
@@ -183,6 +183,13 @@ export function renderPlayerCardHtml({
           </div>
           <b class="pl-v2-stat-val" id="plGamesVal">${games}</b>
           <small class="pl-v2-stat-lbl">Партий</small>
+        </div>
+        <div class="pl-v2-stat" title="Достижения">
+          <div class="pl-v2-stat-icon ach">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#f2b84b" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="9" r="6"/><path d="M8.5 14L7 22l5-3 5 3-1.5-8"/></svg>
+          </div>
+          <b class="pl-v2-stat-val" id="plAchVal">${achievements != null ? +achievements : '—'}</b>
+          <small class="pl-v2-stat-lbl">${achTotal ? `из ${+achTotal}` : 'Достижения'}</small>
         </div>
       </div>
 

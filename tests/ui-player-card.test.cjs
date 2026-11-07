@@ -41,7 +41,6 @@ test('ui/playerCard: formatPresenceDetails, renderPlayerCardHtml, renderReportDi
   assert.ok(peerCard.includes('id="plInviteRoom"'), 'has invite to room button');
   assert.ok(peerCard.includes('id="plAdd"'), 'has offer friendship button');
   assert.ok(peerCard.includes('id="plReport"'), 'has report button');
-  assert.ok(peerCard.includes('id="plCopyId"'), 'has copy id button');
   assert.ok(!peerCard.includes('🏆'), 'no standard emoji trophy, uses SVG');
   assert.ok(peerCard.includes('svg width="18" height="18"'), 'uses SVG icons');
 

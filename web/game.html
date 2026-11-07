@@ -260,7 +260,7 @@
         <div class="lb rules">
           <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Как играть</b></div>
           <button class="tutcard" id="tutBtn"><span>🎓</span><span><b>Обучение за 2 минуты</b><small>Сыграйте первую партию с подсказками · +30 меди</small></span><i class="tgo">›</i></button>
-          <div class="seg rtabs" id="rtabs"><button data-rt="basics" aria-pressed="true">Основы</button><button data-rt="score" aria-pressed="false">Очки</button><button data-rt="meeple" aria-pressed="false">Фишки</button><button data-rt="more" aria-pressed="false">Ещё</button></div>
+          <div class="seg rtabs" id="rtabs"><button data-rt="basics" aria-pressed="true">Основы</button><button data-rt="score" aria-pressed="false">Очки</button><button data-rt="meeple" aria-pressed="false">Фишки</button><button data-rt="more" aria-pressed="false">Ещё</button><button data-rt="modes" aria-pressed="false">Награды</button></div>
 
           <div class="rpane" data-rp="basics">
             <div class="rgoal"><span>🏰</span><div><b>Плиточная стратегия</b><p>Tiletopia — пошаговая плиточная стратегия. Игроки по очереди берут квадратные плитки из общего запаса и выкладывают на стол, развивая города, дороги и особые объекты. Выбранная локация стола меняет мир плиток и добавляет свои уникальные особенности. <b>Побеждает сильнейший тактик!</b></p></div></div>
@@ -299,6 +299,21 @@
             <div class="hitem"><span class="hic">🤝</span><div><b>Благородство зодчего (+1 очко)</b><p>Если вы достроили чужой объект, где нет ваших миплов, игра благодарит вас +1 очком за помощь в градостроительстве.</p></div></div>
           </div>
 
+          <div class="rpane" data-rp="modes" hidden>
+            <div class="h3">Режимы</div>
+            <div class="hitem"><span class="hic">⚡</span><div><b>Быстрая</b><p>30 плиток, 4 фишки, партия минут на 8.</p></div></div>
+            <div class="hitem"><span class="hic">⚖️</span><div><b>Классика</b><p>50 плиток, 6 фишек, около 15 минут.</p></div></div>
+            <div class="hitem"><span class="hic">🏰</span><div><b>Большая</b><p>100 плиток, 8 фишек и редкие карты, около получаса.</p></div></div>
+            <div class="hitem"><span class="hic">⬢</span><div><b>Классика 2.0</b><p>Шестиугольные плитки: у каждой шесть соседей, города и дороги поворачивают как угодно. Монастырь окружают шесть плиток — тогда он даёт 9 очков.</p></div></div>
+            <div class="h3">Монеты</div>
+            <div class="hitem"><span class="hic"><i class="coin copper"></i></span><div><b>Медь</b><p>За партии, задания, подарки и достижения. На неё покупаются обычные вещи.</p></div></div>
+            <div class="hitem"><span class="hic"><i class="coin silver"></i></span><div><b>Серебро</b><p>100 меди = 1 серебро в обменнике витрины. За серебро — дорогие фигурки, рамки и статусы. Серебро дают и серебряные достижения.</p></div></div>
+            <div class="hitem"><span class="hic"><i class="coin gold"></i></span><div><b>Золото</b><p>10 серебра = 1 золото. За золото — самые редкие вещи. Золото дают золотые достижения.</p></div></div>
+            <div class="h3">Прогресс</div>
+            <div class="hitem"><span class="hic">🎯</span><div><b>Задания</b><p>Три задания в день и цели недели. Одно задание в день можно заменить. За все цели недели — большой сундук.</p></div></div>
+            <div class="hitem"><span class="hic">🗺</span><div><b>Дорога прогресса</b><p>Опыт за партии поднимает уровень. На дороге — награды за уровни и кубки: монеты, статусы, рамки, сундуки.</p></div></div>
+            <div class="hitem"><span class="hic">🏆</span><div><b>Кубки и рейтинг</b><p>Онлайн-партии на кубки: за 1 место +30, за 2 +15, за 3 +5, за ничью +10. Лучшие игроки — в рейтинге.</p></div></div>
+          </div>
           <div class="rpane" data-rp="more" hidden>
             <div class="h3">Особые карты</div>
             <div class="hitem"><span class="hic">🌊</span><div><b>Озеро</b><p>Занимает всю карту, и во все стороны в него впадают реки.</p></div></div>
@@ -3320,7 +3335,7 @@ async function presenceMark(on) {
     if (!fbAuth.uid) return;
     const url = `${FB.dbUrl}/presence/${fbAuth.uid}.json?auth=${tok}`;
     const vs = versionSeen(), di = devInfo(), dev = {p: installKind(), v: vs.v, u: vs.t, ...(di.m ? {m: di.m, i: di.i} : {})};
-    const ret = {c: validCol(wallet.color) ? wallet.color : '', st: myStatus(), fs: wallet.firstSeen || today(), d1: (wallet.rd && wallet.rd[1]) ? 1 : 0, d7: (wallet.rd && wallet.rd[7]) ? 1 : 0};
+    const ret = {fr: FRAMES[wallet.frame] ? wallet.frame : '', a: ACH.filter(x => PROG.ach[x.id] === 'got').length, lv: PROG.lvl || 1, w: (PROG.st && PROG.st.wins) || 0, g: (PROG.st && PROG.st.games) || 0, c: validCol(wallet.color) ? wallet.color : '', st: myStatus(), fs: wallet.firstSeen || today(), d1: (wallet.rd && wallet.rd[1]) ? 1 : 0, d7: (wallet.rd && wallet.rd[7]) ? 1 : 0};
     if (on) await fetch(url, {method: 'PUT', body: JSON.stringify({t: {'.sv': 'timestamp'}, n: profileName(), s: presenceState(), r: registered() ? 1 : 0, ...dev, ...ret})});
     else await fetch(url, {method: 'PUT', keepalive: true, body: JSON.stringify({t: {'.sv': 'timestamp'}, n: profileName(), s: 'off', ...dev, ...ret})});
   } catch (_) {}
@@ -4750,7 +4765,7 @@ function renderProfile() {
   const mail = fbAuth && fbAuth.email ? String(fbAuth.email).replace(/[<>&"]/g, '') : 'Профиль не сохранён';
   const profEl = $('#profile');
   if (profEl) {
-    profEl.innerHTML = `<div class="pctop"><span class="av big${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${(name[0] || '?').toUpperCase()}</span><span class="pwho"><b>${name}</b>${myStatus() ? `<em class="fst">${myStatus()}</em>` : ''}<small class="pmail">${mail}</small></span><button class="iconbtn" id="profEdit" aria-label="Редактировать профиль"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button></div><div class="pclvl"><div class="lvl">${ring(PROG.xp / need)}<b>${PROG.lvl}</b></div><div class="pi"><b class="pl1">Уровень ${PROG.lvl}</b><div class="xpbar"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></div><small>${PROG.xp} / ${need} опыта до ${PROG.lvl + 1} уровня</small></div></div><div class="pchips"><span>🏆 <b>${PROG.cups}</b> кубков</span><span><i class="coin"></i> <b>${wallet.gold}</b> меди</span><span>🏅 <b>${ACH.filter(a => PROG.ach[a.id] === 'got').length}</b>/${ACH.length} наград</span></div>${FB ? `<div class="pacts">${fbAuth && fbAuth.email ? '<button class="chip" data-hacct="out">Выйти из аккаунта</button>' : '<button class="chip pri" data-hacct="in">Войти или создать профиль</button>'}</div>` : ''}`;
+    profEl.innerHTML = `<div class="pctop"><span class="av big${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${(name[0] || '?').toUpperCase()}</span><span class="pwho"><b>${name}</b>${myStatus() ? `<em class="fst">${myStatus()}</em>` : ''}<small class="pmail">${mail}</small></span><button class="iconbtn" id="profEdit" aria-label="Редактировать профиль"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button></div><div class="pclvl"><div class="lvl">${ring(PROG.xp / need)}<b>${PROG.lvl}</b></div><div class="pi"><b class="pl1">Уровень ${PROG.lvl}</b><div class="xpbar"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></div><small>${PROG.xp} / ${need} опыта до ${PROG.lvl + 1} уровня</small></div></div><div class="pchips"><span>🏆 <b>${PROG.cups}</b> кубков</span></div><div class="pcoins"><span class="cu"><i class="coin copper"></i><b>${COINS.balance(wallet, 'copper')}</b><small>медь</small></span><span class="ag"><i class="coin silver"></i><b>${COINS.balance(wallet, 'silver')}</b><small>серебро</small></span><span class="au"><i class="coin gold"></i><b>${COINS.balance(wallet, 'gold')}</b><small>золото</small></span></div><div class="pchips"><span>🏅 <b>${ACH.filter(a => PROG.ach[a.id] === 'got').length}</b>/${ACH.length} наград</span></div>${FB ? `<div class="pacts">${fbAuth && fbAuth.email ? '<button class="chip" data-hacct="out">Выйти из аккаунта</button>' : '<button class="chip pri" data-hacct="in">Войти или создать профиль</button>'}</div>` : ''}`;
     const pe = $('#profEdit');
     if (pe) pe.onclick = editProfile;
     profEl.querySelectorAll('[data-hacct]').forEach(b => { b.onclick = () => { const t = $(b.dataset.hacct === 'out' ? '#acLogout' : '#acLogin'); if (t) t.click(); }; });
@@ -4929,6 +4944,7 @@ async function openPlayer(uid, name, col, meta = {}) {
   let games = 0;
   let statusText = (meta && meta.st) ? meta.st : '';
   let frame = (meta && meta.fr) ? meta.fr : '';
+  let ach = null, level = null;
 
   const renderCard = (pData = {}) => {
     if (PG.ui.playerCard && PG.ui.playerCard.renderPlayerCardHtml) {
@@ -4937,6 +4953,8 @@ async function openPlayer(uid, name, col, meta = {}) {
         name: n,
         col: pData.col || c,
         frame: pData.frame || frame,
+        frameRing: FRAMES[pData.frame || frame] ? FRAMES[pData.frame || frame].ring : '',
+        achievements: pData.ach != null ? pData.ach : ach, achTotal: ACH.length, level: pData.level != null ? pData.level : level,
         statusText: pData.statusText || statusText,
         cups: pData.cups != null ? pData.cups : cups,
         wins: pData.wins != null ? pData.wins : wins,
@@ -4994,17 +5012,6 @@ async function openPlayer(uid, name, col, meta = {}) {
       };
     }
 
-    const cp = box.querySelector('#plCopyId');
-    if (cp) {
-      cp.onclick = () => {
-        try {
-          if (navigator.clipboard && navigator.clipboard.writeText) navigator.clipboard.writeText(uid);
-          toastAny('ID игрока скопирован');
-        } catch (_) {
-          toastAny(`ID: ${uid}`);
-        }
-      };
-    }
 
     const rep = box.querySelector('#plReport');
     if (rep) {
@@ -5037,8 +5044,9 @@ async function openPlayer(uid, name, col, meta = {}) {
       : { isOnline: false, seenText: 'Офлайн' };
 
     cups = (lead && +lead.r) ? +lead.r : cups;
-    wins = (lead && +lead.w) ? +lead.w : (lead && +lead.owins ? +lead.owins : 0);
-    games = (lead && +lead.games) ? +lead.games : (lead && +lead.g ? +lead.g : (wins > 0 ? wins : 0));
+    wins = (pres && +pres.w) || (lead && +lead.w) || (lead && +lead.owins) || 0;
+    games = (pres && +pres.g) || (lead && +lead.games) || (lead && +lead.g) || wins;
+    ach = pres && pres.a != null ? +pres.a : null; level = pres && pres.lv ? +pres.lv : null;
     statusText = PG.state.status.shownStatus((pres && pres.st) || (lead && lead.st) || statusText);
     frame = (lead && lead.fr) || (pres && pres.fr) || frame;
 
@@ -5047,7 +5055,7 @@ async function openPlayer(uid, name, col, meta = {}) {
       wins,
       games,
       statusText,
-      frame,
+      frame, ach, level,
       isOnline: details.isOnline,
       seenText: details.seenText
     });

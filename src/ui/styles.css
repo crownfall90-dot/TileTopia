@@ -6656,3 +6656,78 @@ html body #mstat .mpc b{color:#ffd875}
 
 /* the shop characters (rendered figurines) stand tall on their pedestals */
 html body .shop-stall .fig-art{height:84px;width:auto;object-fit:contain;filter:drop-shadow(0 4px 4px rgba(0,0,0,.45))}
+
+/* progress road: the header and the next-reward line sit on dark glass, readable over the grass */
+html body #scr-progress .rd-head{background:rgba(14,20,38,.84);border:1px solid rgba(255,255,255,.14);border-radius:18px;padding:12px 14px;box-shadow:0 8px 20px -10px rgba(0,0,0,.6)}
+html body #scr-progress .rd-head small,html body #scr-progress .rd-head b{color:#eef2ff}
+html body #scr-progress .rd-next{display:block;width:fit-content;max-width:calc(100% - 28px);background:rgba(14,20,38,.8);color:#dfe6f7;padding:8px 12px;border-radius:12px;line-height:1.35;box-shadow:0 6px 14px -8px rgba(0,0,0,.6)}
+html body #scr-progress .rd-next b{color:#ffd875}
+
+/* ---- quests: a hero with day and week rings, cards with an icon tile, a bar with the count, the reward on the right ---- */
+.qk-hero{display:flex;align-items:center;gap:10px;padding:12px;border-radius:18px;margin:4px 0 12px;background:linear-gradient(150deg,rgba(242,184,75,.16),rgba(76,141,255,.08));border:1px solid rgba(242,184,75,.28)}
+.qk-ring{position:relative;flex:0 0 58px;width:58px;height:58px;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center}
+.qk-ring svg{position:absolute;inset:0;width:100%;height:100%;transform:rotate(-90deg)}
+.qk-ring circle{fill:none;stroke-width:5;stroke-linecap:round}.qk-ring .bg{stroke:rgba(255,255,255,.12)}.qk-ring .fg{stroke:#f2b84b}
+.qk-ring b{position:relative;font:800 14px var(--f-display);color:#fff;line-height:1}.qk-ring small{position:relative;font-size:9px;color:var(--muted);line-height:1.2}
+.qk-hero-txt{min-width:0;flex:1}.qk-hero-txt .goalline{margin:0 0 4px;padding:0;background:none;border:0;font-size:13px;line-height:1.3}.qk-hero-txt>small{font-size:11px;color:var(--muted)}
+.qk-list{display:flex;flex-direction:column;gap:8px;margin-bottom:14px}
+.qk,.qk-chest{position:relative;display:flex;align-items:center;gap:10px;padding:10px;border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.03));border:1px solid rgba(255,255,255,.1)}
+.qk-ic,.qk-chest-ic{flex:0 0 44px;height:44px;border-radius:13px;display:grid;place-items:center;font-size:22px;background:linear-gradient(145deg,rgba(76,141,255,.28),rgba(76,141,255,.1));box-shadow:inset 0 1px 0 rgba(255,255,255,.18)}
+.qk-w .qk-ic{background:linear-gradient(145deg,rgba(176,108,240,.32),rgba(176,108,240,.1))}
+.qk-body{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+.qk-body>b{font:700 13.5px var(--f-body);color:#fff;line-height:1.25}
+.qk-body>small{font-size:11.5px;color:var(--muted);line-height:1.3}
+.qk-bar{position:relative;height:16px;border-radius:999px;background:rgba(0,0,0,.3);overflow:hidden}
+.qk-bar i{position:absolute;top:0;bottom:0;left:0;border-radius:inherit;background:linear-gradient(90deg,#4c8dff,#7aa8ff)}
+.qk-w .qk-bar i{background:linear-gradient(90deg,#b06cf0,#d39bff)}
+.qk.done .qk-bar i{background:linear-gradient(90deg,#3fc27a,#7be0a4)}
+.qk-bar em{position:relative;display:block;text-align:center;font:800 10.5px/16px var(--f-display);color:#fff;font-style:normal;text-shadow:0 1px 2px rgba(0,0,0,.6)}
+.qk-rew{flex:0 0 auto;display:inline-flex;align-items:center;gap:4px;padding:6px 9px;border-radius:12px;background:rgba(0,0,0,.25)}
+.qk-rew b{font:800 13px var(--f-display);color:#ffd875}.qk-rew.lock{opacity:.6}
+.qk-claim{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:1px;padding:7px 12px;border:0;border-radius:13px;cursor:pointer;font:800 13px var(--f-display);color:#2a1a02;background:linear-gradient(180deg,#ffd875,#f2b84b);box-shadow:0 0 0 2px rgba(242,184,75,.35),0 6px 14px -4px rgba(242,184,75,.6);animation:qkPulse 1.6s ease-in-out infinite}
+.qk-claim small{display:inline-flex;align-items:center;gap:3px;font-size:11px;font-weight:800}
+@keyframes qkPulse{50%{transform:scale(1.05)}}
+html.calm .qk-claim,html.lowgfx .qk-claim{animation:none}
+.qk-got{flex:0 0 32px;height:32px;border-radius:50%;display:grid;place-items:center;font-weight:900;color:#0f3a1f;background:linear-gradient(180deg,#7be0a4,#3fc27a)}
+.qk.got,.qk-chest.got{opacity:.55}
+.qk.done{border-color:rgba(63,194,122,.5);background:linear-gradient(180deg,rgba(63,194,122,.14),rgba(255,255,255,.03))}
+.qk .qre{flex:0 0 30px;height:30px;border-radius:50%;border:1px solid rgba(255,255,255,.16);background:rgba(255,255,255,.06);color:#cbd7ed;font-size:15px;cursor:pointer}
+.qk-chest{background:linear-gradient(150deg,rgba(242,184,75,.2),rgba(122,74,30,.18));border-color:rgba(242,184,75,.4)}
+.qk-chest-ic{font-size:26px;background:linear-gradient(145deg,rgba(242,184,75,.4),rgba(122,74,30,.3))}
+.qk-pips{display:flex;gap:5px}.qk-pips i{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,.14)}.qk-pips i.on{background:#f2b84b}
+
+/* own profile: the three purses side by side */
+.pcoins{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.pcoins span{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 6px;border-radius:16px;min-width:0;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.1)}
+.pcoins .cu{border-color:rgba(205,127,50,.45)}.pcoins .ag{border-color:rgba(214,226,236,.45)}.pcoins .au{border-color:rgba(255,213,99,.6);box-shadow:0 0 14px -4px rgba(255,200,80,.45)}
+.pcoins .coin{width:26px;height:26px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+.pcoins b{font:800 18px var(--f-display);color:#fff;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.pcoins small{font-size:11px;color:var(--muted)}
+/* another player's card: the frame ring on the avatar, the level badge, four stat tiles */
+.pl-v2-av-box{position:relative}
+.pl-v2-av.fr{border:3px solid transparent;background:linear-gradient(var(--c),var(--c)) padding-box,var(--fr) border-box}
+.pl-v2-lvl{position:absolute;right:-4px;bottom:-4px;min-width:22px;height:22px;padding:0 5px;border-radius:11px;display:grid;place-items:center;font:800 11px var(--f-display);color:#2a1a02;background:linear-gradient(180deg,#ffd875,#f2b84b);border:2px solid #141c33}
+html body .pl-v2-stats{grid-template-columns:repeat(4,1fr)}
+html body .pl-v2-stat-lbl{font-size:10.5px}
+
+/* ---- game history: three summary tiles; each game a card with a result stripe, a medal and a scoreboard ---- */
+.hsum2{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:4px 0 12px}
+.hs-t{display:flex;flex-direction:column;align-items:center;padding:10px 4px;border-radius:16px;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.1)}
+.hs-t b{font:800 20px var(--f-display);color:#fff}.hs-t small{font-size:11px;color:var(--muted)}.hs-t.win b{color:#ffd875}.hs-t.on b{color:#7aa8ff}
+.hrow2{position:relative;margin-bottom:10px;padding:12px 12px 10px 16px;border-radius:18px;background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(255,255,255,.025));border:1px solid rgba(255,255,255,.1);overflow:hidden}
+.hrow2::before{content:"";position:absolute;left:0;top:0;bottom:0;width:5px;background:#5b6684}
+.hrow2.win::before{background:linear-gradient(#ffd875,#f2b84b)}.hrow2.win{border-color:rgba(242,184,75,.4)}
+.hrow2.draw::before{background:#4c8dff}.hrow2.place::before{background:#9aa6c4}.hrow2.loss::before{background:#ef5350}
+.hr2-head{display:flex;align-items:center;gap:10px;margin-bottom:8px}
+.hr2-medal{flex:0 0 36px;height:36px;border-radius:12px;display:grid;place-items:center;font-size:20px;background:rgba(0,0,0,.25)}
+.hr2-title{display:flex;flex-direction:column;min-width:0}.hr2-title b{font:800 15px var(--f-display);color:#fff}.hr2-title small{font-size:11.5px;color:var(--muted)}
+.hrow2.win .hr2-title b{color:#ffd875}
+.hr2-board{display:flex;flex-direction:column;gap:5px}
+.hp2{display:grid;grid-template-columns:16px 10px minmax(0,1fr) 70px 28px;align-items:center;gap:7px;font-size:13px;color:#dfe6f7;padding:3px 0}
+.hp2.me{font-weight:700;color:#fff}.hp2 em{font-style:normal;font:800 11px var(--f-display);color:var(--muted);text-align:center}
+.hp2>i{width:10px;height:10px;border-radius:50%;background:var(--c)}
+.hp2-n{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.hp2-n small{color:var(--muted)}
+.hp2-bar{height:6px;border-radius:3px;background:rgba(255,255,255,.08);overflow:hidden}.hp2-bar i{display:block;height:100%;background:var(--c);border-radius:3px}
+.hp2>b{font:800 13px var(--f-display);text-align:right}
+.hp2 .hadd{grid-column:3 / -1;justify-self:start;margin-top:2px}
+.hp2[data-pl]{cursor:pointer}
