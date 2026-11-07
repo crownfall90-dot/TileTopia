@@ -6600,3 +6600,41 @@ html body #btnMenuNotif .nb-icon svg {
 
 /* achievement icons: the emoji stays inside its 40 px tile */
 html body .ach-card .qi{overflow:hidden;font-size:20px;line-height:1}
+
+/* the exchange in the shop: balances of the three coins, two exchange rows */
+.exch .excard{border-radius:18px;padding:12px 12px 10px;background:linear-gradient(160deg,rgba(242,184,75,.14),rgba(255,255,255,.04) 60%);border:1px solid rgba(242,184,75,.32);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 10px 22px -12px rgba(0,0,0,.6)}
+.exch .exbal{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
+.exch .exbal span{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border-radius:12px;background:rgba(0,0,0,.18);min-width:0}
+.exch .exbal b{font:800 16px var(--f-display);color:#fff;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.exch .exbal small{font-size:11px;color:var(--muted)}
+.exch .exbal .coin{width:22px;height:22px}
+.exch .exrow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 2px;border-top:1px solid rgba(255,255,255,.07);flex-wrap:wrap}
+.exch .exlot{display:flex;align-items:center;gap:5px;font:800 15px var(--f-display);color:#fff;white-space:nowrap}
+.exch .exlot em{font-style:normal;color:var(--brass);margin:0 4px}
+.exch .exbtns{display:flex;gap:6px;flex:0 0 auto}
+.exch .exbtns .chip[disabled]{opacity:.45;pointer-events:none}
+.exch .exnote{margin:6px 2px 0;font-size:12px;line-height:1.4;color:var(--muted)}
+
+/* ---- Shop stalls, the market look: a striped awning with a scalloped valance over each stall (its own colours),
+   wooden posts with a lantern, a plank counter; goods priced in silver and gold glow in their coin's colour,
+   gold goods get a slow shine (stopped with the rest of the motion in calm mode and on economy graphics). ---- */
+.shop-stall{--aw1:#d9433a;--aw2:#f6ead2;position:relative;overflow:hidden}
+.shop-stall.stall-frames{--aw1:#3f78c8}.shop-stall.stall-statuses{--aw1:#3fa060}.shop-stall.stall-emotes{--aw1:#e0a83a}.shop-stall.stall-phrases{--aw1:#9a5ad0}
+.shop-stall .stall-awning{position:relative;height:34px;margin:-1px -1px 0;background:repeating-linear-gradient(90deg,var(--aw1) 0 26px,var(--aw2) 26px 52px);box-shadow:inset 0 -6px 10px rgba(0,0,0,.18),inset 0 4px 0 rgba(255,255,255,.18)}
+.shop-stall .stall-awning-stripes{position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.22),transparent 45%,rgba(0,0,0,.12))}
+.shop-stall .stall-valance{position:absolute;left:0;right:0;bottom:-11px;height:12px;background:radial-gradient(circle at 13px 0,var(--aw1) 12px,transparent 12.5px) 0 0/52px 12px repeat-x,radial-gradient(circle at 39px 0,var(--aw2) 12px,transparent 12.5px) 0 0/52px 12px repeat-x;filter:drop-shadow(0 3px 2px rgba(0,0,0,.3));z-index:1}
+.shop-stall .stall-sign-wrap{position:relative;padding-top:14px}
+.shop-stall .stall-post-left,.shop-stall .stall-post-right{position:absolute;top:0;bottom:-6px;width:9px;background:linear-gradient(90deg,#5a3a1e,#9a6a3c 45%,#5a3a1e);border-radius:3px;z-index:0}
+.shop-stall .stall-post-left{left:8px}.shop-stall .stall-post-right{right:8px}
+.shop-stall .stall-post-left::after,.shop-stall .stall-post-right::after{content:"";position:absolute;top:18px;left:50%;width:12px;height:16px;transform:translateX(-50%);border-radius:5px 5px 7px 7px;background:radial-gradient(circle at 50% 60%,#fff6c8,#ffc94d 45%,#c2711e 80%);box-shadow:0 0 14px 4px rgba(255,200,80,.55)}
+.shop-stall .stall-signboard{position:relative;z-index:1;margin:0 26px;border-radius:12px;background:linear-gradient(180deg,#8a5a33,#6b4426);border:2px solid #4a2f17;box-shadow:inset 0 1px 0 rgba(255,230,190,.35),0 6px 12px -4px rgba(0,0,0,.5)}
+.shop-stall .stall-counter{background:repeating-linear-gradient(180deg,#4a2f1b 0 2px,transparent 2px 46px),linear-gradient(180deg,#6b4426,#56351c);border-top:3px solid #9a6a3c;box-shadow:inset 0 8px 14px -8px rgba(0,0,0,.6)}
+.shop-stall .stall-item{position:relative;background:linear-gradient(180deg,rgba(255,236,200,.1),rgba(0,0,0,.18));border:1px solid rgba(255,220,170,.18);box-shadow:inset 0 1px 0 rgba(255,240,210,.18),0 6px 10px -6px rgba(0,0,0,.6);transition:transform .15s}
+.shop-stall .stall-item:active{transform:scale(.97)}
+.shop-stall .stall-item:has(.coin.silver){border-color:rgba(214,226,236,.55);box-shadow:inset 0 0 18px rgba(214,226,236,.12),0 0 0 1px rgba(214,226,236,.18),0 6px 12px -6px rgba(0,0,0,.6)}
+.shop-stall .stall-item:has(.coin.gold){border-color:rgba(255,213,99,.75);box-shadow:inset 0 0 22px rgba(255,200,80,.18),0 0 14px rgba(255,190,60,.25),0 6px 12px -6px rgba(0,0,0,.6);overflow:hidden}
+.shop-stall .stall-item:has(.coin.gold)::after{content:"";position:absolute;inset:-40% -60%;background:linear-gradient(115deg,transparent 42%,rgba(255,245,200,.32) 50%,transparent 58%);animation:stallShine 4.5s ease-in-out infinite;pointer-events:none}
+@keyframes stallShine{0%,55%{transform:translateX(-55%)}100%{transform:translateX(55%)}}
+html.calm .shop-stall .stall-item::after{animation-play-state:paused}html.lowgfx .shop-stall .stall-item::after{display:none}
+.shop-stall .fig-art{transition:transform .2s}.shop-stall .stall-item:hover .fig-art{transform:translateY(-3px) rotate(-3deg)}
+.shop-stall .stall-item-name{display:block;max-width:100%;font-size:clamp(10.5px,3.1vw,12.5px);letter-spacing:-.01em;line-height:1.15;word-break:normal;overflow-wrap:normal;hyphens:auto;-webkit-hyphens:auto}

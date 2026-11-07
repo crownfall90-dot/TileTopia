@@ -93,8 +93,8 @@ export function renderFiguresGrid({figs, wallet, figPreview}) {
   return Object.entries(figs).map(([k, f]) => {
     const own = (wallet.owned || []).includes(k);
     const sel = wallet.fig === k;
-    const tag = sel ? 'Выбрана' : own ? 'Выбрать' : `<i class="coin"></i>${f.price}`;
-    return `<button class="fig${sel ? ' sel' : ''}${!own && (wallet.gold || 0) < f.price ? ' poor' : ''}" data-fig="${k}">` +
+    const tag = sel ? 'Выбрана' : own ? 'Выбрать' : `${priceTag(f.price)}`;
+    return `<button class="fig${sel ? ' sel' : ''}${!own && !canPay(wallet, f.price) ? ' poor' : ''}" data-fig="${k}">` +
       `<img src="${figPreview(k)}" alt=""><span>${f.name}</span><small>${tag}</small></button>`;
   }).join('');
 }
@@ -105,9 +105,9 @@ export function renderFramesGrid({frames, wallet, initial}) {
   return Object.entries(frames).map(([k, f]) => {
     const own = (!f.price && !f.earn) || (wallet.frames || []).includes(k);
     const sel = (wallet.frame || 'none') === k;
-    return `<button class="frb${sel ? ' sel' : ''}${!own && (f.earn || (wallet.gold || 0) < f.price) ? ' poor' : ''}" data-fr="${k}">` +
+    return `<button class="frb${sel ? ' sel' : ''}${!own && (f.earn || !canPay(wallet, f.price)) ? ' poor' : ''}" data-fr="${k}">` +
       `<span class="av${f.ring ? ' fr' : ''}" style="--c:${wallet.color};${f.ring ? `--fr:${f.ring}` : ''}">${fname}</span>` +
-      `<span>${f.name}</span><small>${sel ? 'Выбрана' : own ? 'Выбрать' : f.earn ? '🔒 ' + f.earn : `<i class="coin"></i>${f.price}`}</small></button>`;
+      `<span>${f.name}</span><small>${sel ? 'Выбрана' : own ? 'Выбрать' : f.earn ? '🔒 ' + f.earn : `${priceTag(f.price)}`}</small></button>`;
   }).join('');
 }
 
@@ -164,7 +164,7 @@ export function renderItemsFramesHtml({frames = {}, ownedFrames = [], wornFrame 
   }).join('')}</div>`
     + (lock.length ? `<div class="h3 sec">Ещё не открыты (нажмите для примерки)</div><div class="frgrid">${lock.map(([k, f]) => {
       const isPre = previewFrame === k;
-      return `<button class="frb lockd${isPre ? ' sel' : ''}" data-pfr="${k}" title="Нажмите для примерки"><span class="av fr" style="--c:${color};--fr:${f.ring}">${initial}</span><span>${f.name}</span><small>${isPre ? 'Примерка' : (f.earn ? '🔒 ' + f.earn : `<i class="coin"></i>${f.price}`)}</small></button>`;
+      return `<button class="frb lockd${isPre ? ' sel' : ''}" data-pfr="${k}" title="Нажмите для примерки"><span class="av fr" style="--c:${color};--fr:${f.ring}">${initial}</span><span>${f.name}</span><small>${isPre ? 'Примерка' : (f.earn ? '🔒 ' + f.earn : `${priceTag(f.price)}`)}</small></button>`;
     }).join('')}</div>` : '')
     + '<button class="ghostbtn wide" data-ishop>В магазин</button>';
 }
@@ -318,7 +318,7 @@ export function renderDailyShopShowcase({ items = [], wallet = {}, figPreview = 
       previewHtml = `<div class="dsh-visual"><span class="dsh-emote">${item.key}</span></div>`;
     }
 
-    const canAfford = gold >= item.price;
+    const canAfford = canPay(wallet, item.price);
     let btnHtml = '';
     if (isEquipped) {
       btnHtml = `<button class="dsh-btn equipped" disabled>Надето</button>`;
@@ -326,7 +326,7 @@ export function renderDailyShopShowcase({ items = [], wallet = {}, figPreview = 
       btnHtml = `<button class="dsh-btn select" data-daily-pick="${item.kind}|${item.key}">Выбрать</button>`;
     } else {
       // '|' between the parts: a status key has a ':' of its own (sh:id)
-      btnHtml = `<button class="dsh-btn buy${!canAfford ? ' poor' : ''}" data-daily-buy="${item.kind}|${item.key}|${item.price}"><i class="coin"></i><b>${item.price}</b></button>`;
+      btnHtml = `<button class="dsh-btn buy${!canAfford ? ' poor' : ''}" data-daily-buy="${item.kind}|${item.key}|${item.price}">${priceTag(item.price)}</button>`;
     }
 
     return `
@@ -366,6 +366,7 @@ export function renderDailyShopShowcase({ items = [], wallet = {}, figPreview = 
 }
 
 // Emoji and phrases live in state/reactions.js (prices, ownership); re-exported here for game.html.
+import {canPay, priceTag} from '../state/coins.js';
 import * as R from '../state/reactions.js';
 export const {DEFAULT_EMOTES, DEFAULT_PHRASES, ALL_EMOTES, ALL_PHRASES, SAYS} = R;
 
@@ -387,7 +388,7 @@ export function renderReactionShopHtml({wallet = {}}) {
     const head = `<div class="rs-head"><span>${title}</span><span class="rs-cnt${c.have === c.total ? ' full' : ''}">Собрано ${c.have} / ${c.total}</span></div>`;
     if (!ids.length) return head + `<div class="rs-done">Коллекция собрана ✨</div>`;
     return head + `<div class="rs-grid ${kind}">${ids.map(id => card(kind, id)).join('')}</div>`
-      + `<small class="rs-note">Соберите все — +${R.COLLECTION_REWARD[kind]} золота</small>`;
+      + `<small class="rs-note">Соберите все — +${R.COLLECTION_REWARD[kind]} меди</small>`;
   };
   return `<div class="rshop">${block('emote', 'Эмодзи')}${block('phrase', 'Фразы')}</div>`;
 }
@@ -455,7 +456,7 @@ export function renderItemsEmotesHtml({
       ${allEmotes.map(em => {
         const isSel = curEm.includes(em);
         if (!own('emote', em)) return `
-          <button class="em-cat-btn lockd" data-rbuy="emote" data-rid="${em}" title="Купить за ${R.price('emote', em)} золота">
+          <button class="em-cat-btn lockd" data-rbuy="emote" data-rid="${em}" title="Купить за ${R.price('emote', em)} меди">
             <span class="em-icon">${em}</span>
             <span class="em-badge lock">🔒</span>
             <span class="em-price">${R.price('emote', em)}</span>
@@ -621,7 +622,7 @@ export function renderShopStallsShowcase({
     totalPoolSize: figPool.length,
     emptyText: 'Все фигурки в вашей коллекции! Новые персонажи появятся в обновлениях.',
     renderCardFn: item => {
-      const canAfford = gold >= item.price;
+      const canAfford = canPay(wallet, item.price);
       return `
         <div class="stall-item fig-stall-card">
           <div class="fig-pedestal-wrap">
@@ -631,7 +632,7 @@ export function renderShopStallsShowcase({
           </div>
           <b class="stall-item-name">${item.name}</b>
           <button class="stall-buy-btn${!canAfford ? ' poor' : ''}" data-daily-buy="fig|${item.key}|${item.price}">
-            <i class="coin"></i> <b>${item.price}</b>
+            ${priceTag(item.price)}
           </button>
         </div>
       `;
@@ -648,7 +649,7 @@ export function renderShopStallsShowcase({
     totalPoolSize: framePool.length,
     emptyText: 'Все рамки собраны! Примеряйте в профиле.',
     renderCardFn: item => {
-      const canAfford = gold >= item.price;
+      const canAfford = canPay(wallet, item.price);
       const ring = item.ring || (frames[item.key] && frames[item.key].ring) || '';
       return `
         <div class="stall-item frame-stall-card">
@@ -657,7 +658,7 @@ export function renderShopStallsShowcase({
           </div>
           <b class="stall-item-name">${item.name}</b>
           <button class="stall-buy-btn${!canAfford ? ' poor' : ''}" data-daily-buy="frame|${item.key}|${item.price}">
-            <i class="coin"></i> <b>${item.price}</b>
+            ${priceTag(item.price)}
           </button>
         </div>
       `;
@@ -674,14 +675,14 @@ export function renderShopStallsShowcase({
     totalPoolSize: statusPool.length,
     emptyText: 'Все статусы из лавки уже у вас! Примеряйте в профиле.',
     renderCardFn: item => {
-      const canAfford = gold >= item.price;
+      const canAfford = canPay(wallet, item.price);
       return `
         <div class="stall-item status-stall-card">
           <div class="status-plate-wrap">
             <span class="stchip stall-chip">${item.name}</span>
           </div>
           <button class="stall-buy-btn${!canAfford ? ' poor' : ''}" data-daily-buy="status|${item.key}|${item.price}">
-            <i class="coin"></i> <b>${item.price}</b>
+            ${priceTag(item.price)}
           </button>
         </div>
       `;
@@ -698,7 +699,7 @@ export function renderShopStallsShowcase({
     totalPoolSize: emotePool.length,
     emptyText: 'Все эмодзи собраны! Полный набор реакций в вашем распоряжении.',
     renderCardFn: item => {
-      const canAfford = gold >= item.price;
+      const canAfford = canPay(wallet, item.price);
       const rarClass = item.rarity ? ' r-' + item.rarity : '';
       return `
         <div class="stall-item emote-stall-card${rarClass}">
@@ -707,7 +708,7 @@ export function renderShopStallsShowcase({
             <small class="stall-rar-tag">${item.name}</small>
           </div>
           <button class="stall-buy-btn${!canAfford ? ' poor' : ''}" data-daily-buy="emote|${item.key}|${item.price}">
-            <i class="coin"></i> <b>${item.price}</b>
+            ${priceTag(item.price)}
           </button>
         </div>
       `;
@@ -724,7 +725,7 @@ export function renderShopStallsShowcase({
     totalPoolSize: phrasePool.length,
     emptyText: 'Все фразы открыты!',
     renderCardFn: item => {
-      const canAfford = gold >= item.price;
+      const canAfford = canPay(wallet, item.price);
       const rarClass = item.rarity ? ' r-' + item.rarity : '';
       return `
         <div class="stall-item phrase-stall-card${rarClass}">
@@ -733,7 +734,7 @@ export function renderShopStallsShowcase({
             <small class="stall-rar-tag">${item.name}</small>
           </div>
           <button class="stall-buy-btn${!canAfford ? ' poor' : ''}" data-daily-buy="phrase|${item.key}|${item.price}">
-            <i class="coin"></i> <b>${item.price}</b>
+            ${priceTag(item.price)}
           </button>
         </div>
       `;

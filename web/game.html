@@ -103,6 +103,7 @@
         <div class="lb">
           <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Витрина</b><span class="goldchip static"><i class="coin"></i><b class="goldN">0</b></span></div>
           <div class="gift" id="gift"></div>
+          <div class="exch" id="exch"></div>
           
           <!-- 5 Medieval Market Stalls (max 6 items per stall: 3 top, 3 bottom) -->
           <div id="dailyShopWrap"></div>
@@ -128,9 +129,9 @@
           <div id="prefs"></div>
           <div class="h3">Поддержка и сообщество</div>
           <div class="sgroup">
-            <button class="srow btn" id="tgChannelBtn"><span class="sic">📢</span><span class="stx"><b>Телеграм-канал</b><small id="tgChannelSub">Новости и обновления · +500 золота</small></span><span class="chip pri" id="tgChannelBadge">+500 🪙</span></button>
+            <button class="srow btn" id="tgChannelBtn"><span class="sic">📢</span><span class="stx"><b>Телеграм-канал</b><small id="tgChannelSub">Новости и обновления · +500 меди</small></span><span class="chip pri" id="tgChannelBadge">+500 🪙</span></button>
             <button class="srow btn" id="feedbackBtn"><span class="sic">💬</span><span class="stx"><b>Написать разработчику</b><small>Идеи и отзывы</small></span><span class="sgo">›</span></button>
-            <button class="srow btn" id="nameProposalBtn"><span class="sic">💡</span><span class="stx"><b>Конкурс на новое название</b><small id="nameProposalSub">Придумайте имя игры · +100 золота</small></span><span class="sgo">›</span></button>
+            <button class="srow btn" id="nameProposalBtn"><span class="sic">💡</span><span class="stx"><b>Конкурс на новое название</b><small id="nameProposalSub">Придумайте имя игры · +100 меди</small></span><span class="sgo">›</span></button>
           </div>
           <div class="h3">О приложении</div>
           <div class="sgroup">
@@ -258,7 +259,7 @@
       <section class="screen scroll" id="scr-rules" hidden>
         <div class="lb rules">
           <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Как играть</b></div>
-          <button class="tutcard" id="tutBtn"><span>🎓</span><span><b>Обучение за 2 минуты</b><small>Сыграйте первую партию с подсказками · +30 золота</small></span><i class="tgo">›</i></button>
+          <button class="tutcard" id="tutBtn"><span>🎓</span><span><b>Обучение за 2 минуты</b><small>Сыграйте первую партию с подсказками · +30 меди</small></span><i class="tgo">›</i></button>
           <div class="seg rtabs" id="rtabs"><button data-rt="basics" aria-pressed="true">Основы</button><button data-rt="score" aria-pressed="false">Очки</button><button data-rt="meeple" aria-pressed="false">Фишки</button><button data-rt="more" aria-pressed="false">Ещё</button></div>
 
           <div class="rpane" data-rp="basics">
@@ -722,6 +723,8 @@ const KIND = {c:'Город',r:'Дорога',f:'Монастырь'};
 
 // Seeded randomness lives in src/engine/rng.js (bundled into window.PG by scripts/wrap-web.sh).
 const {rng, hash} = PG.engine;
+// Three coins (src/state/coins.js): copper is wallet.gold; dear things are paid in silver or gold.
+const COINS = PG.state.coins;
 let net = null;
 let queue = [], applied = 0, gameLog = null, ending = false;
 // catchUp: moves taken from the history (coming back to a game) are applied at once, without animation, sound or
@@ -2090,7 +2093,7 @@ function rewardChips(g) {
   else if (net && !net.quick) chips.push(`<div class="rchip dim" style="--i:0"><b>🏆 —</b><small>без кубков: игра с друзьями</small></div>`);
   chips.push(`<div class="rchip gold${g.delta < 0 ? ' neg' : ''}" style="--i:1"><b><i class="coin"></i> ${sign(g.delta)}</b><small>золота · всего ${wallet.gold}</small></div>`);
   if (rw.xp) chips.push(`<div class="rchip xp" style="--i:2"><b>⭐ +${rw.xp}</b><small>опыта · уровень ${rw.lvl}</small></div>`);
-  return `<div class="rchips">${chips.join('')}</div>${rw.up ? `<div class="lvlup">🎉 Новый уровень ${rw.lvl}! +${20 * rw.up} золота</div>` : ''}`;
+  return `<div class="rchips">${chips.join('')}</div>${rw.up ? `<div class="lvlup">🎉 Новый уровень ${rw.lvl}! +${20 * rw.up} меди</div>` : ''}`;
 }
 // Progress to the next level, shown under the reward chips of a finished game.
 function xpLine() {
@@ -2364,7 +2367,7 @@ function streakCheck() {
   const cells = STREAK_GOLD.map((g, i) => `<li class="${i < day ? 'done' : i === day ? 'now' : ''}${i === 6 ? ' big' : ''}"><small>День ${i + 1}</small>${i < day ? '<b>✓</b>' : `<b><i class="coin"></i>${g}</b>`}</li>`).join('');
   const box = document.createElement('div'); box.className = 'over'; box.style.position = 'fixed';
   const freezeMsg = usedFreeze ? '<p class="streak-freeze-badge">🧊 Заморозка спасла серию за пропущенный день!</p>' : `<p class="streak-freeze-badge">🧊 Заморозка серии: ${freezeAvail ? 'доступна на этой неделе' : 'использована'}</p>`;
-  box.innerHTML = `<div class="ocard streak"><div class="fire">🔥</div><h3>${next === 1 ? (lost ? 'Серия прервалась — начнём заново' : 'Ежедневная награда') : `${next} ${next % 10 === 1 && next % 100 !== 11 ? 'день' : next % 10 >= 2 && next % 10 <= 4 && (next % 100 < 10 || next % 100 >= 20) ? 'дня' : 'дней'} подряд!`}</h3><p>Заходите каждый день — награда растёт до 100 золота. Пропуск дня начинает серию заново</p>${freezeMsg}<ol class="days">${cells}</ol><button class="cta wide" id="streakTake">Забрать +${gold} <i class="coin" style="display:inline-block;vertical-align:-2px"></i></button></div>`;
+  box.innerHTML = `<div class="ocard streak"><div class="fire">🔥</div><h3>${next === 1 ? (lost ? 'Серия прервалась — начнём заново' : 'Ежедневная награда') : `${next} ${next % 10 === 1 && next % 100 !== 11 ? 'день' : next % 10 >= 2 && next % 10 <= 4 && (next % 100 < 10 || next % 100 >= 20) ? 'дня' : 'дней'} подряд!`}</h3><p>Заходите каждый день — награда растёт до 100 меди. Пропуск дня начинает серию заново</p>${freezeMsg}<ol class="days">${cells}</ol><button class="cta wide" id="streakTake">Забрать +${gold} <i class="coin" style="display:inline-block;vertical-align:-2px"></i></button></div>`;
   document.body.append(box);
   box.querySelector('#streakTake').onclick = () => {
     const curWeek = (PG.state.progress && PG.state.progress.weekId) ? PG.state.progress.weekId() : 'w1';
@@ -2377,7 +2380,7 @@ function streakCheck() {
     wallet.gold += gold; saveWallet(); beep('coin'); track('daily_streak', {day: next, freeze: usedFreeze});
     document.querySelectorAll('.goldN').forEach(e => e.textContent = wallet.gold);
     box.remove();
-    toastAny(usedFreeze ? `🧊 Заморозка спасла серию! +${gold} золота` : day === 6 ? `Неделя подряд! +${gold} золота 🎉` : `+${gold} золота. Завтра — ${STREAK_GOLD[(day + 1) % 7]}`);
+    toastAny(usedFreeze ? `🧊 Заморозка спасла серию! +${gold} меди` : day === 6 ? `Неделя подряд! +${gold} меди 🎉` : `+${gold} меди. Завтра — ${STREAK_GOLD[(day + 1) % 7]}`);
     if (typeof checkNameProposal === 'function') setTimeout(checkNameProposal, 600);
   };
 }
@@ -2402,7 +2405,7 @@ function payout(reason) {
   if (delta > 0) beep('coin');
   const rw = gameDone(Math.max(0, reason === 'resign' ? place : tied), players[meIdx].score);
   const where = ['1-е', '2-е', '3-е', '4-е', '5-е'][Math.max(0, tied)];
-  return {delta, text: `${where} место: ${delta > 0 ? '+' : delta < 0 ? '−' : ''}${Math.abs(delta)} золота${doubled ? ' (двойное!)' : ''}`, rw};
+  return {delta, text: `${where} место: ${delta > 0 ? '+' : delta < 0 ? '−' : ''}${Math.abs(delta)} меди${doubled ? ' (двойное!)' : ''}`, rw};
 }
 
 // Figures: the classic meeple in the player's colour plus an outfit.
@@ -2526,15 +2529,34 @@ async function redeemPromo(code) {
     wallet.gold = (wallet.gold || 0) + reward;
     wallet.promos.push(code);
     saveWallet();
-    toastAny(`🎉 Промокод активирован! +${reward} золота`);
+    toastAny(`🎉 Промокод активирован! +${reward} меди`);
     renderShop();
     const inp = $('#promoInput'); if (inp) inp.value = '';
   } else {
     toastAny(offline ? 'Не удалось проверить промокод — нужен интернет' : 'Неверный или неактивный промокод');
   }
 }
+// The exchange: 100 copper → 1 silver, 10 silver → 1 gold (src/state/coins.js), one way, one lot or ten at a time.
+function renderExchange() {
+  const el = $('#exch'); if (!el) return;
+  const b = c => COINS.balance(wallet, c);
+  const row = (to, from, cost) => `<div class="exrow"><span class="exlot"><i class="coin ${from}"></i><b>${cost}</b><em>→</em><i class="coin ${to}"></i><b>1</b></span>`
+    + `<span class="exbtns"><button class="chip pri" data-exch="${to}|1"${b(from) < cost ? ' disabled' : ''}>Обменять</button><button class="chip" data-exch="${to}|10"${b(from) < cost * 10 ? ' disabled' : ''}>×10</button></span></div>`;
+  el.innerHTML = `<div class="h3">Обменник</div><div class="excard"><div class="exbal"><span><i class="coin copper"></i><b>${b('copper')}</b><small>медь</small></span><span><i class="coin silver"></i><b>${b('silver')}</b><small>серебро</small></span><span><i class="coin gold"></i><b>${b('gold')}</b><small>золото</small></span></div>`
+    + row('silver', 'copper', COINS.RATE.silver) + row('gold', 'silver', COINS.RATE.gold / COINS.RATE.silver)
+    + `<p class="exnote">Медь — за партии, задания и подарки. Дорогие фигурки, рамки и статусы продаются за серебро и золото.</p></div>`;
+  const st = $('#stBuy'); if (st) st.innerHTML = COINS.priceTag(ST().CUSTOM_PRICE);
+}
+document.addEventListener('click', e => {
+  const x = e.target.closest('[data-exch]'); if (!x || x.disabled) return;
+  const [to, n] = x.dataset.exch.split('|'), k = COINS.exchange(wallet, to, +n);
+  if (!k) return toastAny('Не хватает монет для обмена');
+  beep('coin'); saveWallet(); renderShop(); renderMenuProfile();
+  toastAny(`Обмен: +${k} ${to === 'gold' ? 'золота' : 'серебра'}`); track('exchange', {to, n: k});
+});
 function renderShop() {
   saveWallet();
+  renderExchange();
   const promoBtn = $('#promoApplyBtn');
   if (promoBtn) promoBtn.onclick = () => {
     const inp = $('#promoInput');
@@ -2614,14 +2636,14 @@ const _rs = $('#reactShop'); if (_rs) _rs.addEventListener('click', e => {
 function buyReaction(kind, id) {
   const R = PG.state.reactions, p = R.price(kind, id), what = kind === 'emote' ? `эмодзи ${id}` : `фразу «${id}»`;
   if (R.isOwned(wallet, kind, id)) return;
-  if (wallet.gold < p) return toastAny(`Не хватает ${p - wallet.gold} золота`);
-  confirmBox(`Купить ${what} за ${p} золота? Останется ${wallet.gold - p}.`, 'Купить', () => {
+  if (!COINS.canPay(wallet, p)) return toastAny(COINS.lackText(wallet, p));
+  confirmBox(`Купить ${what} за ${p} меди? Останется ${wallet.gold - p}.`, 'Купить', () => {
     const res = R.buy(wallet, kind, id); if (!res.ok) return;
     beep('coin'); track('spend_virtual_currency', {item_name: kind + '_' + R.ALL_EMOTES.concat(R.ALL_PHRASES).indexOf(id), virtual_currency_name: 'gold', value: res.price});
     // a bought line goes straight into the deck while there is room
     const key = kind === 'emote' ? 'emotes' : 'phrases', cur = R.deck(wallet, kind);
     if (cur.length < 5 && !cur.includes(id)) wallet[key] = [...cur, id];
-    for (const r of R.claimCollections(wallet)) toastAny(`Коллекция ${r.kind === 'emote' ? 'эмодзи' : 'фраз'} собрана! +${r.gold} золота`);
+    for (const r of R.claimCollections(wallet)) toastAny(`Коллекция ${r.kind === 'emote' ? 'эмодзи' : 'фраз'} собрана! +${r.gold} меди`);
     saveWallet(); document.querySelectorAll('.goldN').forEach(e => e.textContent = wallet.gold);
     toastAny(kind === 'emote' ? `Эмодзи ${id} — ваше!` : 'Фраза — ваша!');
     if (!$('#scr-shop').hidden) renderShop();
@@ -2635,10 +2657,10 @@ const _frg = $('#frgrid'); if (_frg) _frg.addEventListener('click', e => {
   const pick = () => { wallet.frame = k; saveWallet(); renderShop(); renderMenuProfile(); };
   if (f.earn && !owned.includes(k)) return toastAny('Рамка за достижение. Получить: ' + f.earn);
   if (!f.price || owned.includes(k)) return pick();
-  if (wallet.gold < f.price) return toastAny(`Не хватает ${f.price - wallet.gold} золота`);
-  confirmBox(`Купить рамку «${f.name}» за ${f.price} золота?`, 'Купить', () => {
-    if ((wallet.frames || []).includes(k) || wallet.gold < f.price) return;
-    wallet.gold -= f.price; wallet.frames = [...(wallet.frames || []), k]; beep('coin');
+  if (!COINS.canPay(wallet, f.price)) return toastAny(COINS.lackText(wallet, f.price));
+  confirmBox(`Купить рамку «${f.name}» за ${f.price} меди?`, 'Купить', () => {
+    if ((wallet.frames || []).includes(k) || !COINS.canPay(wallet, f.price)) return;
+    COINS.pay(wallet, f.price); wallet.frames = [...(wallet.frames || []), k]; beep('coin');
     track('spend_virtual_currency', {item_name: 'frame_' + k, virtual_currency_name: 'gold', value: f.price});
     pick(); toastAny(`Рамка «${f.name}» — ваша!`);
   });
@@ -2647,7 +2669,7 @@ const _fgg = $('#figgrid'); if (_fgg) _fgg.addEventListener('click', e => {
   const b = e.target.closest('[data-fig]'); if (!b) return;
   const k = b.dataset.fig, f = FIGS[k];
   if (!wallet.owned.includes(k)) {
-    if (wallet.gold < f.price) return toastAny(`Не хватает ${f.price - wallet.gold} золота`);
+    if (!COINS.canPay(wallet, f.price)) return toastAny(COINS.lackText(wallet, f.price));
     return confirmBuy(k);
   }
   pickFig(k);
@@ -2659,13 +2681,13 @@ function pickFig(k) {
 // Buying spends gold, so it asks first: the figure, its price and what is left afterwards.
 function confirmBuy(k) {
   const f = FIGS[k], box = document.createElement('div'); box.className = 'over'; box.style.position = 'fixed';
-  box.innerHTML = `<div class="ocard"><img src="${figPreview(k)}" alt="" style="width:64px;height:84px;margin:0 auto;display:block"><h3>Купить «${f.name}»?</h3><p>Цена: <b><i class="coin" style="display:inline-block;vertical-align:-3px"></i> ${f.price}</b> · останется ${wallet.gold - f.price} золота</p><button class="cta wide" data-b="yes">Купить</button><button class="ghostbtn" data-b="no">Отмена</button></div>`;
+  box.innerHTML = `<div class="ocard"><img src="${figPreview(k)}" alt="" style="width:64px;height:84px;margin:0 auto;display:block"><h3>Купить «${f.name}»?</h3><p>Цена: <b><i class="coin" style="display:inline-block;vertical-align:-3px"></i> ${f.price}</b> · останется ${wallet.gold - f.price} меди</p><button class="cta wide" data-b="yes">Купить</button><button class="ghostbtn" data-b="no">Отмена</button></div>`;
   document.body.append(box);
   box.onclick = e => {
     const b = e.target.closest('[data-b]'); if (!b && e.target !== box) return;
     box.remove();
-    if (!b || b.dataset.b !== 'yes' || wallet.owned.includes(k) || wallet.gold < f.price) return;
-    wallet.gold -= f.price; wallet.owned.push(k); beep('coin'); track('spend_virtual_currency', {item_name: k, virtual_currency_name: 'gold', value: f.price}); toastAny(`${f.name} — ваша фигурка!`);
+    if (!b || b.dataset.b !== 'yes' || wallet.owned.includes(k) || !COINS.canPay(wallet, f.price)) return;
+    COINS.pay(wallet, f.price); wallet.owned.push(k); beep('coin'); track('spend_virtual_currency', {item_name: k, virtual_currency_name: 'gold', value: f.price}); toastAny(`${f.name} — ваша фигурка!`);
     pickFig(k);
   };
 }
@@ -4422,7 +4444,7 @@ function gameDone(place, score) {
   const wb = PG.state.progress.winBonus({win, streak: PROG.st.streak, laid, today: today(), fw: wallet.fwDay});
   if (wb.gold) {
     wallet.gold += wb.gold; if (wb.first) wallet.fwDay = today();
-    setTimeout(() => toastAny(`${wb.first ? 'Первая победа дня' : 'Серия побед'}: +${wb.gold} золота${wb.first && wb.streakGold ? ` (серия ×${PROG.st.streak})` : wb.streakGold ? ` · ${PROG.st.streak} подряд` : ''}`), 2600);
+    setTimeout(() => toastAny(`${wb.first ? 'Первая победа дня' : 'Серия побед'}: +${wb.gold} меди${wb.first && wb.streakGold ? ` (серия ×${PROG.st.streak})` : wb.streakGold ? ` · ${PROG.st.streak} подряд` : ''}`), 2600);
   }
   // Cups: quick online games, and a private room whose creator turned "for cups" on (at most 5 such games a day:
   // nobody can farm cups with a friend). No cups if any bot is in the game.
@@ -4723,7 +4745,7 @@ function renderProfile() {
   const mail = fbAuth && fbAuth.email ? String(fbAuth.email).replace(/[<>&"]/g, '') : 'Профиль не сохранён';
   const profEl = $('#profile');
   if (profEl) {
-    profEl.innerHTML = `<div class="pctop"><span class="av big${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${(name[0] || '?').toUpperCase()}</span><span class="pwho"><b>${name}</b>${myStatus() ? `<em class="fst">${myStatus()}</em>` : ''}<small class="pmail">${mail}</small></span><button class="iconbtn" id="profEdit" aria-label="Редактировать профиль"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button></div><div class="pclvl"><div class="lvl">${ring(PROG.xp / need)}<b>${PROG.lvl}</b></div><div class="pi"><b class="pl1">Уровень ${PROG.lvl}</b><div class="xpbar"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></div><small>${PROG.xp} / ${need} опыта до ${PROG.lvl + 1} уровня</small></div></div><div class="pchips"><span>🏆 <b>${PROG.cups}</b> кубков</span><span><i class="coin"></i> <b>${wallet.gold}</b> золота</span><span>🏅 <b>${ACH.filter(a => PROG.ach[a.id] === 'got').length}</b>/${ACH.length} наград</span></div>${FB ? `<div class="pacts">${fbAuth && fbAuth.email ? '<button class="chip" data-hacct="out">Выйти из аккаунта</button>' : '<button class="chip pri" data-hacct="in">Войти или создать профиль</button>'}</div>` : ''}`;
+    profEl.innerHTML = `<div class="pctop"><span class="av big${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${(name[0] || '?').toUpperCase()}</span><span class="pwho"><b>${name}</b>${myStatus() ? `<em class="fst">${myStatus()}</em>` : ''}<small class="pmail">${mail}</small></span><button class="iconbtn" id="profEdit" aria-label="Редактировать профиль"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button></div><div class="pclvl"><div class="lvl">${ring(PROG.xp / need)}<b>${PROG.lvl}</b></div><div class="pi"><b class="pl1">Уровень ${PROG.lvl}</b><div class="xpbar"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></div><small>${PROG.xp} / ${need} опыта до ${PROG.lvl + 1} уровня</small></div></div><div class="pchips"><span>🏆 <b>${PROG.cups}</b> кубков</span><span><i class="coin"></i> <b>${wallet.gold}</b> меди</span><span>🏅 <b>${ACH.filter(a => PROG.ach[a.id] === 'got').length}</b>/${ACH.length} наград</span></div>${FB ? `<div class="pacts">${fbAuth && fbAuth.email ? '<button class="chip" data-hacct="out">Выйти из аккаунта</button>' : '<button class="chip pri" data-hacct="in">Войти или создать профиль</button>'}</div>` : ''}`;
     const pe = $('#profEdit');
     if (pe) pe.onclick = editProfile;
     profEl.querySelectorAll('[data-hacct]').forEach(b => { b.onclick = () => { const t = $(b.dataset.hacct === 'out' ? '#acLogout' : '#acLogin'); if (t) t.click(); }; });
@@ -5099,7 +5121,7 @@ function onProgressClick(e) {
   if (q) { const it = PROG.q.find(x => x.id === q.dataset.claimq), Q = QUESTS.find(x => x.id === it.id); if (it.got || it.n < Q.n) return; it.got = true; wallet.gold += Q.g; }
   else if (a) { const A = ACH.find(x => x.id === a.dataset.claima); if (PROG.ach[A.id] === 'got' || !A.ok(PROG.st, PROG.lvl)) return; PROG.ach[A.id] = 'got'; wallet.gold += A.g; }
   else if (wq) { const it = (PROG.wq || []).find(x => x.id === wq.dataset.claimwq), WQ = WEEKLY_ALL.find(x => x.id === it.id); if (!it || !WQ || it.got || it.n < WQ.n) return; it.got = true; wallet.gold += WQ.g; }
-  else if (wch) { if (PROG.wchest || !PROG.wq || !PROG.wq.length || !PROG.wq.every(x => x.got)) return; PROG.wchest = true; wallet.gold += WEEKLY_CHEST_GOLD || 100; toastAny('Большой сундук недели открыт! +100 золота 🎉'); }
+  else if (wch) { if (PROG.wchest || !PROG.wq || !PROG.wq.length || !PROG.wq.every(x => x.got)) return; PROG.wchest = true; wallet.gold += WEEKLY_CHEST_GOLD || 100; toastAny('Большой сундук недели открыт! +100 меди 🎉'); }
   else if (cl) {
     const col = (COLLECTIONS || []).find(x => x.id === cl.dataset.claimcol);
     if (!col) return;
@@ -5107,7 +5129,7 @@ function onProgressClick(e) {
     if (!p.isComplete || p.isClaimed) return;
     wallet.gold += col.reward;
     wallet.colClaimed = [...(wallet.colClaimed || []), col.id];
-    toastAny(`Коллекция «${col.name}» собрана! +${col.reward} золота 🎉`);
+    toastAny(`Коллекция «${col.name}» собрана! +${col.reward} меди 🎉`);
   }
   else return;
   beep('coin'); saveWallet(); progressDot(); renderProgress(); if (typeof renderAchievements === 'function' && !$('#scr-achievements').hidden) renderAchievements(); renderMenuProfile();
@@ -5335,7 +5357,7 @@ function tutFinale(n = 0) {
   const fin = $('#over .fin');
   if (!fin) return n < 25 ? setTimeout(() => tut && TUT[tut.i].done && tutFinale(n + 1), 200) : null; // the board appears a moment after the last card
   fin.querySelectorAll('.cta, .ghostbtn').forEach(b => b.remove());
-  fin.insertAdjacentHTML('beforeend', '<button class="cta wide" id="tutNext">Играть · +30 золота</button>');
+  fin.insertAdjacentHTML('beforeend', '<button class="cta wide" id="tutNext">Играть · +30 меди</button>');
 }
 $('#over').addEventListener('click', e => { if (e.target.closest('#tutNext')) tutNext(); });
 function tutNext() {
@@ -5731,7 +5753,7 @@ function renderStatusShop() {
   box.innerHTML = (typeof PG !== 'undefined' && PG.ui && PG.ui.shop && PG.ui.shop.renderStatusShopHtml)
     ? PG.ui.shop.renderStatusShopHtml({shopStatuses: ST().SHOP_STATUSES, ownedStatuses: own, wornKey: worn, gold: wallet.gold, stBadgeFn: stBadge})
     : ST().SHOP_STATUSES.map(x => {
-        const k = 'sh:' + x.id, has = own.includes(k), poor = !has && wallet.gold < x.price;
+        const k = 'sh:' + x.id, has = own.includes(k), poor = !has && !COINS.canPay(wallet, x.price);
         return `<button class="stb${worn === k ? ' sel' : ''}${poor ? ' poor' : ''}" data-stb="${x.id}">${stBadge(x.text)}<small>${worn === k ? 'Надет' : has ? 'Надеть' : `<i class="coin"></i>${x.price}`}</small></button>`;
       }).join('');
 }
@@ -5741,8 +5763,8 @@ const _stg = $('#stgrid'); if (_stg) _stg.addEventListener('click', e => {
   const b = e.target.closest('[data-stb]'); if (!b) return;
   const x = ST().SHOP_STATUSES.find(q => q.id === b.dataset.stb), k = 'sh:' + x.id;
   if (ST().ownedStatuses(wallet).includes(k)) { ST().wearStatus(wallet, wallet.statusKey === k ? null : k); return afterStatusChange(); }
-  if (wallet.gold < x.price) return toastAny(`Не хватает ${x.price - wallet.gold} золота`);
-  confirmBox(`Купить статус «${x.text}» за ${x.price} золота?`, 'Купить', () => {
+  if (!COINS.canPay(wallet, x.price)) return toastAny(COINS.lackText(wallet, x.price));
+  confirmBox(`Купить статус «${x.text}» за ${x.price} меди?`, 'Купить', () => {
     const r = ST().buyShopStatus(wallet, x.id);
     if (!r.ok) return toastAny(STATUS_ERR[r.reason] || 'Не получилось');
     ST().wearStatus(wallet, r.key); beep('coin');
@@ -5755,8 +5777,8 @@ $('#stBuy').onclick = () => {
   if (String(inp.value).trim().length > ST().STATUS_MAX) return toastAny(STATUS_ERR.long);
   if (t.length < 2) return toastAny(STATUS_ERR.short);
   if (ST().isBadStatus(t)) return toastAny(STATUS_ERR.bad);
-  if (wallet.gold < ST().CUSTOM_PRICE) return toastAny(`Не хватает ${ST().CUSTOM_PRICE - wallet.gold} золота`);
-  confirmBox(`Свой статус «${t}» за ${ST().CUSTOM_PRICE} золота?`, 'Купить', () => {
+  if (!COINS.canPay(wallet, ST().CUSTOM_PRICE)) return toastAny(COINS.lackText(wallet, ST().CUSTOM_PRICE));
+  confirmBox(`Свой статус «${t}» за ${ST().CUSTOM_PRICE} меди?`, 'Купить', () => {
     const r = ST().buyCustomStatus(wallet, t);
     if (!r.ok) return toastAny(STATUS_ERR[r.reason] || 'Не получилось');
     ST().wearStatus(wallet, r.key); beep('coin'); inp.value = '';
@@ -6417,7 +6439,7 @@ function openFeedback() {
       if (first) { wallet.gold += 10; wallet.feedbackSent = true; saveWallet(); beep('coin'); }
       plog('feedback_sent', {cat, stars});
       box.remove();
-      toastAny(first ? 'Спасибо за помощь! +10 золота 🎉' : 'Спасибо за обратную связь!');
+      toastAny(first ? 'Спасибо за помощь! +10 меди 🎉' : 'Спасибо за обратную связь!');
     } catch (_) {
       btn.disabled = false; btn.textContent = 'Отправить'; toastAny('Нет связи — попробуйте позже');
     }
@@ -6430,7 +6452,7 @@ function updateNameProposalBtnLabel() {
   if (wallet && wallet.nameSuggested && wallet.suggestedGameName) {
     sub.textContent = `Ваш вариант: «${wallet.suggestedGameName}»`;
   } else {
-    sub.textContent = 'Придумайте имя игры · +100 золота';
+    sub.textContent = 'Придумайте имя игры · +100 меди';
   }
 }
 
@@ -6463,7 +6485,7 @@ function updateTgChannelBtn() {
       badge.className = 'chip pri';
     }
   } else {
-    sub.innerHTML = 'Новости и обновления · <b style="color:var(--brass)">+500 золота</b>';
+    sub.innerHTML = 'Новости и обновления · <b style="color:var(--brass)">+500 меди</b>';
     if (badge) {
       badge.textContent = '+500 🪙';
       badge.className = 'chip pri';
@@ -6486,7 +6508,7 @@ function claimTgSubscriptionReward() {
     saveWallet();
     beep('coin');
     track('claim_tg_subscription_reward', {gold: 500});
-    toastAny('🎉 Спасибо за подписку! Вам начислено +500 золота');
+    toastAny('🎉 Спасибо за подписку! Вам начислено +500 меди');
     updateTgChannelBtn();
     renderAccount();
     if (typeof renderMenuProfile === 'function') renderMenuProfile();
@@ -6511,7 +6533,7 @@ function showTelegramDialog() {
       <p>Подпишитесь на официальный канал <b>@diarydevelopment</b>, чтобы первыми получать промокоды, анонсы турниров и общаться с игроками!</p>
       <div class="tg-reward-box">
         <span>🎁 Награда за подписку:</span>
-        <b>+500 золота</b>
+        <b>+500 меди</b>
       </div>
       <button class="cta wide" id="tgGoBtn">${visited ? '✓ Канал открыт (перейти ещё раз)' : '1. Перейти в канал'}</button>
       <button class="${visited ? 'cta wide' : 'ghostbtn wide'}" id="tgClaimBtn" style="${visited ? 'background:linear-gradient(180deg,#55d688 0%,#3fc27a 100%);color:#0b2214;font-weight:700;' : ''}">2. Я подписался · Забрать 500 🪙</button>
@@ -6579,7 +6601,7 @@ function showNameProposalDialog(force) {
     </p>
     <div class="namecard-prizes">
       <div class="nprize-card gold">
-        <div class="nprize-head"><span>💰</span> +100 золота</div>
+        <div class="nprize-head"><span>💰</span> +100 меди</div>
         <div class="nprize-sub">Сразу на ваш счёт за отправку</div>
       </div>
       <div class="nprize-card crown">
@@ -6688,7 +6710,7 @@ function showNameProposalDialog(force) {
       saveWallet();
       plog('name_suggested', title);
       closeDialog();
-      toastAny(already ? 'Ваш вариант обновлён! Спасибо! 🎉' : '🎉 Отлично! +100 золота начислено. Спасибо за идею!');
+      toastAny(already ? 'Ваш вариант обновлён! Спасибо! 🎉' : '🎉 Отлично! +100 меди начислено. Спасибо за идею!');
       updateNameProposalBtnLabel();
     } catch (_) {
       if (!wallet.nameSuggested) {
@@ -6699,7 +6721,7 @@ function showNameProposalDialog(force) {
       wallet.suggestedGameName = title;
       saveWallet();
       closeDialog();
-      toastAny('Идея сохранена! +100 золота 🎉');
+      toastAny('Идея сохранена! +100 меди 🎉');
       updateNameProposalBtnLabel();
     }
   };
@@ -7288,7 +7310,7 @@ function accountDialog(mode, prefill) {
   };
 }
 function renameDialog() {
-  if (wallet.gold < RENAME_PRICE) return toastAny(`Смена имени стоит ${RENAME_PRICE} золота — не хватает ${RENAME_PRICE - wallet.gold}`);
+  if (!COINS.canPay(wallet, RENAME_PRICE)) return toastAny(`Смена имени стоит ${RENAME_PRICE} меди — не хватает ${RENAME_PRICE - wallet.gold}`);
   const box = document.createElement('div'); box.className = 'over'; box.style.position = 'fixed';
   box.innerHTML = `<div class="ocard acc"><h3>Смена имени</h3><p>Стоимость: <b><i class="coin" style="display:inline-block;vertical-align:-3px"></i> ${RENAME_PRICE}</b> · останется ${wallet.gold - RENAME_PRICE}</p><div style="display:flex;gap:8px;align-items:center;margin-bottom:12px"><input class="field" id="newName" maxlength="12" placeholder="${profileName()}" style="flex:1"><button type="button" class="iconbtn" id="rnDice" title="Случайное имя" style="width:44px;height:44px;border-radius:10px;background:var(--surface-hover);font-size:20px;border:1px solid var(--line);cursor:pointer;flex:0 0 auto">🎲</button></div><button class="cta wide" id="rnGo" disabled>Сменить имя</button><button class="ghostbtn" id="rnNo">Отмена</button></div>`;
   document.body.append(box);
@@ -7305,7 +7327,7 @@ function renameDialog() {
     };
   }
   box.querySelector('#rnNo').onclick = () => box.remove();
-  go.onclick = () => { if (wallet.gold < RENAME_PRICE) return; wallet.gold -= RENAME_PRICE; setProfileName(inp.value); beep('coin'); box.remove(); toastAny(`Теперь вы — ${profileName()}`); renderAccount(); syncRating(true); };
+  go.onclick = () => { if (!COINS.canPay(wallet, RENAME_PRICE)) return; COINS.pay(wallet, RENAME_PRICE); setProfileName(inp.value); beep('coin'); box.remove(); toastAny(`Теперь вы — ${profileName()}`); renderAccount(); syncRating(true); };
   setTimeout(() => inp.focus(), 200);
 }
 function renderAccount() {
@@ -7456,7 +7478,7 @@ document.addEventListener('click', e => {
       saveWallet();
       renderMenuProfile();
       renderInbox();
-      toastAny('Получено +500 золота! 🪙', 'gold', 'Казна');
+      toastAny('Получено +500 меди! 🪙', 'gold', 'Казна');
       return;
     }
 
@@ -8200,21 +8222,21 @@ initMenuHub();
       const parts = buyBtn.dataset.dailyBuy.split('|');
       const kind = parts[0], key = kind === 'status' ? parts[1].replace(/^sh:/, '') : parts[1], price = +parts[2];
       if (kind === 'emote' || kind === 'phrase') return buyReaction(kind, key);
-      if (wallet.gold < price) return toastAny(`Не хватает ${price - wallet.gold} золота`);
+      if (!COINS.canPay(wallet, price)) return toastAny(COINS.lackText(wallet, price));
 
       if (kind === 'fig') {
         const f = FIGS[key];
-        confirmBox(`Купить фигурку «${f ? f.name : key}» за ${price} золота?`, 'Купить', () => {
-          if (wallet.gold < price || wallet.owned.includes(key)) return;
-          wallet.gold -= price; wallet.owned.push(key);
+        confirmBox(`Купить фигурку «${f ? f.name : key}» за ${price} меди?`, 'Купить', () => {
+          if (!COINS.canPay(wallet, price) || wallet.owned.includes(key)) return;
+          COINS.pay(wallet, price); wallet.owned.push(key);
           beep('coin'); pickFig(key);
           toastAny(`Фигурка «${f ? f.name : key}» — ваша!`);
         });
       } else if (kind === 'frame') {
         const f = FRAMES[key];
-        confirmBox(`Купить рамку «${f ? f.name : key}» за ${price} золота?`, 'Купить', () => {
-          if (wallet.gold < price || (wallet.frames || []).includes(key)) return;
-          wallet.gold -= price; wallet.frames = [...(wallet.frames || []), key];
+        confirmBox(`Купить рамку «${f ? f.name : key}» за ${price} меди?`, 'Купить', () => {
+          if (!COINS.canPay(wallet, price) || (wallet.frames || []).includes(key)) return;
+          COINS.pay(wallet, price); wallet.frames = [...(wallet.frames || []), key];
           wallet.frame = key; beep('coin');
           saveWallet(); renderShop(); renderMenuProfile();
           toastAny(`Рамка «${f ? f.name : key}» — ваша!`);
@@ -8222,10 +8244,10 @@ initMenuHub();
       } else if (kind === 'status') {
         const st = PG.state.status.SHOP_STATUSES.find(s => s.id === key);
         const name = st ? st.text : key;
-        confirmBox(`Купить статус «${name}» за ${price} золота?`, 'Купить', () => {
+        confirmBox(`Купить статус «${name}» за ${price} меди?`, 'Купить', () => {
           const fullKey = 'sh:' + key;
-          if (wallet.gold < price || (wallet.statuses || []).includes(fullKey)) return;
-          wallet.gold -= price; wallet.statuses = [...(wallet.statuses || []), fullKey];
+          if (!COINS.canPay(wallet, price) || (wallet.statuses || []).includes(fullKey)) return;
+          COINS.pay(wallet, price); wallet.statuses = [...(wallet.statuses || []), fullKey];
           wallet.statusKey = fullKey; wallet.status = name; beep('coin');
           saveWallet(); renderShop(); renderMenuProfile();
           toastAny(`Статус «${name}» надет!`);

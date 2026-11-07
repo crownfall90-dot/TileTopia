@@ -53,11 +53,14 @@ const PRELUDE = `
   }
 `;
 const go = s => `await boot(); show('${s}'); await wait(900); clear(); await wait(200);`;
+const ONLY = process.env.ONLY ? process.env.ONLY.split(',') : null;
 const SCENES = {
   menu: `await boot();`,
   shop: go('shop'), progress: go('progress'), achievements: go('achievements'), friends: go('friends'), history: go('history'),
   inbox: go('inbox'), items: go('items'), lobby: go('lobby'), profile: go('profile'), rating: go('rating'), rules: go('rules'),
   settings: go('settings'),
+  shopStalls: go('shop') + ` document.getElementById('dailyShopWrap').scrollIntoView(); await wait(300);`,
+  shopStalls2: go('shop') + ` const w = document.getElementById('dailyShopWrap'); w.scrollIntoView(); document.getElementById('scr-shop').scrollTop += 700; await wait(300);`,
   quests: go('progress') + ` const q = document.getElementById('btnRoadQuests'); if (!q) throw new Error('no quests button'); q.click(); await wait(900);`,
   menuQuests: `await boot(); const b = document.querySelector('[data-nav="progress"], .tile-quest, #btnMenuQuests'); if (b) b.click(); await wait(900);`,
   setup: `await boot(); openSetup('bots'); await wait(900); clear();`,
@@ -84,7 +87,7 @@ try {
   fs.mkdirSync(outDir, {recursive: true});
   for (const size of sizes.split(',')) {
     const [W, H] = size.split('x').map(Number);
-    for (const name of Object.keys(SCENES)) {
+    for (const name of Object.keys(SCENES).filter(n => !ONLY || ONLY.includes(n))) {
       const {targetId} = await browser.send('Target.createTarget', {url: 'about:blank'});
       const list = await (await fetch(`http://127.0.0.1:${port}/json/list`)).json();
       const page = await cdpConnect(list.find(p => p.id === targetId).webSocketDebuggerUrl);

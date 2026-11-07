@@ -45,7 +45,7 @@ test('ui/feedback: renderFeedbackCardHtml renders categories, star rating and he
   });
 
   assert.ok(html.includes('fbcard'), 'contains card container');
-  assert.ok(html.includes('🎁 +10 золота'), 'first time reward badge displayed');
+  assert.ok(html.includes('🎁 +10 меди'), 'first time reward badge displayed');
   assert.ok(html.includes('promo'), 'contains name contest promo');
   assert.ok(html.includes('5/5 — Отличная игра!'), 'renders star label');
   assert.ok(html.includes('Опишите идею...'), 'renders placeholder');
