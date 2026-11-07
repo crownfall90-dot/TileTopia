@@ -5119,7 +5119,7 @@ function onProgressClick(e) {
     saveWallet(); renderProgress(); toastAny('Задание заменено'); return;
   }
   if (q) { const it = PROG.q.find(x => x.id === q.dataset.claimq), Q = QUESTS.find(x => x.id === it.id); if (it.got || it.n < Q.n) return; it.got = true; wallet.gold += Q.g; }
-  else if (a) { const A = ACH.find(x => x.id === a.dataset.claima); if (PROG.ach[A.id] === 'got' || !A.ok(PROG.st, PROG.lvl)) return; PROG.ach[A.id] = 'got'; wallet.gold += A.g; }
+  else if (a) { const A = ACH.find(x => x.id === a.dataset.claima); if (PROG.ach[A.id] === 'got' || !A.ok(PROG.st, PROG.lvl)) return; PROG.ach[A.id] = 'got'; if (A.coin === 'gold') wallet.goldCoins = COINS.balance(wallet, 'gold') + A.g; else if (A.coin === 'silver') wallet.silver = COINS.balance(wallet, 'silver') + A.g; else wallet.gold += A.g; }
   else if (wq) { const it = (PROG.wq || []).find(x => x.id === wq.dataset.claimwq), WQ = WEEKLY_ALL.find(x => x.id === it.id); if (!it || !WQ || it.got || it.n < WQ.n) return; it.got = true; wallet.gold += WQ.g; }
   else if (wch) { if (PROG.wchest || !PROG.wq || !PROG.wq.length || !PROG.wq.every(x => x.got)) return; PROG.wchest = true; wallet.gold += WEEKLY_CHEST_GOLD || 100; toastAny('Большой сундук недели открыт! +100 меди 🎉'); }
   else if (cl) {

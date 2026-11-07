@@ -37,6 +37,10 @@ export const FRAMES = {
   holo: {name: 'Голография', price: 1200, ring: 'conic-gradient(from 0deg, #ff007f, #7f00ff, #00ffff, #00ff7f, #ffff00, #ff7f00, #ff007f)', anim: 'holo'},
   prismatic: {name: 'Призма', price: 1500, ring: 'conic-gradient(from 45deg, #e0c3fc, #8ec5fc, #fbc2eb, #a1c4fd, #c2e9fb, #e0c3fc)', anim: 'prismatic'},
   aurora: {name: 'Северное сияние', price: 1800, ring: 'conic-gradient(from 180deg, #00f2fe, #4facfe, #00ff87, #60efe6, #00f2fe)', anim: 'aurora'},
+  // rare frames: paid in silver and gold (src/state/coins.js)
+  obsidian: {name: 'Обсидиан', price: 1400, ring: 'conic-gradient(from 30deg,#0b0b12,#3d2b5a,#0b0b12,#5a3b7a,#0b0b12)'},
+  starlight: {name: 'Звёздный свет', price: 2000, ring: 'conic-gradient(from 0deg,#fff8d6,#ffd66b,#ffffff,#9fd8ff,#fff8d6,#ffd66b,#fff8d6)', anim: 'prismatic'},
+  phoenix: {name: 'Феникс', price: 3000, ring: 'conic-gradient(from 90deg,#ffef9a,#ff9c2a,#e8311f,#7a0d3a,#e8311f,#ff9c2a,#ffef9a)', anim: 'holo'},
   cyber: {name: 'Киберпанк', price: 2100, ring: 'conic-gradient(from 90deg, #ff0055, #00ffff, #ffea00, #00e5ff, #ff0055)', anim: 'cyber'},
   cosmic: {name: 'Космос', price: 2400, ring: 'conic-gradient(from 45deg, #ff00cc, #333399, #00ffff, #ff0066, #ff00cc)', anim: 'cosmic'},
 };

@@ -85,7 +85,7 @@ export function renderRewardsTabHtml({
 
   const aRows = [...achDefs].sort((a, b) => rank(a.ok(progStats, progLvl), progAch[a.id] === 'got') - rank(b.ok(progStats, progLvl), progAch[b.id] === 'got')).map(a => {
     const ok = a.ok(progStats, progLvl), got = progAch[a.id] === 'got';
-    return `<div class="quest${got ? ' got' : ok ? ' done' : ' lock'}${a.tier ? ' tier-' + a.tier : ''}"><span class="qi">${a.ic}</span><span class="qt"><b>${a.t}</b><small>${a.d} · <i class="coin"></i> ${a.g}</small></span>${got ? '<span class="pill">Получено</span>' : ok ? `<button class="chip pri" data-claima="${a.id}">Забрать</button>` : ''}</div>`;
+    return `<div class="quest${got ? ' got' : ok ? ' done' : ' lock'}${a.tier ? ' tier-' + a.tier : ''}"><span class="qi">${a.ic}</span><span class="qt"><b>${a.t}</b><small>${a.d} · <i class="coin ${a.coin || 'copper'}"></i> ${a.g}</small></span>${got ? '<span class="pill">Получено</span>' : ok ? `<button class="chip pri" data-claima="${a.id}">Забрать</button>` : ''}</div>`;
   }).join('');
 
   const wqDone = q => { const WQ = weeklyDefs.find(x => x.id === q.id); return WQ && q.n >= WQ.n; };
@@ -132,7 +132,7 @@ export function renderAchievementsHtml({
     const statusPill = got
       ? '<span class="pill ach-done-pill">Получено ✓</span>'
       : ok
-      ? `<button class="chip pri ach-claim-btn" data-claima="${a.id}">Забрать +${a.g} <i class="coin"></i></button>`
+      ? `<button class="chip pri ach-claim-btn" data-claima="${a.id}">Забрать +${a.g} <i class="coin ${a.coin || 'copper'}"></i></button>`
       : '<span class="pill lock">В процессе</span>';
 
     return `
@@ -144,7 +144,7 @@ export function renderAchievementsHtml({
             ${tierTag}
           </div>
           <small class="ach-desc">${a.d}</small>
-          <div class="ach-reward-val"><i class="coin"></i> +${a.g} монет</div>
+          <div class="ach-reward-val"><i class="coin ${a.coin || 'copper'}"></i> +${a.g} ${a.coin === 'gold' ? 'золота' : a.coin === 'silver' ? 'серебра' : 'меди'}</div>
         </span>
         <div class="ach-action-wrap">
           ${statusPill}
