@@ -48,7 +48,7 @@ if done and sheet:
         t = im.resize((cw - 20, round((cw - 20) * math.sqrt(3) / 2)), Image.LANCZOS)
         x, y = (i % cols) * cw + 10, (i // cols) * chh + 6
         S.paste(t, (x, y), t)
-        d.text((x + 4, y + t.height + 4), f"{tid}  {types[tid]['e']}  {types[tid]['name']}", fill=(220, 226, 240))
+        d.text((x + 4, y + t.height + 4), f"{tid}  {types[tid]['e']}", fill=(220, 226, 240))
     os.makedirs(os.path.dirname(sheet), exist_ok=True)
     S.save(sheet, quality=86)
     print('sheet', sheet)

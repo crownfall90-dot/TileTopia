@@ -713,8 +713,6 @@ function injectHexArt() {
   }
   const st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 }
-  const st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
-}
 
 
   return {cv, drawTile, SPR, sprite, TILE_URL, injectArt, injectHexArt};

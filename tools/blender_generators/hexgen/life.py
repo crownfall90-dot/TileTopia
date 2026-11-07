@@ -700,6 +700,164 @@ class Life:
                 k.rod(pa, pa + o * w, .0028 * s, 'timber', seg=4)
             k.rod(q0 + o * w, q1 + o * w, .0028 * s, 'timber', seg=4)
 
+    # ---------------------------------------------------------------- layout (game frame)
+    def spots(self, step=.035):
+        """Every free point on a jittered grid with how much room it has, roomiest first."""
+        r, room, out = self.rnd, self.room, []
+        y = -.5 + step / 2
+        while y < .5:
+            x = -R + step / 2
+            while x < R:
+                p = (x + r.uniform(-.4, .4) * step, y + r.uniform(-.4, .4) * step)
+                c = room.clear(p)
+                if c > .02:
+                    out.append((c, p))
+                x += step
+            y += step
+        out.sort(key=lambda q: -q[0])
+        return out
+
+    def take(self, p, rr):
+        """Claim a circle of free ground (game frame); False when it is not free."""
+        return self.mask.claim(p, rr, edge=EDGE)
+
+    def piece(self, kind, p, rr):
+        """A set piece of radius rr (card heights) round game point p."""
+        r, h = self.rnd, self.rnd.random() * TAU
+        c = B(p)
+        ru = rr * U
+
+        def around(f0, f1):
+            a, d = r.random() * TAU, r.uniform(f0, f1) * ru
+            return (c[0] + math.cos(a) * d, c[1] + math.sin(a) * d)
+        if kind == 'flock':
+            for i in range(r.randint(4, 6)):
+                self.sheep(around(.1, .75), h + r.uniform(-.8, .8), r.uniform(1.1, 1.3))
+            a = r.random() * TAU
+            self.villager((c[0] + math.cos(a) * ru * .85, c[1] + math.sin(a) * ru * .85), h, 1.25, item='crook', hat='hood')
+            if r.random() < .6:
+                self.dog((c[0] - math.cos(a) * ru * .7, c[1] - math.sin(a) * ru * .7), h + 1, 1.2)
+        elif kind == 'cows':
+            for i in range(r.randint(2, 3)):
+                self.cow(around(.15, .7), h + r.uniform(-1, 1), 1.15, r.choice(('holstein', 'holstein', 'brown')))
+            if r.random() < .5:
+                self.trough((c[0] + ru * .55, c[1]), h, 1.1)
+        elif kind == 'horses':
+            for i in range(2):
+                self.horse(around(.15, .65), h + r.uniform(-1, 1), 1.15, r.choice(('life_horse', 'life_horse2', 'life_horse3')))
+        elif kind == 'field':
+            # a fenced plot of wheat or vegetables in rows, with a scarecrow or a farmer
+            w, d = ru * 1.25, ru * .95
+            P = local(c, h)
+            corners = [P(-w / 2, -d / 2)[:2], P(w / 2, -d / 2)[:2], P(w / 2, d / 2)[:2], P(-w / 2, d / 2)[:2]]
+            self.kit.prism(corners, .0, .006, r.choice(('life_soil', 'life_soil_dark')))
+            crop = r.choice(('life_wheat', 'life_wheat', 'life_cabbage', 'life_veg_leaf', 'life_lavender', 'life_sunflower', 'life_pumpkin'))
+            rows = max(3, int(d / .045))
+            for i in range(rows):
+                b = -d / 2 + (i + .5) * d / rows
+                self.kit.ridge(P(-w / 2 + .015, b)[:2], P(w / 2 - .015, b)[:2], d / rows * .78, .028 if crop == 'life_wheat' else .018, crop, z0=.004)
+            self.fence(corners + [corners[0]], 1.0)
+            if r.random() < .5:
+                self.scarecrow(P(0, 0)[:2], h, 1.2, z=.004)
+            else:
+                self.villager(P(w / 2 + .04, 0)[:2], h + math.pi, 1.25, hat='straw', item='fork')
+        elif kind == 'orchard':
+            fruit = r.choice(('life_fruit_red', 'life_fruit_orange', 'life_fruit_yellow'))
+            for i in range(r.randint(3, 4)):
+                a, d = TAU * i / 4 + r.uniform(-.3, .3), ru * .55
+                self.oak((c[0] + math.cos(a) * d, c[1] + math.sin(a) * d), .8, r.choice(OAKS), fruit=fruit)
+            if r.random() < .5:
+                self.blanket(c, h, 1.2)
+            else:
+                self.villager(c, h, 1.25, item='basket', hat='scarf')
+        elif kind == 'hives':
+            for i in range(r.randint(3, 4)):
+                self.hive((c[0] + (i - 1.5) * .055, c[1] + r.uniform(-.02, .02)), h, 1.2, 'life_hive%d' % r.randrange(4))
+            self.flowers((c[0], c[1] - .07), .07, (r.choice(FLOWERS), r.choice(FLOWERS)))
+        elif kind == 'hay':
+            for i in range(r.randint(2, 3)):
+                q = around(.1, .65)
+                if r.random() < .6:
+                    self.haystack(q, 1.1)
+                else:
+                    self.stook(q, 1.1)
+            if r.random() < .6:
+                self.cart((c[0] + ru * .6, c[1]), h, 1.15)
+        elif kind == 'farm':
+            for i in range(r.randint(4, 6)):
+                self.hen(around(0, .8), r.random() * TAU, 1.3)
+            if r.random() < .6:
+                self.pig((c[0] + ru * .4, c[1] - ru * .3), r.random() * TAU, 1.2)
+        elif kind == 'windmill':
+            self.windmill(c, h, 1.0)
+            for i in range(2):
+                self.bale((c[0] + .14 + i * .05, c[1] - .1), h, 1.1)
+        elif kind == 'stones':
+            for i in range(r.randint(3, 5)):
+                self.boulder(around(0, .7), r.uniform(.035, .06))
+        elif kind == 'woodcut':
+            self.logs(c, h, 1.2)
+            self.stump((c[0] + .05, c[1] + .04), 1.1)
+            self.villager((c[0] - .06, c[1]), h, 1.25, item='fork')
+
+    def run(self):
+        ctx, r = self.ctx, self.rnd
+        self.room = Room(self.mask)
+        meadow = ctx.id == 'hG'
+        # set pieces where there is most room: up to three per card (five on the meadow), apart from each other
+        kinds = ['flock', 'field', 'cows', 'orchard', 'hay', 'hives', 'horses', 'farm', 'woodcut']
+        r.shuffle(kinds)
+        if meadow:
+            kinds = ['windmill', 'flock', 'stones', 'field', 'cows'] + kinds
+        size = {'flock': .11, 'field': .1, 'cows': .1, 'orchard': .1, 'hay': .08, 'hives': .07, 'horses': .09, 'farm': .07,
+                'woodcut': .07, 'windmill': .12, 'stones': .08}
+        placed, want = [], (5 if meadow else 3)
+        for kind in kinds:
+            if len(placed) >= want:
+                break
+            rr = size[kind]
+            for c, p in self.spots():
+                if c < rr:
+                    break
+                if any(dist(p, q) < rr + qr + .06 for q, qr in placed):
+                    continue
+                if self.take(p, rr):
+                    self.piece(kind, p, rr)
+                    placed.append((p, rr))
+                    self.room.update()
+                    break
+        # little woods: trees cluster toward the corners and the edges
+        for c, p in self.spots(.03):
+            if r.random() >= (.9 if hex_inset(p) < .17 else .4):
+                continue
+            rr = r.uniform(.05, .065)
+            if c < rr or not self.take(p, rr):
+                continue
+            k = r.random()
+            if k < .42:
+                self.pine(B(p), r.uniform(1.0, 1.25), r.choice(('life_pine', 'life_pine2')))
+            elif k < .92:
+                self.oak(B(p), r.uniform(.95, 1.2), 'life_autumn' if r.random() < .1 else r.choice(OAKS))
+            else:
+                self.oak(B(p), r.uniform(.75, .9), 'life_blossom')
+            self.trees.append((p, rr))
+        self.room.update()
+        # the rest of the free grass: bushes, flowers, a stone, a walker, deer by the woods
+        people = 0
+        for c, p in self.spots(.028):
+            k = r.random()
+            if k < .3 and c > .03 and self.take(p, .028):
+                self.bush(B(p), r.uniform(.85, 1.1), bloom=r.choice((None, None, 'flower0', 'flower2', 'flower4')))
+            elif k < .55 and c > .03 and self.take(p, .03):
+                self.flowers(B(p), r.uniform(.04, .06), (r.choice(FLOWERS), r.choice(FLOWERS)))
+            elif k < .6 and c > .02 and self.take(p, .02):
+                self.boulder(B(p), r.uniform(.018, .03), moss=r.random() < .5)
+            elif k < .64 and people < 2 and c > .03 and self.take(p, .025):
+                self.villager(B(p), r.random() * TAU, 1.25, item=r.choice((None, 'basket', 'fork')))
+                people += 1
+            elif k < .66 and c > .035 and any(dist(p, q) < .12 for q, _ in self.trees) and self.take(p, .03):
+                self.deer(B(p), r.random() * TAU, 1.2)
+
 
 def build(ctx):
     palette(ctx)
