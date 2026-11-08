@@ -1544,7 +1544,99 @@ def y_star_violet():
     mini_star('#7a4dff', 3.2)
 
 
-MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare, 'c_main': c_main, 'c_rare': c_rare, 'd_main': d_main, 'd_rare': d_rare, 'e_main': e_main, 'e_rare': e_rare, 'g_line': g_line, 'g_stack': g_stack, 'g_ring': g_ring, 'g_serif': g_serif, 'h_jig': h_jig, 'h_split': h_split, 'h_onest': h_onest, 'h_stamp': h_stamp, 'i_banner': i_banner, 'i_center': i_center, 'i_wide': i_wide, 'j_gem_blue': j_gem_blue, 'j_gem_green': j_gem_green, 'j_gem_violet': j_gem_violet, 'j_meeple_gold': j_meeple_gold, 'j_jigsaw_gold': j_jigsaw_gold, 'k_main': k_main, 'k_rare': k_rare, 'p_main': p_main, 'p_rare': p_rare, 'q_rare': q_rare, 'p2_main': p2_main, 'q2_rare': q2_rare, 'r_main': r_main, 'r_rare': r_rare, 's_main': s_main, 't_main': t_main, 't_rare': t_rare, 'u1_rare': u1_rare, 'u2_rare': u2_rare, 'u3_rare': u3_rare, 'u4_rare': u4_rare, 'v_coin': flat_coin, 'v_star': flat_star, 'w_coin': clay_coin, 'w_star': clay_star, 'x_coin': clay2_coin, 'x_star': neon_star, 'y_coin': y_coin, 'y_star_gold': y_star_gold, 'y_star_violet': y_star_violet}
+def satin(name, hexcol):
+    """paint, not metal: a plain diffuse colour with no specular, so nothing can glint"""
+    m = bpy.data.materials.new(name)
+    b = next(n for n in m.node_tree.nodes if n.type == 'BSDF_PRINCIPLED')
+    h = hexcol.lstrip('#')
+    b.inputs['Base Color'].default_value = (*srgb(tuple(int(h[i:i + 2], 16) / 255 for i in (0, 2, 4))), 1)
+    b.inputs['Metallic'].default_value = 0.0
+    b.inputs['Roughness'].default_value = 1.0
+    for k in ('Specular IOR Level', 'Specular'):
+        if k in b.inputs:
+            b.inputs[k].default_value = 0.0
+    return m
+
+
+def soft_light():
+    """big soft lights from above and the side: shade shows the shape, nothing reflects"""
+    sc = bpy.context.scene
+    for o in [o for o in sc.objects if o.type == 'LIGHT']:
+        bpy.data.objects.remove(o)
+    bg = next(n for n in sc.world.node_tree.nodes if n.type == 'BACKGROUND')
+    bg.inputs['Color'].default_value = (.55, .58, .72, 1)
+    bg.inputs['Strength'].default_value = .9
+    for name, energy, size, col, loc in (('Key', 700, 6, (1, .96, .9), (-3.2, -2.6, 4.5)), ('Fill', 220, 8, (.8, .86, 1), (3.2, -2.0, 2.4)), ('Top', 300, 6, (1, 1, 1), (0, 0, 6))):
+        L = bpy.data.lights.new(name, 'AREA')
+        L.energy, L.size, L.color = energy, size, col
+        o = bpy.data.objects.new(name, L)
+        sc.collection.objects.link(o)
+        o.location = loc
+        o.rotation_euler = (Vector((0, 0, 0)) - Vector(loc)).to_track_quat('-Z', 'Y').to_euler()
+
+
+def fine_coin(accent='#e8b04a'):
+    body = satin('fcBody', '#14162a')
+    rim = satin('fcRim', '#1c1f38')
+    field = satin('fcField', '#101224')
+    deep = satin('fcDeep', '#0b0c1a')
+    gold = satin('fcGold', accent)
+    goldD = satin('fcGoldD', '#a87a22')
+    put(smooth(cyl(1.0, .32, 0), .09), body)
+    put(torus(.9, .075, .165), rim)                       # the raised outer rim
+    n = 96
+    for i in range(n):                                    # a ring of fine ticks cut into the rim
+        a = i / n * math.tau
+        put(smooth(box(.012, .06, .02, (math.cos(a) * .9, math.sin(a) * .9, .235), a), .002), deep)
+    put(smooth(cyl(.8, .03, .17), .006), field)           # the sunk field
+    put(torus(.79, .018, .19), gold)                      # the thin gold ring
+    put(torus(.7, .008, .185), goldD)                     # a finer second ring
+    for i in range(24):                                   # small gold pips between the rings
+        a = i / 24 * math.tau + math.pi / 24
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=16, ring_count=10, radius=.018, location=(math.cos(a) * .745, math.sin(a) * .745, .2))
+        put(smooth(bpy.context.object), gold)
+    z = .2
+    put(smooth(box(.64, .64, .04, (0, 0, z), math.radians(45)), .012), goldD)        # the stepped tile: three plates
+    put(smooth(box(.5, .5, .06, (0, 0, z + .02), math.radians(45)), .012), gold)
+    put(smooth(box(.3, .3, .08, (0, 0, z + .04), math.radians(45)), .01), goldD)
+    put(smooth(box(.14, .14, .1, (0, 0, z + .06), math.radians(45)), .008), gold)
+    set_cam(60, -90, 2.35, .08)
+
+
+def fine_star(glow_c='#7a4dff', glow_s=3.2):
+    body = satin('fsBody', '#14162a')
+    face = satin('fsFace', '#101224')
+    deep = satin('fsDeep', '#0b0c1a')
+    put(smooth(star_mesh(1.0, .52, .32, 0), .1), body)
+    put(smooth(star_mesh(.84, .43, .04, .165), .02), face)             # the sunk face
+    f = facet_star(.62, .32, .09, .18)                                  # a low faceted star on it: shade only
+    put(f, body)
+    for p_ in f.data.polygons:
+        p_.use_smooth = False
+    tube(star_pts(.97, .5, .162), glow_c, glow_s, .018)                 # the thin glowing edge
+    tube(star_pts(.62, .32, .205), glow_c, glow_s * .8, .012)           # a finer line on the inner star
+    for i in range(5):                                                   # five small dots between the rays
+        a = math.pi / 2 + i * math.tau / 5
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=16, ring_count=10, radius=.024, location=(math.cos(a) * .74, math.sin(a) * .74, .19))
+        o = bpy.context.object
+        o.data.materials.append(glow('dot', glow_c, glow_c, glow_s * 1.2))
+    set_cam(62, -90, 2.4, .08)
+    GLOW.append(1)
+
+
+def z_coin():
+    fine_coin()
+
+
+def z_star_violet():
+    fine_star('#7a4dff', 3.2)
+
+
+def z_star_gold():
+    fine_star('#ff9d00', 2.8)
+
+
+MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare, 'c_main': c_main, 'c_rare': c_rare, 'd_main': d_main, 'd_rare': d_rare, 'e_main': e_main, 'e_rare': e_rare, 'g_line': g_line, 'g_stack': g_stack, 'g_ring': g_ring, 'g_serif': g_serif, 'h_jig': h_jig, 'h_split': h_split, 'h_onest': h_onest, 'h_stamp': h_stamp, 'i_banner': i_banner, 'i_center': i_center, 'i_wide': i_wide, 'j_gem_blue': j_gem_blue, 'j_gem_green': j_gem_green, 'j_gem_violet': j_gem_violet, 'j_meeple_gold': j_meeple_gold, 'j_jigsaw_gold': j_jigsaw_gold, 'k_main': k_main, 'k_rare': k_rare, 'p_main': p_main, 'p_rare': p_rare, 'q_rare': q_rare, 'p2_main': p2_main, 'q2_rare': q2_rare, 'r_main': r_main, 'r_rare': r_rare, 's_main': s_main, 't_main': t_main, 't_rare': t_rare, 'u1_rare': u1_rare, 'u2_rare': u2_rare, 'u3_rare': u3_rare, 'u4_rare': u4_rare, 'v_coin': flat_coin, 'v_star': flat_star, 'w_coin': clay_coin, 'w_star': clay_star, 'x_coin': clay2_coin, 'x_star': neon_star, 'y_coin': y_coin, 'y_star_gold': y_star_gold, 'y_star_violet': y_star_violet, 'z_coin': z_coin, 'z_star_violet': z_star_violet, 'z_star_gold': z_star_gold}
 
 
 def scene(samples, size=512):
@@ -1614,9 +1706,11 @@ def main(argv):
         MATTE.clear()
         NO_OUTLINE.clear()
         MAKERS[key]()
-        (studio if key.startswith(('c_', 'd_', 'e_', 'f_', 'g_', 'h_', 'i_', 'j_', 'q_', 'p2_', 'q2_', 'r_', 's_', 't_', 'u', 'v_', 'w_', 'x_', 'y_')) and not key.startswith(('j_gem', 'k_', 'p_', 'q_', 'p2_', 'q2_', 'r_', 's_', 't_', 'u', 'v_', 'w_', 'x_', 'y_')) else scene)(samples)
+        (studio if key.startswith(('c_', 'd_', 'e_', 'f_', 'g_', 'h_', 'i_', 'j_', 'q_', 'p2_', 'q2_', 'r_', 's_', 't_', 'u', 'v_', 'w_', 'x_', 'y_', 'z_')) and not key.startswith(('j_gem', 'k_', 'p_', 'q_', 'p2_', 'q2_', 'r_', 's_', 't_', 'u', 'v_', 'w_', 'x_', 'y_', 'z_')) else scene)(samples)
         if CAM:
             apply_cam(*CAM[0])
+        if key.startswith('z_'):
+            soft_light()
         bpy.context.scene.render.filepath = os.path.join(out, key + '.png')
         bpy.ops.render.render(write_still=True)
         if GLOW:
