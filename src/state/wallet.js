@@ -1,6 +1,8 @@
 // The player's wallet on this device (localStorage 'wallet'): gold, figures, boosts, settings, profile.
 // The keys and the default values must stay as they are: players' saved wallets are read with them.
 
+import {migrate} from './coins.js';
+
 const DEFAULTS = () => ({gold: 100, owned: ['classic'], fig: 'classic', daily: '', dailyBox: '', paid: [], sound: true, color: '#ef5350'});
 
 /** Checksum of what a hand edit would change (gold, figures, friend code). Not a protection: it is computed in public
@@ -24,6 +26,7 @@ export function loadWallet(storage, colorOk, fallbackColor, onMismatch) {
   if (w && sig && sig !== walletSig(w) && onMismatch) { try { onMismatch({gold: +w.gold || 0}); } catch (_) {} }
   const v = Object.assign(DEFAULTS(), w);
   v.boosts = Object.assign({double: 0, meeple: 0}, v.boosts);
+  migrate(v); // the old three coins become two currencies (src/state/coins.js)
   if (!colorOk(v.color)) v.color = fallbackColor; // a colour taken out of the palette (turquoise)
   return v;
 }

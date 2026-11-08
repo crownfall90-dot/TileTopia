@@ -35,6 +35,10 @@ test('google on iPhone web: the button goes to Google\'s page; the answer is tak
     await a.page.evaluate(() => document.querySelector('#acLogin').click());
     await a.page.waitForSelector('#accGoogle');
     await a.page.evaluate(() => document.querySelector('#accGoogle').click());
+    await a.page.waitForTimeout(300);
+    assert.equal(a.google.length, 0, 'locked until the consent tick-box is ticked');
+    await a.page.evaluate(() => document.querySelector('#consentBox').click());
+    await a.page.evaluate(() => document.querySelector('#accGoogle').click());
     await a.page.waitForTimeout(500);
     assert.equal(a.google.length, 1, 'went to Google');
     const u = new URL(a.google[0]);

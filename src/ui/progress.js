@@ -1,5 +1,5 @@
 // Progress and profile UI helpers (E-1.4)
-// Renders level circles, mastery grids, quests, and collection cards.
+// Renders level circles, mastery grids, and quests.
 
 /** Generates circular SVG progress ring. */
 export function ringSvg(frac) {
@@ -30,35 +30,6 @@ export function renderBuildingStats(st = {}) {
     `</div>`;
 }
 
-/** Generates HTML markup for a single collection card. */
-export function renderCollectionCard(col, prog, figs, frames, wallet, figPreview, initial) {
-  const nameInitial = (initial || '?').toUpperCase();
-  const figItems = (col.figs || []).map(k => {
-    const f = figs[k] || {name: k};
-    const has = prog.figsDone && prog.figsDone.has(k);
-    return `<span class="col-item${has ? ' has' : ''}"><img src="${figPreview(k)}" alt=""><span>${f.name}</span><i class="cchk">${has ? '✓' : '—'}</i></span>`;
-  }).join('');
-
-  const frameItems = (col.frames || []).map(k => {
-    const f = frames[k] || {name: k};
-    const has = prog.framesDone && prog.framesDone.has(k);
-    return `<span class="col-item${has ? ' has' : ''}"><span class="av mini${f.ring ? ' fr' : ''}" style="--c:${wallet.color || '#ef5350'};${f.ring ? `--fr:${f.ring}` : ''}">${nameInitial}</span><span>${f.name}</span><i class="cchk">${has ? '✓' : '—'}</i></span>`;
-  }).join('');
-
-  const pct = Math.min(100, Math.round(100 * prog.done / prog.total));
-  const actionBtn = prog.isClaimed
-    ? '<span class="pill">Собрано</span>'
-    : prog.isComplete
-      ? `<button class="chip pri" data-claimcol="${col.id}">Забрать +${col.reward}</button>`
-      : '<span class="pill lock">В процессе</span>';
-
-  return `<div class="col-card${prog.isClaimed ? ' got' : prog.isComplete ? ' done' : ''}">` +
-    `<div class="col-head"><span class="col-ic">${col.ic}</span><div class="col-info"><b>${col.name}</b><small>${col.desc}</small></div><span class="col-rew"><i class="coin"></i> +${col.reward}</span></div>` +
-    `<div class="col-grid">${figItems}${frameItems}</div>` +
-    `<div class="col-foot"><div class="xpbar"><i style="width:${pct}%"></i></div><small>${prog.done} / ${prog.total}</small>${actionBtn}</div>` +
-    `</div>`;
-}
-
 /** Generates HTML markup for Rewards tab (daily quests, weekly quests, achievements). */
 export function renderRewardsTabHtml({
   progQuests = [],
@@ -76,11 +47,11 @@ export function renderRewardsTabHtml({
 }) {
   const rank = (done, got) => got ? 2 : done ? 0 : 1;
   // one card: the icon tile, the title, a bar with the count in it, and on the right the reward, the claim button or a tick
-  const card = ({ic, title, n, need, reward, coin = 'copper', got, claim, swap = '', kind = 'q'}) => {
+  const card = ({ic, title, n, need, reward, coin = 'tile', got, claim, swap = '', kind = 'q'}) => {
     const done = n >= need, pct = Math.min(100, 100 * n / need);
     const side = got ? '<span class="qk-got" aria-label="Получено">✓</span>'
-      : done ? `<button class="qk-claim" ${claim}>Забрать<small><i class="coin ${coin}"></i>${reward}</small></button>`
-      : `<span class="qk-rew"><i class="coin ${coin}"></i><b>${reward}</b></span>`;
+      : done ? `<button class="qk-claim" ${claim}>Забрать<small><i class="coin c-${coin}"></i>${reward}</small></button>`
+      : `<span class="qk-rew"><i class="coin c-${coin}"></i><b>${reward}</b></span>`;
     return `<div class="qk qk-${kind}${got ? ' got' : done ? ' done' : ''}"><span class="qk-ic">${ic}</span><span class="qk-body"><b>${title}</b>`
       + `<span class="qk-bar"><i style="width:${pct.toFixed(0)}%"></i><em>${Math.min(n, need)} / ${need}</em></span></span>${side}${swap}</div>`;
   };
@@ -102,7 +73,7 @@ export function renderRewardsTabHtml({
   const pips = progWeekly.map(q => `<i class="${q.got ? 'on' : ''}"></i>`).join('');
   const chestRow = `<div class="qk-chest${weeklyChestClaimed ? ' got' : allWqGot ? ' done' : ''}"><span class="qk-chest-ic">${weeklyChestClaimed ? '🧰' : '🎁'}</span>`
     + `<span class="qk-body"><b>Большой сундук недели</b><small>${weeklyChestClaimed ? 'Открыт — новый на следующей неделе' : allWqGot ? 'Все цели недели достигнуты!' : `Выполните все ${progWeekly.length} цели недели`}</small><span class="qk-pips">${pips}</span></span>`
-    + (weeklyChestClaimed ? '<span class="qk-got">✓</span>' : allWqGot ? `<button class="qk-claim" data-claimwchest="1">Открыть<small><i class="coin copper"></i>${weeklyChestGold}</small></button>` : `<span class="qk-rew lock"><i class="coin copper"></i><b>${weeklyChestGold}</b></span>`) + '</div>';
+    + (weeklyChestClaimed ? '<span class="qk-got">✓</span>' : allWqGot ? `<button class="qk-claim" data-claimwchest="1">Открыть<small><i class="coin c-tile"></i>${weeklyChestGold}</small></button>` : `<span class="qk-rew lock"><i class="coin c-tile"></i><b>${weeklyChestGold}</b></span>`) + '</div>';
 
   const qGot = progQuests.filter(q => q.got).length;
   const nearQ = progQuests.filter(q => !q.got).map(q => ({q, Q: questDefs.find(x => x.id === q.id)})).filter(x => x.Q).sort((a, b) => (a.Q.n - a.q.n) / a.Q.n - (b.Q.n - b.q.n) / b.Q.n)[0];
@@ -139,7 +110,7 @@ export function renderAchievementsHtml({
     const statusPill = got
       ? '<span class="pill ach-done-pill">Получено ✓</span>'
       : ok
-      ? `<button class="chip pri ach-claim-btn" data-claima="${a.id}">Забрать +${a.g} <i class="coin ${a.coin || 'copper'}"></i></button>`
+      ? `<button class="chip pri ach-claim-btn" data-claima="${a.id}">Забрать +${a.g} <i class="coin c-${a.coin || 'tile'}"></i></button>`
       : '<span class="pill lock">В процессе</span>';
 
     return `
@@ -151,7 +122,7 @@ export function renderAchievementsHtml({
             ${tierTag}
           </div>
           <small class="ach-desc">${a.d}</small>
-          <div class="ach-reward-val"><i class="coin ${a.coin || 'copper'}"></i> +${a.g} ${a.coin === 'gold' ? 'золота' : a.coin === 'silver' ? 'серебра' : 'меди'}</div>
+          <div class="ach-reward-val"><i class="coin c-${a.coin || 'tile'}"></i> +${a.g} ${a.coin === 'star' ? 'звёзд' : 'тайлов'}</div>
         </span>
         <div class="ach-action-wrap">
           ${statusPill}
