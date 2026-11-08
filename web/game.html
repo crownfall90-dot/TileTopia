@@ -309,7 +309,7 @@
             <div class="hitem"><span class="hic"><i class="coin star"></i></span><div><b>Звёзды</b><p>Редкая валюта. Их дают только золотые достижения. За звёзды покупаются самые редкие вещи. Обмена между валютами нет.</p></div></div>
             <div class="h3">Прогресс</div>
             <div class="hitem"><span class="hic">🎯</span><div><b>Задания</b><p>Три задания в день и цели недели. Одно задание в день можно заменить. За все цели недели — большой сундук.</p></div></div>
-            <div class="hitem"><span class="hic">🗺</span><div><b>Дорога прогресса</b><p>Опыт за партии поднимает уровень. На дороге — награды за уровни и кубки: монеты, статусы, рамки, сундуки.</p></div></div>
+            <div class="hitem"><span class="hic">🗺</span><div><b>Дорога прогресса</b><p>Опыт за партии поднимает уровень. На дороге — награды за уровни и кубки: тайлы, звёзды, статусы, рамки, фигурки.</p></div></div>
             <div class="hitem"><span class="hic">🏆</span><div><b>Кубки и рейтинг</b><p>Онлайн-партии на кубки: за 1 место +30, за 2 +15, за 3 +5, за ничью +10. Лучшие игроки — в рейтинге.</p></div></div>
           </div>
           <div class="rpane" data-rp="more" hidden>
@@ -2187,11 +2187,11 @@ function getDailyTrioOptions() {
   const notOwned = Object.keys(FIGS).filter(k => !wallet.owned.includes(k));
   const options = [];
 
-  // 1. Золотой куш (35-50 монет)
+  // 1. Куш тайлов (35-50)
   const g1 = 35 + ((Math.random() * 4) | 0) * 5;
-  options.push({ type: 'gold', amount: g1, title: `+${g1} монет`, sub: 'Золотой куш' });
+  options.push({ type: 'gold', amount: g1, title: `+${g1} тайлов`, sub: 'Куш тайлов' });
 
-  // 2. Буст удвоения золота + 25 монет
+  // 2. Буст удвоения тайлов + 25
   const g2 = 25;
   options.push({ type: 'boost_double', amount: g2, title: `+${g2} 💰 и ×2 тайлов`, sub: 'Двойные тайлы' });
 
@@ -4445,16 +4445,16 @@ function ptabsDot() {
 }
 // every next stage: +5 levels and +250 cups
 const PROGRESS_ROAD_MILESTONES = [
-  { id: 'm5', lvl: 5, cups: 250, title: 'Новичок', desc: '+50 монет и эмодзи 😎', reward: { gold: 50, emote: '😎' }, ic: '🌱' },
-  { id: 'm10', lvl: 10, cups: 500, title: 'Следопыт', desc: 'Статус «Следопыт» и +80 монет', reward: { status: 'Следопыт', gold: 80 }, ic: '🧭' },
-  { id: 'm15', lvl: 15, cups: 750, title: 'Зодчий', desc: '+120 монет и эмодзи 🏰', reward: { gold: 120, emote: '🏰' }, ic: '🏰' },
-  { id: 'm20', lvl: 20, cups: 1000, title: 'Изумруд', desc: 'Рамка «Изумруд» и +150 монет', reward: { frame: 'emerald', gold: 150 }, ic: '💎' },
-  { id: 'm25', lvl: 25, cups: 1250, title: 'Мастер', desc: '+200 монет и фраза «Красиво строишь!»', reward: { gold: 200, phrase: 'Красиво строишь!' }, ic: '⭐' },
-  { id: 'm30', lvl: 30, cups: 1500, title: 'Магистр', desc: 'Фигурка и +250 монет', reward: { fig: 'classic', gold: 250 }, ic: '🧙‍♂️' },
-  { id: 'm35', lvl: 35, cups: 1750, title: 'Золотой сундук', desc: '+350 монет', reward: { gold: 350 }, ic: '🎁' },
-  { id: 'm40', lvl: 40, cups: 2000, title: 'Гроссмейстер', desc: 'Статус «Гроссмейстер» и фраза', reward: { status: 'Гроссмейстер', gold: 300, phrase: 'Ну ты гроссмейстер! 👑' }, ic: '👑' },
-  { id: 'm45', lvl: 45, cups: 2250, title: 'Легенда', desc: '+400 монет и статус «Легенда»', reward: { status: 'Легенда', gold: 400 }, ic: '⚔️' },
-  { id: 'm50', lvl: 50, cups: 2500, title: 'Чемпион', desc: 'Кубок Чемпиона, рамка, +600 монет и 🏆', reward: { frame: 'gold', gold: 600, emote: '🏆' }, ic: '🏆' },
+  { id: 'm5', lvl: 5, cups: 250, title: 'Новичок', desc: '+50 тайлов и эмодзи 😎', reward: { gold: 50, emote: '😎' }, ic: '🌱' },
+  { id: 'm10', lvl: 10, cups: 500, title: 'Следопыт', desc: 'Статус «Следопыт» и +80 тайлов', reward: { status: 'Следопыт', gold: 80 }, ic: '🧭' },
+  { id: 'm15', lvl: 15, cups: 750, title: 'Зодчий', desc: '+120 тайлов и эмодзи 🏰', reward: { gold: 120, emote: '🏰' }, ic: '🏰' },
+  { id: 'm20', lvl: 20, cups: 1000, title: 'Изумруд', desc: 'Рамка «Изумруд» и +150 тайлов', reward: { frame: 'emerald', gold: 150 }, ic: '💎' },
+  { id: 'm25', lvl: 25, cups: 1250, title: 'Мастер', desc: '+200 тайлов и фраза «Красиво строишь!»', reward: { gold: 200, phrase: 'Красиво строишь!' }, ic: '⭐' },
+  { id: 'm30', lvl: 30, cups: 1500, title: 'Магистр', desc: 'Фигурка, +250 тайлов и +1 звезда', reward: { fig: 'classic', gold: 250, stars: 1 }, ic: '🧙‍♂️' },
+  { id: 'm35', lvl: 35, cups: 1750, title: 'Золотой сундук', desc: '+350 тайлов', reward: { gold: 350 }, ic: '🎁' },
+  { id: 'm40', lvl: 40, cups: 2000, title: 'Гроссмейстер', desc: 'Статус «Гроссмейстер», +300 тайлов, фраза и +2 звезды', reward: { status: 'Гроссмейстер', gold: 300, stars: 2, phrase: 'Ну ты гроссмейстер! 👑' }, ic: '👑' },
+  { id: 'm45', lvl: 45, cups: 2250, title: 'Легенда', desc: '+400 тайлов, статус «Легенда» и +2 звезды', reward: { status: 'Легенда', gold: 400, stars: 2 }, ic: '⚔️' },
+  { id: 'm50', lvl: 50, cups: 2500, title: 'Чемпион', desc: 'Кубок Чемпиона, рамка, +600 тайлов и +3 звезды', reward: { frame: 'gold', gold: 600, stars: 3, emote: '🏆' }, ic: '🏆' },
 ];
 
 function progressDot() {
@@ -4640,6 +4640,7 @@ function claimRoadMilestone(id) {
   if (!isUnlocked || wallet.roadClaimed.includes(id)) return;
   wallet.roadClaimed.push(id);
   if (m.reward.gold) wallet.gold += m.reward.gold;
+  if (m.reward.stars) COINS.give(wallet, m.reward.stars, 'star');
   if (m.reward.status) {
     if (!wallet.statuses) wallet.statuses = [];
     if (!wallet.statuses.includes(m.reward.status)) wallet.statuses.push(m.reward.status);

@@ -16,3 +16,11 @@ test('rating: a tap on a player is left to the global player-card handler (no se
   assert.ok(!/showPlayerInspectModal|playerInspectModal/.test(src), 'the old simple card is gone');
   assert.ok(!/сброс в понедельник/.test(src), 'the rating is not reset');
 });
+
+test('progress road: the top stages also pay stars, claimed through the one coin module', () => {
+  const src = fs.readFileSync(__dirname + '/../web/game.html', 'utf8');
+  const stars = [...src.matchAll(/id: '(m\d+)'[^\n]*?stars: (\d+)/g)].map(x => [x[1], +x[2]]);
+  assert.deepEqual(stars, [['m30', 1], ['m40', 2], ['m45', 2], ['m50', 3]], 'stars on the four top stages');
+  assert.match(src, /if \(m\.reward\.stars\) COINS\.give\(wallet, m\.reward\.stars, 'star'\)/, 'the stars are given by COINS.give');
+  assert.ok(!/\d+ монет\b/.test(src), 'no «монет» left: the currency is tiles');
+});
