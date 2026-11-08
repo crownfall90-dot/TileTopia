@@ -2100,7 +2100,7 @@ function renderResults(final, gold) {
 /* ---------------- gold, figures, shop ----------------
    Gold lives on this phone only (no accounts yet) and is never sold for money. */
 // The shop catalogue lives in src/state/catalog.js.
-const {FIGS, LOCS, CHEST_SVG, CHEST_OPEN_SVG, FRAMES, COLLECTIONS, collectionProgress} = PG.state.catalog;
+const {FIGS, LOCS, CHEST_SVG, CHEST_OPEN_SVG, FRAMES} = PG.state.catalog;
 // The player's own avatar frame: style for an avatar element (empty when none).
 const myRing = () => (FRAMES[wallet.frame] || FRAMES.none).ring;
 const randomFig = () => { const k = Object.keys(FIGS); return k[(Math.random() * k.length) | 0]; };
@@ -4445,8 +4445,7 @@ const rewardReady = () => {
   const qDot = PROG.q.some(q => !q.got && q.n >= QUESTS.find(x => x.id === q.id).n);
   const wqDot = PROG.wq && (PROG.wq.some(q => !q.got && q.n >= (WEEKLY_ALL.find(x => x.id === q.id) || {}).n) || (!PROG.wchest && PROG.wq.every(q => q.got)));
   const aDot = ACH.some(a => a.ok(PROG.st, PROG.lvl) && PROG.ach[a.id] !== 'got');
-  const cDot = typeof COLLECTIONS !== 'undefined' && Array.isArray(COLLECTIONS) && typeof collectionProgress === 'function' ? COLLECTIONS.some(c => { const p = collectionProgress(c, wallet); return p.isComplete && !p.isClaimed; }) : false;
-  return qDot || wqDot || aDot || cDot || !!PROG.inTop10;
+  return qDot || wqDot || aDot || !!PROG.inTop10;
 };
 function ptabsDot() {
   questsToday();
@@ -4454,24 +4453,24 @@ function ptabsDot() {
   const qDot = PROG.q.some(q => !q.got && q.n >= QUESTS.find(x => x.id === q.id).n);
   const wqDot = PROG.wq && (PROG.wq.some(q => !q.got && q.n >= (WEEKLY_ALL.find(x => x.id === q.id) || {}).n) || (!PROG.wchest && PROG.wq.every(q => q.got)));
   const aDot = ACH.some(a => a.ok(PROG.st, PROG.lvl) && PROG.ach[a.id] !== 'got');
-  const cDot = typeof COLLECTIONS !== 'undefined' && Array.isArray(COLLECTIONS) && typeof collectionProgress === 'function' ? COLLECTIONS.some(c => { const p = collectionProgress(c, wallet); return p.isComplete && !p.isClaimed; }) : false;
   const tDot = !!PROG.inTop10;
   document.querySelectorAll('#ptabs button').forEach(b => {
     const pt = b.dataset.pt;
-    b.classList.toggle('hasdot', pt === 'rewards' ? (qDot || wqDot || aDot) : pt === 'cols' ? cDot : pt === 'top' ? tDot : false);
+    b.classList.toggle('hasdot', pt === 'rewards' ? (qDot || wqDot || aDot) : pt === 'top' ? tDot : false);
   });
 }
+// every next stage: +5 levels and +250 cups
 const PROGRESS_ROAD_MILESTONES = [
-  { id: 'm5', lvl: 5, cups: 50, title: 'Новичок', desc: '+50 монет и эмодзи 😎', reward: { gold: 50, emote: '😎' }, ic: '🌱' },
-  { id: 'm10', lvl: 10, cups: 150, title: 'Следопыт', desc: 'Статус «Следопыт» и +80 монет', reward: { status: 'Следопыт', gold: 80 }, ic: '🧭' },
-  { id: 'm15', lvl: 15, cups: 300, title: 'Зодчий', desc: '+120 монет и эмодзи 🏰', reward: { gold: 120, emote: '🏰' }, ic: '🏰' },
-  { id: 'm20', lvl: 20, cups: 500, title: 'Изумруд', desc: 'Рамка «Изумруд» и +150 монет', reward: { frame: 'emerald', gold: 150 }, ic: '💎' },
-  { id: 'm25', lvl: 25, cups: 800, title: 'Мастер', desc: '+200 монет и фраза «Красиво строишь!»', reward: { gold: 200, phrase: 'Красиво строишь!' }, ic: '⭐' },
-  { id: 'm30', lvl: 30, cups: 1200, title: 'Магистр', desc: 'Фигурка и +250 монет', reward: { fig: 'classic', gold: 250 }, ic: '🧙‍♂️' },
-  { id: 'm35', lvl: 35, cups: 1700, title: 'Золотой сундук', desc: '+350 монет', reward: { gold: 350 }, ic: '🎁' },
-  { id: 'm40', lvl: 40, cups: 2300, title: 'Гроссмейстер', desc: 'Статус «Гроссмейстер» и фраза', reward: { status: 'Гроссмейстер', gold: 300, phrase: 'Ну ты гроссмейстер! 👑' }, ic: '👑' },
-  { id: 'm45', lvl: 45, cups: 3000, title: 'Легенда', desc: '+400 монет и статус «Легенда»', reward: { status: 'Легенда', gold: 400 }, ic: '⚔️' },
-  { id: 'm50', lvl: 50, cups: 4000, title: 'Чемпион', desc: 'Кубок Чемпиона, рамка, +600 монет и 🏆', reward: { frame: 'gold', gold: 600, emote: '🏆' }, ic: '🏆' },
+  { id: 'm5', lvl: 5, cups: 250, title: 'Новичок', desc: '+50 монет и эмодзи 😎', reward: { gold: 50, emote: '😎' }, ic: '🌱' },
+  { id: 'm10', lvl: 10, cups: 500, title: 'Следопыт', desc: 'Статус «Следопыт» и +80 монет', reward: { status: 'Следопыт', gold: 80 }, ic: '🧭' },
+  { id: 'm15', lvl: 15, cups: 750, title: 'Зодчий', desc: '+120 монет и эмодзи 🏰', reward: { gold: 120, emote: '🏰' }, ic: '🏰' },
+  { id: 'm20', lvl: 20, cups: 1000, title: 'Изумруд', desc: 'Рамка «Изумруд» и +150 монет', reward: { frame: 'emerald', gold: 150 }, ic: '💎' },
+  { id: 'm25', lvl: 25, cups: 1250, title: 'Мастер', desc: '+200 монет и фраза «Красиво строишь!»', reward: { gold: 200, phrase: 'Красиво строишь!' }, ic: '⭐' },
+  { id: 'm30', lvl: 30, cups: 1500, title: 'Магистр', desc: 'Фигурка и +250 монет', reward: { fig: 'classic', gold: 250 }, ic: '🧙‍♂️' },
+  { id: 'm35', lvl: 35, cups: 1750, title: 'Золотой сундук', desc: '+350 монет', reward: { gold: 350 }, ic: '🎁' },
+  { id: 'm40', lvl: 40, cups: 2000, title: 'Гроссмейстер', desc: 'Статус «Гроссмейстер» и фраза', reward: { status: 'Гроссмейстер', gold: 300, phrase: 'Ну ты гроссмейстер! 👑' }, ic: '👑' },
+  { id: 'm45', lvl: 45, cups: 2250, title: 'Легенда', desc: '+400 монет и статус «Легенда»', reward: { status: 'Легенда', gold: 400 }, ic: '⚔️' },
+  { id: 'm50', lvl: 50, cups: 2500, title: 'Чемпион', desc: 'Кубок Чемпиона, рамка, +600 монет и 🏆', reward: { frame: 'gold', gold: 600, emote: '🏆' }, ic: '🏆' },
 ];
 
 function progressDot() {
@@ -4798,15 +4797,6 @@ function renderTasks() {
   else if (ptab === 'hist') renderHistory(el);
   else { ptab = 'road'; renderProgressRoad(); }
 }
-function renderCollections(el) {
-  if (!COLLECTIONS || !COLLECTIONS.length) { el.innerHTML = '<p class="shint">Коллекции появятся скоро</p>'; return; }
-  const colRows = COLLECTIONS.map(c => {
-    // R-9: data-claimcol="${c.id}"
-    const p = collectionProgress(c, wallet);
-    return PG.ui.progress.renderCollectionCard(c, p, FIGS, FRAMES, wallet, figPreview, profileName()[0]);
-  }).join('');
-  el.innerHTML = `<div class="h3 sec">Тематические наборы</div>${colRows}`;
-}
 // The last games (kept on this phone, newest first): when, how it went and who played. Saved profiles met online
 // can be added as friends from here.
 // Another player's card: name, colour, cups and when seen, with "add friend". Opened from the history, the room and
@@ -5082,7 +5072,7 @@ if ($('#ptabs')) $('#ptabs').onclick = e => {
 function onProgressClick(e) {
   const road = e.target.closest('[data-claimroad]');
   if (road) return claimRoadMilestone(road.dataset.claimroad);
-  const q = e.target.closest('[data-claimq]'), a = e.target.closest('[data-claima]'), wq = e.target.closest('[data-claimwq]'), wch = e.target.closest('[data-claimwchest]'), cl = e.target.closest('[data-claimcol]');
+  const q = e.target.closest('[data-claimq]'), a = e.target.closest('[data-claima]'), wq = e.target.closest('[data-claimwq]'), wch = e.target.closest('[data-claimwchest]');
   const rr = e.target.closest('[data-reroll]');
   if (rr) {   // one free swap a day: the quest goes, a fresh one (not on today's list) takes its place
     const it = PROG.q.find(x => x.id === rr.dataset.reroll);
@@ -5095,15 +5085,6 @@ function onProgressClick(e) {
   else if (a) { const A = ACH.find(x => x.id === a.dataset.claima); if (PROG.ach[A.id] === 'got' || !A.ok(PROG.st, PROG.lvl)) return; PROG.ach[A.id] = 'got'; if (A.coin === 'gold') wallet.goldCoins = COINS.balance(wallet, 'gold') + A.g; else if (A.coin === 'silver') wallet.silver = COINS.balance(wallet, 'silver') + A.g; else wallet.gold += A.g; }
   else if (wq) { const it = (PROG.wq || []).find(x => x.id === wq.dataset.claimwq), WQ = WEEKLY_ALL.find(x => x.id === it.id); if (!it || !WQ || it.got || it.n < WQ.n) return; it.got = true; wallet.gold += WQ.g; }
   else if (wch) { if (PROG.wchest || !PROG.wq || !PROG.wq.length || !PROG.wq.every(x => x.got)) return; PROG.wchest = true; wallet.gold += WEEKLY_CHEST_GOLD || 100; toastAny('Большой сундук недели открыт! +100 меди 🎉'); }
-  else if (cl) {
-    const col = (COLLECTIONS || []).find(x => x.id === cl.dataset.claimcol);
-    if (!col) return;
-    const p = collectionProgress(col, wallet);
-    if (!p.isComplete || p.isClaimed) return;
-    wallet.gold += col.reward;
-    wallet.colClaimed = [...(wallet.colClaimed || []), col.id];
-    toastAny(`Коллекция «${col.name}» собрана! +${col.reward} меди 🎉`);
-  }
   else return;
   beep('coin'); saveWallet(); progressDot(); renderProgress(); if (typeof renderAchievements === 'function' && !$('#scr-achievements').hidden) renderAchievements(); renderMenuProfile();
 }
@@ -5224,7 +5205,7 @@ async function renderTop(customEl) {
     : '';
 
   const scopeTabs = `<div class="scope-tabs"><button class="chip${topScope === 'all' ? ' pri' : ''}" id="topScopeAll">Все игроки (Топ-20)</button><button class="chip${topScope === 'friends' ? ' pri' : ''}" id="topScopeFriends">Среди друзей</button></div>`;
-  const seasonTag = `<div style="text-align:center;color:var(--muted);font-size:12px;margin-bottom:8px">Лига · Сезон <b>${curWeek}</b> (сброс в понедельник)</div>`;
+  const seasonTag = `<div style="text-align:center;color:var(--muted);font-size:12px;margin-bottom:8px">Лига · Сезон <b>${curWeek}</b></div>`;
 
   const emptyNote = rows.length < 4 ? `<p class="qnote" style="text-align:center">${boardLoaded ? 'Пока вас мало в таблице — играйте онлайн и поднимайтесь выше.' : 'Таблица игроков сейчас недоступна. Здесь ваши кубки; общий рейтинг появится, когда связь вернётся.'}</p>` : '';
   el.innerHTML = seasonTag + scopeTabs + `<div class="podium">${podium}</div>` + `<div class="leader-tile-list">${list}</div>` + myRow + emptyNote + '<p class="qnote">Нажмите на игрока, чтобы посмотреть профиль · За победу в рейтинге +10 🏆</p>';
@@ -5233,49 +5214,8 @@ async function renderTop(customEl) {
   if (btnAll) btnAll.onclick = () => { topScope = 'all'; renderTop(); };
   if (btnFriends) btnFriends.onclick = () => { topScope = 'friends'; renderTop(); };
 
-  // Clicking on any player row or podium card
-  el.querySelectorAll('[data-pl]').forEach(card => {
-    card.onclick = () => {
-      const name = card.dataset.n || 'Игрок';
-      const st = card.dataset.st || 'Искатель приключений';
-      const cups = card.dataset.cups || '0';
-      const fr = card.dataset.fr || 'none';
-      const ring = (FRAMES[fr] && FRAMES[fr].ring) || '';
-      const c = card.dataset.c || '#3a7bd5';
-      const init = (name || '?')[0].toUpperCase();
-
-      showPlayerInspectModal({ name, st, cups, ring, c, init });
-    };
-  });
+  // A tap on a player row or podium card opens the player card: the global [data-pl] handler does it
 }
-
-function showPlayerInspectModal(p) {
-  const old = $('#playerInspectModal');
-  if (old) old.remove();
-  const modal = document.createElement('div');
-  modal.id = 'playerInspectModal';
-  modal.className = 'player-inspect-modal';
-  modal.innerHTML = `
-    <div class="pim-backdrop"></div>
-    <div class="pim-card">
-      <button class="pim-close" aria-label="Закрыть">✕</button>
-      <div class="pim-avatar-box">
-        <span class="av big${p.ring ? ' fr' : ''}" style="--c:${p.c};${p.ring ? `--fr:${p.ring}` : ''};width:72px;height:72px;font-size:28px">${p.init}</span>
-      </div>
-      <b class="pim-name">${p.name}</b>
-      <span class="st-rank-badge pim-st">${p.st}</span>
-      <div class="pim-stats">
-        <div class="pim-stat"><span class="ic">🏆</span><b>${p.cups}</b><small>Кубков</small></div>
-        <div class="pim-stat"><span class="ic">⭐</span><b>Мастер</b><small>Ранг</small></div>
-      </div>
-    </div>
-  `;
-  document.body.append(modal);
-  const close = () => modal.remove();
-  modal.querySelector('.pim-close').onclick = close;
-  modal.querySelector('.pim-backdrop').onclick = close;
-}
-
 questsToday(); progressDot();
 
 /* ---------------- tutorial ----------------

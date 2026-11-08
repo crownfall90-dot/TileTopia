@@ -135,8 +135,8 @@ test('ui/shop: renderGiftCard, renderFiguresGrid, renderFramesGrid, renderLocati
   assert.ok(emotesHtml.includes('data-reset-deck'));
 });
 
-test('ui/progress: ringSvg, renderMasteryGrid, renderBuildingStats, renderCollectionCard', async () => {
-  const {ringSvg, renderMasteryGrid, renderBuildingStats, renderCollectionCard} = await import('../src/ui/progress.js');
+test('ui/progress: ringSvg, renderMasteryGrid, renderBuildingStats', async () => {
+  const {ringSvg, renderMasteryGrid, renderBuildingStats} = await import('../src/ui/progress.js');
 
   // Ring SVG
   const ring = ringSvg(0.5);
@@ -162,33 +162,6 @@ test('ui/progress: ringSvg, renderMasteryGrid, renderBuildingStats, renderCollec
   assert.ok(buildHtml.includes('рекорд: 14 карт'));
   assert.ok(buildHtml.includes('25</b> дорог'));
   assert.ok(buildHtml.includes('4</b> монастырей'));
-
-  // Collection card
-  const col = {
-    id: 'court',
-    name: 'Королевский двор',
-    desc: 'Набор знати',
-    reward: 200,
-    ic: '👑',
-    figs: ['knight'],
-    frames: ['royal']
-  };
-  const prog = {
-    isComplete: true,
-    isClaimed: false,
-    done: 2,
-    total: 2,
-    figsDone: new Set(['knight']),
-    framesDone: new Set(['royal'])
-  };
-  const figs = {knight: {name: 'Рыцарь'}};
-  const frames = {royal: {name: 'Королевская', ring: 'gold'}};
-  const cardHtml = renderCollectionCard(col, prog, figs, frames, {color: '#ef5350'}, k => k, 'П');
-
-  assert.ok(cardHtml.includes('Королевский двор'));
-  assert.ok(cardHtml.includes('+200'));
-  assert.ok(cardHtml.includes('data-claimcol="court"'));
-  assert.ok(cardHtml.includes('Забрать +200'));
 
   // Rewards tab and history markup
   const {renderRewardsTabHtml, renderHistoryHtml} = await import('../src/ui/progress.js');

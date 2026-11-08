@@ -20,7 +20,7 @@ export const FEATURES = {
   'btn:openGift': 'Ежедневный подарок', 'btn:itemsBtn': 'Мои предметы', 'btn:installBtn': 'Установка игры',
   'say:emote': 'Реакция: эмодзи', 'say:phrase': 'Реакция: фраза',
   'claim:quest': 'Награда за задание', 'claim:achievement': 'Награда за достижение', 'claim:weekly': 'Награда за недельную цель', 'claim:chest': 'Сундук недели',
-  'claim:collection': 'Награда за коллекцию', 'claim:road': 'Награда с пути прогресса', 'claim:reroll': 'Замена задания',
+  'claim:road': 'Награда с пути прогресса', 'claim:reroll': 'Замена задания',
   'buy:emote': 'Покупка: эмодзи', 'buy:phrase': 'Покупка: фраза', 'buy:daily': 'Покупка в дневной витрине', 'pick:daily': 'Выбор купленного в витрине',
   'deck:emote': 'Колода: эмодзи', 'deck:phrase': 'Колода: фраза',
   'mode:bots': 'Режим: с ботами', 'mode:local': 'Режим: на одном телефоне', 'mode:lobby': 'Режим: с друзьями (комната)', 'mode:online': 'Режим: онлайн',
@@ -38,7 +38,7 @@ export const isFeatureId = id => typeof id === 'string' && KEY.test(id);
 /** The id of what was tapped, from its markup: a data-* name and value, else the element id. null when it is not worth counting. */
 export function featureOf(el) {
   if (!el || !el.closest) return null;
-  const b = el.closest('[data-claimq],[data-claima],[data-claimwq],[data-claimwchest],[data-claimcol],[data-claimroad],[data-reroll],[data-rbuy],[data-daily-buy],[data-daily-pick],[data-toggle-emote],[data-toggle-phrase],[data-hub-action],[data-pt],[data-mode-action],[data-setmode],[data-nav],[data-go],[data-say],button[id],a[id]');
+  const b = el.closest('[data-claimq],[data-claima],[data-claimwq],[data-claimwchest],[data-claimroad],[data-reroll],[data-rbuy],[data-daily-buy],[data-daily-pick],[data-toggle-emote],[data-toggle-phrase],[data-hub-action],[data-pt],[data-mode-action],[data-setmode],[data-nav],[data-go],[data-say],button[id],a[id]');
   if (!b) return null;
   const d = b.dataset || {};
   const id = k => isFeatureId(k) ? k : null;
@@ -46,7 +46,6 @@ export function featureOf(el) {
   if (d.claima != null) return 'claim:achievement';
   if (d.claimwq != null) return 'claim:weekly';
   if (d.claimwchest != null) return 'claim:chest';
-  if (d.claimcol != null) return 'claim:collection';
   if (d.claimroad != null) return 'claim:road';
   if (d.reroll != null) return 'claim:reroll';
   if (d.rbuy) return id('buy:' + d.rbuy);

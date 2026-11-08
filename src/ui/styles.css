@@ -5621,6 +5621,16 @@ html body #btnMenuNotif .nb-icon svg {
   0%, 100% { transform: scale(1); }
   50% { transform: scale(1.04); }
 }
+/* narrow phones: the text keeps the whole row, the claim button goes under it at full width (44 px to tap) */
+@media (max-width: 440px) {
+  .ach-card { flex-wrap: wrap; }
+  .ach-qt { min-width: 0; }
+  .ach-action-wrap { flex: 1 0 100%; display: flex; }
+  .ach-action-wrap .ach-claim-btn, .ach-action-wrap .pill { flex: 1; min-height: 44px; justify-content: center; text-align: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ach-claim-btn, .ach-card.ready-glow { animation: none; }
+}
 
 /* ==================== Shop Stalls (Прилавки Витрины) ==================== */
 .shop-stalls-container {

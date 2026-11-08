@@ -1,5 +1,5 @@
 // Progress and profile UI helpers (E-1.4)
-// Renders level circles, mastery grids, quests, and collection cards.
+// Renders level circles, mastery grids, and quests.
 
 /** Generates circular SVG progress ring. */
 export function ringSvg(frac) {
@@ -27,35 +27,6 @@ export function renderBuildingStats(st = {}) {
     `<span>🏰 <b>${st.c || 0}</b> городов${maxCityText}</span>` +
     `<span>🛤 <b>${st.r || 0}</b> дорог</span>` +
     `<span>⛪ <b>${st.f || 0}</b> монастырей</span>` +
-    `</div>`;
-}
-
-/** Generates HTML markup for a single collection card. */
-export function renderCollectionCard(col, prog, figs, frames, wallet, figPreview, initial) {
-  const nameInitial = (initial || '?').toUpperCase();
-  const figItems = (col.figs || []).map(k => {
-    const f = figs[k] || {name: k};
-    const has = prog.figsDone && prog.figsDone.has(k);
-    return `<span class="col-item${has ? ' has' : ''}"><img src="${figPreview(k)}" alt=""><span>${f.name}</span><i class="cchk">${has ? '✓' : '—'}</i></span>`;
-  }).join('');
-
-  const frameItems = (col.frames || []).map(k => {
-    const f = frames[k] || {name: k};
-    const has = prog.framesDone && prog.framesDone.has(k);
-    return `<span class="col-item${has ? ' has' : ''}"><span class="av mini${f.ring ? ' fr' : ''}" style="--c:${wallet.color || '#ef5350'};${f.ring ? `--fr:${f.ring}` : ''}">${nameInitial}</span><span>${f.name}</span><i class="cchk">${has ? '✓' : '—'}</i></span>`;
-  }).join('');
-
-  const pct = Math.min(100, Math.round(100 * prog.done / prog.total));
-  const actionBtn = prog.isClaimed
-    ? '<span class="pill">Собрано</span>'
-    : prog.isComplete
-      ? `<button class="chip pri" data-claimcol="${col.id}">Забрать +${col.reward}</button>`
-      : '<span class="pill lock">В процессе</span>';
-
-  return `<div class="col-card${prog.isClaimed ? ' got' : prog.isComplete ? ' done' : ''}">` +
-    `<div class="col-head"><span class="col-ic">${col.ic}</span><div class="col-info"><b>${col.name}</b><small>${col.desc}</small></div><span class="col-rew"><i class="coin"></i> +${col.reward}</span></div>` +
-    `<div class="col-grid">${figItems}${frameItems}</div>` +
-    `<div class="col-foot"><div class="xpbar"><i style="width:${pct}%"></i></div><small>${prog.done} / ${prog.total}</small>${actionBtn}</div>` +
     `</div>`;
 }
 
