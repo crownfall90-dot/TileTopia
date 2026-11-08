@@ -101,7 +101,7 @@
 
       <section class="screen scroll" id="scr-shop" hidden>
         <div class="lb">
-          <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Витрина</b><span class="goldchip static coin3"><span><i class="coin tile"></i><b data-coin="tile">0</b></span><span><i class="coin star"></i><b data-coin="star">0</b></span></span></div>
+          <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Витрина</b><span class="goldchip static coin3"><span><i class="coin c-tile"></i><b data-coin="tile">0</b></span><span><i class="coin c-star"></i><b data-coin="star">0</b></span></span></div>
           <div class="gift" id="gift"></div>
           
           <!-- 5 Medieval Market Stalls (max 6 items per stall: 3 top, 3 bottom) -->
@@ -212,7 +212,7 @@
 
       <section class="screen scroll" id="scr-achievements" hidden>
         <div class="lb">
-          <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Достижения</b><span class="goldchip static coin3"><span><i class="coin tile"></i><b data-coin="tile">0</b></span><span><i class="coin star"></i><b data-coin="star">0</b></span></span></div>
+          <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Достижения</b><span class="goldchip static coin3"><span><i class="coin c-tile"></i><b data-coin="tile">0</b></span><span><i class="coin c-star"></i><b data-coin="star">0</b></span></span></div>
           <div class="col" id="achievementsContent"></div>
         </div>
       </section>
@@ -305,8 +305,8 @@
             <div class="hitem"><span class="hic">🏰</span><div><b>Большая</b><p>100 плиток, 8 фишек и редкие карты, около получаса.</p></div></div>
             <div class="hitem"><span class="hic">⬢</span><div><b>Классика 2.0</b><p>Шестиугольные плитки: у каждой шесть соседей, города и дороги поворачивают как угодно. Монастырь окружают шесть плиток — тогда он даёт 9 очков.</p></div></div>
             <div class="h3">Монеты</div>
-            <div class="hitem"><span class="hic"><i class="coin tile"></i></span><div><b>Тайлы</b><p>Главная валюта. За партии, задания, подарки и достижения. На тайлы покупаются фигурки, рамки, статусы и эмодзи.</p></div></div>
-            <div class="hitem"><span class="hic"><i class="coin star"></i></span><div><b>Звёзды</b><p>Редкая валюта. Их дают только золотые достижения. За звёзды покупаются самые редкие вещи. Обмена между валютами нет.</p></div></div>
+            <div class="hitem"><span class="hic"><i class="coin c-tile"></i></span><div><b>Тайлы</b><p>Главная валюта. За партии, задания, подарки и достижения. На тайлы покупаются фигурки, рамки, статусы и эмодзи.</p></div></div>
+            <div class="hitem"><span class="hic"><i class="coin c-star"></i></span><div><b>Звёзды</b><p>Редкая валюта. Их дают только золотые достижения. За звёзды покупаются самые редкие вещи. Обмена между валютами нет.</p></div></div>
             <div class="h3">Прогресс</div>
             <div class="hitem"><span class="hic">🎯</span><div><b>Задания</b><p>Три задания в день и цели недели. Одно задание в день можно заменить. За все цели недели — большой сундук.</p></div></div>
             <div class="hitem"><span class="hic">🗺</span><div><b>Дорога прогресса</b><p>Опыт за партии поднимает уровень. На дороге — награды за уровни и кубки: тайлы, звёзды, статусы, рамки, фигурки.</p></div></div>
@@ -4693,9 +4693,9 @@ function renderMenuProfile() {
 
   // Under the plate: the two currencies, plain (to the shop), then the trophies (to the rating).
   if (st) st.innerHTML = `<button class="mpg menu-cur-trio" data-go="shop" title="Витрина и кошелёк" aria-label="Тайлы: ${tiles}, Звёзды: ${stars}">`
-    + `<span class="mcur-item tile" title="Тайлы"><i class="coin tile"></i><b>${tiles}</b></span>`
+    + `<span class="mcur-item c-tile" title="Тайлы"><i class="coin c-tile"></i><b>${tiles}</b></span>`
     + `<span class="mcur-sep"></span>`
-    + `<span class="mcur-item star" title="Звёзды"><i class="coin star"></i><b>${stars}</b></span>`
+    + `<span class="mcur-item c-star" title="Звёзды"><i class="coin c-star"></i><b>${stars}</b></span>`
     + `</button>`
     + `<button class="mpc" data-go="rating" title="Рейтинг игроков" aria-label="Кубки: ${PROG.cups || 0}. Открыть рейтинг"><svg class="cup-svg-ic" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#ffd875" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px"><path d="M6 9H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2"/><path d="M18 9h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2"/><path d="M6 3h12v7a6 6 0 0 1-12 0V3z"/><path d="M12 16v4"/><path d="M8 20h8"/></svg> <b class="cupsN">${PROG.cups || 0}</b><small>кубков</small><i>›</i></button>`;
   renderMenuQuestBanner();
@@ -4705,7 +4705,7 @@ function renderProfile() {
   const mail = fbAuth && fbAuth.email ? String(fbAuth.email).replace(/[<>&"]/g, '') : 'Профиль не сохранён';
   const profEl = $('#profile');
   if (profEl) {
-    profEl.innerHTML = `<div class="pctop"><span class="av big${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${(name[0] || '?').toUpperCase()}</span><span class="pwho"><b>${name}</b>${myStatus() ? `<em class="fst">${myStatus()}</em>` : ''}<small class="pmail">${mail}</small></span><button class="iconbtn" id="profEdit" aria-label="Редактировать профиль"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button></div><div class="pclvl"><div class="lvl">${ring(PROG.xp / need)}<b>${PROG.lvl}</b></div><div class="pi"><b class="pl1">Уровень ${PROG.lvl}</b><div class="xpbar"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></div><small>${PROG.xp} / ${need} опыта до ${PROG.lvl + 1} уровня</small></div></div><div class="pchips"><span>🏆 <b>${PROG.cups}</b> кубков</span></div><div class="pcoins"><span class="cu"><i class="coin tile"></i><b>${COINS.balance(wallet, 'tile')}</b><small>тайлы</small></span><span class="au"><i class="coin star"></i><b>${COINS.balance(wallet, 'star')}</b><small>звёзды</small></span></div><div class="pchips"><span>🏅 <b>${ACH.filter(a => PROG.ach[a.id] === 'got').length}</b>/${ACH.length} наград</span></div>${FB ? `<div class="pacts">${fbAuth && fbAuth.email ? '<button class="chip" data-hacct="out">Выйти из аккаунта</button>' : '<button class="chip pri" data-hacct="in">Войти или создать профиль</button>'}</div>` : ''}`;
+    profEl.innerHTML = `<div class="pctop"><span class="av big${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${(name[0] || '?').toUpperCase()}</span><span class="pwho"><b>${name}</b>${myStatus() ? `<em class="fst">${myStatus()}</em>` : ''}<small class="pmail">${mail}</small></span><button class="iconbtn" id="profEdit" aria-label="Редактировать профиль"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button></div><div class="pclvl"><div class="lvl">${ring(PROG.xp / need)}<b>${PROG.lvl}</b></div><div class="pi"><b class="pl1">Уровень ${PROG.lvl}</b><div class="xpbar"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></div><small>${PROG.xp} / ${need} опыта до ${PROG.lvl + 1} уровня</small></div></div><div class="pchips"><span>🏆 <b>${PROG.cups}</b> кубков</span></div><div class="pcoins"><span class="cu"><i class="coin c-tile"></i><b>${COINS.balance(wallet, 'tile')}</b><small>тайлы</small></span><span class="au"><i class="coin c-star"></i><b>${COINS.balance(wallet, 'star')}</b><small>звёзды</small></span></div><div class="pchips"><span>🏅 <b>${ACH.filter(a => PROG.ach[a.id] === 'got').length}</b>/${ACH.length} наград</span></div>${FB ? `<div class="pacts">${fbAuth && fbAuth.email ? '<button class="chip" data-hacct="out">Выйти из аккаунта</button>' : '<button class="chip pri" data-hacct="in">Войти или создать профиль</button>'}</div>` : ''}`;
     const pe = $('#profEdit');
     if (pe) pe.onclick = editProfile;
     profEl.querySelectorAll('[data-hacct]').forEach(b => { b.onclick = () => { const t = $(b.dataset.hacct === 'out' ? '#acLogout' : '#acLogin'); if (t) t.click(); }; });
@@ -5292,6 +5292,20 @@ function colorPick(input, av) {
   row.onclick = e => { const b = e.target.closest('[data-c]'); if (!b) return; wallet.color = setup.seats[0].col = b.dataset.c; saveWallet(); saveSetup(); clearTimeout(colorSyncT); colorSyncT = setTimeout(() => { try { presenceMark(true); syncRating(true); } catch (_) {} }, 600); if (av) av.style.setProperty('--c', b.dataset.c); draw(); };
   input.after(row);
 }
+function addConsent(box, anchorSel, gated) {
+  const C = PG.ui.consent;
+  if (C.hasConsent(wallet)) return;
+  const anchor = box.querySelector(anchorSel); if (!anchor) return;
+  const holder = document.createElement('div'); holder.className = 'consent-wrap'; holder.innerHTML = C.consentHtml('consentBox');
+  anchor.parentNode.insertBefore(holder, anchor);
+  const legal = box.querySelector('.legal'); if (legal) legal.hidden = true;
+  const input = holder.querySelector('#consentBox'), hint = holder.querySelector('.consent-hint');
+  const sync = () => { const on = input.checked; gated.map(q => box.querySelector(q)).filter(Boolean).forEach(t => t.classList.toggle('consent-lock', !on)); hint.hidden = on; };
+  input.onchange = () => { C.setConsent(wallet, input.checked); saveWallet(); sync(); };
+  // a tap (or Enter, which clicks the button from code) on a locked button only shakes the tick-box
+  box.addEventListener('click', e => { if (input.checked) return; const t = e.target.closest(gated.join(',')); if (!t) return; e.preventDefault(); e.stopImmediatePropagation(); holder.classList.remove('need'); void holder.offsetWidth; holder.classList.add('need'); }, true);
+  sync();
+}
 function askProfile() {
   if (wallet.name || document.getElementById('profBox')) return;
   const box = document.createElement('div'); box.className = 'over'; box.id = 'profBox'; box.style.position = 'fixed';
@@ -5299,6 +5313,7 @@ function askProfile() {
     ? PG.game.tutorial.renderAskProfileDialogHtml(wallet.color)
     : `<div class="ocard prof"><div class="pav" id="pav" style="--c:${wallet.color}">?</div><h3>Создайте профиль</h3><p>Придумайте никнейм и выберите цвет — их увидят соперники и рейтинг</p><input class="field" id="profName" maxlength="12" placeholder="Никнейм" autocomplete="off"><small class="legal">Нажимая «Готово», вы принимаете <a href="https://crownfall90-dot.github.io/TileTopia/terms.html" target="_blank" rel="noopener">Соглашение</a> и <a href="https://crownfall90-dot.github.io/TileTopia/privacy.html" target="_blank" rel="noopener">Политику</a>. Профиль хранится в Google Firebase, то есть за границей</small><button class="cta wide" id="profOk" disabled>Готово</button><button class="ghostbtn" id="profLogin">У меня уже есть профиль — войти</button></div>`;
   document.body.append(box);
+  addConsent(box, '#profOk', ['#profOk']);
   const inp = box.querySelector('#profName'), ok = box.querySelector('#profOk'), av = box.querySelector('#pav'), dice = box.querySelector('#profDice');
   colorPick(box.querySelector('#profColorLabel') || inp, av);
   inp.oninput = () => { const n = clean(inp.value); ok.disabled = n.length < 2 || n === 'Вы'; av.textContent = (n[0] || '?').toUpperCase(); };
@@ -7107,6 +7122,7 @@ function accountDialog(mode, prefill) {
     <p class="phint" id="accHint">Пароль от 6 символов</p>
     <p class="accErr" id="accErr" role="alert"></p><small class="legal">Продолжая, вы принимаете <a href="https://crownfall90-dot.github.io/TileTopia/terms.html" target="_blank" rel="noopener">Соглашение</a> и <a href="https://crownfall90-dot.github.io/TileTopia/privacy.html" target="_blank" rel="noopener">Политику</a>. Профиль хранится в Google Firebase, то есть за границей</small><button class="cta wide" id="accGo">Продолжить</button><button class="linkbtn" id="accReset">Забыли пароль?</button><button class="ghostbtn" id="accNo">${link ? 'Позже' : 'Отмена'}</button></div>`;
   document.body.append(box);
+  addConsent(box, '#accGo', ['#accGo', '#accGoogle', '#accGSlot']);
   const mailEl = box.querySelector('#accMail'), passEl = box.querySelector('#accPass'), eye = box.querySelector('#accEye'), hint = box.querySelector('#accHint');
   const mail = () => mailEl.value.trim(), pass = () => passEl.value;
   const gbtn = box.querySelector('#accGoogle');

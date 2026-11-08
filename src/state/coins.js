@@ -32,7 +32,7 @@ export function give(w, n, c = 'tile') {
 }
 export const lackText = (w, p) => { const {c, n} = priceCoin(p); return `Не хватает ${n - balance(w, c)} ${NAME[c]}`; };
 /** A price for the shop: the coin's picture and the number. */
-export const priceTag = p => { const {c, n} = priceCoin(p); return `<i class="coin ${c}"></i><b>${n}</b>`; };
+export const priceTag = p => { const {c, n} = priceCoin(p); return `<i class="coin c-${c}"></i><b>${n}</b>`; };
 
 /**
  * Moves an old three-coin wallet to two currencies, once. Copper was the same as the tiles (wallet.gold) and stays. Silver is
