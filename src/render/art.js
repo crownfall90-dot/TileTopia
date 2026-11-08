@@ -2,7 +2,7 @@
 // createArt receives the few game constants it needs; injectArt puts the pictures into the page as CSS classes
 // (.t-<card type>, .s-<sprite>).
 import {TYPES} from '../engine/tiles.js';
-import {TYPES as HTYPES} from '../engine/hex.js';
+import {TYPES as HTYPES, shapes as hexShapes, GEO as HGEO} from '../engine/hex.js';
 import {rng, hash} from '../engine/rng.js';
 
 /** S: tile art size in px; V: direction vectors; PL0: default seats (figure colours); MEEPLE_D: figure outline.
@@ -499,165 +499,18 @@ function drawTile(id) {
   return c.toDataURL('image/jpeg', .88);
 }
 
-/* Classic 2.0: a six-sided card face (flat top), S tall and S·2/√3 wide, transparent outside the hexagon. The same
-   materials as the square cards: grass, the layered river, the rutted road, a walled town of cobbles and roofs with its
-   keep, a monastery. Sides clockwise from the top: N NE SE S SW NW (src/engine/hex.js). */
-function drawHexTile(id) {
-  const def = HTYPES[id], E = def.e, R = rng(hash(id)), HW = S * 2 / Math.sqrt(3), C = [HW / 2, S / 2], RR = HW / 2;
-  const [c, g] = cv(HW, S, K);
-  const corner = k => { const a = (-120 + 60 * k) * Math.PI / 180; return [C[0] + Math.cos(a) * RR, C[1] + Math.sin(a) * RR]; };   // corner k starts side k
-  const HV = [[0, -1], [.866, -.5], [.866, .5], [0, 1], [-.866, .5], [-.866, -.5]];
-  const mid = HV.map(([x, y]) => [C[0] + x * S / 2, C[1] + y * S / 2]);
-  const hex = new Path2D(); for (let k = 0; k < 6; k++) hex[k ? 'lineTo' : 'moveTo'](...corner(k)); hex.closePath();
-  g.save(); g.clip(hex);
-  const gr = g.createLinearGradient(0, 0, HW, S); gr.addColorStop(0, '#80be56'); gr.addColorStop(1, '#62a242');
-  g.fillStyle = gr; g.fillRect(0, 0, HW, S);
-  for (let i = 0; i < 16; i++) { const x = R() * HW, y = R() * S, r = 18 + R() * 30, rg = g.createRadialGradient(x, y, 0, x, y, r); rg.addColorStop(0, R() < .5 ? 'rgba(40,90,25,.2)' : 'rgba(200,230,120,.16)'); rg.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = rg; g.fillRect(x - r, y - r, 2 * r, 2 * r); }
-  for (let i = 0; i < 800; i++) { g.fillStyle = R() < .5 ? 'rgba(230,255,170,.10)' : 'rgba(25,70,20,.14)'; g.fillRect(R() * HW, R() * S, 1.6, 2.6); }
-  g.strokeStyle = 'rgba(40,95,30,.55)'; g.lineWidth = 1.2;
-  for (let i = 0; i < 44; i++) { const x = R() * HW, y = R() * S; g.beginPath(); g.moveTo(x - 2.5, y - 3); g.lineTo(x, y); g.lineTo(x + 2.5, y - 3.5); g.stroke(); }
-  for (let i = 0; i < 14; i++) { g.fillStyle = ['#fff6d8', '#ffd75e', '#f3a6c8'][i % 3]; g.beginPath(); g.arc(R() * HW, R() * S, 1.7, 0, 7); g.fill(); }
-  const idx = k => [0, 1, 2, 3, 4, 5].filter(d => E[d] === k);
-  // a path from side a to side b (or to the middle): the tighter the turn, the further the curve keeps from the centre
-  const path = (a, b, wind = 0) => {
-    const p = new Path2D(); p.moveTo(...mid[a]);
-    if (b == null) { p.lineTo(...C); return p; }
-    const turn = Math.min((b - a + 6) % 6, (a - b + 6) % 6), m = [(mid[a][0] + mid[b][0]) / 2, (mid[a][1] + mid[b][1]) / 2], k = [0, .62, .3, 0][turn];
-    if (turn === 3 && wind) {   // a straight river winds: an S-bend that still leaves both sides straight
-      const [ax, ay] = HV[a], px = -ay * wind * S, py = ax * wind * S;
-      p.bezierCurveTo(mid[a][0] - ax * S * .3 + px, mid[a][1] - ay * S * .3 + py, mid[b][0] + ax * S * .3 - px, mid[b][1] + ay * S * .3 - py, ...mid[b]);
-      return p;
-    }
-    p.quadraticCurveTo(C[0] + (m[0] - C[0]) * k, C[1] + (m[1] - C[1]) * k, ...mid[b]);
-    return p;
-  };
-  const layers = (p, list) => { g.lineCap = 'butt'; g.lineJoin = 'round'; for (const [w, col, dash] of list) { g.lineWidth = w; g.strokeStyle = col; g.setLineDash(dash || []); g.stroke(p); } g.setLineDash([]); };
-  const RIVER = [[52, 'rgba(30,70,20,.3)'], [40, '#a8975f'], [37, '#d6c48e'], [33, '#bba872'], [30, 'rgba(240,252,255,.8)'], [28, '#46b3d3'], [22, '#2f93c8'], [15, '#2276b8'], [8, '#1c64a6']];
-  const ROAD = [[26, 'rgba(60,90,30,.35)'], [22, '#80653e'], [18, '#d9bf88'], [12, '#c7a874'], [8, '#e2cb98'], [2, 'rgba(150,120,70,.45)', [2, 7]]];
-  const w = idx('w');
-  if (w.length === 2) {
-    const p = path(w[0], w[1], id === 'hWBr' ? 0 : .2); layers(p, RIVER);
-    g.lineWidth = 1.3; g.strokeStyle = 'rgba(235,250,255,.6)'; g.setLineDash([5, 13]); g.lineDashOffset = R() * 10; g.stroke(p); g.setLineDash([]);
-  } else if (w.length === 1) {
-    // a spring: a round pool under a mossy rock, spilling into the river
-    layers(path(w[0], null), RIVER);
-    [[31, '#a8975f'], [29.5, '#d6c48e'], [27, '#bba872'], [25.5, 'rgba(240,252,255,.85)'], [24, '#46b3d3'], [19, '#2f93c8'], [13, '#2276b8'], [7, '#1b5c9c']].forEach(([r, col]) => { g.beginPath(); g.ellipse(C[0], C[1], r, r * .9, 0, 0, 7); g.fillStyle = col; g.fill(); });
-    const back = [C[0] - HV[w[0]][0] * 34, C[1] - HV[w[0]][1] * 34];
-    [[-10, 0, 15, 11, '#8d8779'], [8, -4, 12, 9, '#7d776b'], [0, 8, 11, 8, '#a39d90']].forEach(([dx, dy, rx, ry, col]) => { g.fillStyle = 'rgba(0,0,0,.28)'; g.beginPath(); g.ellipse(back[0] + dx + 2, back[1] + dy + 3, rx, ry, 0, 0, 7); g.fill(); g.fillStyle = col; g.beginPath(); g.ellipse(back[0] + dx, back[1] + dy, rx, ry, 0, 0, 7); g.fill(); g.fillStyle = '#5f9a3e'; g.beginPath(); g.ellipse(back[0] + dx - 2, back[1] + dy - ry * .5, rx * .55, ry * .35, 0, 0, 7); g.fill(); });
+/* Classic 2.0: the six-sided cards are pictures rendered in Blender (tools/blender_generators/generate_hex_tiles.py,
+   shipped in assets/hex/). Only the river masks are drawn here: the water of every river card, white on transparent,
+   so a slow glint can run over the water and nowhere else (src/ui/styles.css .hexwater). */
+function hexWaterMask(id) {
+  const sh = hexShapes(id), H = 96, W = H * 2 / Math.sqrt(3), [c, g] = cv(W, H, 1);
+  g.translate(W / 2, H / 2); g.scale(H, H); g.strokeStyle = g.fillStyle = '#fff'; g.lineCap = 'round';
+  for (const r of sh.rivers) {
+    const P = r.path; g.beginPath(); g.moveTo(...P[0]);
+    if (P.length === 2) g.lineTo(...P[1]); else for (let k = 1; k < P.length; k += 3) g.bezierCurveTo(...P[k], ...P[k + 1], ...P[k + 2]);
+    g.lineWidth = HGEO.water * .8; g.stroke();
   }
-  const r = idx('r');
-  const roadOf = p => {
-    layers(p, ROAD);
-  };
-  if (r.length === 2) roadOf(path(r[0], r[1]));
-  else r.forEach(d => roadOf(path(d, null)));
-  if (id === 'hWBr') {   // a humpbacked wooden bridge where the road crosses the river
-    const a = Math.atan2(HV[r[0]][1], HV[r[0]][0]);
-    g.save(); g.translate(...C); g.rotate(a);
-    g.fillStyle = 'rgba(0,30,60,.35)'; g.beginPath(); g.ellipse(3, 5, 34, 18, 0, 0, 7); g.fill();
-    const pl = g.createLinearGradient(0, -15, 0, 15); pl.addColorStop(0, '#c08a4d'); pl.addColorStop(.5, '#a8743f'); pl.addColorStop(1, '#8a5a2e');
-    g.fillStyle = pl; g.fillRect(-32, -14, 64, 28);
-    g.fillStyle = 'rgba(60,35,15,.55)'; for (let x = -30; x < 32; x += 5.5) g.fillRect(x, -14, 1.2, 28);
-    for (const y of [-17, 13]) { g.fillStyle = '#5d3c1d'; g.fillRect(-34, y, 68, 4); g.fillStyle = '#7e532a'; g.fillRect(-34, y, 68, 1.5); }
-    g.restore();
-  } else if (r.length >= 3 || (r.length === 1 && !def.fort && !E.includes('c'))) {
-    // a crossroads or a dead end: a little square with a well (boulders stand on a dead end, see the decor)
-    g.beginPath(); g.arc(...C, 16, 0, 7); g.fillStyle = '#7a603b'; g.fill();
-    g.beginPath(); g.arc(...C, 13, 0, 7); g.fillStyle = '#d9bf88'; g.fill();
-    if (!def.end) { g.beginPath(); g.arc(...C, 5, 0, 7); g.fillStyle = '#5a6e7c'; g.fill(); g.strokeStyle = '#8b8478'; g.lineWidth = 2.5; g.stroke(); }
-  }
-  if (def.rocks) for (let k = 0; k < 12; k++) { g.fillStyle = 'rgba(110,100,85,.35)'; g.beginPath(); g.ellipse(40 + R() * (HW - 80), 34 + R() * (S - 68), 3 + R() * 4, 2 + R() * 2, R() * 3, 0, 7); g.fill(); }
-  const city = idx('c');
-  if (city.length) {
-    // the town: every run of town sides follows the card's edge; every gap between runs is closed by a curved wall,
-    // deeper the wider the gap, with a round tower in its middle
-    const fill = new Path2D(), wall = new Path2D(), towers = [];
-    if (city.length === 6) fill.addPath(hex);
-    else {
-      const s0 = city.find(d => E[(d + 5) % 6] !== 'c');
-      fill.moveTo(...corner(s0));
-      for (let i = s0, n = 0; n < 6;) {
-        if (E[i % 6] === 'c') { fill.lineTo(...corner((i + 1) % 6)); i++; n++; continue; }
-        let L = 0; while (E[(i + L) % 6] !== 'c') L++;
-        let ux = 0, uy = 0; for (let k = 0; k < L; k++) { ux += HV[(i + k) % 6][0]; uy += HV[(i + k) % 6][1]; }
-        const ul = Math.hypot(ux, uy) || 1, depth = [0, .06, .1, .13, .16, .2][L] * S;
-        const from = corner(i % 6), to = corner((i + L) % 6), Kc = [C[0] + ux / ul * depth, C[1] + uy / ul * depth];
-        fill.quadraticCurveTo(...Kc, ...to); wall.moveTo(...from); wall.quadraticCurveTo(...Kc, ...to);
-        towers.push([(from[0] + 2 * Kc[0] + to[0]) / 4, (from[1] + 2 * Kc[1] + to[1]) / 4]);
-        i += L; n += L;
-      }
-      fill.closePath();
-    }
-    const tc = city.length === 6 ? C : (() => { let x = 0, y = 0; city.forEach(d => { x += HV[d][0]; y += HV[d][1]; }); const L = Math.hypot(x, y); return L < .01 ? C : [C[0] + x / L * S * (city.length === 1 ? .3 : .16), C[1] + y / L * S * (city.length === 1 ? .3 : .16)]; })();
-    g.save(); g.clip(fill);
-    g.fillStyle = '#c4a67c'; g.fillRect(0, 0, HW, S);
-    for (let i = 0; i < 1000; i++) { g.fillStyle = ['rgba(120,96,64,.32)', 'rgba(250,236,206,.42)', 'rgba(170,140,100,.35)'][i % 3]; g.beginPath(); g.ellipse(R() * HW, R() * S, 1.9 + R(), 1.3 + R() * .6, R() * 3, 0, 7); g.fill(); }
-    const lanes = city.map(d => path(d, null));
-    g.lineCap = 'round';
-    for (const [lw, col] of [[12, 'rgba(120,92,60,.45)'], [9, '#e0cba3']]) for (const p of lanes) { g.lineWidth = lw; g.strokeStyle = col; g.stroke(p); }
-    const Kp = g.getTransform().a, ROOFS = [['#d0573e', '#913222'], ['#d97a43', '#9c4c25'], ['#b4472f', '#76291b'], ['#6a8098', '#3d4e60'], ['#d1a24a', '#8d6620']];
-    for (let y = 6, row = 0; y < S; y += 16, row++) for (let x = row % 2 ? 6 : 14; x < HW; x += 16) {
-      const px = x + (R() - .5) * 6, py = y + (R() - .5) * 6;
-      if (!g.isPointInPath(fill, px * Kp, py * Kp) || !g.isPointInPath(hex, px * Kp, py * Kp)) continue;
-      g.lineWidth = 22; if (g.isPointInStroke(wall, px * Kp, py * Kp)) continue;
-      g.lineWidth = 14; if (lanes.some(p => g.isPointInStroke(p, px * Kp, py * Kp)) || Math.hypot(px - tc[0], py - tc[1]) < 22) continue;
-      if (R() < .12) { g.fillStyle = '#3f7f33'; g.beginPath(); g.arc(px, py, 6, 0, 7); g.fill(); g.fillStyle = '#5fa547'; g.beginPath(); g.arc(px - 1.5, py - 1.5, 3.8, 0, 7); g.fill(); continue; }
-      const ww = 10 + R() * 6, hh = 8 + R() * 2.5, [lt, dk] = ROOFS[(R() * ROOFS.length) | 0], ang = Math.atan2(tc[1] - py, tc[0] - px) + Math.PI / 2;
-      g.save(); g.translate(px, py); g.rotate(Math.round(ang / (Math.PI / 3)) * Math.PI / 3 + (R() - .5) * .3);
-      g.fillStyle = 'rgba(30,18,8,.32)'; g.fillRect(-ww / 2 + 1.8, -hh / 2 + 2.2, ww, hh);
-      g.fillStyle = lt; g.fillRect(-ww / 2, -hh / 2, ww, hh / 2); g.fillStyle = dk; g.fillRect(-ww / 2, 0, ww, hh / 2);
-      g.fillStyle = 'rgba(255,240,215,.55)'; g.fillRect(-ww / 2, -.55, ww, 1.1);
-      g.strokeStyle = 'rgba(40,20,10,.45)'; g.lineWidth = .7; g.strokeRect(-ww / 2, -hh / 2, ww, hh);
-      g.restore();
-    }
-    // the square with the keep: a paved round, a stone keep with a courtyard, four corner towers and a red banner
-    g.fillStyle = 'rgba(120,92,60,.4)'; g.beginPath(); g.arc(...tc, 17, 0, 7); g.fill();
-    g.fillStyle = '#e4d2ad'; g.beginPath(); g.arc(...tc, 16, 0, 7); g.fill();
-    g.save(); g.translate(...tc); const kk = city.length >= 3 ? 1 : .8; g.scale(kk, kk);
-    g.fillStyle = 'rgba(30,18,8,.35)'; g.fillRect(-9, -7.5, 20, 20);
-    g.fillStyle = '#7d7464'; g.fillRect(-10.5, -10.5, 21, 21); g.fillStyle = '#cfc4ad'; g.fillRect(-9, -9, 18, 18); g.fillStyle = '#b0a58e'; g.fillRect(-5, -5, 10, 10);
-    for (const [sx, sy] of [[-1, -1], [1, -1], [1, 1], [-1, 1]]) {
-      g.fillStyle = '#6d665a'; g.beginPath(); g.arc(sx * 10, sy * 10, 4.6, 0, 7); g.fill();
-      const rg = g.createRadialGradient(sx * 10 - 1, sy * 10 - 1.2, .4, sx * 10, sy * 10, 3.8); rg.addColorStop(0, '#f08a68'); rg.addColorStop(.6, '#c8503a'); rg.addColorStop(1, '#8f3020');
-      g.fillStyle = rg; g.beginPath(); g.arc(sx * 10, sy * 10, 3.6, 0, 7); g.fill();
-    }
-    g.fillStyle = '#d9361f'; g.beginPath(); g.moveTo(0, -1.2); g.quadraticCurveTo(3.5, -2.2, 7.2, -.4); g.lineTo(5.6, 1); g.lineTo(7.2, 2.4); g.quadraticCurveTo(3.5, 3.4, 0, 2.2); g.fill();
-    g.fillStyle = '#f2c14e'; g.fillRect(0, -1.3, .9, 3.6);
-    g.restore();
-    g.lineWidth = 24; g.strokeStyle = 'rgba(50,30,12,.3)'; g.stroke(wall);
-    g.restore();
-    g.lineJoin = 'round'; g.lineCap = 'round';
-    for (const [lw, col, dash] of [[16, 'rgba(0,0,0,.3)'], [14.5, '#55504a', [3.2, 2.6]], [10.5, '#8f8675'], [7, '#e6dcc6'], [7, '#b3a890', [2.6, 3.4]], [1, 'rgba(70,60,48,.5)']]) { g.setLineDash(dash || []); g.lineWidth = lw; g.strokeStyle = col; g.stroke(wall); }
-    g.setLineDash([]);
-    for (const [tx, ty] of towers) {
-      g.fillStyle = 'rgba(0,0,0,.3)'; g.beginPath(); g.arc(tx + 1.8, ty + 2.4, 8.5, 0, 7); g.fill();
-      g.fillStyle = '#6d665a'; g.beginPath(); g.arc(tx, ty, 8.5, 0, 7); g.fill();
-      g.fillStyle = '#d7cdb7'; g.beginPath(); g.arc(tx, ty, 7, 0, 7); g.fill();
-      const rg = g.createRadialGradient(tx - 1.6, ty - 1.8, .5, tx, ty, 5.4); rg.addColorStop(0, '#f08a68'); rg.addColorStop(.6, '#c8503a'); rg.addColorStop(1, '#8f3020');
-      g.fillStyle = rg; g.beginPath(); g.arc(tx, ty, 5.2, 0, 7); g.fill();
-    }
-  }
-  if (def.fort) {
-    // the monastery: a low stone enclosure round a garden, a church with a cross-shaped roof, a bell tower
-    g.fillStyle = 'rgba(30,18,8,.25)'; g.beginPath(); g.ellipse(C[0] + 2, C[1] + 3, 44, 40, 0, 0, 7); g.fill();
-    g.fillStyle = '#8f8675'; g.beginPath(); g.ellipse(...C, 43, 39, 0, 0, 7); g.fill();
-    g.fillStyle = '#7fbf5a'; g.beginPath(); g.ellipse(...C, 39, 35, 0, 0, 7); g.fill();
-    g.strokeStyle = '#d9c9a3'; g.lineWidth = 4; g.beginPath(); g.moveTo(C[0], C[1] + 35); g.lineTo(C[0], C[1] + 8); g.stroke();
-    for (let k = 0; k < 6; k++) { g.fillStyle = k % 2 ? '#5d9a3e' : '#4b8a33'; g.fillRect(C[0] + 14 + (k % 3) * 6, C[1] + 8 + ((k / 3) | 0) * 9, 4.5, 7); }
-    const roof = (x, y, w2, h2, lt, dk) => { g.fillStyle = 'rgba(30,18,8,.32)'; g.fillRect(x + 2, y + 2.6, w2, h2); g.fillStyle = lt; g.fillRect(x, y, w2, h2 / 2); g.fillStyle = dk; g.fillRect(x, y + h2 / 2, w2, h2 / 2); g.fillStyle = 'rgba(255,240,215,.6)'; g.fillRect(x, y + h2 / 2 - .6, w2, 1.2); };
-    roof(C[0] - 26, C[1] - 12, 44, 16, '#c8603f', '#8f3a22');
-    roof(C[0] - 6, C[1] - 26, 12, 40, '#c8603f', '#8f3a22');
-    g.fillStyle = '#cfc4ad'; g.fillRect(C[0] - 31, C[1] - 23, 12, 12); g.fillStyle = '#6d665a'; g.fillRect(C[0] - 28, C[1] - 20, 6, 6);
-    g.fillStyle = '#f2c14e'; g.fillRect(C[0] - 25.6, C[1] - 23, 1.2, 12); g.fillRect(C[0] - 29, C[1] - 18.6, 8, 1.2);
-    g.fillStyle = '#9fd3f0'; g.beginPath(); g.arc(C[0] + 22, C[1] - 10, 5, 0, 7); g.fill(); g.strokeStyle = '#8f8675'; g.lineWidth = 2; g.stroke();
-  }
-  // the card's own rim: lit on the upper sides, shaded below, so a laid tile reads as a thick piece
-  g.restore();
-  g.lineJoin = 'round';
-  g.lineWidth = 4; g.strokeStyle = 'rgba(0,0,0,.18)'; g.stroke(hex);
-  g.save(); g.clip(hex);
-  for (let k = 0; k < 6; k++) { g.beginPath(); g.moveTo(...corner(k)); g.lineTo(...corner((k + 1) % 6)); g.lineWidth = 5; g.strokeStyle = k === 5 || k === 0 || k === 1 ? 'rgba(255,255,255,.22)' : 'rgba(0,0,0,.2)'; g.stroke(); }
-  g.restore();
+  if (sh.spring) { g.beginPath(); g.arc(...sh.spring, HGEO.pond * .85, 0, 7); g.fill(); }
   return c.toDataURL();
 }
 
@@ -849,15 +702,18 @@ function injectArt() {
   for (const k in SPR) css += `.s-${k}{background-image:url(${SPR[k].url})}`;
   const st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 }
-// Classic 2.0 faces are drawn only when the first such game starts (most games never need them).
+// Classic 2.0: the card pictures come from assets/hex/ (loaded only when a card shows up); the river glints get their masks.
 let hexDone = false;
 function injectHexArt() {
   if (hexDone) return; hexDone = true;
   let css = '';
-  for (const id in HTYPES) { TILE_URL[id] = drawHexTile(id); css += `.t-${id}{background-image:url(${TILE_URL[id]})}`; }
+  for (const id in HTYPES) {
+    TILE_URL[id] = `hex/${id}.webp`; css += `.t-${id}{background-image:url(hex/${id}.webp)}`;
+    if (HTYPES[id].e.includes('w')) { const m = hexWaterMask(id); css += `.tile .face.t-${id}::after{-webkit-mask-image:url(${m});mask-image:url(${m})}`; }
+  }
   const st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 }
 
 
-  return {cv, drawTile, drawHexTile, SPR, sprite, TILE_URL, injectArt, injectHexArt};
+  return {cv, drawTile, SPR, sprite, TILE_URL, injectArt, injectHexArt};
 }

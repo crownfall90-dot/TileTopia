@@ -832,8 +832,8 @@ const lowGfx = () => document.documentElement.classList.contains('lowgfx');
 const HOUSES = ['house', 'house2', 'house3', 'house4'];
 function addDecor(el, t, delay) {
   let items, cityCount;
-  if (HEX) ({items, cityCount} = hexDecor(t));
-  else if (typeof PG !== 'undefined' && PG.game && PG.game.world && PG.game.world.generateDecorItems) {
+  if (HEX) return;   // a six-sided card is a finished picture: its houses, trees and herds are rendered in
+  if (typeof PG !== 'undefined' && PG.game && PG.game.world && PG.game.world.generateDecorItems) {
     const res = PG.game.world.generateDecorItems(t, edgeAt, rng, lowGfx(), TYPES);
     items = res.items;
     cityCount = res.cityCount;
@@ -867,28 +867,6 @@ function addDecor(el, t, delay) {
   const box = document.createDocumentFragment();
   items.forEach((it, i) => addSprite(box, it[0], it[1], it[2], 'dc', delay == null ? null : delay + i * .05, (it[0] === 'tower' && cityCount ? .8 : 1) * (it[3] && /^house|^tower/.test(it[0]) ? .85 : 1)));
   el.querySelector('.face').after(box);
-}
-// Houses by the town, the monastery's tower, boulders at a dead end and trees in the free corners of a six-sided tile.
-function hexDecor(t) {
-  const E = [0, 1, 2, 3, 4, 5].map(d => edgeAt(t, d)), R = rng(t.seed), v = HX.V, def = TY(t.type), items = [];
-  const city = [0, 1, 2, 3, 4, 5].filter(d => E[d] === 'c');
-  if (city.length) {
-    let sx = 0, sy = 0; city.forEach(d => { sx += v[d][0]; sy += v[d][1]; });
-    const L = Math.hypot(sx, sy), ux = L < .01 ? 0 : sx / L, uy = L < .01 ? -1 : sy / L, px = -uy, py = ux, f = city.length === 1 ? .34 : .2;
-    const n = city.length >= 4 ? 4 : city.length >= 2 ? 3 : 2;
-    for (let i = 0; i < n; i++) { const o = (i - (n - 1) / 2) * .17; items.push([i === 0 && city.length >= 3 ? 'tower' : HOUSES[(R() * 4) | 0], ux * f + px * o + (R() - .5) * .04, uy * f + py * o + (i % 2 ? .07 : -.03)]); }
-  }
-  if (def.fort) items.push(['tower', 0, .18]);
-  if (def.end) { const d = E.indexOf('r'); items.push([def.end, -v[d][0] * .1, -v[d][1] * .1 + .06]); }
-  if (def.rocks) items.push(['boulders', -.05, .05], ['rock', .22, -.12], ['rock', -.24, .2]);
-  if (!lowGfx()) for (let k = 0; k < 6; k++) {   // corner k lies between sides k - 1 and k
-    if (E[k] === 'c' || E[(k + 5) % 6] === 'c' || R() >= .55) continue;
-    const a = (-120 + 60 * k) * Math.PI / 180, kk = R();
-    items.push([kk < .36 ? 'pine' : kk < .62 ? 'oak' : kk < .71 ? 'birch' : kk < .78 ? 'poplar' : kk < .9 ? 'bush' : 'rock', Math.cos(a) * (.38 + R() * .05), Math.sin(a) * (.33 + R() * .04)]);
-  }
-  items.forEach(it => { if (it[2] < -.2 && !['rock', 'boulders', 'hay', 'bush'].includes(it[0])) { it[2] = -.2 + (it[2] + .2) * .35; it[3] = 1; } });
-  items.sort((p, q) => p[2] - q[2]);
-  return {items, cityCount: city.length};
 }
 // Switching graphics redraws the decor of the cards already on the table; the game itself stays as it is.
 function redecorate() {
@@ -1186,48 +1164,30 @@ function ownSvg(t, list) {
   return 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${out}</svg>`);
 }
 // The owner colours on a six-sided tile, drawn in the tile type's own frame (the picture turns with the face), on the
-// same paths as its art (src/render/art.js drawHexTile): roads through the middle, the town's wall curves, the monastery.
+// shapes the tile renders are built from (src/engine/hex.js shapes): its roads, the town's wall curves, the monastery.
 function hexOwnSvg(t, list) {
-  const W = 100 * HX.WIDTH, C = [W / 2, 50], HV = HX.V, mid = HV.map(([x, y]) => [C[0] + x * 50, C[1] + y * 50]);
-  const corner = k => { const a = (-120 + 60 * k) * Math.PI / 180; return [C[0] + Math.cos(a) * W / 2, C[1] + Math.sin(a) * W / 2]; };
-  const P = p => p[0].toFixed(1) + ' ' + p[1].toFixed(1);
-  const strokes = (d, cols, w) => cols.map((c, i) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="${cols.length > 1 ? 'butt' : 'round'}"${cols.length > 1 ? ` stroke-dasharray="7 ${7 * (cols.length - 1)}" stroke-dashoffset="${-7 * i}"` : ''}/>`).join('');
-  const E = HX.TYPES[t.type].e;
+  const R = HX.GEO.R, S = HX.shapes(t.type), P = p => p[0].toFixed(4) + ' ' + p[1].toFixed(4);
+  const line = path => path.length === 4 ? `M${P(path[0])}C${P(path[1])} ${P(path[2])} ${P(path[3])}` : `M${P(path[0])}L${P(path[1])}`;
+  const strokes = (d, cols, w) => cols.map((c, i) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="${cols.length > 1 ? 'butt' : 'round'}"${cols.length > 1 ? ` stroke-dasharray=".07 ${.07 * (cols.length - 1)}" stroke-dashoffset="${-.07 * i}"` : ''}/>`).join('');
   let out = '';
   for (const it of list) {
-    const base = it.edges.map(d => (d - t.r + 6) % 6);
+    const base = it.edges.map(d => (d - t.r + 6) % 6).sort();
     if (it.kind === 'r') {
-      let d;
-      if (base.length === 2) {
-        const [a, b] = base, turn = Math.min((b - a + 6) % 6, (a - b + 6) % 6), m = [(mid[a][0] + mid[b][0]) / 2, (mid[a][1] + mid[b][1]) / 2], k = [0, .62, .3, 0][turn];
-        d = `M${P(mid[a])}Q${P([C[0] + (m[0] - C[0]) * k, C[1] + (m[1] - C[1]) * k])} ${P(mid[b])}`;
-      } else d = `M${P(mid[base[0]])}L${P(C)}`;
-      out += `<path d="${d}" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="10" stroke-linecap="round"/>` + strokes(d, it.cols, 6.5);
-    } else if (it.kind === 'c') {
-      const city = [0, 1, 2, 3, 4, 5].filter(d => E[d] === 'c');
-      let fill = '', wall = '';
-      if (city.length === 6) fill = `M${[0, 1, 2, 3, 4, 5].map(k => P(corner(k))).join('L')}Z`;
-      else {
-        const s0 = city.find(d => E[(d + 5) % 6] !== 'c');
-        fill = `M${P(corner(s0))}`;
-        for (let i = s0, n = 0; n < 6;) {
-          if (E[i % 6] === 'c') { fill += `L${P(corner((i + 1) % 6))}`; i++; n++; continue; }
-          let L = 0; while (E[(i + L) % 6] !== 'c') L++;
-          let ux = 0, uy = 0; for (let k = 0; k < L; k++) { ux += HV[(i + k) % 6][0]; uy += HV[(i + k) % 6][1]; }
-          const ul = Math.hypot(ux, uy) || 1, dep = [0, .06, .1, .13, .16, .2][L] * 100, K = [C[0] + ux / ul * dep, C[1] + uy / ul * dep];
-          fill += `Q${P(K)} ${P(corner((i + L) % 6))}`; wall += `M${P(corner(i % 6))}Q${P(K)} ${P(corner((i + L) % 6))}`;
-          i += L; n += L;
-        }
-        fill += 'Z';
-      }
+      const road = S.roads.find(x => x.edges.slice().sort().join() === base.join());
+      if (!road) continue;
+      const d = line(road.path);
+      out += `<path d="${d}" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width=".1" stroke-linecap="round"/>` + strokes(d, it.cols, .065);
+    } else if (it.kind === 'c' && S.town) {
+      const T6 = S.town, fill = `M${P(T6.from)}${T6.segs.map(s => s.c ? `Q${P(s.c)} ${P(s.to)}` : `L${P(s.to)}`).join('')}Z`;
+      const wall = T6.walls.map(([a, c, b]) => `M${P(a)}Q${P(c)} ${P(b)}`).join('');
       out += `<path d="${fill}" fill="${it.cols[0]}" fill-opacity="${it.cols.length > 1 ? .12 : .22}"/>`;
-      out += wall ? `<path d="${wall}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="7" stroke-linecap="round"/>` + strokes(wall, it.cols, 4.5) : strokes(fill, it.cols, 4.5);
+      out += wall ? `<path d="${wall}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width=".07" stroke-linecap="round"/>` + strokes(wall, it.cols, .045) : strokes(fill, it.cols, .045);
     } else if (it.kind === 'f') {
-      const d = `M${C[0]} 22A28 28 0 1 1 ${C[0] - .1} 22Z`;
-      out += `<path d="${d}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="7"/>` + strokes(d, it.cols, 4.5);
+      const d = 'M0 -.26A.26 .26 0 1 1 -.001 -.26Z';
+      out += `<path d="${d}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width=".07"/>` + strokes(d, it.cols, .045);
     }
   }
-  return 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 ${W.toFixed(2)} 100" preserveAspectRatio="none">${out}</svg>`);
+  return 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${-R} -.5 ${2 * R} 1" preserveAspectRatio="none">${out}</svg>`);
 }
 /* Finished and scored features stay in their owners' colours and get little banners of
    those colours on a few of their pieces (around the keep for a fortress). */
@@ -5149,6 +5109,7 @@ function onProgressClick(e) {
 }
 $('#ptab').addEventListener('click', onProgressClick);
 if ($('#roadQuestsSheetBody')) $('#roadQuestsSheetBody').addEventListener('click', onProgressClick);
+if ($('#achievementsContent')) $('#achievementsContent').addEventListener('click', onProgressClick);
 /* Rating: cups from online games (1st +30, 2nd +15, 3rd +5, draw +10) in /leaders, top 50.
    The database rules let a player raise their own score by at most 30 a minute, so a big
    backlog goes up in steps. */
@@ -7870,7 +7831,8 @@ window.onUpdateAvailable = (info, manual) => {
     box.querySelector('.prog').hidden = true; const m = box.querySelector('#manual'); m.hidden = false; m.textContent = 'Скачать новую версию вручную'; m.href = info.url; m.className = 'cta wide';
     toastAny(msg);
   };
-};// An update the app found before this script ran (web/boot-guard.js kept it).
+};
+// An update the app found before this script ran (web/boot-guard.js kept it).
 if (window.__upd) setTimeout(() => window.onUpdateAvailable(window.__upd, false));
 
 

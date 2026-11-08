@@ -5406,7 +5406,7 @@ html body .ocard details.more a{color:#8db4ff}
    (corner to corner x side to side, T = 88); the face is clipped to the hexagon, six walls hang from its sides. ---- */
 .tile.hex{width:101.61px;height:88px}
 .tile.hex .face{inset:0;border-radius:0;box-shadow:none;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)}
-.tile.hex .sd{position:absolute;height:14px;transform-origin:0 0;background:linear-gradient(#5f9a3e 0,#5f9a3e 2.5px,#8a6a40 3px,#6f5232 55%,#4a3520 100%)}
+.tile.hex .sd{position:absolute;height:14px;transform-origin:0 0;background:linear-gradient(#efdcb3 0,#d9c398 38%,#b39a72 60%,#8a5a33 63%,#6f4426 100%)}
 .tile.hex .sd.h0,.tile.hex .sd.h1,.tile.hex .sd.h5{filter:brightness(1.12)}
 .tile.hex .sd.h2,.tile.hex .sd.h4{filter:brightness(.9)}
 .tile.hex .sd.fall::before{left:calc(50% - 6.5px);width:13px;top:0;bottom:0;right:auto;height:auto}
@@ -5421,6 +5421,13 @@ html.lowgfx .tile.hex .sd.h0,html.lowgfx .tile.hex .sd.h1,html.lowgfx .tile.hex 
 html.hexg .ct{width:84px;height:73px;border-radius:0;box-shadow:none;filter:drop-shadow(0 0 2px var(--c,transparent)) drop-shadow(0 10px 8px rgba(0,0,0,.5))}
 html.hexg .ct .face{border-radius:0;box-shadow:none;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)}
 html.hexg .ct::after{display:none}
+/* the rendered cards: a slow glint over the water of river cards (masked to the water, see art.js hexWaterMask);
+   it stops with the rest of the board's motion (calm, dragging) and on economy graphics */
+.tile.hex .face[class*="t-hW"]::after{content:"";position:absolute;inset:0;-webkit-mask-size:100% 100%;mask-size:100% 100%;background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.5) 50%,transparent 62%) 0 0/260% 100%;mix-blend-mode:screen;pointer-events:none;animation:lakeFlow 4.2s steps(42) infinite}
+html.calm .tile.hex .face[class*="t-hW"]::after,.board.dragging .tile.hex .face[class*="t-hW"]::after{animation-play-state:paused}
+html.lowgfx .tile.hex .face[class*="t-hW"]::after{display:none}
+.mcard[data-setmode="hex"] i{font-size:0;width:38px;height:33px;background:url(hex/hC2r.webp) center/contain no-repeat}
+html.hexg .hitem .rimg{background-size:contain;background-repeat:no-repeat;border-radius:0;box-shadow:none;filter:drop-shadow(0 4px 6px rgba(0,0,0,.4))}
 
 /* ==================== Top Menu Header Parallel Alignment ==================== */
 html body .mtop {
