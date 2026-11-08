@@ -393,7 +393,13 @@ def p2_rare():
     put(facet_star(.4, .17, .09, .125), gem)
 
 
+MATTE = []  # a variant can ask for clay: every toy material becomes matte
+NO_OUTLINE = []
+
+
 def toy(name, hexcol, rough=.3, coat=.9):
+    if MATTE:
+        rough, coat = .9, 0.0
     """glossy cartoon plastic (not metal): a saturated colour with a bright clear coat"""
     m = bpy.data.materials.new(name)
     b = next(n for n in m.node_tree.nodes if n.type == 'BSDF_PRINCIPLED')
@@ -1013,6 +1019,8 @@ OUTLINE = []  # (colour, width) set by a variant to replace the default brown li
 
 
 def outline(color=(.22, .08, .0), width=3.2, crease=True):
+    if NO_OUTLINE:
+        return
     if OUTLINE:
         color, width = OUTLINE[0]
     """the dark brown contour line that Supercell art has round every shape (Freestyle)"""
@@ -1336,7 +1344,73 @@ def u4_rare():
     star_variant('#14246b', '#2e47c4', '#ffd23a', '#c8e6ff', .52, .15, '#ffc928')
 
 
-MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare, 'c_main': c_main, 'c_rare': c_rare, 'd_main': d_main, 'd_rare': d_rare, 'e_main': e_main, 'e_rare': e_rare, 'g_line': g_line, 'g_stack': g_stack, 'g_ring': g_ring, 'g_serif': g_serif, 'h_jig': h_jig, 'h_split': h_split, 'h_onest': h_onest, 'h_stamp': h_stamp, 'i_banner': i_banner, 'i_center': i_center, 'i_wide': i_wide, 'j_gem_blue': j_gem_blue, 'j_gem_green': j_gem_green, 'j_gem_violet': j_gem_violet, 'j_meeple_gold': j_meeple_gold, 'j_jigsaw_gold': j_jigsaw_gold, 'k_main': k_main, 'k_rare': k_rare, 'p_main': p_main, 'p_rare': p_rare, 'q_rare': q_rare, 'p2_main': p2_main, 'q2_rare': q2_rare, 'r_main': r_main, 'r_rare': r_rare, 's_main': s_main, 't_main': t_main, 't_rare': t_rare, 'u1_rare': u1_rare, 'u2_rare': u2_rare, 'u3_rare': u3_rare, 'u4_rare': u4_rare}
+def em(name, hexcol):
+    """a flat, unlit colour: what a vector icon is made of (an emission shader alone, colour managed to read true)"""
+    m = bpy.data.materials.new(name)
+    nt = m.node_tree
+    for n in list(nt.nodes):
+        nt.nodes.remove(n)
+    h = hexcol.lstrip('#')
+    e = nt.nodes.new('ShaderNodeEmission')
+    e.inputs['Color'].default_value = (*srgb(tuple(int(h[i:i + 2], 16) / 255 for i in (0, 2, 4))), 1)
+    e.inputs['Strength'].default_value = 1.0
+    o = nt.nodes.new('ShaderNodeOutputMaterial')
+    nt.links.new(e.outputs[0], o.inputs[0])
+    return m
+
+
+def layer(shape, z, m, off=(0, 0)):
+    o = shape
+    o.location = (off[0], off[1], z)
+    put(o, m)
+    return o
+
+
+def flat_coin():
+    OUTLINE[:] = [((.12, .05, .38), 2.2)]
+    sh = em('fSh', '#a85a08')
+    layer(cyl(1.0, .02, 0, 128), 0, sh, (0, -.07))
+    layer(cyl(1.0, .02, 0, 128), .02, em('fRim', '#ffc928'))
+    layer(cyl(.84, .02, 0, 128), .04, em('fRim2', '#ffe27a'))
+    layer(cyl(.72, .02, 0, 128), .06, em('fFace', '#f5a323'))
+    layer(torus(.6, .018, 0), .08, em('fGr', '#c97a0a'))
+    c = sn = math.sqrt(.5)
+    s_, g = .29, .055
+    for (dx, dy, col) in ((-1, -1, '#fff2a6'), (1, -1, '#ffbf2e'), (-1, 1, '#ffbf2e'), (1, 1, '#fff2a6')):
+        ox, oy = dx * (s_ / 2 + g / 2), dy * (s_ / 2 + g / 2)
+        pos = (ox * c - oy * sn, ox * sn + oy * c)
+        t = box(s_, s_, .02, (0, 0, 0), math.radians(45))
+        layer(t, .1, em('fT' + col, col), pos)
+    set_cam(89.9, -90, 2.3, 0)
+    outline(width=2.2)
+
+
+def flat_star():
+    OUTLINE[:] = [((.12, .05, .38), 2.2)]
+    layer(star_mesh(1.0, .55, .02, 0), 0, em('sSh', '#0a1445'), (0, -.07))
+    layer(star_mesh(1.0, .55, .02, 0), .02, em('sBody', '#14246b'))
+    layer(star_mesh(.9, .48, .02, 0), .04, em('sTrim', '#ffc928'))
+    layer(star_mesh(.8, .42, .02, 0), .06, em('sFace', '#3a56d8'))
+    layer(star_mesh(.46, .24, .02, 0), .08, em('sIn', '#ffd23a'))
+    bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=.1, depth=.02, location=(0, 0, .1))
+    put(bpy.context.object, em('sGem', '#ff4fa8'))
+    set_cam(89.9, -90, 2.3, 0)
+    outline(width=2.2, crease=False)
+
+
+def clay_coin():
+    MATTE.append(1)
+    NO_OUTLINE.append(1)
+    r_main()
+
+
+def clay_star():
+    MATTE.append(1)
+    NO_OUTLINE.append(1)
+    star_variant('#14246b', '#2e47c4', '#ffd23a', '#c8e6ff', .52, .15, '#ffc928')
+
+
+MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare, 'c_main': c_main, 'c_rare': c_rare, 'd_main': d_main, 'd_rare': d_rare, 'e_main': e_main, 'e_rare': e_rare, 'g_line': g_line, 'g_stack': g_stack, 'g_ring': g_ring, 'g_serif': g_serif, 'h_jig': h_jig, 'h_split': h_split, 'h_onest': h_onest, 'h_stamp': h_stamp, 'i_banner': i_banner, 'i_center': i_center, 'i_wide': i_wide, 'j_gem_blue': j_gem_blue, 'j_gem_green': j_gem_green, 'j_gem_violet': j_gem_violet, 'j_meeple_gold': j_meeple_gold, 'j_jigsaw_gold': j_jigsaw_gold, 'k_main': k_main, 'k_rare': k_rare, 'p_main': p_main, 'p_rare': p_rare, 'q_rare': q_rare, 'p2_main': p2_main, 'q2_rare': q2_rare, 'r_main': r_main, 'r_rare': r_rare, 's_main': s_main, 't_main': t_main, 't_rare': t_rare, 'u1_rare': u1_rare, 'u2_rare': u2_rare, 'u3_rare': u3_rare, 'u4_rare': u4_rare, 'v_coin': flat_coin, 'v_star': flat_star, 'w_coin': clay_coin, 'w_star': clay_star}
 
 
 def scene(samples, size=512):
@@ -1402,8 +1476,10 @@ def main(argv):
         bpy.ops.wm.read_homefile(use_empty=True)
         CAM.clear()
         OUTLINE.clear()
+        MATTE.clear()
+        NO_OUTLINE.clear()
         MAKERS[key]()
-        (studio if key.startswith(('c_', 'd_', 'e_', 'f_', 'g_', 'h_', 'i_', 'j_', 'q_', 'p2_', 'q2_', 'r_', 's_', 't_', 'u')) and not key.startswith(('j_gem', 'k_', 'p_', 'q_', 'p2_', 'q2_', 'r_', 's_', 't_', 'u')) else scene)(samples)
+        (studio if key.startswith(('c_', 'd_', 'e_', 'f_', 'g_', 'h_', 'i_', 'j_', 'q_', 'p2_', 'q2_', 'r_', 's_', 't_', 'u', 'v_', 'w_')) and not key.startswith(('j_gem', 'k_', 'p_', 'q_', 'p2_', 'q2_', 'r_', 's_', 't_', 'u', 'v_', 'w_')) else scene)(samples)
         if CAM:
             apply_cam(*CAM[0])
         bpy.context.scene.render.filepath = os.path.join(out, key + '.png')
