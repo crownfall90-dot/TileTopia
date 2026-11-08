@@ -1,11 +1,11 @@
 """The two coins of the game, modelled and rendered in Blender.
 
-  ducat  - the main coin (earned in games, quests, rewards): a gold coin with a mosaic tile of four pieces on it.
-  lunar  - the rare coin (top achievements, rare goods): a moon-violet coin with a crescent and a star.
+  tile - «Тайлы», the main coin (earned in games, quests, rewards): a gold coin with a mosaic tile of four pieces on it.
+  star - «Звёзды», the rare coin (top achievements, rare goods): a blue-violet coin with a big gold star.
 
 Output: build/coins/<key>.png (transparent, 512x512), packed to WebP by scripts/coins-pack.py.
 
-    python3 tools/blender_generators/generate_coins.py [--only ducat] [--out build/coins] [--samples 96]
+    python3 tools/blender_generators/generate_coins.py [--only tile] [--out build/coins] [--samples 96]
     (needs the `bpy` module: pip install bpy; or run it inside Blender: blender -b -P <this file> -- ...)
 """
 import math
@@ -16,7 +16,7 @@ import bpy
 from mathutils import Vector
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
-KEYS = ['ducat', 'lunar']
+KEYS = ['tile', 'star']
 
 
 def srgb(c):
@@ -85,7 +85,7 @@ def body(face, rim, top):
     return top
 
 
-def ducat():
+def tile():
     gold = metal('gold', '#f4b73f', .26)
     deep = metal('goldDeep', '#c98a1c', .34)
     light = metal('goldLight', '#ffd978', .2)
@@ -106,36 +106,40 @@ def ducat():
     put(smooth(bpy.context.object), light)
 
 
-def lunar():
-    face = metal('lunarFace', '#3a2a86', .24)
-    rim = metal('lunarRim', '#a9b8ff', .2)
-    moon = metal('lunarMoon', '#d9d2ff', .3, .6)
-    star = metal('lunarStar', '#ffd978', .2)
+def star_mesh(R, r, depth, z):
+    """a five-point star, extruded"""
+    import bmesh
+    me = bpy.data.meshes.new('Star')
+    bm = bmesh.new()
+    pts = [(math.cos(math.pi / 2 + i * math.pi / 5) * (R if i % 2 == 0 else r), math.sin(math.pi / 2 + i * math.pi / 5) * (R if i % 2 == 0 else r)) for i in range(10)]
+    vs = [bm.verts.new((x, y, -depth / 2)) for x, y in pts]
+    f = bm.faces.new(vs)
+    r2 = bmesh.ops.extrude_face_region(bm, geom=[f])
+    bmesh.ops.translate(bm, vec=(0, 0, depth), verts=[v for v in r2['geom'] if isinstance(v, bmesh.types.BMVert)])
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    bm.to_mesh(me)
+    bm.free()
+    o = bpy.data.objects.new('Star', me)
+    bpy.context.scene.collection.objects.link(o)
+    o.location = (0, 0, z)
+    bpy.context.view_layer.objects.active = o
+    return o
+
+
+def star():
+    face = metal('starFace', '#2c2a7c', .24)
+    rim = metal('starRim', '#9fb2ff', .2)
+    gem = metal('starGem', '#ffe38a', .18)
     body(face, rim, .09)
     beads(28, .8, .03, .1, rim)
-    z = .115
-    # a crescent: a disc minus a shifted disc
-    a = cyl(.56, .07, z, 96)
-    b = cyl(.47, .2, z, 96)
-    b.location = (.22, .14, z)
-    mod = a.modifiers.new('Cut', 'BOOLEAN')
-    mod.operation = 'DIFFERENCE'
-    mod.object = b
-    bpy.context.view_layer.objects.active = a
-    bpy.ops.object.modifier_apply(modifier='Cut')
-    bpy.data.objects.remove(b)
-    a.location = (-.14, -.07, z)
-    put(smooth(a, .012), moon)
-    # a four-point star
-    for rot in (0, math.pi / 2):
-        bpy.ops.mesh.primitive_cylinder_add(vertices=4, radius=1, depth=.07, location=(.36, .3, z + .005), rotation=(0, 0, rot))
-        d = bpy.context.object
-        d.scale = (.075, .30, 1)
-        bpy.ops.object.transform_apply(scale=True)
-        put(smooth(d, .008), star)
+    z = .12
+    put(smooth(star_mesh(.62, .26, .08, z), .014), gem)
+    # a small bright dot in the middle of the star
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=16, ring_count=10, radius=.07, location=(0, 0, z + .05))
+    put(smooth(bpy.context.object), metal('starDot', '#fff6d0', .15))
 
 
-MAKERS = {'ducat': ducat, 'lunar': lunar}
+MAKERS = {'tile': tile, 'star': star}
 
 
 def scene(samples, size=512):
