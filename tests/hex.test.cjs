@@ -34,6 +34,33 @@ test('hex: sides must match; a town closed by two cards scores 2 per card; a mon
   assert.equal(H.featurePoints(mon, H.fortComp(mon, [], f), false), 9);
 });
 
+test('hex shapes: every road and river leaves its side square at the middle; towns, gates and the monastery line up', async () => {
+  const H = await import('../src/engine/hex.js');
+  const near = (a, b) => Math.hypot(a[0] - b[0], a[1] - b[1]) < 1e-9;
+  for (const [id, t] of Object.entries(H.TYPES)) {
+    const s = H.shapes(id), mid = d => [H.V[d][0] * .5, H.V[d][1] * .5];
+    // every road and river side has exactly one path starting (or ending) at its middle, heading straight in
+    for (const k of ['r', 'w']) {
+      const sides = [0, 1, 2, 3, 4, 5].filter(d => t.e[d] === k), paths = k === 'r' ? s.roads : s.rivers;
+      for (const d of sides) {
+        const p = paths.find(x => x.edges.includes(d));
+        assert.ok(p, `${id}: side ${d} has its ${k}`);
+        const P = p.edges[0] === d ? p.path : p.path.slice().reverse(), a = P[0], b = P[1];
+        assert.ok(near(a, mid(d)), `${id}: the ${k} starts at the middle of side ${d}`);
+        const dx = b[0] - a[0], dy = b[1] - a[1], L = Math.hypot(dx, dy);
+        assert.ok((dx * H.V[d][0] + dy * H.V[d][1]) / L < -.85, `${id}: the ${k} heads inwards`);
+        if (P.length > 2) assert.ok(Math.abs(dx * H.V[d][1] - dy * H.V[d][0]) < 1e-9, `${id}: the ${k} leaves side ${d} square`);
+      }
+    }
+    if (t.e.includes('c')) {
+      assert.ok(s.town && H.inTown(s.town, s.town.keep), `${id}: the keep is inside the town`);
+      for (const r of s.roads.filter(x => x.end === 'gate')) assert.ok(H.inTown(s.town, r.path[1]) && !H.inTown(s.town, r.path[0]), `${id}: a gate road runs from the field to the wall`);
+      for (const d of [0, 1, 2, 3, 4, 5].filter(d => t.e[d] !== 'c')) assert.ok(!H.inTown(s.town, [mid(d)[0] * .98, mid(d)[1] * .98]) || t.e.split('').every(x => x === 'c'), `${id}: side ${d} is outside the town`);
+    } else assert.equal(s.town, null);
+    if (t.fort) assert.ok(s.roads.every(r => r.end === 'fort'), `${id}: roads end at the monastery gate`);
+  }
+});
+
 test('hex: a whole game of bots plays legal moves to the end', async () => {
   const H = await import('../src/engine/hex.js'), {hex: bots} = await import('../src/engine/bots.js');
   const random = seeded(42), deck = H.deckList({rivers: true});

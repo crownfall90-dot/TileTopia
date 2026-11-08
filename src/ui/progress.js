@@ -125,13 +125,13 @@ export function renderAchievementsHtml({
   const gotCount = achDefs.filter(a => progAch[a.id] === 'got').length;
   const totalCount = achDefs.length;
 
-  const tierNames = { 1: 'Бронза', 2: 'Серебро', 3: 'Золото', 4: 'Платина' };
+  const tierNames = { 1: 'Бронза', 2: 'Серебро', 3: 'Золото', 4: 'Платина', bronze: 'Бронза', silver: 'Серебро', gold: 'Золото' };
 
   const aRows = [...achDefs].sort((a, b) => {
     const rA = rank(a.ok(progStats, progLvl), progAch[a.id] === 'got');
     const rB = rank(b.ok(progStats, progLvl), progAch[b.id] === 'got');
     if (rA !== rB) return rA - rB;
-    return (a.tier || 1) - (b.tier || 1);
+    return ({bronze:1,silver:2,gold:3}[a.tier] || a.tier || 1) - ({bronze:1,silver:2,gold:3}[b.tier] || b.tier || 1);
   }).map(a => {
     const ok = a.ok(progStats, progLvl), got = progAch[a.id] === 'got';
     const tierName = tierNames[a.tier] || '';
