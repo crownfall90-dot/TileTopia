@@ -599,7 +599,11 @@ def jigsaw(size, depth, z, m, rot=0.0, bevel=.012):
     op('socket', 0, -size * .5)
     o.rotation_euler = (0, 0, math.radians(rot))
     o.location = (0, 0, z)
-    return put(smooth(o, bevel), m)
+    put(o, m)
+    md = o.modifiers.new('Bevel', 'BEVEL')
+    md.width, md.segments = bevel, 3
+    md.harden_normals = False
+    return o
 
 
 def e_main():
@@ -877,7 +881,135 @@ def i_wide():
     i_logo('wide')
 
 
-MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare, 'c_main': c_main, 'c_rare': c_rare, 'd_main': d_main, 'd_rare': d_rare, 'e_main': e_main, 'e_rare': e_rare, 'g_line': g_line, 'g_stack': g_stack, 'g_ring': g_ring, 'g_serif': g_serif, 'h_jig': h_jig, 'h_split': h_split, 'h_onest': h_onest, 'h_stamp': h_stamp, 'i_banner': i_banner, 'i_center': i_center, 'i_wide': i_wide}
+CAM = []
+
+
+def set_cam(*args):
+    CAM[:] = [args]  # the scene is built after the model: main applies it
+
+
+def apply_cam(el_deg, az_deg=-90, scale=2.35, target_z=0.0):
+    co = bpy.context.scene.camera
+    co.data.ortho_scale = scale
+    el, az = math.radians(el_deg), math.radians(az_deg)
+    tgt = Vector((0, 0, target_z))
+    co.location = tgt + Vector((math.cos(az) * math.cos(el), math.sin(az) * math.cos(el), math.sin(el))) * 8
+    co.rotation_euler = (tgt - co.location).to_track_quat('-Z', 'Y').to_euler()
+
+
+def glass(name, hexcol, ior=2.2):
+    """a faceted stone as a glossy, softly glowing solid: real transmission tore holes through the facets, and a solid reads better small"""
+    m = bpy.data.materials.new(name)
+    b = next(n for n in m.node_tree.nodes if n.type == 'BSDF_PRINCIPLED')
+    h = hexcol.lstrip('#')
+    c = (*srgb(tuple(int(h[i:i + 2], 16) / 255 for i in (0, 2, 4))), 1)
+    b.inputs['Base Color'].default_value = c
+    b.inputs['Metallic'].default_value = .55
+    b.inputs['Roughness'].default_value = .22
+    for k in ('Coat Weight', 'Clearcoat'):
+        if k in b.inputs:
+            b.inputs[k].default_value = .6
+            break
+    b.inputs['Emission Color'].default_value = c
+    b.inputs['Emission Strength'].default_value = 0.0
+    return m
+
+
+def gem_mesh(n, R, table, crown_h, pav_h, rot=0.0, square=False):
+    """a cut stone: a girdle ring, a flat table above it, a pointed pavilion below"""
+    import bmesh
+    me = bpy.data.meshes.new('Gem')
+    bm = bmesh.new()
+    def ring(rad, z, off):
+        out = []
+        for i in range(n):
+            a = rot + off + i / n * math.tau
+            r = rad / max(abs(math.cos((a - rot - off) % (math.tau / n) - math.pi / n)) , 1) if square else rad
+            out.append(bm.verts.new((math.cos(a) * rad, math.sin(a) * rad, z)))
+        return out
+    g = ring(R, 0, 0)
+    t = ring(table, crown_h, math.pi / n)
+    apex = bm.verts.new((0, 0, -pav_h))
+    for i in range(n):
+        j = (i + 1) % n
+        bm.faces.new((g[i], g[j], t[i]))
+        bm.faces.new((t[i], g[j], t[j]))
+        bm.faces.new((g[j], g[i], apex))
+    bm.faces.new(list(reversed(t)))
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    bm.to_mesh(me)
+    bm.free()
+    o = bpy.data.objects.new('Gem', me)
+    bpy.context.scene.collection.objects.link(o)
+    bpy.context.view_layer.objects.active = o
+    return o
+
+
+def gem_backdrop():
+    """what the stone sees inside: a dark dome and a few bright cards, all hidden from the camera so the picture stays transparent"""
+    def emit(name, col, strength):
+        m = bpy.data.materials.new(name)
+        nt = m.node_tree
+        for n in list(nt.nodes):
+            nt.nodes.remove(n)
+        e = nt.nodes.new('ShaderNodeEmission')
+        e.inputs['Color'].default_value = (*col, 1)
+        e.inputs['Strength'].default_value = strength
+        o = nt.nodes.new('ShaderNodeOutputMaterial')
+        nt.links.new(e.outputs[0], o.inputs[0])
+        return m
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=48, ring_count=24, radius=7, location=(0, 0, 0))
+    d = bpy.context.object
+    d.data.materials.append(emit('domeDark', (.02, .03, .06), 1.0))
+    d.visible_camera = False
+    import random
+    rnd = random.Random(7)
+    for i in range(9):
+        a, e = rnd.uniform(0, math.tau), rnd.uniform(-.2, 1.2)
+        loc = Vector((math.cos(a) * math.cos(e), math.sin(a) * math.cos(e), math.sin(e))) * 5.5
+        bpy.ops.mesh.primitive_plane_add(size=rnd.uniform(1.2, 2.6), location=loc)
+        c = bpy.context.object
+        c.rotation_euler = (-loc).to_track_quat('Z', 'Y').to_euler()
+        c.data.materials.append(emit('card%d' % i, (1, 1, 1) if i % 3 else (.7, .85, 1), rnd.uniform(6, 14)))
+        c.visible_camera = False
+
+
+def j_gem_blue():
+    put(gem_mesh(8, .78, .42, .3, .62), glass('gemBlue', '#1a86ff'))
+    set_cam(32, -90, 2.2, 0)
+
+
+def j_gem_green():
+    put(gem_mesh(6, .8, .5, .26, .5, math.radians(30)), glass('gemGreen', '#10b866', 1.9))
+    set_cam(32, -90, 2.2, 0)
+
+
+def j_gem_violet():
+    put(gem_mesh(12, .76, .34, .34, .7), glass('gemViolet', '#8a3fe0', 2.0))
+    set_cam(30, -90, 2.2, 0)
+
+
+def meeple(m, z=0.0):
+    """the player's piece as in the board game: the flat silhouette (feet, waist, wide arms, neck) extruded, a round head on top"""
+    pts = [(-.4, 0), (-.1, 0), (0, .14), (.1, 0), (.4, 0), (.3, .3), (.2, .42), (.58, .52), (.62, .74), (.18, .8), (.1, .86), (-.1, .86), (-.18, .8), (-.62, .74), (-.58, .52), (-.2, .42), (-.3, .3)]
+    body = poly(pts, .34, 0, m, .05)
+    body.rotation_euler = (math.pi / 2, 0, 0)
+    body.location = (0, 0, z)
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=48, ring_count=24, radius=.23, location=(0, 0, z + 1.0))
+    put(smooth(bpy.context.object), m)
+
+
+def j_meeple_gold():
+    meeple(metal('mGold', '#f4b73f', .2))
+    set_cam(18, -90, 2.5, .55)
+
+
+def j_jigsaw_gold():
+    put(jigsaw(1.1, .26, .13, metal('jGold', '#f4b73f', .2), 14, .035), metal('jGold2', '#f4b73f', .2))
+    set_cam(48, -90, 2.4, .1)
+
+
+MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare, 'c_main': c_main, 'c_rare': c_rare, 'd_main': d_main, 'd_rare': d_rare, 'e_main': e_main, 'e_rare': e_rare, 'g_line': g_line, 'g_stack': g_stack, 'g_ring': g_ring, 'g_serif': g_serif, 'h_jig': h_jig, 'h_split': h_split, 'h_onest': h_onest, 'h_stamp': h_stamp, 'i_banner': i_banner, 'i_center': i_center, 'i_wide': i_wide, 'j_gem_blue': j_gem_blue, 'j_gem_green': j_gem_green, 'j_gem_violet': j_gem_violet, 'j_meeple_gold': j_meeple_gold, 'j_jigsaw_gold': j_jigsaw_gold}
 
 
 def scene(samples, size=512):
@@ -941,8 +1073,11 @@ def main(argv):
     os.makedirs(out, exist_ok=True)
     for key in only:
         bpy.ops.wm.read_homefile(use_empty=True)
+        CAM.clear()
         MAKERS[key]()
-        (studio if key.startswith(('c_', 'd_', 'e_', 'f_', 'g_', 'h_', 'i_')) else scene)(samples)
+        (studio if key.startswith(('c_', 'd_', 'e_', 'f_', 'g_', 'h_', 'i_', 'j_')) and not key.startswith('j_gem') else scene)(samples)
+        if CAM:
+            apply_cam(*CAM[0])
         bpy.context.scene.render.filepath = os.path.join(out, key + '.png')
         bpy.ops.render.render(write_still=True)
         print('COIN', key, flush=True)
