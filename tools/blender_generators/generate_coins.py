@@ -577,7 +577,222 @@ def d_rare():
     put(facet_star(.58, .25, .12, z + .025), glow('eGem', '#3fb4ff', '#1f8cff', 1.1))
 
 
-MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare, 'c_main': c_main, 'c_rare': c_rare, 'd_main': d_main, 'd_rare': d_rare}
+def jigsaw(size, depth, z, m, rot=0.0, bevel=.012):
+    """a jigsaw piece, the game's own motif: a square with a knob on top and on the right, a socket on the left and below"""
+    bpy.ops.mesh.primitive_cube_add(size=1, location=(0, 0, 0))
+    o = bpy.context.object
+    o.scale = (size, size, depth)
+    bpy.ops.object.transform_apply(scale=True)
+    r, off = size * .17, size * .5 + size * .1
+    def op(kind, x, y):
+        bpy.ops.mesh.primitive_cylinder_add(vertices=48, radius=r, depth=depth * 1.6, location=(x, y, 0))
+        c = bpy.context.object
+        md = o.modifiers.new(kind, 'BOOLEAN')
+        md.operation = 'UNION' if kind == 'knob' else 'DIFFERENCE'
+        md.object = c
+        bpy.context.view_layer.objects.active = o
+        bpy.ops.object.modifier_apply(modifier=md.name)
+        bpy.data.objects.remove(c)
+    op('knob', 0, off)
+    op('knob', off, 0)
+    op('socket', -size * .5, 0)
+    op('socket', 0, -size * .5)
+    o.rotation_euler = (0, 0, math.radians(rot))
+    o.location = (0, 0, z)
+    return put(smooth(o, bevel), m)
+
+
+def e_main():
+    body = metal('fBody', '#d9a02a', .3)
+    rim = metal('fRim', '#ffd36a', .12)
+    field = metal('fField', '#b87a16', .42)
+    line = metal('fLine', '#8f5a0e', .4)
+    piece = metal('fPiece', '#ffe08a', .13)
+    d_base(body, rim, field, line)
+    put(jigsaw(.78, .07, .125, piece, 12), piece)
+
+
+def e_rare():
+    body = metal('gBody', '#090b12', .1, .4)
+    rim = metal('gRim', '#e2e6ee', .14)
+    field = metal('gField', '#161c38', .3, .6)
+    line = metal('gLine', '#9aa3b5', .3)
+    piece = metal('gPiece', '#dfe5f2', .13)
+    d_base(body, rim, field, line)
+    put(jigsaw(.78, .07, .125, piece, 12), piece)
+    put(facet_star(.2, .09, .06, .165), glow('gGem', '#3fb4ff', '#1f8cff', 1.2))
+
+
+FONTS = os.path.join(ROOT, 'build', 'fonts')
+
+
+def font_path(name):
+    """the game's own fonts as TTF (Blender cannot read WOFF2): scripts/coins-fonts.py makes them; falls back to the system serif"""
+    for d in (FONTS, '/tmp/claude-0/-home-user-TileTopia/b86818da-678d-5c84-ba86-e608d1ab7449/scratchpad/fonts'):
+        f = os.path.join(d, name)
+        if os.path.exists(f):
+            return f
+    return '/usr/share/fonts/truetype/dejavu/DejaVuSerif-Bold.ttf'
+
+
+def text(txt, font, size, z, m, depth=.035, loc=(0, 0), rot=0.0, spacing=1.0):
+    cu = bpy.data.curves.new('T', 'FONT')
+    cu.body = txt
+    cu.font = bpy.data.fonts.load(font_path(font))
+    cu.size = size
+    cu.extrude = depth / 2
+    cu.bevel_depth = .004
+    cu.bevel_resolution = 2
+    cu.align_x = 'CENTER'
+    cu.align_y = 'CENTER'
+    cu.space_character = spacing
+    o = bpy.data.objects.new('T', cu)
+    bpy.context.scene.collection.objects.link(o)
+    o.location = (loc[0], loc[1], z + depth / 2)
+    o.rotation_euler = (0, 0, math.radians(rot))
+    cu.materials.append(m)
+    return o
+
+
+def text_arc(txt, font, size, R, z, m, center=90.0, depth=.035, inward=False):
+    """letters along a circle, each one measured and turned to stand on it"""
+    objs = []
+    for ch in txt:
+        o = text(ch, font, size, z, m, depth)
+        bpy.context.view_layer.update()
+        objs.append((o, o.dimensions.x))
+    gap = size * .22
+    total = sum(w for _, w in objs) + gap * (len(objs) - 1)
+    pos = -total / 2
+    for o, w in objs:
+        mid = pos + w / 2
+        pos += w + gap
+        a = math.radians(center) - mid / R if not inward else math.radians(center) + mid / R
+        o.location.x, o.location.y = math.cos(a) * R, math.sin(a) * R
+        o.rotation_euler = (0, 0, a - math.pi / 2 if not inward else a + math.pi / 2)
+
+
+def engrave(field, objs):
+    """cut the shapes into the field, one boolean for each (joined cutters tore the surface)"""
+    bpy.context.view_layer.update()  # a new text has no geometry until the scene is evaluated
+    for o in objs:
+        bpy.ops.object.select_all(action='DESELECT')
+        o.select_set(True)
+        bpy.context.view_layer.objects.active = o
+        if o.type in ('CURVE', 'FONT'):
+            bpy.ops.object.convert(target='MESH')
+        cutter = bpy.context.view_layer.objects.active
+        import bmesh
+        bm = bmesh.new()
+        bm.from_mesh(cutter.data)
+        bmesh.ops.remove_doubles(bm, verts=bm.verts, dist=1e-5)
+        bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+        bm.to_mesh(cutter.data)
+        bm.free()
+        cutter.data.update()
+        md = field.modifiers.new('Engrave', 'BOOLEAN')
+        md.operation = 'DIFFERENCE'
+        md.solver = 'EXACT'
+        md.use_hole_tolerant = True
+        md.object = cutter
+        bpy.context.view_layer.objects.active = field
+        bpy.ops.object.modifier_apply(modifier=md.name)
+        inlay = cutter.copy()
+        inlay.data = cutter.data.copy()
+        bpy.context.scene.collection.objects.link(inlay)
+        inlay.data.materials.clear()
+        inlay.data.materials.append(dark())
+        inlay.scale = (1, 1, .375)
+        inlay.location.z = .0675
+        bpy.data.objects.remove(cutter)
+    for poly_ in field.data.polygons:
+        poly_.use_smooth = False  # long triangles of the cut cap shade as shards when smooth
+
+
+def g_base():
+    """a gold coin made to be engraved: a body hollowed under the field, and a thick field the letters are cut deep into"""
+    body = metal('gBody', '#d9a02a', .3)
+    rim = metal('gRim', '#ffd36a', .12)
+    field = metal('gField', '#e6aa33', .26)
+    line = metal('gLine', '#a86a12', .38)
+    b = put(smooth(cyl(1.0, .2, 0), .05), body)
+    hole = cyl(.83, .5, 0, 128)
+    md = b.modifiers.new('Hollow', 'BOOLEAN')
+    md.operation = 'DIFFERENCE'
+    md.object = hole
+    bpy.context.view_layer.objects.active = b
+    bpy.ops.object.modifier_apply(modifier='Hollow', single_user=True) if False else None
+    for m_ in list(b.modifiers):
+        if m_.name == 'Hollow':
+            bpy.ops.object.modifier_apply(modifier='Hollow')
+    bpy.data.objects.remove(hole)
+    put(torus(.92, .07, .1), rim)
+    f = put(cyl(.84, .21, 0), field)
+    put(torus(.74, .014, .112), line)
+    return f
+
+
+def dark():
+    return bpy.data.materials.get('gDark') or metal('gDark', '#6a3f06', .55)
+
+
+def cutbar(w, h, loc, rot=0.0):
+    bpy.ops.mesh.primitive_cube_add(size=1, location=(0, 0, 0))
+    o = bpy.context.object
+    o.scale = (w, h, .12)
+    bpy.ops.object.transform_apply(scale=True)
+    o.rotation_euler = (0, 0, rot)
+    o.location = (loc[0], loc[1], .105)
+    o.data.materials.append(dark())
+    return o
+
+
+def g_line():
+    f = g_base()
+    engrave(f, [text('TILETOPIA', 'unbounded-800-latin.ttf', .3, .045, dark(), .12)])
+
+
+def g_stack():
+    f = g_base()
+    m = dark()
+    engrave(f, [text('TILE', 'unbounded-800-latin.ttf', .34, .045, m, .12, (0, .22)), text('TOPIA', 'unbounded-800-latin.ttf', .34, .045, m, .12, (0, -.2)), cutbar(1.0, .02, (0, .015))])
+
+
+def g_ring():
+    f = g_base()
+    m = dark()
+    arc = []
+    for ch in 'TILETOPIA':
+        arc.append(text(ch, 'unbounded-800-latin.ttf', .16, .045, m, .12))
+    bpy.context.view_layer.update()
+    gap = .16 * .22
+    ws = [o.dimensions.x for o in arc]
+    total = sum(ws) + gap * (len(ws) - 1)
+    pos = -total / 2
+    for o, w in zip(arc, ws):
+        mid = pos + w / 2
+        pos += w + gap
+        a = math.radians(90) - mid / .6
+        o.location.x, o.location.y = math.cos(a) * .6, math.sin(a) * .6
+        o.rotation_euler = (0, 0, a - math.pi / 2)
+    mono = text('T', 'unbounded-800-latin.ttf', .62, .045, m, .12, (0, -.1))
+    dots = []
+    for a in (-35, 0, 35):
+        r = math.radians(270 + a)
+        dots.append(cutbar(.07, .07, (math.cos(r) * .6, math.sin(r) * .6), r + math.pi / 4))
+    engrave(f, arc + [mono] + dots)
+
+
+def g_serif():
+    f = g_base()
+    m = dark()
+    parts = [text('Tiletopia', 'DejaVuSerif-Bold.ttf', .3, .045, m, .12), cutbar(1.1, .012, (0, -.2)), cutbar(1.1, .012, (0, .22))]
+    for sx in (-1, 1):
+        parts.append(cutbar(.09, .09, (sx * .62, -.2), math.radians(45)))
+    engrave(f, parts)
+
+
+MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare, 'c_main': c_main, 'c_rare': c_rare, 'd_main': d_main, 'd_rare': d_rare, 'e_main': e_main, 'e_rare': e_rare, 'g_line': g_line, 'g_stack': g_stack, 'g_ring': g_ring, 'g_serif': g_serif}
 
 
 def scene(samples, size=512):
@@ -642,7 +857,7 @@ def main(argv):
     for key in only:
         bpy.ops.wm.read_homefile(use_empty=True)
         MAKERS[key]()
-        (studio if key.startswith(('c_', 'd_')) else scene)(samples)
+        (studio if key.startswith(('c_', 'd_', 'e_', 'f_', 'g_')) else scene)(samples)
         bpy.context.scene.render.filepath = os.path.join(out, key + '.png')
         bpy.ops.render.render(write_still=True)
         print('COIN', key, flush=True)
