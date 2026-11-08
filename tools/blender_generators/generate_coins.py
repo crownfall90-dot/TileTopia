@@ -1410,7 +1410,107 @@ def clay_star():
     star_variant('#14246b', '#2e47c4', '#ffd23a', '#c8e6ff', .52, .15, '#ffc928')
 
 
-MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare, 'c_main': c_main, 'c_rare': c_rare, 'd_main': d_main, 'd_rare': d_rare, 'e_main': e_main, 'e_rare': e_rare, 'g_line': g_line, 'g_stack': g_stack, 'g_ring': g_ring, 'g_serif': g_serif, 'h_jig': h_jig, 'h_split': h_split, 'h_onest': h_onest, 'h_stamp': h_stamp, 'i_banner': i_banner, 'i_center': i_center, 'i_wide': i_wide, 'j_gem_blue': j_gem_blue, 'j_gem_green': j_gem_green, 'j_gem_violet': j_gem_violet, 'j_meeple_gold': j_meeple_gold, 'j_jigsaw_gold': j_jigsaw_gold, 'k_main': k_main, 'k_rare': k_rare, 'p_main': p_main, 'p_rare': p_rare, 'q_rare': q_rare, 'p2_main': p2_main, 'q2_rare': q2_rare, 'r_main': r_main, 'r_rare': r_rare, 's_main': s_main, 't_main': t_main, 't_rare': t_rare, 'u1_rare': u1_rare, 'u2_rare': u2_rare, 'u3_rare': u3_rare, 'u4_rare': u4_rare, 'v_coin': flat_coin, 'v_star': flat_star, 'w_coin': clay_coin, 'w_star': clay_star}
+GLOW = []  # a variant asks for a neon glow added after the render (Cycles has no bloom, and Blender 5's compositor needs a GPU)
+
+
+def add_glow(path, radius=14, gain=1.6):
+    """screen a blurred copy of the bright pixels over the picture: the halo of a neon tube"""
+    from PIL import Image, ImageFilter, ImageChops
+    im = Image.open(path).convert('RGBA')
+    pad = 40
+    big = Image.new('RGBA', (im.width + 2 * pad, im.height + 2 * pad), (0, 0, 0, 0))
+    big.paste(im, (pad, pad))
+    rgb = big.convert('RGB')
+    bright = rgb.point(lambda v: 255 if v > 235 else (max(0, int((v - 150) * 2.4)) if v > 150 else 0))
+    halo = bright.filter(ImageFilter.GaussianBlur(radius))
+    halo2 = bright.filter(ImageFilter.GaussianBlur(radius / 3))
+    halo = ImageChops.add(halo, halo2).point(lambda v: min(255, int(v * gain)))
+    glow_rgb = ImageChops.screen(rgb, halo)
+    a = big.split()[3]
+    ha = halo.convert('L').point(lambda v: min(255, int(v * 1.4)))
+    alpha = ImageChops.lighter(a, ha)
+    out = glow_rgb.copy()
+    out.putalpha(alpha)
+    out.save(path)
+
+
+def dead_matte(m):
+    """no specular at all: the surface only shows its colour and the soft shade of its shape"""
+    b = next((n for n in m.node_tree.nodes if n.type == 'BSDF_PRINCIPLED'), None)
+    if b:
+        b.inputs['Roughness'].default_value = 1.0
+        for k in ('Specular IOR Level', 'Specular'):
+            if k in b.inputs:
+                b.inputs[k].default_value = 0.0
+        for k in ('Coat Weight', 'Clearcoat'):
+            if k in b.inputs:
+                b.inputs[k].default_value = 0.0
+
+
+def clay2_coin():
+    MATTE.append(1)
+    NO_OUTLINE.append(1)
+    r_main()
+    for m in bpy.data.materials:
+        dead_matte(m)
+
+
+def tube(points, color, strength=7.0, r=.022, closed=True):
+    """a glowing neon tube along a closed outline"""
+    cu = bpy.data.curves.new('Neon', 'CURVE')
+    cu.dimensions = '3D'
+    cu.bevel_depth = r
+    cu.bevel_resolution = 6
+    sp = cu.splines.new('POLY')
+    sp.points.add(len(points) - 1)
+    for i, (x, y, z) in enumerate(points):
+        sp.points[i].co = (x, y, z, 1)
+    sp.use_cyclic_u = closed
+    o = bpy.data.objects.new('Neon', cu)
+    bpy.context.scene.collection.objects.link(o)
+    cu.materials.append(glow('neon' + color, color, color, strength))
+    return o
+
+
+def star_pts(R, r, z, n=5):
+    return [(math.cos(math.pi / 2 + i * math.pi / n) * (R if i % 2 == 0 else r), math.sin(math.pi / 2 + i * math.pi / n) * (R if i % 2 == 0 else r), z) for i in range(2 * n)]
+
+
+def bloom():
+    """a soft glow round the bright parts, added in the compositor (Cycles has no bloom of its own); Blender 5 keeps it in a node group"""
+    sc = bpy.context.scene
+    ng = bpy.data.node_groups.new('Comp', 'CompositorNodeTree')
+    sc.compositing_node_group = ng
+    try:
+        ng.interface.new_socket('Image', in_out='OUTPUT', socket_type='NodeSocketColor')
+    except Exception:
+        pass
+    rl = ng.nodes.new('CompositorNodeRLayers')
+    gl = ng.nodes.new('CompositorNodeGlare')
+    out = ng.nodes.new('NodeGroupOutput')
+    gl.inputs['Type'].default_value = 'Fog Glow' if hasattr(gl.inputs['Type'], 'default_value') and isinstance(gl.inputs['Type'].default_value, str) else gl.inputs['Type'].default_value
+    for k, v in (('Quality', 'High'), ('Threshold', 1.0), ('Size', .5), ('Strength', 1.0), ('Smoothness', 1.0)):
+        try:
+            gl.inputs[k].default_value = v
+        except Exception:
+            pass
+    ng.links.new(rl.outputs['Image'], gl.inputs['Image'])
+    ng.links.new(gl.outputs['Image'], out.inputs[0])
+
+
+def neon_star():
+    body = metal('nBody', '#23235c', .4, .5)
+    face = metal('nFace', '#171748', .5, .5)
+    put(smooth(star_mesh(1.0, .55, .34, 0), .14), body)
+    put(smooth(star_mesh(.82, .43, .05, .19), .04), face)
+    tube(star_pts(.99, .55, .172), '#ff2bd6', 9.0, .03)
+    tube(star_pts(.8, .42, .218), '#2be8ff', 9.0, .026)
+    tube(star_pts(.46, .24, .222), '#ffe14a', 10.0, .026)
+    set_cam(62, -90, 2.4, .1)
+    GLOW.append(1)
+
+
+MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare, 'c_main': c_main, 'c_rare': c_rare, 'd_main': d_main, 'd_rare': d_rare, 'e_main': e_main, 'e_rare': e_rare, 'g_line': g_line, 'g_stack': g_stack, 'g_ring': g_ring, 'g_serif': g_serif, 'h_jig': h_jig, 'h_split': h_split, 'h_onest': h_onest, 'h_stamp': h_stamp, 'i_banner': i_banner, 'i_center': i_center, 'i_wide': i_wide, 'j_gem_blue': j_gem_blue, 'j_gem_green': j_gem_green, 'j_gem_violet': j_gem_violet, 'j_meeple_gold': j_meeple_gold, 'j_jigsaw_gold': j_jigsaw_gold, 'k_main': k_main, 'k_rare': k_rare, 'p_main': p_main, 'p_rare': p_rare, 'q_rare': q_rare, 'p2_main': p2_main, 'q2_rare': q2_rare, 'r_main': r_main, 'r_rare': r_rare, 's_main': s_main, 't_main': t_main, 't_rare': t_rare, 'u1_rare': u1_rare, 'u2_rare': u2_rare, 'u3_rare': u3_rare, 'u4_rare': u4_rare, 'v_coin': flat_coin, 'v_star': flat_star, 'w_coin': clay_coin, 'w_star': clay_star, 'x_coin': clay2_coin, 'x_star': neon_star}
 
 
 def scene(samples, size=512):
@@ -1476,14 +1576,17 @@ def main(argv):
         bpy.ops.wm.read_homefile(use_empty=True)
         CAM.clear()
         OUTLINE.clear()
+        GLOW.clear()
         MATTE.clear()
         NO_OUTLINE.clear()
         MAKERS[key]()
-        (studio if key.startswith(('c_', 'd_', 'e_', 'f_', 'g_', 'h_', 'i_', 'j_', 'q_', 'p2_', 'q2_', 'r_', 's_', 't_', 'u', 'v_', 'w_')) and not key.startswith(('j_gem', 'k_', 'p_', 'q_', 'p2_', 'q2_', 'r_', 's_', 't_', 'u', 'v_', 'w_')) else scene)(samples)
+        (studio if key.startswith(('c_', 'd_', 'e_', 'f_', 'g_', 'h_', 'i_', 'j_', 'q_', 'p2_', 'q2_', 'r_', 's_', 't_', 'u', 'v_', 'w_', 'x_')) and not key.startswith(('j_gem', 'k_', 'p_', 'q_', 'p2_', 'q2_', 'r_', 's_', 't_', 'u', 'v_', 'w_', 'x_')) else scene)(samples)
         if CAM:
             apply_cam(*CAM[0])
         bpy.context.scene.render.filepath = os.path.join(out, key + '.png')
         bpy.ops.render.render(write_still=True)
+        if GLOW:
+            add_glow(bpy.context.scene.render.filepath)
         print('COIN', key, flush=True)
 
 
