@@ -70,7 +70,7 @@ const SCENES = {
 
 const port = 9300 + Math.floor(Math.random() * 400);
 const prof = fs.mkdtempSync(path.join(os.tmpdir(), 'tt-audit-'));
-const chrome = spawn(CHROME, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${prof}`, '--no-first-run', '--hide-scrollbars', 'about:blank']);
+const chrome = spawn(CHROME, ['--headless=new', `--remote-debugging-port=${port}`, `--user-data-dir=${prof}`, '--no-first-run', '--hide-scrollbars', ...(process.env.NO_SANDBOX ? ['--no-sandbox'] : []), 'about:blank']);
 async function cdpConnect(url) {
   const ws = new WebSocket(url);
   await new Promise((res, rej) => { ws.onopen = res; ws.onerror = rej; });

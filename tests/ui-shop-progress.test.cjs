@@ -9,7 +9,7 @@ test('ui/shop: renderGiftCard, renderFiguresGrid, renderFramesGrid, renderLocati
   // Gift card markup
   const readyCard = renderGiftCard({giftReady: true, chestSvg: '<svg>chest</svg>', boosts: {double: 2}});
   assert.ok(readyCard.includes('class="chest ready"'));
-  assert.ok(readyCard.includes('Двойное золото ×2'));
+  assert.ok(readyCard.includes('Двойные тайлы ×2'));
   assert.ok(readyCard.includes('<button class="cta" id="openGift">Открыть</button>'));
 
   const waitingCard = renderGiftCard({giftReady: false, chestSvg: '<svg>chest</svg>', boosts: {}});
