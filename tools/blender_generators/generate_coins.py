@@ -1009,7 +1009,138 @@ def j_jigsaw_gold():
     set_cam(48, -90, 2.4, .1)
 
 
-MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare, 'c_main': c_main, 'c_rare': c_rare, 'd_main': d_main, 'd_rare': d_rare, 'e_main': e_main, 'e_rare': e_rare, 'g_line': g_line, 'g_stack': g_stack, 'g_ring': g_ring, 'g_serif': g_serif, 'h_jig': h_jig, 'h_split': h_split, 'h_onest': h_onest, 'h_stamp': h_stamp, 'i_banner': i_banner, 'i_center': i_center, 'i_wide': i_wide, 'j_gem_blue': j_gem_blue, 'j_gem_green': j_gem_green, 'j_gem_violet': j_gem_violet, 'j_meeple_gold': j_meeple_gold, 'j_jigsaw_gold': j_jigsaw_gold}
+def outline(color=(.22, .08, .0), width=3.2, crease=True):
+    """the dark brown contour line that Supercell art has round every shape (Freestyle)"""
+    sc = bpy.context.scene
+    sc.render.use_freestyle = True
+    sc.render.line_thickness_mode = 'ABSOLUTE'
+    sc.render.line_thickness = width
+    vl = bpy.context.view_layer
+    vl.use_freestyle = True
+    fs = vl.freestyle_settings
+    for ls in list(fs.linesets):
+        fs.linesets.remove(ls)
+    ls = fs.linesets.new('Outline')
+    ls.select_silhouette = True
+    ls.select_border = True
+    ls.select_crease = crease
+    ls.select_edge_mark = False
+    if bpy.data.collections.get('Spark'):
+        ls.select_by_collection = True
+        ls.collection = bpy.data.collections['Spark']
+        ls.collection_negation = 'EXCLUSIVE'
+    st = bpy.data.linestyles.new('Brown')
+    st.color = color
+    st.thickness = width
+    ls.linestyle = st
+
+
+def sparkle(loc, size, m):
+    """the four-point glint painted on top of shiny things"""
+    col = bpy.data.collections.get('Spark') or bpy.data.collections.new('Spark')
+    if col.name not in bpy.context.scene.collection.children:
+        bpy.context.scene.collection.children.link(col)
+    for rot in (0, math.pi / 2):
+        bpy.ops.mesh.primitive_cylinder_add(vertices=4, radius=1, depth=.02, location=(0, 0, 0))
+        d = bpy.context.object
+        for c_ in list(d.users_collection):
+            c_.objects.unlink(d)
+        col.objects.link(d)
+        d.scale = (size * .16, size, 1)
+        bpy.ops.object.transform_apply(scale=True)
+        d.rotation_euler = (0, 0, rot)
+        d.location = loc
+        d.data.materials.append(glow('spark', '#ffffff', '#ffffff', 6.0))
+
+
+def k_main():
+    body = toy('kBody', '#d9780a', .35)
+    rim = toy('kRim', '#ffd23a', .18, 1.0)
+    face = toy('kFace', '#f7a823', .45, .5)
+    tile = toy('kTile', '#fff0a0', .15, 1.0)
+    put(smooth(cyl(1.0, .36, 0), .1), body)
+    put(torus(.84, .13, .17), rim)
+    put(smooth(cyl(.76, .05, .19), .01), face)
+    z = .22
+    s, g = .27, .045
+    c = sn = math.sqrt(.5)
+    for (dx, dy) in ((-1, -1), (1, -1), (-1, 1), (1, 1)):
+        ox, oy = dx * (s / 2 + g / 2), dy * (s / 2 + g / 2)
+        put(smooth(box(s, s, .09, (ox * c - oy * sn, ox * sn + oy * c, z), math.radians(45)), .04), tile)
+    sparkle((-.5, .45, .3), .17, None)
+    set_cam(58, -90, 2.35, .1)
+    outline()
+
+
+def k_rare():
+    gem = glass('kGem', '#09a557')
+    b = next(n for n in gem.node_tree.nodes if n.type == 'BSDF_PRINCIPLED')
+    b.inputs['Metallic'].default_value = .3
+    b.inputs['Roughness'].default_value = .1
+    o = gem_mesh(6, .8, .46, .3, .6, math.radians(30))
+    put(o, gem)
+    sparkle((-.35, -.1, .5), .2, None)
+    set_cam(36, -90, 2.3, 0)
+    outline(width=3.0)
+
+
+def pair_body(body_c, rim_c, face_c, rim_gems=None):
+    """the one shape both currencies share: a fat soft coin, a puffy rim and a sunk face; only colour and emblem differ"""
+    body = toy('pBody', body_c, .35)
+    rim = toy('pRim', rim_c, .18, 1.0)
+    face = toy('pFace', face_c, .45, .5)
+    put(smooth(cyl(1.0, .36, 0), .1), body)
+    put(torus(.84, .13, .17), rim)
+    put(smooth(cyl(.76, .05, .19), .01), face)
+    if rim_gems:
+        gem = toy('pGem', rim_gems, .12, 1.0)
+        for i in range(10):
+            a = i / 10 * math.tau + math.pi / 10
+            bpy.ops.mesh.primitive_uv_sphere_add(segments=24, ring_count=14, radius=.075, location=(math.cos(a) * .84, math.sin(a) * .84, .3))
+            put(smooth(bpy.context.object), gem)
+
+
+def p_main():
+    pair_body('#d9780a', '#ffd23a', '#f7a823')
+    tile = toy('pTile', '#fff0a0', .15, 1.0)
+    z = .22
+    s, g = .27, .045
+    c = sn = math.sqrt(.5)
+    for (dx, dy) in ((-1, -1), (1, -1), (-1, 1), (1, 1)):
+        ox, oy = dx * (s / 2 + g / 2), dy * (s / 2 + g / 2)
+        put(smooth(box(s, s, .09, (ox * c - oy * sn, ox * sn + oy * c, z), math.radians(45)), .04), tile)
+    sparkle((-.52, .42, .3), .16, None)
+    set_cam(58, -90, 2.35, .1)
+    outline()
+
+
+def p_rare():
+    pair_body('#3a1d9a', '#8fd0ff', '#5b3bd6', '#ff5fb0')
+    star_m = toy('pStar', '#ffe45c', .15, 1.0)
+    z = .22
+    put(smooth(star_mesh(.5, .22, .09, z), .035), star_m)
+    sparkle((-.52, .42, .3), .16, None)
+    set_cam(58, -90, 2.35, .1)
+    outline()
+
+
+def q_rare():
+    """the rare currency as a star-shaped token, built like the coin: fat soft body, a lighter raised star on it, a gem in the middle"""
+    body = toy('qBody', '#4a24b8', .35)
+    face = toy('qFace', '#7b57f0', .4, .6)
+    star_m = toy('qStar', '#ffe45c', .15, 1.0)
+    gem = toy('qGem', '#ff5fb0', .1, 1.0)
+    put(smooth(star_mesh(1.0, .54, .36, 0), .12), body)
+    put(smooth(star_mesh(.8, .42, .06, .2), .04), face)
+    put(smooth(star_mesh(.46, .22, .08, .26), .035), star_m)
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=32, ring_count=16, radius=.1, location=(0, 0, .33))
+    put(smooth(bpy.context.object), gem)
+    sparkle((-.42, .5, .4), .15, None)
+    set_cam(62, -90, 2.4, .1)
+    outline(width=2.4, crease=False)
+
+
+MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare, 'c_main': c_main, 'c_rare': c_rare, 'd_main': d_main, 'd_rare': d_rare, 'e_main': e_main, 'e_rare': e_rare, 'g_line': g_line, 'g_stack': g_stack, 'g_ring': g_ring, 'g_serif': g_serif, 'h_jig': h_jig, 'h_split': h_split, 'h_onest': h_onest, 'h_stamp': h_stamp, 'i_banner': i_banner, 'i_center': i_center, 'i_wide': i_wide, 'j_gem_blue': j_gem_blue, 'j_gem_green': j_gem_green, 'j_gem_violet': j_gem_violet, 'j_meeple_gold': j_meeple_gold, 'j_jigsaw_gold': j_jigsaw_gold, 'k_main': k_main, 'k_rare': k_rare, 'p_main': p_main, 'p_rare': p_rare, 'q_rare': q_rare}
 
 
 def scene(samples, size=512):
@@ -1075,7 +1206,7 @@ def main(argv):
         bpy.ops.wm.read_homefile(use_empty=True)
         CAM.clear()
         MAKERS[key]()
-        (studio if key.startswith(('c_', 'd_', 'e_', 'f_', 'g_', 'h_', 'i_', 'j_')) and not key.startswith('j_gem') else scene)(samples)
+        (studio if key.startswith(('c_', 'd_', 'e_', 'f_', 'g_', 'h_', 'i_', 'j_', 'q_')) and not key.startswith(('j_gem', 'k_', 'p_', 'q_')) else scene)(samples)
         if CAM:
             apply_cam(*CAM[0])
         bpy.context.scene.render.filepath = os.path.join(out, key + '.png')
