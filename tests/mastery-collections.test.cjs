@@ -148,7 +148,8 @@ test('collections & mastery DOM: collections tab renders cards, claiming complet
       w.colClaimed = [];
 
       P.show('progress');
-      document.querySelector('#ptabs [data-pt="cols"]').click();
+      const colBox = document.createElement('div'); document.body.append(colBox);
+      P.renderCollections(colBox); colBox.addEventListener('click', P.onProgressClick);
       const cardCount = document.querySelectorAll('.col-card').length;
       const claimBtn = document.querySelector('[data-claimcol="court"]');
       const canClaimBefore = !!claimBtn;
