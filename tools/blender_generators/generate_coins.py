@@ -393,7 +393,63 @@ def p2_rare():
     put(facet_star(.4, .17, .09, .125), gem)
 
 
-MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare}
+def toy(name, hexcol, rough=.3, coat=.9):
+    """glossy cartoon plastic (not metal): a saturated colour with a bright clear coat"""
+    m = bpy.data.materials.new(name)
+    b = next(n for n in m.node_tree.nodes if n.type == 'BSDF_PRINCIPLED')
+    h = hexcol.lstrip('#')
+    b.inputs['Base Color'].default_value = (*srgb(tuple(int(h[i:i + 2], 16) / 255 for i in (0, 2, 4))), 1)
+    b.inputs['Metallic'].default_value = 0.0
+    b.inputs['Roughness'].default_value = rough
+    for k in ('Coat Weight', 'Clearcoat'):
+        if k in b.inputs:
+            b.inputs[k].default_value = coat
+            break
+    return m
+
+
+def chunky(body_m, rim_m, face_m):
+    """a thick, soft-edged coin: a fat rounded disc, a puffy raised rim and a sunk face"""
+    d = cyl(1.0, .34, 0)
+    put(smooth(d, .09), body_m)
+    put(torus(.86, .11, .16), rim_m)
+    put(smooth(cyl(.78, .05, .185), .012), face_m)
+
+
+def under(obj_fn, m, grow=.07):
+    """the dark outline under an emblem: the same shape a little bigger and lower"""
+    return obj_fn(grow, m)
+
+
+def b1_main():
+    body = toy('cBody', '#e08a0c')
+    rim = toy('cRim', '#ffc928')
+    face = toy('cFace', '#f28c08', .6, .2)
+    light = toy('cLight', '#fff09a', .22)
+    dark = toy('cDark', '#b8620a')
+    chunky(body, rim, face)
+    z = .24
+    s, g = .27, .035
+    c = sn = math.sqrt(.5)
+    for grow, mat, dz in ((.07, dark, 0), (0, light, .035)):
+        for (dx, dy) in ((-1, -1), (1, -1), (-1, 1), (1, 1)):
+            ox, oy = dx * (s / 2 + g / 2), dy * (s / 2 + g / 2)
+            put(smooth(box(s + grow, s + grow, .06, (ox * c - oy * sn, ox * sn + oy * c, z + dz), math.radians(45)), .035), mat)
+
+
+def b1_rare():
+    body = toy('rBody', '#1d4fd8')
+    rim = toy('rRim', '#7fd0ff')
+    face = toy('rFace', '#2f5df0', .6, .2)
+    gold = toy('rGold', '#ffd23a', .22)
+    dark = toy('rDark', '#b8620a')
+    chunky(body, rim, face)
+    z = .235
+    put(smooth(star_mesh(.66, .31, .06, z), .035), dark)
+    put(smooth(star_mesh(.56, .25, .09, z + .025), .04), gold)
+
+
+MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare}
 
 
 def scene(samples, size=512):
