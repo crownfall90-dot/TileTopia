@@ -449,7 +449,135 @@ def b1_rare():
     put(smooth(star_mesh(.56, .25, .09, z + .025), .04), gold)
 
 
-MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare}
+def glow(name, hexcol, emit, strength=3.0):
+    m = metal(name, hexcol, .1, 0.0)
+    b = next(n for n in m.node_tree.nodes if n.type == 'BSDF_PRINCIPLED')
+    h = emit.lstrip('#')
+    b.inputs['Emission Color'].default_value = (*srgb(tuple(int(h[i:i + 2], 16) / 255 for i in (0, 2, 4))), 1)
+    b.inputs['Emission Strength'].default_value = strength
+    return m
+
+
+def premium_base(body_m, rim_m, field_m, line_m):
+    """a heavy realistic coin with a smooth edge, a polished rim, a band of inlaid mosaic tiles, a mirror field"""
+    put(smooth(cyl(1.0, .2, 0), .03), body_m)
+    put(torus(.955, .04, .105), rim_m)
+    n = 44
+    for i in range(n):
+        a = i / n * math.tau
+        put(smooth(box(.085, .105, .03, (math.cos(a) * .875, math.sin(a) * .875, .106), a + math.pi / 2), .008), rim_m if i % 2 == 0 else line_m)
+    put(smooth(cyl(.8, .03, .095), .006), field_m)
+    put(torus(.765, .013, .112), line_m)
+    for i in range(96):
+        a = i / 96 * math.tau
+        put(smooth(box(.045, .008, .012, (math.cos(a) * .705, math.sin(a) * .705, .112), a)), line_m)
+
+
+def c_main():
+    satin = metal('cSatin', '#c98f1f', .34)
+    polish = metal('cPolish', '#ffd36a', .1)
+    mirror = metal('cMirror', '#e9a92c', .24)
+    premium_base(satin, polish, mirror, satin)
+    z = .15
+    s, g = .31, .03
+    c = sn = math.sqrt(.5)
+    for (dx, dy) in ((-1, -1), (1, -1), (-1, 1), (1, 1)):
+        ox, oy = dx * (s / 2 + g / 2), dy * (s / 2 + g / 2)
+        pos = (ox * c - oy * sn, ox * sn + oy * c)
+        put(smooth(box(s, s, .06, (pos[0], pos[1], z), math.radians(45)), .014), polish)
+        put(smooth(box(s * .62, s * .62, .07, (pos[0], pos[1], z + .005), math.radians(45)), .01), satin)
+
+
+def c_rare():
+    obs = metal('oObs', '#07080d', .08, .35)
+    plat = metal('oPlat', '#e2e6ee', .14)
+    field = metal('oField', '#0b0f22', .18, .6)
+    line = metal('oLine', '#9aa3b5', .3)
+    premium_base(obs, plat, field, line)
+    z = .13
+    put(smooth(star_mesh(.62, .27, .045, z), .01), plat)
+    put(facet_star(.56, .24, .11, z + .02), glow('oGem', '#3fb4ff', '#1f8cff', 1.1))
+
+
+def poly(pts, depth, z, m, bevel=.012):
+    """a flat shape from its outline (counter-clockwise), extruded"""
+    import bmesh
+    me = bpy.data.meshes.new('Poly')
+    bm = bmesh.new()
+    vs = [bm.verts.new((x, y, -depth / 2)) for x, y in pts]
+    f = bm.faces.new(vs)
+    r2 = bmesh.ops.extrude_face_region(bm, geom=[f])
+    bmesh.ops.translate(bm, vec=(0, 0, depth), verts=[v for v in r2['geom'] if isinstance(v, bmesh.types.BMVert)])
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    bm.to_mesh(me)
+    bm.free()
+    o = bpy.data.objects.new('Poly', me)
+    bpy.context.scene.collection.objects.link(o)
+    o.location = (0, 0, z)
+    bpy.context.view_layer.objects.active = o
+    return put(smooth(o, bevel), m)
+
+
+def arc(cx, cy, r, a0, a1, n=24):
+    return [(cx + math.cos(math.radians(a0 + (a1 - a0) * k / n)) * r, cy + math.sin(math.radians(a0 + (a1 - a0) * k / n)) * r) for k in range(n + 1)]
+
+
+def d_base(body_m, rim_m, field_m, line_m):
+    """a smooth heavy coin: soft edge, one wide polished rim, a satin field, one fine ring"""
+    put(smooth(cyl(1.0, .2, 0), .05), body_m)
+    put(torus(.92, .07, .1), rim_m)
+    put(smooth(cyl(.84, .03, .09), .006), field_m)
+    put(torus(.74, .014, .112), line_m)
+
+
+def plateau(R, r, h, z, rot=45):
+    """a square tile cut like a gem: sloped sides and a flat top, so every side catches the light differently"""
+    import bmesh
+    me = bpy.data.meshes.new('Plateau')
+    bm = bmesh.new()
+    def sq(rad, zz):
+        return [bm.verts.new((math.cos(math.radians(rot + 90 * i)) * rad, math.sin(math.radians(rot + 90 * i)) * rad, zz)) for i in range(4)]
+    lo, hi = sq(R, 0), sq(r, h)
+    for i in range(4):
+        bm.faces.new((lo[i], lo[(i + 1) % 4], hi[(i + 1) % 4], hi[i]))
+    bm.faces.new(hi)
+    bm.faces.new(list(reversed(lo)))
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    bm.to_mesh(me)
+    bm.free()
+    o = bpy.data.objects.new('Plateau', me)
+    bpy.context.scene.collection.objects.link(o)
+    o.location = (0, 0, z)
+    bpy.context.view_layer.objects.active = o
+    return o
+
+
+def d_main():
+    body = metal('dBody', '#d9a02a', .3)
+    rim = metal('dRim', '#ffd36a', .12)
+    field = metal('dField', '#c98f1f', .4)
+    line = metal('dLine', '#a86a12', .38)
+    tile = metal('dTile', '#ffe08a', .14)
+    top = metal('dTop', '#e8b037', .3)
+    d_base(body, rim, field, line)
+    z = .115
+    put(plateau(.66, .5, .06, z), tile)
+    put(plateau(.4, .27, .05, z + .06), tile)
+    put(smooth(cyl(.12, .05, z + .13), .01), top)
+
+
+def d_rare():
+    body = metal('eBody', '#090b12', .1, .4)
+    rim = metal('eRim', '#e2e6ee', .14)
+    field = metal('eField', '#141a33', .3, .6)
+    line = metal('eLine', '#9aa3b5', .3)
+    d_base(body, rim, field, line)
+    z = .125
+    put(smooth(star_mesh(.66, .29, .05, z), .012), rim)
+    put(facet_star(.58, .25, .12, z + .025), glow('eGem', '#3fb4ff', '#1f8cff', 1.1))
+
+
+MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare, 'c_main': c_main, 'c_rare': c_rare, 'd_main': d_main, 'd_rare': d_rare}
 
 
 def scene(samples, size=512):
@@ -486,6 +614,26 @@ def scene(samples, size=512):
     sc.camera = co
 
 
+def studio(samples, size=512):
+    """soft boxes against a dark room: metal shows crisp, long reflections instead of a flat sheen"""
+    scene(samples, size)
+    sc = bpy.context.scene
+    for o in [o for o in sc.objects if o.type == 'LIGHT']:
+        bpy.data.objects.remove(o)
+    w = sc.world
+    bg = next(n for n in w.node_tree.nodes if n.type == 'BACKGROUND')
+    bg.inputs['Color'].default_value = (.5, .46, .4, 1)
+    bg.inputs['Strength'].default_value = .55
+    for name, energy, sx, sy, col, loc in (('Key', 900, 3.2, 1.6, (1, .93, .8), (-3.0, -2.2, 3.4)), ('Strip', 520, 0.9, 4.5, (.75, .88, 1), (3.4, 0.6, 2.4)), ('Top', 260, 2.6, 2.6, (1, 1, 1), (0, -.6, 5.0)), ('Warm', 300, 2.0, 1.2, (1, .8, .55), (1.2, -3.6, 1.2))):
+        L = bpy.data.lights.new(name, 'AREA')
+        L.shape = 'RECTANGLE'
+        L.energy, L.size, L.size_y, L.color = energy, sx, sy, col
+        o = bpy.data.objects.new(name, L)
+        sc.collection.objects.link(o)
+        o.location = loc
+        o.rotation_euler = (Vector((0, 0, .05)) - Vector(loc)).to_track_quat('-Z', 'Y').to_euler()
+
+
 def main(argv):
     out = argv[argv.index('--out') + 1] if '--out' in argv else os.path.join(ROOT, 'build', 'coins')
     only = argv[argv.index('--only') + 1].split(',') if '--only' in argv else KEYS
@@ -494,7 +642,7 @@ def main(argv):
     for key in only:
         bpy.ops.wm.read_homefile(use_empty=True)
         MAKERS[key]()
-        scene(samples)
+        (studio if key.startswith(('c_', 'd_')) else scene)(samples)
         bpy.context.scene.render.filepath = os.path.join(out, key + '.png')
         bpy.ops.render.render(write_still=True)
         print('COIN', key, flush=True)
