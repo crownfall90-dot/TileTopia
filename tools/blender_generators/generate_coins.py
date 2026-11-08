@@ -1697,7 +1697,75 @@ def blue_star2():
     outline(width=2.4, crease=False)
 
 
-MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare, 'c_main': c_main, 'c_rare': c_rare, 'd_main': d_main, 'd_rare': d_rare, 'e_main': e_main, 'e_rare': e_rare, 'g_line': g_line, 'g_stack': g_stack, 'g_ring': g_ring, 'g_serif': g_serif, 'h_jig': h_jig, 'h_split': h_split, 'h_onest': h_onest, 'h_stamp': h_stamp, 'i_banner': i_banner, 'i_center': i_center, 'i_wide': i_wide, 'j_gem_blue': j_gem_blue, 'j_gem_green': j_gem_green, 'j_gem_violet': j_gem_violet, 'j_meeple_gold': j_meeple_gold, 'j_jigsaw_gold': j_jigsaw_gold, 'k_main': k_main, 'k_rare': k_rare, 'p_main': p_main, 'p_rare': p_rare, 'q_rare': q_rare, 'p2_main': p2_main, 'q2_rare': q2_rare, 'r_main': r_main, 'r_rare': r_rare, 's_main': s_main, 't_main': t_main, 't_rare': t_rare, 'u1_rare': u1_rare, 'u2_rare': u2_rare, 'u3_rare': u3_rare, 'u4_rare': u4_rare, 'v_coin': flat_coin, 'v_star': flat_star, 'w_coin': clay_coin, 'w_star': clay_star, 'x_coin': clay2_coin, 'x_star': neon_star, 'y_coin': y_coin, 'y_star_gold': y_star_gold, 'y_star_violet': y_star_violet, 'z_coin': z_coin, 'z_star_violet': z_star_violet, 'z_star_gold': z_star_gold, 'a_coin': clay_coin2, 'a_star': blue_star2}
+def clay_coin3():
+    """the yellow clay coin without studs; the tiles in the middle are plain matte pieces in close shades (no white spots)"""
+    body = clay('k3Body', '#ee8a0c')
+    rim = clay('k3Rim', '#ffd21c')
+    rimL = clay('k3RimL', '#ffe05a')
+    face = clay('k3Face', '#f6a216')
+    groove = clay('k3Groove', '#c2620a')
+    tA = clay('k3TA', '#ffe27a')
+    tB = clay('k3TB', '#ffcf45')
+    tC = clay('k3TC', '#f0b02a')
+    put(smooth(cyl(1.0, .42, 0), .13), body)
+    put(torus(.86, .15, .2), rim)
+    put(torus(.86, .085, .245), rimL)
+    put(smooth(cyl(.7, .06, .225), .014), face)
+    put(torus(.63, .03, .262), groove)
+    put(torus(.54, .016, .258), groove)
+    z = .27
+    s_, g = .27, .05
+    c = sn = math.sqrt(.5)
+    for (dx, dy, m) in ((-1, -1, tA), (1, -1, tB), (-1, 1, tB), (1, 1, tA)):
+        ox, oy = dx * (s_ / 2 + g / 2), dy * (s_ / 2 + g / 2)
+        pos = (ox * c - oy * sn, ox * sn + oy * c)
+        put(smooth(box(s_, s_, .1, (pos[0], pos[1], z), math.radians(45)), .045), m)
+        put(smooth(box(s_ * .55, s_ * .55, .12, (pos[0], pos[1], z + .006), math.radians(45)), .03), tC)
+    set_cam(58, -90, 2.35, .1)
+    NO_OUTLINE.append(1)
+
+
+def sharp_star():
+    """a grown-up star: no outline, slim and sharp, satin enamel in blues, crisp facets, a thin pale rim and a cut stone"""
+    def enamel(name, hexcol, rough=.5, metallic=.0):
+        m = bpy.data.materials.new(name)
+        b = next(n for n in m.node_tree.nodes if n.type == 'BSDF_PRINCIPLED')
+        h = hexcol.lstrip('#')
+        b.inputs['Base Color'].default_value = (*srgb(tuple(int(h[i:i + 2], 16) / 255 for i in (0, 2, 4))), 1)
+        b.inputs['Metallic'].default_value = metallic
+        b.inputs['Roughness'].default_value = rough
+        return m
+    body = enamel('sBody', '#1b3fae', .55, .3)
+    face = enamel('sFace', '#3f7bf0', .5, .25)
+    rimm = enamel('sRim', '#cfdcff', .45, .5)
+    core = enamel('sCore', '#eef3ff', .55, .15)
+    gem = enamel('sGem', '#ffc93a', .35, .6)
+    NO_OUTLINE.append(1)
+    put(smooth(star_mesh(1.0, .46, .26, 0), .035), body)
+    r = facet_star(.97, .45, .05, .13)                     # a thin pale rim just under the edge
+    put(r, rimm)
+    f = facet_star(.86, .38, .15, .15)                     # the face: five sharp planes
+    put(f, face)
+    c = facet_star(.4, .17, .1, .27)                       # a pale core star
+    put(c, core)
+    for o in (r, f, c):
+        for p_ in o.data.polygons:
+            p_.use_smooth = False
+    g = gem_mesh(8, .1, .06, .05, .09, math.radians(22.5))
+    g.location = (0, 0, .39)
+    put(g, gem)
+    set_cam(60, -90, 2.4, .08)
+
+
+def aa_coin():
+    clay_coin3()
+
+
+def aa_star():
+    sharp_star()
+
+
+MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare, 'c_main': c_main, 'c_rare': c_rare, 'd_main': d_main, 'd_rare': d_rare, 'e_main': e_main, 'e_rare': e_rare, 'g_line': g_line, 'g_stack': g_stack, 'g_ring': g_ring, 'g_serif': g_serif, 'h_jig': h_jig, 'h_split': h_split, 'h_onest': h_onest, 'h_stamp': h_stamp, 'i_banner': i_banner, 'i_center': i_center, 'i_wide': i_wide, 'j_gem_blue': j_gem_blue, 'j_gem_green': j_gem_green, 'j_gem_violet': j_gem_violet, 'j_meeple_gold': j_meeple_gold, 'j_jigsaw_gold': j_jigsaw_gold, 'k_main': k_main, 'k_rare': k_rare, 'p_main': p_main, 'p_rare': p_rare, 'q_rare': q_rare, 'p2_main': p2_main, 'q2_rare': q2_rare, 'r_main': r_main, 'r_rare': r_rare, 's_main': s_main, 't_main': t_main, 't_rare': t_rare, 'u1_rare': u1_rare, 'u2_rare': u2_rare, 'u3_rare': u3_rare, 'u4_rare': u4_rare, 'v_coin': flat_coin, 'v_star': flat_star, 'w_coin': clay_coin, 'w_star': clay_star, 'x_coin': clay2_coin, 'x_star': neon_star, 'y_coin': y_coin, 'y_star_gold': y_star_gold, 'y_star_violet': y_star_violet, 'z_coin': z_coin, 'z_star_violet': z_star_violet, 'z_star_gold': z_star_gold, 'a_coin': clay_coin2, 'a_star': blue_star2, 'aa_coin': aa_coin, 'aa_star': aa_star}
 
 
 def scene(samples, size=512):
@@ -1767,7 +1835,7 @@ def main(argv):
         MATTE.clear()
         NO_OUTLINE.clear()
         MAKERS[key]()
-        (studio if key.startswith(('c_', 'd_', 'e_', 'f_', 'g_', 'h_', 'i_', 'j_', 'q_', 'p2_', 'q2_', 'r_', 's_', 't_', 'u', 'v_', 'w_', 'x_', 'y_', 'z_', 'a_')) and not key.startswith(('j_gem', 'k_', 'p_', 'q_', 'p2_', 'q2_', 'r_', 's_', 't_', 'u', 'v_', 'w_', 'x_', 'y_', 'z_', 'a_')) else scene)(samples)
+        (studio if key.startswith(('c_', 'd_', 'e_', 'f_', 'g_', 'h_', 'i_', 'j_', 'q_', 'p2_', 'q2_', 'r_', 's_', 't_', 'u', 'v_', 'w_', 'x_', 'y_', 'z_', 'a_', 'aa_')) and not key.startswith(('j_gem', 'k_', 'p_', 'q_', 'p2_', 'q2_', 'r_', 's_', 't_', 'u', 'v_', 'w_', 'x_', 'y_', 'z_', 'a_', 'aa_')) else scene)(samples)
         if CAM:
             apply_cam(*CAM[0])
         if key.startswith('z_'):
