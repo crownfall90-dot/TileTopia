@@ -1009,7 +1009,12 @@ def j_jigsaw_gold():
     set_cam(48, -90, 2.4, .1)
 
 
+OUTLINE = []  # (colour, width) set by a variant to replace the default brown line
+
+
 def outline(color=(.22, .08, .0), width=3.2, crease=True):
+    if OUTLINE:
+        color, width = OUTLINE[0]
     """the dark brown contour line that Supercell art has round every shape (Freestyle)"""
     sc = bpy.context.scene
     sc.render.use_freestyle = True
@@ -1279,7 +1284,59 @@ def r_rare():
     outline(width=2.6, crease=False)
 
 
-MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare, 'c_main': c_main, 'c_rare': c_rare, 'd_main': d_main, 'd_rare': d_rare, 'e_main': e_main, 'e_rare': e_rare, 'g_line': g_line, 'g_stack': g_stack, 'g_ring': g_ring, 'g_serif': g_serif, 'h_jig': h_jig, 'h_split': h_split, 'h_onest': h_onest, 'h_stamp': h_stamp, 'i_banner': i_banner, 'i_center': i_center, 'i_wide': i_wide, 'j_gem_blue': j_gem_blue, 'j_gem_green': j_gem_green, 'j_gem_violet': j_gem_violet, 'j_meeple_gold': j_meeple_gold, 'j_jigsaw_gold': j_jigsaw_gold, 'k_main': k_main, 'k_rare': k_rare, 'p_main': p_main, 'p_rare': p_rare, 'q_rare': q_rare, 'p2_main': p2_main, 'q2_rare': q2_rare, 'r_main': r_main, 'r_rare': r_rare, 's_main': s_main}
+def t_main():
+    """the yellow coin with a deep violet outline (the star's colour) instead of brown"""
+    OUTLINE[:] = [((.12, .05, .38), 2.6)]
+    r_main()
+
+
+def t_rare():
+    OUTLINE[:] = [((.12, .05, .38), 2.4)]
+    r_rare()
+
+
+def star_variant(body_c, face_c, inner_c, gem_c, R_in=.55, bevel=.16, trim_c=None, gem_kind=6):
+    """one rare star: a fat body, a faceted face, a smaller faceted star on it and a cut stone in the middle (optionally a trim step)"""
+    OUTLINE[:] = [((.12, .05, .38), 2.5)]
+    body = toy('vBody', body_c, .6, .1)
+    face = toy('vFace', face_c, .5, .2)
+    inner = toy('vInner', inner_c, .45, .2)
+    gem = toy('vGem', gem_c, .35, .4)
+    put(smooth(star_mesh(1.0, R_in, .4, 0), bevel), body)
+    z = .2
+    if trim_c:
+        put(facet_star(.88, R_in * .78, .1, .2), toy('vTrim', trim_c, .45, .2))
+        z = .27
+    put(facet_star(.76 if trim_c else .8, R_in * .76, .18, z), face)
+    put(facet_star(.42, R_in * .4, .12, z + .17), inner)
+    for o in bpy.context.scene.objects:
+        if o.type == 'MESH' and o.name.startswith('FStar'):
+            for p_ in o.data.polygons:
+                p_.use_smooth = False
+    g = gem_mesh(gem_kind, .13, .08, .06, .1, math.radians(30))
+    g.location = (0, 0, z + .32)
+    put(g, gem)
+    set_cam(62, -90, 2.4, .1)
+    outline(width=2.5, crease=False)
+
+
+def u1_rare():
+    star_variant('#1f4fd8', '#4d8bff', '#ffffff', '#ffc928', .6, .2)
+
+
+def u2_rare():
+    star_variant('#b3157f', '#ff5fbf', '#ffe3f4', '#6a2cff', .45, .12)
+
+
+def u3_rare():
+    star_variant('#0a8f86', '#2fd6c4', '#d8fff8', '#ffd23a', .6, .2)
+
+
+def u4_rare():
+    star_variant('#14246b', '#2e47c4', '#ffd23a', '#c8e6ff', .52, .15, '#ffc928')
+
+
+MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare, 'c_main': c_main, 'c_rare': c_rare, 'd_main': d_main, 'd_rare': d_rare, 'e_main': e_main, 'e_rare': e_rare, 'g_line': g_line, 'g_stack': g_stack, 'g_ring': g_ring, 'g_serif': g_serif, 'h_jig': h_jig, 'h_split': h_split, 'h_onest': h_onest, 'h_stamp': h_stamp, 'i_banner': i_banner, 'i_center': i_center, 'i_wide': i_wide, 'j_gem_blue': j_gem_blue, 'j_gem_green': j_gem_green, 'j_gem_violet': j_gem_violet, 'j_meeple_gold': j_meeple_gold, 'j_jigsaw_gold': j_jigsaw_gold, 'k_main': k_main, 'k_rare': k_rare, 'p_main': p_main, 'p_rare': p_rare, 'q_rare': q_rare, 'p2_main': p2_main, 'q2_rare': q2_rare, 'r_main': r_main, 'r_rare': r_rare, 's_main': s_main, 't_main': t_main, 't_rare': t_rare, 'u1_rare': u1_rare, 'u2_rare': u2_rare, 'u3_rare': u3_rare, 'u4_rare': u4_rare}
 
 
 def scene(samples, size=512):
@@ -1344,8 +1401,9 @@ def main(argv):
     for key in only:
         bpy.ops.wm.read_homefile(use_empty=True)
         CAM.clear()
+        OUTLINE.clear()
         MAKERS[key]()
-        (studio if key.startswith(('c_', 'd_', 'e_', 'f_', 'g_', 'h_', 'i_', 'j_', 'q_', 'p2_', 'q2_', 'r_', 's_')) and not key.startswith(('j_gem', 'k_', 'p_', 'q_', 'p2_', 'q2_', 'r_', 's_')) else scene)(samples)
+        (studio if key.startswith(('c_', 'd_', 'e_', 'f_', 'g_', 'h_', 'i_', 'j_', 'q_', 'p2_', 'q2_', 'r_', 's_', 't_', 'u')) and not key.startswith(('j_gem', 'k_', 'p_', 'q_', 'p2_', 'q2_', 'r_', 's_', 't_', 'u')) else scene)(samples)
         if CAM:
             apply_cam(*CAM[0])
         bpy.context.scene.render.filepath = os.path.join(out, key + '.png')
