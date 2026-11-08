@@ -1207,7 +1207,79 @@ def q2_rare():
     outline(width=2.4, crease=False)
 
 
-MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare, 'c_main': c_main, 'c_rare': c_rare, 'd_main': d_main, 'd_rare': d_rare, 'e_main': e_main, 'e_rare': e_rare, 'g_line': g_line, 'g_stack': g_stack, 'g_ring': g_ring, 'g_serif': g_serif, 'h_jig': h_jig, 'h_split': h_split, 'h_onest': h_onest, 'h_stamp': h_stamp, 'i_banner': i_banner, 'i_center': i_center, 'i_wide': i_wide, 'j_gem_blue': j_gem_blue, 'j_gem_green': j_gem_green, 'j_gem_violet': j_gem_violet, 'j_meeple_gold': j_meeple_gold, 'j_jigsaw_gold': j_jigsaw_gold, 'k_main': k_main, 'k_rare': k_rare, 'p_main': p_main, 'p_rare': p_rare, 'q_rare': q_rare, 'p2_main': p2_main, 'q2_rare': q2_rare}
+def r_main():
+    """the gold coin, no glints: painted-looking matte colour with strong light/dark steps and a deep, clean outline"""
+    body = toy('nBody', '#b85a06', .6, .1)
+    rim = toy('nRim', '#ffc928', .5, .15)
+    rim2 = toy('nRim2', '#ffe27a', .5, .15)
+    face = toy('nFace', '#f08c0a', .6, .1)
+    groove = toy('nGroove', '#a5520a', .7, 0.0)
+    warm = toy('nWarm', '#ffbf2e', .5, .15)
+    light = toy('nLight', '#fff2a6', .45, .2)
+    put(smooth(cyl(1.0, .4, 0), .12), body)
+    put(torus(.85, .15, .19), rim)
+    put(torus(.85, .09, .23), rim2)
+    put(smooth(cyl(.72, .06, .21), .012), face)
+    put(torus(.6, .022, .245), groove)
+    z = .25
+    s_, g = .29, .055
+    c = sn = math.sqrt(.5)
+    for (dx, dy, m) in ((-1, -1, light), (1, -1, warm), (-1, 1, warm), (1, 1, light)):
+        ox, oy = dx * (s_ / 2 + g / 2), dy * (s_ / 2 + g / 2)
+        pos = (ox * c - oy * sn, ox * sn + oy * c)
+        put(smooth(box(s_, s_, .11, (pos[0], pos[1], z), math.radians(45)), .045), m)
+        put(smooth(box(s_ * .5, s_ * .5, .12, (pos[0], pos[1], z + .006), math.radians(45)), .03), warm if m is light else light)
+    set_cam(58, -90, 2.35, .1)
+    outline(width=3.2)
+
+
+def s_main():
+    """the main coin in the star's violet palette, no glints: painted-looking matte colour with strong light/dark steps and a deep, clean outline"""
+    body = toy('nBody', '#3b1c9c', .6, .1)
+    rim = toy('nRim', '#8a63f5', .5, .15)
+    rim2 = toy('nRim2', '#b79bff', .5, .15)
+    face = toy('nFace', '#5b3bd6', .6, .1)
+    groove = toy('nGroove', '#241072', .7, 0.0)
+    warm = toy('nWarm', '#ffd23a', .5, .15)
+    light = toy('nLight', '#fff0a0', .45, .2)
+    put(smooth(cyl(1.0, .4, 0), .12), body)
+    put(torus(.85, .15, .19), rim)
+    put(torus(.85, .09, .23), rim2)
+    put(smooth(cyl(.72, .06, .21), .012), face)
+    put(torus(.6, .022, .245), groove)
+    z = .25
+    s_, g = .29, .055
+    c = sn = math.sqrt(.5)
+    for (dx, dy, m) in ((-1, -1, light), (1, -1, warm), (-1, 1, warm), (1, 1, light)):
+        ox, oy = dx * (s_ / 2 + g / 2), dy * (s_ / 2 + g / 2)
+        pos = (ox * c - oy * sn, ox * sn + oy * c)
+        put(smooth(box(s_, s_, .11, (pos[0], pos[1], z), math.radians(45)), .045), m)
+        put(smooth(box(s_ * .5, s_ * .5, .12, (pos[0], pos[1], z + .006), math.radians(45)), .03), warm if m is light else light)
+    set_cam(58, -90, 2.35, .1)
+    outline(width=3.2)
+
+
+def r_rare():
+    """the rare star, no glints: three clear steps (body, faceted face, golden star) and a faceted gem"""
+    body = toy('tBody', '#3b1c9c', .6, .1)
+    face = toy('tFace', '#8a63f5', .5, .2)
+    inner = toy('tInner', '#ffd23a', .45, .2)
+    gem = toy('tGem', '#ff4fa8', .35, .4)
+    put(smooth(star_mesh(1.0, .55, .4, 0), .16), body)
+    put(facet_star(.8, .42, .18, .2), face)
+    put(facet_star(.44, .22, .12, .37), inner)
+    for o in bpy.context.scene.objects:
+        if o.type == 'MESH' and o.name.startswith('FStar'):
+            for p_ in o.data.polygons:
+                p_.use_smooth = False
+    g = gem_mesh(6, .13, .08, .06, .1, math.radians(30))
+    g.location = (0, 0, .52)
+    put(g, gem)
+    set_cam(62, -90, 2.4, .1)
+    outline(width=2.6, crease=False)
+
+
+MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare, 'c_main': c_main, 'c_rare': c_rare, 'd_main': d_main, 'd_rare': d_rare, 'e_main': e_main, 'e_rare': e_rare, 'g_line': g_line, 'g_stack': g_stack, 'g_ring': g_ring, 'g_serif': g_serif, 'h_jig': h_jig, 'h_split': h_split, 'h_onest': h_onest, 'h_stamp': h_stamp, 'i_banner': i_banner, 'i_center': i_center, 'i_wide': i_wide, 'j_gem_blue': j_gem_blue, 'j_gem_green': j_gem_green, 'j_gem_violet': j_gem_violet, 'j_meeple_gold': j_meeple_gold, 'j_jigsaw_gold': j_jigsaw_gold, 'k_main': k_main, 'k_rare': k_rare, 'p_main': p_main, 'p_rare': p_rare, 'q_rare': q_rare, 'p2_main': p2_main, 'q2_rare': q2_rare, 'r_main': r_main, 'r_rare': r_rare, 's_main': s_main}
 
 
 def scene(samples, size=512):
@@ -1273,7 +1345,7 @@ def main(argv):
         bpy.ops.wm.read_homefile(use_empty=True)
         CAM.clear()
         MAKERS[key]()
-        (studio if key.startswith(('c_', 'd_', 'e_', 'f_', 'g_', 'h_', 'i_', 'j_', 'q_', 'p2_', 'q2_')) and not key.startswith(('j_gem', 'k_', 'p_', 'q_', 'p2_', 'q2_')) else scene)(samples)
+        (studio if key.startswith(('c_', 'd_', 'e_', 'f_', 'g_', 'h_', 'i_', 'j_', 'q_', 'p2_', 'q2_', 'r_', 's_')) and not key.startswith(('j_gem', 'k_', 'p_', 'q_', 'p2_', 'q2_', 'r_', 's_')) else scene)(samples)
         if CAM:
             apply_cam(*CAM[0])
         bpy.context.scene.render.filepath = os.path.join(out, key + '.png')
