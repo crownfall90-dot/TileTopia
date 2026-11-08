@@ -1140,7 +1140,74 @@ def q_rare():
     outline(width=2.4, crease=False)
 
 
-MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare, 'c_main': c_main, 'c_rare': c_rare, 'd_main': d_main, 'd_rare': d_rare, 'e_main': e_main, 'e_rare': e_rare, 'g_line': g_line, 'g_stack': g_stack, 'g_ring': g_ring, 'g_serif': g_serif, 'h_jig': h_jig, 'h_split': h_split, 'h_onest': h_onest, 'h_stamp': h_stamp, 'i_banner': i_banner, 'i_center': i_center, 'i_wide': i_wide, 'j_gem_blue': j_gem_blue, 'j_gem_green': j_gem_green, 'j_gem_violet': j_gem_violet, 'j_meeple_gold': j_meeple_gold, 'j_jigsaw_gold': j_jigsaw_gold, 'k_main': k_main, 'k_rare': k_rare, 'p_main': p_main, 'p_rare': p_rare, 'q_rare': q_rare}
+def shine_arc(R, a0, a1, z, width=.028):
+    """the white curved streak painted along the rim of shiny things (outside the outline, like a highlight)"""
+    cu = bpy.data.curves.new('Arc', 'CURVE')
+    cu.dimensions = '3D'
+    cu.bevel_depth = width
+    cu.bevel_resolution = 3
+    sp = cu.splines.new('POLY')
+    n = 18
+    sp.points.add(n)
+    for i in range(n + 1):
+        a = math.radians(a0 + (a1 - a0) * i / n)
+        sp.points[i].co = (math.cos(a) * R, math.sin(a) * R, z, 1)
+    o = bpy.data.objects.new('Arc', cu)
+    col = bpy.data.collections.get('Spark') or bpy.data.collections.new('Spark')
+    if col.name not in bpy.context.scene.collection.children:
+        bpy.context.scene.collection.children.link(col)
+    col.objects.link(o)
+    cu.materials.append(glow('arc', '#ffffff', '#ffffff', 5.0))
+    return o
+
+
+def p2_main():
+    body = toy('mBody', '#cf6f08', .35)
+    rim = toy('mRim', '#ffd23a', .16, 1.0)
+    bead = toy('mBead', '#fff3a8', .12, 1.0)
+    face = toy('mFace', '#f7a823', .45, .5)
+    groove = toy('mGroove', '#c9780f', .5, .2)
+    warm = toy('mWarm', '#ffcf4a', .15, 1.0)
+    light = toy('mLight', '#fff4b0', .12, 1.0)
+    put(smooth(cyl(1.0, .38, 0), .11), body)
+    put(torus(.84, .14, .18), rim)
+    put(smooth(cyl(.74, .05, .2), .01), face)
+    put(torus(.62, .018, .232), groove)
+    z = .24
+    s, g = .27, .05
+    c = sn = math.sqrt(.5)
+    for (dx, dy, m) in ((-1, -1, light), (1, -1, warm), (-1, 1, warm), (1, 1, light)):
+        ox, oy = dx * (s / 2 + g / 2), dy * (s / 2 + g / 2)
+        pos = (ox * c - oy * sn, ox * sn + oy * c)
+        put(smooth(box(s, s, .1, (pos[0], pos[1], z), math.radians(45)), .04), m)
+        put(smooth(box(s * .5, s * .5, .11, (pos[0], pos[1], z + .006), math.radians(45)), .025), warm if m is light else light)
+    shine_arc(.8, 125, 170, .385, .022)
+    sparkle((-.5, .4, .36), .15, None)
+    set_cam(58, -90, 2.35, .1)
+    outline(width=3.0)
+
+
+def q2_rare():
+    body = toy('sBody', '#4a24b8', .35)
+    face = toy('sFace', '#8a63f5', .3, .8)
+    inner = toy('sInner', '#ffd84a', .14, 1.0)
+    gem = toy('sGem', '#ff4fa8', .08, 1.0)
+    put(smooth(star_mesh(1.0, .54, .38, 0), .14), body)
+    put(smooth(facet_star(.78, .4, .17, .19), .0), face)
+    put(smooth(facet_star(.4, .2, .11, .34), .0), inner)
+    for o in bpy.context.scene.objects:
+        if o.type == 'MESH' and o.name.startswith('FStar'):
+            for p_ in o.data.polygons:
+                p_.use_smooth = False
+    bpy.ops.mesh.primitive_uv_sphere_add(segments=32, ring_count=16, radius=.12, location=(0, 0, .46))
+    put(smooth(bpy.context.object), gem)
+    shine_arc(.92, 112, 150, .39, .024)
+    sparkle((-.42, .5, .5), .15, None)
+    set_cam(62, -90, 2.4, .1)
+    outline(width=2.4, crease=False)
+
+
+MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare, 'c_main': c_main, 'c_rare': c_rare, 'd_main': d_main, 'd_rare': d_rare, 'e_main': e_main, 'e_rare': e_rare, 'g_line': g_line, 'g_stack': g_stack, 'g_ring': g_ring, 'g_serif': g_serif, 'h_jig': h_jig, 'h_split': h_split, 'h_onest': h_onest, 'h_stamp': h_stamp, 'i_banner': i_banner, 'i_center': i_center, 'i_wide': i_wide, 'j_gem_blue': j_gem_blue, 'j_gem_green': j_gem_green, 'j_gem_violet': j_gem_violet, 'j_meeple_gold': j_meeple_gold, 'j_jigsaw_gold': j_jigsaw_gold, 'k_main': k_main, 'k_rare': k_rare, 'p_main': p_main, 'p_rare': p_rare, 'q_rare': q_rare, 'p2_main': p2_main, 'q2_rare': q2_rare}
 
 
 def scene(samples, size=512):
@@ -1206,7 +1273,7 @@ def main(argv):
         bpy.ops.wm.read_homefile(use_empty=True)
         CAM.clear()
         MAKERS[key]()
-        (studio if key.startswith(('c_', 'd_', 'e_', 'f_', 'g_', 'h_', 'i_', 'j_', 'q_')) and not key.startswith(('j_gem', 'k_', 'p_', 'q_')) else scene)(samples)
+        (studio if key.startswith(('c_', 'd_', 'e_', 'f_', 'g_', 'h_', 'i_', 'j_', 'q_', 'p2_', 'q2_')) and not key.startswith(('j_gem', 'k_', 'p_', 'q_', 'p2_', 'q2_')) else scene)(samples)
         if CAM:
             apply_cam(*CAM[0])
         bpy.context.scene.render.filepath = os.path.join(out, key + '.png')
