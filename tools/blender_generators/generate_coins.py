@@ -833,7 +833,51 @@ def h_stamp():
     engrave(f, [t, bar])
 
 
-MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare, 'c_main': c_main, 'c_rare': c_rare, 'd_main': d_main, 'd_rare': d_rare, 'e_main': e_main, 'e_rare': e_rare, 'g_line': g_line, 'g_stack': g_stack, 'g_ring': g_ring, 'g_serif': g_serif, 'h_jig': h_jig, 'h_split': h_split, 'h_onest': h_onest, 'h_stamp': h_stamp}
+def round_bar(w, h, x, y):
+    """the banner's underline: a short bar with round ends, as three cutters (the middle and two caps)"""
+    objs = [cutbar(max(w - h, .001), h, (x, y))]
+    for sx in (-1, 1):
+        bpy.ops.mesh.primitive_cylinder_add(vertices=32, radius=h / 2, depth=.12, location=(0, 0, 0))
+        c = bpy.context.object
+        c.location = (x + sx * (w - h) / 2, y, .105)
+        c.data.materials.append(dark())
+        objs.append(c)
+    return objs
+
+
+def i_logo(variant):
+    """the name the way the project banner sets it: Unbounded ExtraBold, mixed case, a short round underline"""
+    f = g_base()
+    size = .34
+    t = text('Tiletopia', 'unbounded-800-latin.ttf', size, .045, dark(), .12, (0, .08))
+    bpy.context.view_layer.update()
+    w = t.dimensions.x
+    parts = [t]
+    y = -.15
+    if variant == 'banner':
+        parts += round_bar(.34, .05, -w / 2 + .17, y)          # starts under the first letter, as on the banner
+    elif variant == 'center':
+        parts += round_bar(.34, .05, 0, y)
+    else:
+        parts += round_bar(w, .05, 0, y)                        # the line as wide as the name
+        for dx in (-.16, 0, .16):
+            parts.append(cutbar(.07, .07, (dx, y - .16), math.radians(45)))
+    engrave(f, parts)
+
+
+def i_banner():
+    i_logo('banner')
+
+
+def i_center():
+    i_logo('center')
+
+
+def i_wide():
+    i_logo('wide')
+
+
+MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare, 'c_main': c_main, 'c_rare': c_rare, 'd_main': d_main, 'd_rare': d_rare, 'e_main': e_main, 'e_rare': e_rare, 'g_line': g_line, 'g_stack': g_stack, 'g_ring': g_ring, 'g_serif': g_serif, 'h_jig': h_jig, 'h_split': h_split, 'h_onest': h_onest, 'h_stamp': h_stamp, 'i_banner': i_banner, 'i_center': i_center, 'i_wide': i_wide}
 
 
 def scene(samples, size=512):
@@ -898,7 +942,7 @@ def main(argv):
     for key in only:
         bpy.ops.wm.read_homefile(use_empty=True)
         MAKERS[key]()
-        (studio if key.startswith(('c_', 'd_', 'e_', 'f_', 'g_', 'h_')) else scene)(samples)
+        (studio if key.startswith(('c_', 'd_', 'e_', 'f_', 'g_', 'h_', 'i_')) else scene)(samples)
         bpy.context.scene.render.filepath = os.path.join(out, key + '.png')
         bpy.ops.render.render(write_still=True)
         print('COIN', key, flush=True)
