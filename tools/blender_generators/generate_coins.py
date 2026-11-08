@@ -792,7 +792,48 @@ def g_serif():
     engrave(f, parts)
 
 
-MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare, 'c_main': c_main, 'c_rare': c_rare, 'd_main': d_main, 'd_rare': d_rare, 'e_main': e_main, 'e_rare': e_rare, 'g_line': g_line, 'g_stack': g_stack, 'g_ring': g_ring, 'g_serif': g_serif}
+def arc_letters(txt, font, size, R, center, m, inward=False):
+    """letters measured one by one and set on a circle: along the top (reads left to right) or along the bottom (inward)"""
+    objs = [text(ch, font, size, .045, m, .12) for ch in txt]
+    bpy.context.view_layer.update()
+    gap = size * .22
+    ws = [o.dimensions.x for o in objs]
+    total = sum(ws) + gap * (len(ws) - 1)
+    pos = -total / 2
+    for o, w in zip(objs, ws):
+        mid = pos + w / 2
+        pos += w + gap
+        a = math.radians(center) + (mid / R if inward else -mid / R)
+        o.location.x, o.location.y = math.cos(a) * R, math.sin(a) * R
+        o.rotation_euler = (0, 0, a + math.pi / 2 if inward else a - math.pi / 2)
+    return objs
+
+
+def h_jig():
+    f = g_base()
+    engrave(f, arc_letters('TILETOPIA', 'unbounded-800-latin.ttf', .15, .6, 90, dark()) + [jigsaw(.5, .12, .105, dark(), 10)])
+
+
+def h_split():
+    f = g_base()
+    parts = arc_letters('TILE', 'unbounded-800-latin.ttf', .2, .58, 90, dark()) + arc_letters('TOPIA', 'unbounded-800-latin.ttf', .2, .58, 270, dark(), True)
+    engrave(f, parts + [jigsaw(.36, .12, .105, dark(), 10)])
+
+
+def h_onest():
+    f = g_base()
+    engrave(f, [text('Tiletopia', 'onest-700-latin.ttf', .3, .045, dark(), .12), cutbar(.95, .016, (0, .24)), cutbar(.95, .016, (0, -.22)), cutbar(.07, .07, (-.5, -.22), math.radians(45)), cutbar(.07, .07, (.5, -.22), math.radians(45))])
+
+
+def h_stamp():
+    f = g_base()
+    m = dark()
+    t = text('TILETOPIA', 'unbounded-800-latin.ttf', .27, .045, m, .12, (0, .06), 10)
+    bar = cutbar(1.0, .03, (0, -.2), math.radians(10))
+    engrave(f, [t, bar])
+
+
+MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare, 'c_main': c_main, 'c_rare': c_rare, 'd_main': d_main, 'd_rare': d_rare, 'e_main': e_main, 'e_rare': e_rare, 'g_line': g_line, 'g_stack': g_stack, 'g_ring': g_ring, 'g_serif': g_serif, 'h_jig': h_jig, 'h_split': h_split, 'h_onest': h_onest, 'h_stamp': h_stamp}
 
 
 def scene(samples, size=512):
@@ -857,7 +898,7 @@ def main(argv):
     for key in only:
         bpy.ops.wm.read_homefile(use_empty=True)
         MAKERS[key]()
-        (studio if key.startswith(('c_', 'd_', 'e_', 'f_', 'g_')) else scene)(samples)
+        (studio if key.startswith(('c_', 'd_', 'e_', 'f_', 'g_', 'h_')) else scene)(samples)
         bpy.context.scene.render.filepath = os.path.join(out, key + '.png')
         bpy.ops.render.render(write_still=True)
         print('COIN', key, flush=True)
