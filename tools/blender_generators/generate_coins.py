@@ -1510,7 +1510,41 @@ def neon_star():
     GLOW.append(1)
 
 
-MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare, 'c_main': c_main, 'c_rare': c_rare, 'd_main': d_main, 'd_rare': d_rare, 'e_main': e_main, 'e_rare': e_rare, 'g_line': g_line, 'g_stack': g_stack, 'g_ring': g_ring, 'g_serif': g_serif, 'h_jig': h_jig, 'h_split': h_split, 'h_onest': h_onest, 'h_stamp': h_stamp, 'i_banner': i_banner, 'i_center': i_center, 'i_wide': i_wide, 'j_gem_blue': j_gem_blue, 'j_gem_green': j_gem_green, 'j_gem_violet': j_gem_violet, 'j_meeple_gold': j_meeple_gold, 'j_jigsaw_gold': j_jigsaw_gold, 'k_main': k_main, 'k_rare': k_rare, 'p_main': p_main, 'p_rare': p_rare, 'q_rare': q_rare, 'p2_main': p2_main, 'q2_rare': q2_rare, 'r_main': r_main, 'r_rare': r_rare, 's_main': s_main, 't_main': t_main, 't_rare': t_rare, 'u1_rare': u1_rare, 'u2_rare': u2_rare, 'u3_rare': u3_rare, 'u4_rare': u4_rare, 'v_coin': flat_coin, 'v_star': flat_star, 'w_coin': clay_coin, 'w_star': clay_star, 'x_coin': clay2_coin, 'x_star': neon_star}
+def mini_coin(accent='#f2b84b'):
+    """dark and simple: a matte charcoal disc, one thin accent ring, one accent tile (the diamond) in the middle"""
+    body = metal('mcBody', '#16182a', .8, .15)
+    face = metal('mcFace', '#1d2036', .85, .1)
+    ring = metal('mcRing', accent, .45, .9)
+    tile = metal('mcTile', accent, .4, .9)
+    put(smooth(cyl(1.0, .3, 0), .08), body)
+    put(smooth(cyl(.86, .04, .16), .008), face)
+    put(torus(.86, .028, .18), ring)
+    put(smooth(box(.5, .5, .08, (0, 0, .2), math.radians(45)), .03), tile)
+    set_cam(60, -90, 2.35, .08)
+
+
+def mini_star(glow_c='#ffc84a', glow_s=7.0):
+    """dark and simple: a matte charcoal star with one thin glowing edge"""
+    body = metal('msBody', '#0f1122', 1.0, .1)
+    put(smooth(star_mesh(1.0, .52, .3, 0), .1), body)
+    tube(star_pts(.97, .5, .155), glow_c, glow_s, .02)
+    set_cam(62, -90, 2.4, .08)
+    GLOW.append(1)
+
+
+def y_coin():
+    mini_coin()
+
+
+def y_star_gold():
+    mini_star('#ff9d00', 2.6)
+
+
+def y_star_violet():
+    mini_star('#7a4dff', 3.2)
+
+
+MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare, 'b1_main': b1_main, 'b1_rare': b1_rare, 'c_main': c_main, 'c_rare': c_rare, 'd_main': d_main, 'd_rare': d_rare, 'e_main': e_main, 'e_rare': e_rare, 'g_line': g_line, 'g_stack': g_stack, 'g_ring': g_ring, 'g_serif': g_serif, 'h_jig': h_jig, 'h_split': h_split, 'h_onest': h_onest, 'h_stamp': h_stamp, 'i_banner': i_banner, 'i_center': i_center, 'i_wide': i_wide, 'j_gem_blue': j_gem_blue, 'j_gem_green': j_gem_green, 'j_gem_violet': j_gem_violet, 'j_meeple_gold': j_meeple_gold, 'j_jigsaw_gold': j_jigsaw_gold, 'k_main': k_main, 'k_rare': k_rare, 'p_main': p_main, 'p_rare': p_rare, 'q_rare': q_rare, 'p2_main': p2_main, 'q2_rare': q2_rare, 'r_main': r_main, 'r_rare': r_rare, 's_main': s_main, 't_main': t_main, 't_rare': t_rare, 'u1_rare': u1_rare, 'u2_rare': u2_rare, 'u3_rare': u3_rare, 'u4_rare': u4_rare, 'v_coin': flat_coin, 'v_star': flat_star, 'w_coin': clay_coin, 'w_star': clay_star, 'x_coin': clay2_coin, 'x_star': neon_star, 'y_coin': y_coin, 'y_star_gold': y_star_gold, 'y_star_violet': y_star_violet}
 
 
 def scene(samples, size=512):
@@ -1580,7 +1614,7 @@ def main(argv):
         MATTE.clear()
         NO_OUTLINE.clear()
         MAKERS[key]()
-        (studio if key.startswith(('c_', 'd_', 'e_', 'f_', 'g_', 'h_', 'i_', 'j_', 'q_', 'p2_', 'q2_', 'r_', 's_', 't_', 'u', 'v_', 'w_', 'x_')) and not key.startswith(('j_gem', 'k_', 'p_', 'q_', 'p2_', 'q2_', 'r_', 's_', 't_', 'u', 'v_', 'w_', 'x_')) else scene)(samples)
+        (studio if key.startswith(('c_', 'd_', 'e_', 'f_', 'g_', 'h_', 'i_', 'j_', 'q_', 'p2_', 'q2_', 'r_', 's_', 't_', 'u', 'v_', 'w_', 'x_', 'y_')) and not key.startswith(('j_gem', 'k_', 'p_', 'q_', 'p2_', 'q2_', 'r_', 's_', 't_', 'u', 'v_', 'w_', 'x_', 'y_')) else scene)(samples)
         if CAM:
             apply_cam(*CAM[0])
         bpy.context.scene.render.filepath = os.path.join(out, key + '.png')
