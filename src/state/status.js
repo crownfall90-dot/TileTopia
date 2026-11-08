@@ -28,7 +28,7 @@ export const SHOP_STATUSES = [
   {id: 'builderhero', text: 'Строю как могу', price: 1000},
   {id: 'genius', text: 'Случайный гений', price: 1100},
   {id: 'bushlord', text: 'Барон кустов', price: 1200},
-  // rare statuses: silver and gold
+  // rare statuses: paid in stars
   {id: 'tilelord', text: 'Владыка плиток', price: 1800},
   {id: 'legend', text: 'Живая легенда', price: 2500},
   {id: 'crowned', text: 'Коронованный', price: 3500},

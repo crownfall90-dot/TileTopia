@@ -1265,17 +1265,6 @@ html.tutoring #mrow .skip{display:none}
 
 .linkbtn{border:0;background:none;color:var(--muted);font:inherit;text-decoration:underline;cursor:pointer;padding:4px}
 
-/* Coins: Copper (default / base), Silver (rare), Gold (legendary) */
-.coin, .coin.copper{display:inline-block;width:17px;height:17px;border-radius:50%;background:radial-gradient(circle at 34% 26%,#ffd3b6 0%,#e58e26 30%,#c0392b 68%,#5d170c 100%);box-shadow:0 2px 6px rgba(0,0,0,.45),inset 0 1px 1.5px rgba(255,230,210,.85),inset 0 -1.5px 2px rgba(60,20,10,.8),inset 0 0 0 1.2px rgba(195,80,45,.9);position:relative;flex:0 0 auto;vertical-align:-2.5px;transition:transform .15s}
-.coin::before, .coin.copper::before{content:"";position:absolute;inset:2.5px;border-radius:50%;border:1px dashed rgba(255,220,180,.65);box-shadow:inset 0 0 2px rgba(90,25,10,.45)}
-.coin:hover{transform:scale(1.1) rotate(6deg)}
-
-.coin.silver{background:radial-gradient(circle at 34% 26%,#ffffff 0%,#e0e6ed 30%,#95a5a6 68%,#34495e 100%);box-shadow:0 2px 6px rgba(0,0,0,.45),inset 0 1px 1.5px rgba(255,255,255,.9),inset 0 -1.5px 2px rgba(30,40,55,.8),inset 0 0 0 1.2px rgba(180,195,210,.9)}
-.coin.silver::before{border-color:rgba(255,255,255,.7);box-shadow:inset 0 0 2px rgba(40,50,65,.45)}
-
-.coin.gold{background:radial-gradient(circle at 34% 26%,#fffceb 0%,#ffe169 30%,#f09d18 68%,#8f4e02 100%);box-shadow:0 2px 6px rgba(0,0,0,.45),inset 0 1px 1.5px rgba(255,255,255,.85),inset 0 -1.5px 2px rgba(80,35,0,.7),inset 0 0 0 1.2px rgba(230,165,30,.9)}
-.coin.gold::before{border-color:rgba(255,248,190,.65);box-shadow:inset 0 0 2px rgba(130,65,0,.45)}
-
 .goldchip{position:absolute;top:10px;right:14px;display:flex;align-items:center;gap:7px;padding:6px 12px 6px 8px;border-radius:999px;background:var(--glass);border:1px solid var(--line);cursor:pointer;z-index:2}
 
 .goldchip b{font:800 14px var(--f-display);font-variant-numeric:tabular-nums}
@@ -5929,68 +5918,7 @@ html body #btnMenuNotif .nb-icon svg {
   color: #d1b490;
 }
 
-/* Volumetric 2D Game Currency Coins: Consistent Stylized Icons (Copper, Silver, Gold) */
-.coin, .coin.copper {
-  display: inline-block;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%20width%3D%2264%22%20height%3D%2264%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3Cfilter%20id%3D%22c-shadow%22%20x%3D%22-20%25%22%20y%3D%22-20%25%22%20width%3D%22140%25%22%20height%3D%22140%25%22%3E%0A%20%20%20%20%20%20%3CfeDropShadow%20dx%3D%220%22%20dy%3D%223%22%20stdDeviation%3D%222.5%22%20flood-color%3D%22%23000000%22%20flood-opacity%3D%220.45%22/%3E%0A%20%20%20%20%3C/filter%3E%0A%20%20%20%20%3C%21--%20Outer%20edge%203D%20thickness%20--%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22c-edge%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%238a3418%22/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%233d1408%22/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%3C%21--%20Face%20bevel%20gradient%20--%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22c-rim%22%20x1%3D%220.2%22%20y1%3D%220.1%22%20x2%3D%220.8%22%20y2%3D%220.9%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23ffb188%22/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%2240%25%22%20stop-color%3D%22%23d46132%22/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%235a1e0c%22/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%3C%21--%20Inner%20field%20recessed%20gradient%20--%3E%0A%20%20%20%20%3CradialGradient%20id%3D%22c-field%22%20cx%3D%2238%25%22%20cy%3D%2232%25%22%20r%3D%2265%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23e87742%22/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%2255%25%22%20stop-color%3D%22%23b64920%22/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23641f0b%22/%3E%0A%20%20%20%20%3C/radialGradient%3E%0A%20%20%20%20%3C%21--%20Emboss%20highlight/shadow%20--%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22c-emboss%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23ffd5be%22/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%234a1507%22/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22c-glare%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23ffffff%22%20stop-opacity%3D%220.4%22/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%2245%25%22%20stop-color%3D%22%23ffffff%22%20stop-opacity%3D%220.0%22/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%0A%20%20%3C%21--%203D%20Coin%20Edge%20/%20Base%20--%3E%0A%20%20%3Cg%20filter%3D%22url%28%23c-shadow%29%22%3E%0A%20%20%20%20%3C%21--%20Bottom%203D%20thickness%20lip%20--%3E%0A%20%20%20%20%3Cellipse%20cx%3D%2232%22%20cy%3D%2234%22%20rx%3D%2227%22%20ry%3D%2227%22%20fill%3D%22url%28%23c-edge%29%22/%3E%0A%20%20%20%20%3C%21--%20Main%20coin%20face%20--%3E%0A%20%20%20%20%3Ccircle%20cx%3D%2232%22%20cy%3D%2231%22%20r%3D%2227%22%20fill%3D%22url%28%23c-rim%29%22/%3E%0A%20%20%20%20%3C%21--%20Outer%20rim%20inner%20shadow%20--%3E%0A%20%20%20%20%3Ccircle%20cx%3D%2232%22%20cy%3D%2231%22%20r%3D%2224.5%22%20fill%3D%22%23521909%22/%3E%0A%20%20%20%20%3C%21--%20Recessed%20coin%20field%20--%3E%0A%20%20%20%20%3Ccircle%20cx%3D%2232%22%20cy%3D%2231%22%20r%3D%2223%22%20fill%3D%22url%28%23c-field%29%22/%3E%0A%20%20%20%20%3C%21--%20Beaded%20/%20dashed%20milled%20ring%20--%3E%0A%20%20%20%20%3Ccircle%20cx%3D%2232%22%20cy%3D%2231%22%20r%3D%2221%22%20fill%3D%22none%22%20stroke%3D%22%23ffa375%22%20stroke-width%3D%221.2%22%20stroke-dasharray%3D%222%202%22%20opacity%3D%220.65%22/%3E%0A%20%20%20%20%0A%20%20%20%20%3C%21--%20EMBOSSED%20SYMBOL%3A%20Medieval%20Castle%20Tower%20with%20Meeple%20Arch%20--%3E%0A%20%20%20%20%3C%21--%20Shadow%20underneath%20emboss%20--%3E%0A%20%20%20%20%3Cpath%20d%3D%22M22%2041h20v-3l-2-2v-9h2v-4h-4v2h-4v-2h-4v2h-4v-2h-4v4h2v9l-2%202v3zm7-4c0-1.7%201.3-3%203-3s3%201.3%203%203v4h-6v-4z%22%20fill%3D%22%23380f05%22%20transform%3D%22translate%280%2C%201.2%29%22/%3E%0A%20%20%20%20%3C%21--%20Highlighted%20emboss%20body%20--%3E%0A%20%20%20%20%3Cpath%20d%3D%22M22%2040h20v-3l-2-2v-9h2v-4h-4v2h-4v-2h-4v2h-4v-2h-4v4h2v9l-2%202v3zm7-4c0-1.7%201.3-3%203-3s3%201.3%203%203v4h-6v-4z%22%20fill%3D%22url%28%23c-emboss%29%22/%3E%0A%20%20%20%20%3C%21--%20Top%20inner%20highlight%20line%20on%20tower%20--%3E%0A%20%20%20%20%3Cpath%20d%3D%22M23%2023h18v1.5h-18zm2%206h14v1h-14z%22%20fill%3D%22%23ffe0ce%22%20opacity%3D%220.8%22/%3E%0A%20%20%20%20%0A%20%20%20%20%3C%21--%20Diagonal%20metallic%20coin%20sheen%20--%3E%0A%20%20%20%20%3Cpath%20d%3D%22M12%2025%20Q%2032%2010%2046%2014%20A%2023%2023%200%200%200%2016%2016%20Z%22%20fill%3D%22url%28%23c-glare%29%22/%3E%0A%20%20%3C/g%3E%0A%3C/svg%3E") no-repeat center / contain !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  position: relative;
-  flex: 0 0 auto;
-  vertical-align: -2.5px;
-  transition: transform 0.15s ease;
-}
-.coin::before, .coin.copper::before {
-  display: none !important;
-}
-.coin:hover, .coin.copper:hover {
-  transform: scale(1.12) rotate(6deg);
-}
-
-.coin.silver {
-  display: inline-block;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%20width%3D%2264%22%20height%3D%2264%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3Cfilter%20id%3D%22s-shadow%22%20x%3D%22-20%25%22%20y%3D%22-20%25%22%20width%3D%22140%25%22%20height%3D%22140%25%22%3E%0A%20%20%20%20%20%20%3CfeDropShadow%20dx%3D%220%22%20dy%3D%223%22%20stdDeviation%3D%222.5%22%20flood-color%3D%22%23000000%22%20flood-opacity%3D%220.45%22/%3E%0A%20%20%20%20%3C/filter%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22s-edge%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23636e72%22/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%232d3436%22/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22s-rim%22%20x1%3D%220.2%22%20y1%3D%220.1%22%20x2%3D%220.8%22%20y2%3D%220.9%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23ffffff%22/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%2240%25%22%20stop-color%3D%22%23b2bec3%22/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%233e4a52%22/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%3CradialGradient%20id%3D%22s-field%22%20cx%3D%2238%25%22%20cy%3D%2232%25%22%20r%3D%2265%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23e2e8f0%22/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%2255%25%22%20stop-color%3D%22%2394a3b8%22/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23475569%22/%3E%0A%20%20%20%20%3C/radialGradient%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22s-emboss%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23ffffff%22/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23334155%22/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22s-glare%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23ffffff%22%20stop-opacity%3D%220.5%22/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%2245%25%22%20stop-color%3D%22%23ffffff%22%20stop-opacity%3D%220.0%22/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%0A%20%20%3Cg%20filter%3D%22url%28%23s-shadow%29%22%3E%0A%20%20%20%20%3C%21--%20Bottom%203D%20thickness%20lip%20--%3E%0A%20%20%20%20%3Cellipse%20cx%3D%2232%22%20cy%3D%2234%22%20rx%3D%2227%22%20ry%3D%2227%22%20fill%3D%22url%28%23s-edge%29%22/%3E%0A%20%20%20%20%3C%21--%20Main%20coin%20face%20--%3E%0A%20%20%20%20%3Ccircle%20cx%3D%2232%22%20cy%3D%2231%22%20r%3D%2227%22%20fill%3D%22url%28%23s-rim%29%22/%3E%0A%20%20%20%20%3C%21--%20Outer%20rim%20inner%20shadow%20--%3E%0A%20%20%20%20%3Ccircle%20cx%3D%2232%22%20cy%3D%2231%22%20r%3D%2224.5%22%20fill%3D%22%23242b35%22/%3E%0A%20%20%20%20%3C%21--%20Recessed%20coin%20field%20--%3E%0A%20%20%20%20%3Ccircle%20cx%3D%2232%22%20cy%3D%2231%22%20r%3D%2223%22%20fill%3D%22url%28%23s-field%29%22/%3E%0A%20%20%20%20%3C%21--%20Beaded%20/%20dashed%20milled%20ring%20--%3E%0A%20%20%20%20%3Ccircle%20cx%3D%2232%22%20cy%3D%2231%22%20r%3D%2221%22%20fill%3D%22none%22%20stroke%3D%22%23f1f5f9%22%20stroke-width%3D%221.2%22%20stroke-dasharray%3D%222%202%22%20opacity%3D%220.75%22/%3E%0A%20%20%20%20%0A%20%20%20%20%3C%21--%20EMBOSSED%20SYMBOL%3A%20Heraldic%20Knight%20Shield%20%26%20Crossed%20Swords%20--%3E%0A%20%20%20%20%3C%21--%20Shadow%20underneath%20emboss%20--%3E%0A%20%20%20%20%3Cpath%20d%3D%22M32%2020l9%203v8c0%207-5%2011-9%2013-4-2-9-6-9-13v-8l9-3zm-6%2020l-3%203-1.5-1.5%203-3zm12%200l3%203%201.5-1.5-3-3z%22%20fill%3D%22%231e293b%22%20transform%3D%22translate%280%2C%201.2%29%22/%3E%0A%20%20%20%20%3C%21--%20Highlighted%20emboss%20body%20--%3E%0A%20%20%20%20%3Cpath%20d%3D%22M32%2019l9%203v8c0%207-5%2011-9%2013-4-2-9-6-9-13v-8l9-3zm-6%2020l-3%203-1.5-1.5%203-3zm12%200l3%203%201.5-1.5-3-3z%22%20fill%3D%22url%28%23s-emboss%29%22/%3E%0A%20%20%20%20%3C%21--%20Inner%20shield%20ridge%20highlight%20--%3E%0A%20%20%20%20%3Cpath%20d%3D%22M32%2021v19c3-1.5%207-5%207-10v-6.5l-7-2.5z%22%20fill%3D%22%23ffffff%22%20opacity%3D%220.45%22/%3E%0A%20%20%20%20%0A%20%20%20%20%3C%21--%20Diagonal%20metallic%20coin%20sheen%20--%3E%0A%20%20%20%20%3Cpath%20d%3D%22M12%2025%20Q%2032%2010%2046%2014%20A%2023%2023%200%200%200%2016%2016%20Z%22%20fill%3D%22url%28%23s-glare%29%22/%3E%0A%20%20%3C/g%3E%0A%3C/svg%3E") no-repeat center / contain !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  position: relative;
-  flex: 0 0 auto;
-  vertical-align: -2.5px;
-  transition: transform 0.15s ease;
-}
-.coin.silver::before {
-  display: none !important;
-}
-.coin.silver:hover {
-  transform: scale(1.12) rotate(6deg);
-}
-
-.coin.gold {
-  display: inline-block;
-  width: 18px;
-  height: 18px;
-  border-radius: 50%;
-  background: url("data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%22http%3A//www.w3.org/2000/svg%22%20viewBox%3D%220%200%2064%2064%22%20width%3D%2264%22%20height%3D%2264%22%3E%0A%20%20%3Cdefs%3E%0A%20%20%20%20%3Cfilter%20id%3D%22g-shadow%22%20x%3D%22-20%25%22%20y%3D%22-20%25%22%20width%3D%22140%25%22%20height%3D%22140%25%22%3E%0A%20%20%20%20%20%20%3CfeDropShadow%20dx%3D%220%22%20dy%3D%223%22%20stdDeviation%3D%222.5%22%20flood-color%3D%22%23000000%22%20flood-opacity%3D%220.45%22/%3E%0A%20%20%20%20%3C/filter%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22g-edge%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23b37d14%22/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23543802%22/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22g-rim%22%20x1%3D%220.2%22%20y1%3D%220.1%22%20x2%3D%220.8%22%20y2%3D%220.9%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23fff8db%22/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%2235%25%22%20stop-color%3D%22%23f5b82e%22/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23694503%22/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%3CradialGradient%20id%3D%22g-field%22%20cx%3D%2238%25%22%20cy%3D%2232%25%22%20r%3D%2265%25%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23fed766%22/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%2255%25%22%20stop-color%3D%22%23e59819%22/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%238a5302%22/%3E%0A%20%20%20%20%3C/radialGradient%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22g-emboss%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%220%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23fffbeb%22/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%22100%25%22%20stop-color%3D%22%23664103%22/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%20%20%3ClinearGradient%20id%3D%22g-glare%22%20x1%3D%220%22%20y1%3D%220%22%20x2%3D%221%22%20y2%3D%221%22%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%220%25%22%20stop-color%3D%22%23ffffff%22%20stop-opacity%3D%220.55%22/%3E%0A%20%20%20%20%20%20%3Cstop%20offset%3D%2245%25%22%20stop-color%3D%22%23ffffff%22%20stop-opacity%3D%220.0%22/%3E%0A%20%20%20%20%3C/linearGradient%3E%0A%20%20%3C/defs%3E%0A%0A%20%20%3Cg%20filter%3D%22url%28%23g-shadow%29%22%3E%0A%20%20%20%20%3C%21--%20Bottom%203D%20thickness%20lip%20--%3E%0A%20%20%20%20%3Cellipse%20cx%3D%2232%22%20cy%3D%2234%22%20rx%3D%2227%22%20ry%3D%2227%22%20fill%3D%22url%28%23g-edge%29%22/%3E%0A%20%20%20%20%3C%21--%20Main%20coin%20face%20--%3E%0A%20%20%20%20%3Ccircle%20cx%3D%2232%22%20cy%3D%2231%22%20r%3D%2227%22%20fill%3D%22url%28%23g-rim%29%22/%3E%0A%20%20%20%20%3C%21--%20Outer%20rim%20inner%20shadow%20--%3E%0A%20%20%20%20%3Ccircle%20cx%3D%2232%22%20cy%3D%2231%22%20r%3D%2224.5%22%20fill%3D%22%23523402%22/%3E%0A%20%20%20%20%3C%21--%20Recessed%20coin%20field%20--%3E%0A%20%20%20%20%3Ccircle%20cx%3D%2232%22%20cy%3D%2231%22%20r%3D%2223%22%20fill%3D%22url%28%23g-field%29%22/%3E%0A%20%20%20%20%3C%21--%20Beaded%20/%20dashed%20milled%20ring%20--%3E%0A%20%20%20%20%3Ccircle%20cx%3D%2232%22%20cy%3D%2231%22%20r%3D%2221%22%20fill%3D%22none%22%20stroke%3D%22%23fff1b8%22%20stroke-width%3D%221.2%22%20stroke-dasharray%3D%222%202%22%20opacity%3D%220.8%22/%3E%0A%20%20%20%20%0A%20%20%20%20%3C%21--%20EMBOSSED%20SYMBOL%3A%20Royal%20Imperial%20Crown%20--%3E%0A%20%20%20%20%3C%21--%20Shadow%20underneath%20emboss%20--%3E%0A%20%20%20%20%3Cpath%20d%3D%22M20%2040h24v-4l-3-13-6%207-3-10-3%2010-6-7-3%2013v4zm3-2l2-9%204%205%203-9%203%209%204-5%202%209h-18z%22%20fill%3D%22%233b2301%22%20transform%3D%22translate%280%2C%201.2%29%22/%3E%0A%20%20%20%20%3C%21--%20Highlighted%20emboss%20body%20--%3E%0A%20%20%20%20%3Cpath%20d%3D%22M20%2039h24v-4l-3-13-6%207-3-10-3%2010-6-7-3%2013v4zm3-2l2-9%204%205%203-9%203%209%204-5%202%209h-18z%22%20fill%3D%22url%28%23g-emboss%29%22/%3E%0A%20%20%20%20%3C%21--%20Crown%20gems%20/%20pearls%20--%3E%0A%20%20%20%20%3Ccircle%20cx%3D%2232%22%20cy%3D%2219%22%20r%3D%221.8%22%20fill%3D%22%23ffffff%22/%3E%0A%20%20%20%20%3Ccircle%20cx%3D%2223%22%20cy%3D%2222%22%20r%3D%221.5%22%20fill%3D%22%23ffffff%22/%3E%0A%20%20%20%20%3Ccircle%20cx%3D%2241%22%20cy%3D%2222%22%20r%3D%221.5%22%20fill%3D%22%23ffffff%22/%3E%0A%20%20%20%20%3C%21--%20Base%20ribbon%20band%20--%3E%0A%20%20%20%20%3Crect%20x%3D%2222%22%20y%3D%2236.5%22%20width%3D%2220%22%20height%3D%222%22%20rx%3D%221%22%20fill%3D%22%23fff8db%22%20opacity%3D%220.85%22/%3E%0A%20%20%20%20%0A%20%20%20%20%3C%21--%20Diagonal%20metallic%20coin%20sheen%20--%3E%0A%20%20%20%20%3Cpath%20d%3D%22M12%2025%20Q%2032%2010%2046%2014%20A%2023%2023%200%200%200%2016%2016%20Z%22%20fill%3D%22url%28%23g-glare%29%22/%3E%0A%20%20%3C/g%3E%0A%3C/svg%3E") no-repeat center / contain !important;
-  border: 0 !important;
-  box-shadow: none !important;
-  position: relative;
-  flex: 0 0 auto;
-  vertical-align: -2.5px;
-  transition: transform 0.15s ease;
-}
-.coin.gold::before {
-  display: none !important;
-}
-.coin.gold:hover {
-  transform: scale(1.12) rotate(6deg);
-}
-
-/* ==================== 3 Currencies Display (Медь, Серебро, Золото) ==================== */
+/* ==================== Currencies display (Тайлы, Звёзды) ==================== */
 .menu-cur-trio {
   display: inline-flex !important;
   align-items: center !important;
@@ -6648,9 +6576,8 @@ html body .ach-card .qi{overflow:hidden;font-size:20px;line-height:1}
 .shop-stall .stall-counter{background:repeating-linear-gradient(180deg,#4a2f1b 0 2px,transparent 2px 46px),linear-gradient(180deg,#6b4426,#56351c);border-top:3px solid #9a6a3c;box-shadow:inset 0 8px 14px -8px rgba(0,0,0,.6)}
 .shop-stall .stall-item{position:relative;background:linear-gradient(180deg,rgba(255,236,200,.1),rgba(0,0,0,.18));border:1px solid rgba(255,220,170,.18);box-shadow:inset 0 1px 0 rgba(255,240,210,.18),0 6px 10px -6px rgba(0,0,0,.6);transition:transform .15s}
 .shop-stall .stall-item:active{transform:scale(.97)}
-.shop-stall .stall-item:has(.coin.silver){border-color:rgba(214,226,236,.55);box-shadow:inset 0 0 18px rgba(214,226,236,.12),0 0 0 1px rgba(214,226,236,.18),0 6px 12px -6px rgba(0,0,0,.6)}
-.shop-stall .stall-item:has(.coin.gold){border-color:rgba(255,213,99,.75);box-shadow:inset 0 0 22px rgba(255,200,80,.18),0 0 14px rgba(255,190,60,.25),0 6px 12px -6px rgba(0,0,0,.6);overflow:hidden}
-.shop-stall .stall-item:has(.coin.gold)::after{content:"";position:absolute;inset:-40% -60%;background:linear-gradient(115deg,transparent 42%,rgba(255,245,200,.32) 50%,transparent 58%);animation:stallShine 4.5s ease-in-out infinite;pointer-events:none}
+.shop-stall .stall-item:has(.coin.star){border-color:rgba(255,213,99,.75);box-shadow:inset 0 0 22px rgba(255,200,80,.18),0 0 14px rgba(255,190,60,.25),0 6px 12px -6px rgba(0,0,0,.6);overflow:hidden}
+.shop-stall .stall-item:has(.coin.star)::after{content:"";position:absolute;inset:-40% -60%;background:linear-gradient(115deg,transparent 42%,rgba(255,245,200,.32) 50%,transparent 58%);animation:stallShine 4.5s ease-in-out infinite;pointer-events:none}
 @keyframes stallShine{0%,55%{transform:translateX(-55%)}100%{transform:translateX(55%)}}
 html.calm .shop-stall .stall-item::after{animation-play-state:paused}html.lowgfx .shop-stall .stall-item::after{display:none}
 .shop-stall .fig-art{transition:transform .2s}.shop-stall .stall-item:hover .fig-art{transform:translateY(-3px) rotate(-3deg)}
@@ -6714,7 +6641,7 @@ html.calm .qk-claim,html.lowgfx .qk-claim{animation:none}
 .qk-pips{display:flex;gap:5px}.qk-pips i{flex:1;height:6px;border-radius:3px;background:rgba(255,255,255,.14)}.qk-pips i.on{background:#f2b84b}
 
 /* own profile: the three purses side by side */
-.pcoins{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0}
+.pcoins{display:grid;grid-template-columns:repeat(2,1fr);gap:8px;margin:10px 0}
 .pcoins span{display:flex;flex-direction:column;align-items:center;gap:3px;padding:10px 6px;border-radius:16px;min-width:0;background:linear-gradient(180deg,rgba(255,255,255,.08),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.1)}
 .pcoins .cu{border-color:rgba(205,127,50,.45)}.pcoins .ag{border-color:rgba(214,226,236,.45)}.pcoins .au{border-color:rgba(255,213,99,.6);box-shadow:0 0 14px -4px rgba(255,200,80,.45)}
 .pcoins .coin{width:26px;height:26px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
@@ -6748,3 +6675,25 @@ html body .pl-v2-stat-lbl{font-size:10.5px}
 .hp2>b{font:800 13px var(--f-display);text-align:right}
 .hp2 .hadd{grid-column:3 / -1;justify-self:start;margin-top:2px}
 .hp2[data-pl]{cursor:pointer}
+
+/* ==================== Two currencies: Тайлы and Звёзды ====================
+   The coin pictures are rendered in Blender (tools/blender_generators/generate_coins.py, aa_coin and aa_star).
+   They replace the three old painted coins; the old class names (copper, silver, gold) are kept only as aliases. */
+.coin, .coin.tile, .coin.copper, .coin.silver, .coin.star, .coin.gold {
+  display: inline-block;
+  position: relative;
+  width: 17px;
+  height: 17px;
+  border-radius: 0;
+  border: 0;
+  background: url("coins/tile.webp") center / contain no-repeat;
+  box-shadow: none;
+  filter: none;
+  vertical-align: -3px;
+  flex: 0 0 auto;
+}
+.coin.star, .coin.gold { background-image: url("coins/star.webp"); }
+.coin::before, .coin::after { content: none !important; }
+.coin:hover { transform: none; }
+.mcur-item.tile b, .mcur-item.copper b { color: #ffd875; }
+.mcur-item.star b, .mcur-item.gold b { color: #9fc2ff; }

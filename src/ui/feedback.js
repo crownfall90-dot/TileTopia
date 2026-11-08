@@ -71,7 +71,7 @@ export function renderFeedbackCardHtml({first, namePromo, stars = 0, starLabel, 
 
   return `<div class="ocard fbcard">
     <div class="jig shero small" id="fbHero"><div class="mhero"><span class="mhi">💬</span><div><b>Поддержка и отзывы</b><p>Оценки, идеи и сообщения об ошибках</p></div></div></div>
-    ${first ? '<p class="fbgift">🎁 +10 меди за первое сообщение</p>' : ''}
+    ${first ? '<p class="fbgift">🎁 +10 тайлов за первое сообщение</p>' : ''}
     ${namePromo || ''}
     <div style="font-size:12px;font-weight:700;color:var(--muted);text-align:center;margin-top:2px">Оцените игру:</div>
     <div class="fb-stars" id="fbStars" role="radiogroup" aria-label="Оценка">${starsHtml}</div>
@@ -85,7 +85,7 @@ export function renderFeedbackCardHtml({first, namePromo, stars = 0, starLabel, 
       </label>
       <div style="font-size:11px;opacity:.7">${diagSummary || ''}</div>
     </div>
-    <button class="cta wide" id="fbSend">Отправить${first ? ' (+10 меди)' : ''}</button>
+    <button class="cta wide" id="fbSend">Отправить${first ? ' (+10 тайлов)' : ''}</button>
     <button class="ghostbtn" id="fbCancel">Отмена</button>
   </div>`;
 }

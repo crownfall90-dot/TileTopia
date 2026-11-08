@@ -47,7 +47,7 @@ export function renderRewardsTabHtml({
 }) {
   const rank = (done, got) => got ? 2 : done ? 0 : 1;
   // one card: the icon tile, the title, a bar with the count in it, and on the right the reward, the claim button or a tick
-  const card = ({ic, title, n, need, reward, coin = 'copper', got, claim, swap = '', kind = 'q'}) => {
+  const card = ({ic, title, n, need, reward, coin = 'tile', got, claim, swap = '', kind = 'q'}) => {
     const done = n >= need, pct = Math.min(100, 100 * n / need);
     const side = got ? '<span class="qk-got" aria-label="Получено">✓</span>'
       : done ? `<button class="qk-claim" ${claim}>Забрать<small><i class="coin ${coin}"></i>${reward}</small></button>`
@@ -73,7 +73,7 @@ export function renderRewardsTabHtml({
   const pips = progWeekly.map(q => `<i class="${q.got ? 'on' : ''}"></i>`).join('');
   const chestRow = `<div class="qk-chest${weeklyChestClaimed ? ' got' : allWqGot ? ' done' : ''}"><span class="qk-chest-ic">${weeklyChestClaimed ? '🧰' : '🎁'}</span>`
     + `<span class="qk-body"><b>Большой сундук недели</b><small>${weeklyChestClaimed ? 'Открыт — новый на следующей неделе' : allWqGot ? 'Все цели недели достигнуты!' : `Выполните все ${progWeekly.length} цели недели`}</small><span class="qk-pips">${pips}</span></span>`
-    + (weeklyChestClaimed ? '<span class="qk-got">✓</span>' : allWqGot ? `<button class="qk-claim" data-claimwchest="1">Открыть<small><i class="coin copper"></i>${weeklyChestGold}</small></button>` : `<span class="qk-rew lock"><i class="coin copper"></i><b>${weeklyChestGold}</b></span>`) + '</div>';
+    + (weeklyChestClaimed ? '<span class="qk-got">✓</span>' : allWqGot ? `<button class="qk-claim" data-claimwchest="1">Открыть<small><i class="coin tile"></i>${weeklyChestGold}</small></button>` : `<span class="qk-rew lock"><i class="coin tile"></i><b>${weeklyChestGold}</b></span>`) + '</div>';
 
   const qGot = progQuests.filter(q => q.got).length;
   const nearQ = progQuests.filter(q => !q.got).map(q => ({q, Q: questDefs.find(x => x.id === q.id)})).filter(x => x.Q).sort((a, b) => (a.Q.n - a.q.n) / a.Q.n - (b.Q.n - b.q.n) / b.Q.n)[0];
@@ -110,7 +110,7 @@ export function renderAchievementsHtml({
     const statusPill = got
       ? '<span class="pill ach-done-pill">Получено ✓</span>'
       : ok
-      ? `<button class="chip pri ach-claim-btn" data-claima="${a.id}">Забрать +${a.g} <i class="coin ${a.coin || 'copper'}"></i></button>`
+      ? `<button class="chip pri ach-claim-btn" data-claima="${a.id}">Забрать +${a.g} <i class="coin ${a.coin || 'tile'}"></i></button>`
       : '<span class="pill lock">В процессе</span>';
 
     return `
@@ -122,7 +122,7 @@ export function renderAchievementsHtml({
             ${tierTag}
           </div>
           <small class="ach-desc">${a.d}</small>
-          <div class="ach-reward-val"><i class="coin ${a.coin || 'copper'}"></i> +${a.g} ${a.coin === 'gold' ? 'золота' : a.coin === 'silver' ? 'серебра' : 'меди'}</div>
+          <div class="ach-reward-val"><i class="coin ${a.coin || 'tile'}"></i> +${a.g} ${a.coin === 'star' ? 'звёзд' : 'тайлов'}</div>
         </span>
         <div class="ach-action-wrap">
           ${statusPill}

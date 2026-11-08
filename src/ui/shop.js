@@ -4,7 +4,7 @@
 /** Generates HTML markup for the daily gift chest card. */
 export function renderGiftCard({giftReady, chestSvg, boosts = {}, nextGiftTimeStr = ''}) {
   const inv = [
-    boosts.double ? `Двойное золото ×${boosts.double}` : '',
+    boosts.double ? `Двойные тайлы ×${boosts.double}` : '',
     boosts.meeple ? `+1 фигурка ×${boosts.meeple}` : '',
   ].filter(Boolean).join(' · ');
 
@@ -29,7 +29,7 @@ export function renderGiftTrioShowcase({
   boosts = {}
 } = {}) {
   const inv = [
-    boosts.double ? `Двойное золото ×${boosts.double}` : '',
+    boosts.double ? `Двойные тайлы ×${boosts.double}` : '',
     boosts.meeple ? `+1 фигурка ×${boosts.meeple}` : '',
   ].filter(Boolean).join(' · ');
 
@@ -388,7 +388,7 @@ export function renderReactionShopHtml({wallet = {}}) {
     const head = `<div class="rs-head"><span>${title}</span><span class="rs-cnt${c.have === c.total ? ' full' : ''}">Собрано ${c.have} / ${c.total}</span></div>`;
     if (!ids.length) return head + `<div class="rs-done">Коллекция собрана ✨</div>`;
     return head + `<div class="rs-grid ${kind}">${ids.map(id => card(kind, id)).join('')}</div>`
-      + `<small class="rs-note">Соберите все — +${R.COLLECTION_REWARD[kind]} меди</small>`;
+      + `<small class="rs-note">Соберите все — +${R.COLLECTION_REWARD[kind]} тайлов</small>`;
   };
   return `<div class="rshop">${block('emote', 'Эмодзи')}${block('phrase', 'Фразы')}</div>`;
 }
@@ -456,7 +456,7 @@ export function renderItemsEmotesHtml({
       ${allEmotes.map(em => {
         const isSel = curEm.includes(em);
         if (!own('emote', em)) return `
-          <button class="em-cat-btn lockd" data-rbuy="emote" data-rid="${em}" title="Купить за ${R.price('emote', em)} меди">
+          <button class="em-cat-btn lockd" data-rbuy="emote" data-rid="${em}" title="Купить за ${R.price('emote', em)} тайлов">
             <span class="em-icon">${em}</span>
             <span class="em-badge lock">🔒</span>
             <span class="em-price">${R.price('emote', em)}</span>
