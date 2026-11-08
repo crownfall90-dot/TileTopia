@@ -16,7 +16,7 @@ import bpy
 from mathutils import Vector
 
 ROOT = os.path.abspath(os.path.join(os.path.dirname(os.path.abspath(__file__)), '..', '..'))
-KEYS = ['tile', 'star']
+KEYS = ['tile', 'star', 'tile2', 'tile3', 'star2', 'star3', 'hex_tile', 'road_tile', 'hex_star', 'spark_star']  # variants A-E of each coin; the owner picks one of each
 
 
 def srgb(c):
@@ -106,12 +106,12 @@ def tile():
     put(smooth(bpy.context.object), light)
 
 
-def star_mesh(R, r, depth, z):
+def star_mesh(R, r, depth, z, n=5):
     """a five-point star, extruded"""
     import bmesh
     me = bpy.data.meshes.new('Star')
     bm = bmesh.new()
-    pts = [(math.cos(math.pi / 2 + i * math.pi / 5) * (R if i % 2 == 0 else r), math.sin(math.pi / 2 + i * math.pi / 5) * (R if i % 2 == 0 else r)) for i in range(10)]
+    pts = [(math.cos(math.pi / 2 + i * math.pi / n) * (R if i % 2 == 0 else r), math.sin(math.pi / 2 + i * math.pi / n) * (R if i % 2 == 0 else r)) for i in range(2 * n)]
     vs = [bm.verts.new((x, y, -depth / 2)) for x, y in pts]
     f = bm.faces.new(vs)
     r2 = bmesh.ops.extrude_face_region(bm, geom=[f])
@@ -139,7 +139,156 @@ def star():
     put(smooth(bpy.context.object), metal('starDot', '#fff6d0', .15))
 
 
-MAKERS = {'tile': tile, 'star': star}
+def tile2():
+    """one big tile in a tile: a diamond with a lower diamond inside and a bright pip"""
+    gold = metal('gold', '#f4b73f', .26)
+    deep = metal('goldDeep', '#b8791a', .36)
+    light = metal('goldLight', '#ffd978', .2)
+    body(deep, gold, .09)
+    beads(28, .8, .03, .1, gold)
+    z = .115
+    put(smooth(box(.92, .92, .07, (0, 0, z), math.radians(45)), .015), light)
+    put(smooth(box(.66, .66, .08, (0, 0, z + .01), math.radians(45)), .015), deep)
+    put(smooth(box(.34, .34, .09, (0, 0, z + .02), math.radians(45)), .012), light)
+
+
+def tile3():
+    """a square tile of nine pieces in a checker, on a coin with a plain, grooved rim"""
+    gold = metal('gold', '#f0a93a', .3)
+    deep = metal('goldDeep', '#a8681a', .4)
+    light = metal('goldLight', '#ffd37a', .2)
+    body(deep, gold, .09)
+    for i in range(48):
+        a = i / 48 * math.tau
+        put(smooth(box(.018, .05, .03, (math.cos(a) * .965, math.sin(a) * .965, .1), a), .005), deep)
+    z = .115
+    s, g = .3, .04
+    for ix in (-1, 0, 1):
+        for iy in (-1, 0, 1):
+            put(smooth(box(s, s, .07, (ix * (s + g), iy * (s + g), z)), .012), light if (ix + iy) % 2 == 0 else gold)
+
+
+def star2():
+    """a teal coin with a silver-white star and five small dots between its points"""
+    face = metal('starFace', '#0f5d63', .26)
+    rim = metal('starRim', '#cfe9ea', .2)
+    gem = metal('starGem', '#f2f7ff', .16)
+    body(face, rim, .09)
+    beads(28, .8, .03, .1, rim)
+    z = .12
+    put(smooth(star_mesh(.62, .27, .08, z), .014), gem)
+    for i in range(5):
+        a = math.pi / 2 + math.pi / 5 + i * math.tau / 5
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=16, ring_count=10, radius=.05, location=(math.cos(a) * .6, math.sin(a) * .6, z))
+        put(smooth(bpy.context.object), gem)
+
+
+def star3():
+    """a plum coin with a golden rim and star, and five bright gems around it"""
+    face = metal('starFace', '#5b1a73', .26)
+    rim = metal('starRim', '#f4b73f', .24)
+    gem = metal('starGem', '#ffd978', .18)
+    cyan = metal('starCyan', '#7dffea', .12, .0)
+    body(face, rim, .09)
+    z = .12
+    put(smooth(star_mesh(.55, .24, .1, z), .02), gem)
+    for i in range(5):
+        a = math.pi / 2 + math.pi / 5 + i * math.tau / 5
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=16, ring_count=10, radius=.07, location=(math.cos(a) * .7, math.sin(a) * .7, z))
+        put(smooth(bpy.context.object), cyan)
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=16, ring_count=10, radius=.07, location=(math.cos(a) * .7, math.sin(a) * .7, z))
+        o = bpy.context.object
+        put(smooth(o), cyan)
+
+
+def rsq(m, size=1.7, depth=.16, radius=.34):
+    """a square slab with rounded corners: the outline is built from four arcs and extruded"""
+    import bmesh
+    me = bpy.data.meshes.new('Slab')
+    bm = bmesh.new()
+    h = size / 2 - radius
+    pts = []
+    for cx, cy, a0 in ((h, h, 0), (-h, h, 90), (-h, -h, 180), (h, -h, 270)):
+        for k in range(13):
+            a = math.radians(a0 + k * 90 / 12)
+            pts.append((cx + math.cos(a) * radius, cy + math.sin(a) * radius))
+    vs = [bm.verts.new((x, y, -depth / 2)) for x, y in pts]
+    f = bm.faces.new(vs)
+    r2 = bmesh.ops.extrude_face_region(bm, geom=[f])
+    bmesh.ops.translate(bm, vec=(0, 0, depth), verts=[v for v in r2['geom'] if isinstance(v, bmesh.types.BMVert)])
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    bm.to_mesh(me)
+    bm.free()
+    o = bpy.data.objects.new('Slab', me)
+    bpy.context.scene.collection.objects.link(o)
+    bpy.context.view_layer.objects.active = o
+    return put(smooth(o, .02), m)
+
+
+def hexcyl(r, depth, z):
+    bpy.ops.mesh.primitive_cylinder_add(vertices=6, radius=r, depth=depth, location=(0, 0, z))
+    return bpy.context.object
+
+
+def hex_tile():
+    """a hexagon coin (the Classic 2.0 shape) with a honeycomb of seven cells"""
+    gold = metal('gold', '#f4b73f', .26)
+    deep = metal('goldDeep', '#b8791a', .36)
+    light = metal('goldLight', '#ffd978', .2)
+    put(smooth(hexcyl(1.05, .16, 0), .03), gold)
+    put(smooth(hexcyl(.9, .03, .085), .006), deep)
+    z = .12
+    r = .21
+    for k in range(7):
+        if k == 0:
+            x = y = 0
+        else:
+            a = math.radians(30 + 60 * (k - 1)); x, y = math.cos(a) * .4, math.sin(a) * .4
+        c = hexcyl(r, .07, z)
+        c.location = (x, y, z)
+        put(smooth(c, .01), light if k == 0 else gold)
+
+
+def road_tile():
+    """a rounded square coin with a crossing of two roads and a round square in the middle"""
+    gold = metal('gold', '#f0a93a', .3)
+    deep = metal('goldDeep', '#a8681a', .4)
+    light = metal('goldLight', '#ffd37a', .2)
+    rsq(gold)
+    put(smooth(box(1.42, 1.42, .03, (0, 0, .085)), .01), deep)
+    z = .12
+    put(smooth(box(1.3, .24, .06, (0, 0, z)), .012), light)
+    put(smooth(box(.24, 1.3, .06, (0, 0, z)), .012), light)
+    put(smooth(cyl(.3, .08, z, 48), .012), gold)
+    put(smooth(cyl(.14, .1, z + .01, 48), .01), light)
+
+
+def hex_star():
+    """a teal hexagon coin with an eight-point compass star"""
+    face = metal('hsFace', '#0f5d63', .26)
+    rim = metal('hsRim', '#cfe9ea', .2)
+    gem = metal('hsGem', '#fff2c4', .16)
+    put(smooth(hexcyl(1.05, .16, 0), .03), rim)
+    put(smooth(hexcyl(.9, .03, .085), .006), face)
+    z = .12
+    put(smooth(star_mesh(.78, .3, .08, z, 8), .014), gem)
+    put(smooth(cyl(.1, .1, z + .02, 32), .01), rim)
+
+
+def spark_star():
+    """a plum rounded square with a four-ray sparkle"""
+    gold = metal('spGold', '#f4b73f', .24)
+    face = metal('spFace', '#5b1a73', .26)
+    gem = metal('spGem', '#ffe6f2', .14)
+    rsq(gold)
+    put(smooth(box(1.42, 1.42, .03, (0, 0, .085)), .01), face)
+    z = .12
+    put(smooth(star_mesh(.72, .17, .09, z, 4), .016), gem)
+    for (x, y) in ((.55, .55), (-.55, -.55)):
+        put(smooth(star_mesh(.16, .05, .06, z, 4), .008), gold).location = (x, y, z)
+
+
+MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star}
 
 
 def scene(samples, size=512):
