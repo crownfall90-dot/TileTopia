@@ -288,7 +288,112 @@ def spark_star():
         put(smooth(star_mesh(.16, .05, .06, z, 4), .008), gold).location = (x, y, z)
 
 
-MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star}
+def facet_star(R, r, h, z, n=5):
+    """a star as a low pyramid: every ray has two flat faces that catch the light differently"""
+    import bmesh
+    me = bpy.data.meshes.new('FStar')
+    bm = bmesh.new()
+    top = bm.verts.new((0, 0, h))
+    ring = [bm.verts.new((math.cos(math.pi / 2 + i * math.pi / n) * (R if i % 2 == 0 else r), math.sin(math.pi / 2 + i * math.pi / n) * (R if i % 2 == 0 else r), 0)) for i in range(2 * n)]
+    for i in range(2 * n):
+        bm.faces.new((top, ring[i], ring[(i + 1) % (2 * n)]))
+    bm.faces.new(list(reversed(ring)))
+    bmesh.ops.recalc_face_normals(bm, faces=bm.faces)
+    bm.to_mesh(me)
+    bm.free()
+    o = bpy.data.objects.new('FStar', me)
+    bpy.context.scene.collection.objects.link(o)
+    o.location = (0, 0, z)
+    bpy.context.view_layer.objects.active = o
+    return o
+
+
+def reeded(n, m):
+    """the milled edge of a coin"""
+    for i in range(n):
+        a = i / n * math.tau
+        put(smooth(box(.035, .07, .15, (math.cos(a) * 1.0, math.sin(a) * 1.0, 0), a)), m)
+
+
+def rays(n, r0, r1, z, m):
+    """a sunburst: thin raised rays between two radii"""
+    for i in range(n):
+        a = i / n * math.tau
+        rm = (r0 + r1) / 2
+        put(smooth(box(r1 - r0, .018, .014, (math.cos(a) * rm, math.sin(a) * rm, z), a)), m)
+
+
+def p1_main():
+    gold = metal('gold', '#f4b73f', .26)
+    deep = metal('goldDeep', '#c4801a', .36)
+    light = metal('goldLight', '#ffd978', .2)
+    put(smooth(cyl(1.0, .16, 0), .02), gold)
+    reeded(112, deep)
+    put(torus(.93, .05, .08), gold)
+    put(torus(.8, .018, .085), deep)
+    put(smooth(cyl(.78, .02, .082)), deep)
+    put(torus(.66, .014, .09), light)
+    for a in (0, 90, 180, 270):
+        r = math.radians(a)
+        put(smooth(box(.09, .09, .03, (math.cos(r) * .72, math.sin(r) * .72, .1), math.radians(45)), .006), light)
+    z = .115
+    s, g = .27, .03
+    for (dx, dy, m) in ((-1, -1, light), (1, -1, gold), (-1, 1, gold), (1, 1, light)):
+        c = math.cos(math.radians(45)); sn = math.sin(math.radians(45))
+        ox, oy = dx * (s / 2 + g / 2), dy * (s / 2 + g / 2)
+        put(smooth(box(s, s, .07, (ox * c - oy * sn, ox * sn + oy * c, z), math.radians(45)), .012), m)
+        put(smooth(box(s * .55, s * .55, .08, (ox * c - oy * sn, ox * sn + oy * c, z + .008), math.radians(45)), .008), deep if m is light else light)
+
+
+def p1_rare():
+    face = metal('rFace', '#262a74', .26)
+    rim = metal('rRim', '#a9b8ff', .2)
+    deep = metal('rDeep', '#5b69c9', .3)
+    gem = metal('rGem', '#ffe38a', .16)
+    put(smooth(cyl(1.0, .16, 0), .02), rim)
+    reeded(112, deep)
+    put(torus(.93, .05, .08), rim)
+    put(torus(.8, .018, .085), deep)
+    put(smooth(cyl(.78, .02, .082)), face)
+    put(torus(.66, .014, .09), rim)
+    for i in range(5):
+        a = math.pi / 2 + math.pi / 5 + i * math.tau / 5
+        bpy.ops.mesh.primitive_uv_sphere_add(segments=16, ring_count=10, radius=.045, location=(math.cos(a) * .72, math.sin(a) * .72, .1))
+        put(smooth(bpy.context.object), rim)
+    put(facet_star(.6, .26, .1, .095), gem)
+
+
+def p2_main():
+    gold = metal('gold', '#f4b73f', .26)
+    deep = metal('goldDeep', '#b8791a', .38)
+    light = metal('goldLight', '#ffd978', .2)
+    put(smooth(cyl(1.0, .16, 0), .02), gold)
+    put(torus(.94, .045, .08), gold)
+    put(smooth(cyl(.88, .02, .082)), deep)
+    rays(60, .46, .86, .1, light)
+    put(torus(.44, .03, .1), gold)
+    put(smooth(cyl(.42, .05, .1)), gold)
+    z = .13
+    put(smooth(box(.5, .5, .05, (0, 0, z), math.radians(45)), .012), light)
+    put(smooth(box(.36, .36, .06, (0, 0, z + .008), math.radians(45)), .01), deep)
+    put(smooth(box(.2, .2, .07, (0, 0, z + .016), math.radians(45)), .008), light)
+
+
+def p2_rare():
+    face = metal('r2Face', '#4a1666', .26)
+    rim = metal('r2Rim', '#f4b73f', .24)
+    ray = metal('r2Ray', '#d8c8ff', .22)
+    gem = metal('r2Gem', '#fff1c8', .16)
+    put(smooth(cyl(1.0, .16, 0), .02), rim)
+    put(torus(.94, .045, .08), rim)
+    put(smooth(cyl(.88, .02, .082)), face)
+    rays(60, .5, .86, .1, ray)
+    put(torus(.48, .03, .1), rim)
+    put(smooth(cyl(.46, .05, .1)), face)
+    put(facet_star(.4, .17, .09, .125), gem)
+
+
+MAKERS = {'tile': tile, 'star': star, 'tile2': tile2, 'tile3': tile3, 'star2': star2, 'star3': star3, 'hex_tile': hex_tile, 'road_tile': road_tile, 'hex_star': hex_star, 'spark_star': spark_star, 'p1_main': p1_main, 'p1_rare': p1_rare, 'p2_main': p2_main, 'p2_rare': p2_rare}
 
 
 def scene(samples, size=512):
