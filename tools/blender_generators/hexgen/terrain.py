@@ -23,7 +23,7 @@ import numpy as np
 from mathutils import Matrix, Vector
 
 from . import core
-from .core import GEO, R, U, V6, dist, hex_inset, hexcol, sample, to3
+from .core import GEO, R, U, V6, NS, dist, hex_inset, hexcol, sample, to3
 
 # sizes in card heights, heights (z) in Blender units
 CURB_W = .03                                   # the curb's width
@@ -167,7 +167,17 @@ def mound_field(mounds, P):
 
 # ------------------------------------------------------------------ the card body and its grass top
 def hex_grid(n):
-    """Points of a triangular grid filling the card exactly (game frame) and its triangles."""
+    """Points of a grid filling the card exactly (game frame) and its triangles: triangular on a six-sided card,
+    square (two triangles a cell) on a four-sided one."""
+    if NS == 4:
+        m = 2 * n
+        pts = [(-.5 + i / m, -.5 + j / m) for j in range(m + 1) for i in range(m + 1)]
+        tris = []
+        for j in range(m):
+            for i in range(m):
+                k = j * (m + 1) + i
+                tris += [(k, k + 1, k + m + 1), (k + 1, k + m + 2, k + m + 1)]
+        return pts, tris
     a, bx, by = R / n, R / (2 * n), .5 / n
     idx, pts = {}, []
     for j in range(-n, n + 1):
@@ -189,7 +199,7 @@ def ground_weights(ctx, P, mounds, df):
     """Per point of P: height, and the shader's weights earth, lift, lush, calm."""
     g = GEO
     n = len(P)
-    inset = np.min(np.stack([.5 - (P[:, 0] * V6[d][0] + P[:, 1] * V6[d][1]) for d in range(6)]), 0)
+    inset = np.min(np.stack([.5 - (P[:, 0] * V6[d][0] + P[:, 1] * V6[d][1]) for d in range(NS)]), 0)
     feat = np.array([df(tuple(p)) for p in P])
     h, lift = mound_field(mounds, P)
     fall = np_sstep(.05, .1, inset) * np_sstep(.008, .05, feat)
@@ -394,7 +404,7 @@ def grass_material(ctx):
 # ------------------------------------------------------------------ the curb
 def frame(ctx, d):
     """Side d as a function of (s along the side from its first corner, k inward) -> game point, and its length."""
-    a, b = ctx.corners[d], ctx.corners[(d + 1) % 6]
+    a, b = ctx.corners[d], ctx.corners[(d + 1) % NS]
     L = dist(a, b)
     t = ((b[0] - a[0]) / L, (b[1] - a[1]) / L)
     n = (-V6[d][0], -V6[d][1])
@@ -427,26 +437,26 @@ def split(rnd, a, b):
 def curb(ctx):
     rnd, e, mask = ctx.rnd, ctx.e, ctx.mask
     bm = bmesh.new()
-    corner = [e[c] != 'c' and e[(c - 1) % 6] != 'c' for c in range(6)]   # corner c lies between sides c-1 and c
+    corner = [e[c] != 'c' and e[(c - 1) % NS] != 'c' for c in range(NS)]   # corner c lies between sides c-1 and c
     runs_all = []
-    for c in range(6):
+    for c in range(NS):
         if not corner[c]:
             continue
         P1, L1 = frame(ctx, c)
-        P0, L0 = frame(ctx, (c - 1) % 6)
+        P0, L0 = frame(ctx, (c - 1) % NS)
         A = ctx.corners[c]
         bis = Vector(P1(1, 0)) - Vector(A) + Vector(P0(L0 - 1, 0)) - Vector(A)
         bis.normalize()
-        inner = (A[0] + bis.x * CORNER_W / math.sin(math.pi / 3), A[1] + bis.y * CORNER_W / math.sin(math.pi / 3))
+        inner = (A[0] + bis.x * CORNER_W / math.sin(math.pi / 2 - math.pi / NS), A[1] + bis.y * CORNER_W / math.sin(math.pi / 2 - math.pi / NS))
         poly = [A, P1(CORNER_A, 0), P1(CORNER_A, CORNER_W), inner, P0(L0 - CORNER_A, CORNER_W), P0(L0 - CORNER_A, 0)]
         solid(bm, poly, -.01, CORNER_H * rnd.uniform(.94, 1.04))
         mask.take_circle(A, CORNER_A)
-    for d in range(6):
+    for d in range(NS):
         if e[d] == 'c':
             continue
         P, L = frame(ctx, d)
         a = CORNER_A + JOINT if corner[d] else 0.0
-        b = L - (CORNER_A + JOINT if corner[(d + 1) % 6] else 0.0)
+        b = L - (CORNER_A + JOINT if corner[(d + 1) % NS] else 0.0)
         runs = [(a, b)]
         if e[d] in 'rw':
             gap, m = (ROAD_GAP if e[d] == 'r' else RIVER_GAP), L / 2

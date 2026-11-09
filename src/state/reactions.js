@@ -1,3 +1,4 @@
+import {canPay, pay} from './coins.js';
 // Emoji and quick phrases for games: three of each, the most ordinary ones, are free; the rest are bought in the shop
 // for gold or earned (progress road) and collected like figures and frames. The deck (up to 5 + 5 shown in a game)
 // is chosen in «Мои предметы» only from what the player owns.
@@ -143,8 +144,8 @@ export function buy(w, kind, id) {
   if (!exists(kind, id)) return {ok: false, reason: 'unknown'};
   if (isOwned(w, kind, id)) return {ok: false, reason: 'owned'};
   const p = price(kind, id);
-  if ((w.gold || 0) < p) return {ok: false, reason: 'gold', need: p - (w.gold || 0)};
-  w.gold -= p;
+  if (!canPay(w, p)) return {ok: false, reason: 'gold', need: p - (w.gold || 0)};
+  pay(w, p);
   const ownKey = LISTS[kind][2];
   w[ownKey] = [...(w[ownKey] || []), id];
   return {ok: true, price: p};

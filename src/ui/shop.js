@@ -121,13 +121,13 @@ export function renderLocationsGrid(locs) {
 }
 
 /** Generates HTML markup for status buttons grid in status shop. */
-export function renderStatusShopHtml({shopStatuses, ownedStatuses = [], wornKey = '', gold = 0, stBadgeFn}) {
+export function renderStatusShopHtml({shopStatuses, ownedStatuses = [], wornKey = '', gold = 0, stars = 0, stBadgeFn}) {
   const badge = stBadgeFn || (t => `<span class="stchip">${t}</span>`);
   return (shopStatuses || []).map(x => {
     const k = 'sh:' + x.id;
     const has = ownedStatuses.includes(k);
-    const poor = !has && gold < x.price;
-    return `<button class="stb${wornKey === k ? ' sel' : ''}${poor ? ' poor' : ''}" data-stb="${x.id}">${badge(x.text)}<small>${wornKey === k ? 'Надет' : has ? 'Надеть' : `<i class="coin"></i>${x.price}`}</small></button>`;
+    const poor = !has && !canPay({gold, stars}, x.price);
+    return `<button class="stb${wornKey === k ? ' sel' : ''}${poor ? ' poor' : ''}" data-stb="${x.id}">${badge(x.text)}<small>${wornKey === k ? 'Надет' : has ? 'Надеть' : priceTag(x.price)}</small></button>`;
   }).join('');
 }
 
@@ -175,7 +175,7 @@ export function renderItemsFigsHtml({figs = {}, ownedFigs = [], selectedFig = 'c
   const lock = Object.keys(figs).filter(k => !ownedFigs.includes(k));
 
   return `<div class="icount">Собрано <b>${ownF.length}</b> из ${Object.keys(figs).length}</div><div class="figgrid">${ownF.map(k => `<button class="fig${selectedFig === k ? ' sel' : ''}" data-ifig="${k}"><img src="${figPreviewFn(k)}" alt=""><b>${figs[k].name}</b><small>${selectedFig === k ? 'Выбрана' : 'Выбрать'}</small></button>`).join('')}</div>`
-    + (lock.length ? `<div class="h3 sec">Ещё не куплены</div><div class="figgrid">${lock.map(k => `<div class="fig poor lockd"><img src="${figPreviewFn(k)}" alt="" style="filter:grayscale(1) brightness(.6)"><b>${figs[k].name}</b><small><i class="coin"></i>${figs[k].price}</small></div>`).join('')}</div>` : '')
+    + (lock.length ? `<div class="h3 sec">Ещё не куплены</div><div class="figgrid">${lock.map(k => `<div class="fig poor lockd"><img src="${figPreviewFn(k)}" alt="" style="filter:grayscale(1) brightness(.6)"><b>${figs[k].name}</b><small>${priceTag(figs[k].price)}</small></div>`).join('')}</div>` : '')
     + '<button class="ghostbtn wide" data-ishop>В магазин</button>';
 }
 
@@ -367,6 +367,7 @@ export function renderDailyShopShowcase({ items = [], wallet = {}, figPreview = 
 
 // Emoji and phrases live in state/reactions.js (prices, ownership); re-exported here for game.html.
 import {canPay, priceTag} from '../state/coins.js';
+import * as AV from '../state/avatars.js';
 import * as R from '../state/reactions.js';
 export const {DEFAULT_EMOTES, DEFAULT_PHRASES, ALL_EMOTES, ALL_PHRASES, SAYS} = R;
 
@@ -377,10 +378,10 @@ const coin = '<i class="coin" style="display:inline-block;vertical-align:-3px"><
 export function renderReactionShopHtml({wallet = {}}) {
   const pr = R.progress(wallet), gold = wallet.gold || 0;
   const card = (kind, id) => {
-    const p = R.price(kind, id), rar = R.rarity(kind, id), poor = gold < p;
+    const p = R.price(kind, id), rar = R.rarity(kind, id), poor = !canPay(wallet, p);
     const body = kind === 'emote' ? `<span class="rs-em">${id}</span>` : `<span class="rs-ph">${id}</span>`;
     const earn = R.EARN[kind][id];
-    return `<button class="rs-item ${kind}${RARITY_CLASS[rar]}${poor ? ' poor' : ''}" data-rbuy="${kind}" data-rid="${id}">${body}<small class="rs-rar">${R.RARITY[rar].name}</small><b class="rs-price">${coin} ${p}</b>${earn ? `<small class="rs-earn">или: ${earn}</small>` : ''}</button>`;
+    return `<button class="rs-item ${kind}${RARITY_CLASS[rar]}${poor ? ' poor' : ''}" data-rbuy="${kind}" data-rid="${id}">${body}<small class="rs-rar">${R.RARITY[rar].name}</small><b class="rs-price">${priceTag(p)}</b>${earn ? `<small class="rs-earn">или: ${earn}</small>` : ''}</button>`;
   };
   const left = kind => (kind === 'emote' ? R.ALL_EMOTES : R.ALL_PHRASES).filter(id => !R.isOwned(wallet, kind, id));
   const block = (kind, title) => {
@@ -730,7 +731,7 @@ export function renderShopStallsShowcase({
       return `
         <div class="stall-item phrase-stall-card${rarClass}">
           <div class="phrase-scroll-wrap">
-            <span class="stall-phrase-text">«${item.key}»</span>
+            <span class="chat-msg"><i class="chat-av" style="--c:${wallet.color || '#3a7bd5'}">${fname}</i><span class="chat-bubble">${item.key}</span></span>
             <small class="stall-rar-tag">${item.name}</small>
           </div>
           <button class="stall-buy-btn${!canAfford ? ' poor' : ''}" data-daily-buy="phrase|${item.key}|${item.price}">
@@ -741,8 +742,41 @@ export function renderShopStallsShowcase({
     }
   });
 
+  // 6. Прилавок картинок профиля: формы аватара, аватарки и баннеры
+  const avItems = [
+    ...Object.entries(AV.SHAPES).filter(([k]) => !AV.owns(w, 'shape', k)).map(([k, x]) => ({kind: 'shape', key: k, ...x})),
+    ...Object.entries(AV.PICS).filter(([k]) => !AV.owns(w, 'pic', k)).map(([k, x]) => ({kind: 'pic', key: k, ...x})),
+    ...Object.entries(AV.BANNERS).filter(([k]) => !AV.owns(w, 'banner', k)).map(([k, x]) => ({kind: 'banner', key: k, ...x})),
+  ];
+  const avShown = [...avItems.filter(x => x.kind === 'shape'), ...avItems.filter(x => x.kind !== 'shape').sort((a, b) => ((dateKey.length + a.key.length * 7) % 5) - ((dateKey.length + b.key.length * 7) % 5))].slice(0, 6);
+  const avStallHtml = renderSingleStall({
+    stallClass: 'stall-avatars',
+    icon: '<svg class="stall-svg-ic" viewBox="0 0 24 24" width="26" height="26" fill="none"><rect x="3" y="5" width="18" height="14" rx="3" stroke="#c4a8ff" stroke-width="2.2"/><circle cx="9" cy="10.5" r="2" fill="#c4a8ff"/><path d="M5 17l5-4 3 2 3-3 3 3" stroke="#c4a8ff" stroke-width="2" stroke-linejoin="round"/></svg>',
+    title: 'Картинки профиля',
+    sub: 'Аватарки, баннеры и формы аватара',
+    items: avShown,
+    totalPoolSize: avItems.length,
+    emptyText: 'Все картинки профиля собраны! Выбирайте в «Мои предметы» → «Аватар».',
+    renderCardFn: item => {
+      const canAfford = canPay(wallet, item.price);
+      const shape = item.kind === 'banner' || item.key === 'rect' ? ' sh-rect' : item.key === 'square' ? ' sh-square' : '';
+      const pic = item.kind === 'shape' ? '' : ` pic" style="--c:${wallet.color || '#3a7bd5'};--pic:url(${item.src});--pp:${item.pos}`;
+      const label = item.kind === 'shape' ? `Форма: ${item.name}` : item.kind === 'banner' ? `Баннер «${item.name}»` : item.name;
+      return `
+        <div class="stall-item avatar-stall-card">
+          <div class="av-pedestal"><span class="av${shape}${pic || `" style="--c:${wallet.color || '#3a7bd5'}`}">${fname}</span></div>
+          <b class="stall-item-name">${label}</b>
+          <button class="stall-buy-btn${!canAfford ? ' poor' : ''}" data-daily-buy="av|${item.kind}:${item.key}|${item.price}">
+            ${priceTag(item.price)}
+          </button>
+        </div>
+      `;
+    }
+  });
+
   return `
     <div class="shop-stalls-container">
+      ${avStallHtml}
       ${figStallHtml}
       ${frameStallHtml}
       ${statusStallHtml}

@@ -15,11 +15,14 @@ import random
 from mathutils import Vector, Matrix
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SHAPES = json.load(open(os.path.join(HERE, '..', 'hex_shapes.json'), encoding='utf-8'))
+# The card set: hex_shapes.json (Classic 2.0) by default, or another file of the same format named in TILE_SHAPES
+# (square_shapes.json: the classic four-sided cards, scripts/gen-square-defs.mjs).
+SHAPES = json.load(open(os.path.join(HERE, '..', os.environ.get('TILE_SHAPES', 'hex_shapes.json')), encoding='utf-8'))
 GEO = SHAPES['geo']
 U = 2.0                                   # Blender units per card height
 R = GEO['R']                              # centre to corner, in card heights
-V6 = [(0, -1), (.866, -.5), (.866, .5), (0, 1), (-.866, .5), (-.866, -.5)]   # side directions, game frame
+V6 = [tuple(v) for v in SHAPES.get('dirs', [(0, -1), (.866, -.5), (.866, .5), (0, 1), (-.866, .5), (-.866, -.5)])]   # side directions, game frame
+NS = len(V6)                              # sides of a card: 6 (Classic 2.0) or 4
 
 
 def srgb(c):
@@ -91,7 +94,7 @@ def inside_poly(p, poly):
 
 def hex_inset(p):
     """Distance from p to the card's edge (negative outside): min over the six sides."""
-    return min(.5 - (p[0] * V6[d][0] + p[1] * V6[d][1]) for d in range(6))
+    return min(.5 - (p[0] * V6[d][0] + p[1] * V6[d][1]) for d in range(NS))
 
 
 # ------------------------------------------------------------------ materials
@@ -533,7 +536,7 @@ def scene(samples=96, res=1280, device='gpu'):
     sc.cycles.use_denoising = True
     sc.render.film_transparent = True
     sc.render.resolution_x = res
-    sc.render.resolution_y = round(res * math.sqrt(3) / 2)
+    sc.render.resolution_y = round(res * .5 / R)        # the card frame: 2R wide, 1 tall
     sc.render.resolution_percentage = 100
     sc.view_settings.view_transform = 'Standard'
     sc.view_settings.exposure = -.05

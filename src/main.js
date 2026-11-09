@@ -5,6 +5,7 @@ import * as board from './engine/board.js';
 import * as scoring from './engine/scoring.js';
 import * as bots from './engine/bots.js';
 import * as hex from './engine/hex.js';
+import * as square from './engine/square.js';
 import {createSound} from './audio/sound.js';
 import {walletSig, loadWallet, storeWallet} from './state/wallet.js';
 import * as progress from './state/progress.js';
@@ -15,6 +16,7 @@ import * as save from './state/save.js';
 import * as reactions from './state/reactions.js';
 import * as usage from './state/usage.js';
 import * as coins from './state/coins.js';
+import * as avatars from './state/avatars.js';
 import {createArt} from './render/art.js';
 import {createFirebase} from './net/firebase.js';
 import * as friends from './net/friends.js';
@@ -46,10 +48,10 @@ import * as turns from './game/turns.js';
 import * as timers from './game/timers.js';
 import * as tutorial from './game/tutorial.js';
 
-export const engine = {rng, hash, TYPES, normEdge, rareName, deckList, isRareTile, board, scoring, bots, hex};
+export const engine = {rng, hash, TYPES, normEdge, rareName, deckList, isRareTile, board, scoring, bots, hex, square};
 
 export const audio = {createSound};
-export const state = {walletSig, loadWallet, storeWallet, progress, catalog, config, status, save, reactions, usage, coins};
+export const state = {walletSig, loadWallet, storeWallet, progress, catalog, config, status, save, reactions, usage, coins, avatars};
 export const render = {createArt};
 export const net = {createFirebase, friends, presence, rooms, matchmaking};
 export const app = {web, update, telegram};

@@ -1,3 +1,4 @@
+import {pay} from './coins.js';
 // Player statuses: a short line (up to 15 characters) shown in the profile, in the friends list, on the player plates
 // of an online game and in the rating. Bought in the shop, written by hand (3000 gold a new text) or earned.
 // Pure functions: the game keeps the wallet and the gold.
@@ -100,8 +101,8 @@ export function buyShopStatus(wallet, id) {
   if (!f) return {ok: false, reason: 'unknown'};
   wallet.statuses = Array.isArray(wallet.statuses) ? wallet.statuses : [];
   if (wallet.statuses.includes('sh:' + id)) return {ok: false, reason: 'owned'};
-  if ((wallet.gold || 0) < f.price) return {ok: false, reason: 'gold'};
-  wallet.gold -= f.price; wallet.statuses.push('sh:' + id);
+  if (!pay(wallet, f.price)) return {ok: false, reason: 'gold'};   // in tiles or stars, as the price says
+  wallet.statuses.push('sh:' + id);
   return {ok: true, key: 'sh:' + id, price: f.price};
 }
 
@@ -113,8 +114,8 @@ export function buyCustomStatus(wallet, text) {
   if (isBadStatus(t)) return {ok: false, reason: 'bad'};
   wallet.statuses = Array.isArray(wallet.statuses) ? wallet.statuses : [];
   if (wallet.statuses.includes('cu:' + t)) return {ok: false, reason: 'owned'};
-  if ((wallet.gold || 0) < CUSTOM_PRICE) return {ok: false, reason: 'gold'};
-  wallet.gold -= CUSTOM_PRICE; wallet.statuses.push('cu:' + t);
+  if (!pay(wallet, CUSTOM_PRICE)) return {ok: false, reason: 'gold'};
+  wallet.statuses.push('cu:' + t);
   return {ok: true, key: 'cu:' + t, price: CUSTOM_PRICE};
 }
 

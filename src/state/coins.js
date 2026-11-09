@@ -30,6 +30,12 @@ export function give(w, n, c = 'tile') {
   if (c === 'star') w.stars = balance(w, 'star') + n; else w.gold = balance(w, 'tile') + n;
   return n;
 }
+const FORMS = {tile: ['тайл', 'тайла', 'тайлов'], star: ['звезда', 'звезды', 'звёзд']};
+const word = (c, n) => { const m = n % 100, k = n % 10; return FORMS[c][m > 10 && m < 20 ? 2 : k === 1 ? 0 : k >= 2 && k <= 4 ? 1 : 2]; };
+/** A price in words, in the coin it is paid in: «1500 тайлов», «3 звезды». */
+export const priceText = p => { const {c, n} = priceCoin(p); return `${n} ${word(c, n)}`; };
+/** What is left of that coin after paying: «останется 2 звезды». */
+export const leftText = (w, p) => { const {c, n} = priceCoin(p), m = Math.max(0, balance(w, c) - n); return `останется ${m} ${word(c, m)}`; };
 export const lackText = (w, p) => { const {c, n} = priceCoin(p); return `Не хватает ${n - balance(w, c)} ${NAME[c]}`; };
 /** A price for the shop: the coin's picture and the number. */
 export const priceTag = p => { const {c, n} = priceCoin(p); return `<i class="coin c-${c}"></i><b>${n}</b>`; };

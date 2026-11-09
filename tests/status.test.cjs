@@ -16,18 +16,18 @@ test('status module: clean, filter, buy, wear, earned', async () => {
   assert.ok(!S.isBadStatus('Мастер пазлов'), 'a good one passes');
   assert.equal(S.shownStatus('<script>'), 'script', 'markup is stripped');
   for (const x of [...S.SHOP_STATUSES, ...S.EXCLUSIVE_STATUSES]) assert.ok(x.text.length <= S.STATUS_MAX && !S.isBadStatus(x.text), 'ready status fits: ' + x.text);
-  const w = {gold: 3500, statuses: []};
+  const w = {gold: 3500, stars: 4, statuses: []};
   assert.equal(S.buyCustomStatus(w, 'Я').reason, 'short');
   assert.equal(S.buyCustomStatus(w, 'a'.repeat(16)).reason, 'long');
   assert.equal(S.buyCustomStatus(w, 'пиздец').reason, 'bad');
   let r = S.buyCustomStatus(w, 'Мой статус');
-  assert.ok(r.ok); assert.equal(w.gold, 500, 'exactly 3000 gold');
+  assert.ok(r.ok); assert.equal(w.stars, 1, 'a price from 2000 is paid in stars: 3000 = 3 stars'); assert.equal(w.gold, 3500, 'no tiles taken');
   assert.equal(S.buyCustomStatus(w, 'Мой статус').reason, 'owned');
   assert.equal(S.buyCustomStatus(w, 'Другой текст').reason, 'gold');
   assert.ok(S.wearStatus(w, r.key)); assert.equal(w.status, 'Мой статус');
   assert.ok(!S.wearStatus(w, 'sh:strategist'), 'cannot wear what is not owned');
   assert.ok(S.wearStatus(w, null)); assert.equal(w.status, '');
-  r = S.buyShopStatus(w, 'newbie'); assert.ok(r.ok); assert.equal(w.gold, 300);
+  r = S.buyShopStatus(w, 'newbie'); assert.ok(r.ok); assert.equal(w.gold, 3500 - r.price);
   assert.equal(S.buyShopStatus(w, 'newbie').reason, 'owned');
   assert.equal(S.buyShopStatus(w, 'king').reason, 'gold');
   // earned

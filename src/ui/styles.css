@@ -7015,3 +7015,75 @@ html body .pl-v2-stat-lbl{font-size:10.5px}
 
 /* rating: Classic / Classic 2.0 switch above the board */
 .board-tabs{margin-bottom:6px}
+
+/* ==== Shop stalls, each with its own look (renderShopStallsHtml) ==== */
+/* figures: a lit stage, the figure stands in a spotlight */
+.shop-stall.stall-figures .stall-counter{background:radial-gradient(120% 70% at 50% 0,rgba(255,214,120,.16),transparent 60%),linear-gradient(180deg,#3b2a4a,#24182e)}
+.shop-stall.stall-figures .stall-item{background:radial-gradient(70% 55% at 50% 18%,rgba(255,230,160,.28),transparent 70%),linear-gradient(180deg,rgba(255,255,255,.06),rgba(0,0,0,.25));border-color:rgba(255,215,140,.25)}
+.shop-stall.stall-figures .fig-shadow{background:radial-gradient(closest-side,rgba(0,0,0,.55),transparent)}
+/* frames: avatars on velvet cushions under a gilded rim */
+.shop-stall.stall-frames .stall-counter{background:linear-gradient(180deg,#5b1f33,#3a1222)}
+.shop-stall.stall-frames .stall-item{background:linear-gradient(180deg,rgba(255,255,255,.07),rgba(0,0,0,.2));border:1.5px solid rgba(232,190,110,.5);box-shadow:inset 0 0 0 3px rgba(60,20,30,.6),inset 0 0 0 4px rgba(232,190,110,.25)}
+.shop-stall.stall-frames .frame-cushion-wrap{padding:8px 0 6px;background:radial-gradient(60% 45% at 50% 62%,#a3324f 0,#7a1f38 55%,transparent 72%)}
+.shop-stall.stall-frames .frame-cushion-wrap .av{box-shadow:0 6px 10px -2px rgba(0,0,0,.6)}
+/* statuses: ribbons with notched ends */
+.shop-stall.stall-statuses .stall-counter{background:linear-gradient(180deg,#183a33,#0f2823)}
+.shop-stall.stall-statuses .stall-item{background:none;border:0;box-shadow:none}
+.shop-stall.stall-statuses .status-plate-wrap{padding:10px 0 8px}
+.shop-stall.stall-statuses .stall-chip{position:relative;display:inline-block;padding:7px 16px;border-radius:0;font-weight:800;color:#fff8e6;background:linear-gradient(180deg,#2fa57d,#1d7a5b);box-shadow:0 3px 0 #13563f,0 8px 12px -6px rgba(0,0,0,.7);clip-path:polygon(0 0,100% 0,calc(100% - 9px) 50%,100% 100%,0 100%,9px 50%);text-shadow:0 1px 0 rgba(0,0,0,.35)}
+.shop-stall.stall-statuses .stall-item:has(.coin.c-star) .stall-chip{background:linear-gradient(180deg,#f2c14e,#c98d1d);color:#3a2504;text-shadow:none;box-shadow:0 3px 0 #8d5f0f,0 8px 12px -6px rgba(0,0,0,.7)}
+/* emotes: round reaction bubbles that glow by rarity */
+.shop-stall.stall-emotes .stall-counter{background:linear-gradient(180deg,#24325c,#172140)}
+.shop-stall.stall-emotes .stall-item{background:none;border:0;box-shadow:none}
+.shop-stall.stall-emotes .emote-token-wrap{display:grid;justify-items:center;gap:4px}
+.shop-stall.stall-emotes .stall-emote-icon{display:grid;place-items:center;width:56px;height:56px;border-radius:50%;font-size:30px;background:radial-gradient(circle at 35% 30%,#ffffff,#dfe7ff 60%,#b9c7f0);box-shadow:0 6px 12px -4px rgba(0,0,0,.6),inset 0 -3px 0 rgba(0,0,0,.12);animation:emBob 3.2s ease-in-out infinite}
+.shop-stall.stall-emotes .stall-item:nth-child(2n) .stall-emote-icon{animation-delay:-1.6s}
+.shop-stall.stall-emotes .r-rare .stall-emote-icon{box-shadow:0 0 0 3px #4c8dff,0 0 16px rgba(76,141,255,.7)}
+.shop-stall.stall-emotes .r-epic .stall-emote-icon{box-shadow:0 0 0 3px #b06cf0,0 0 18px rgba(176,108,240,.8)}
+@keyframes emBob{50%{transform:translateY(-4px) scale(1.04)}}
+html.calm .shop-stall.stall-emotes .stall-emote-icon{animation:none}
+/* phrases: chat messages */
+.shop-stall.stall-phrases .stall-counter{background:linear-gradient(180deg,#1d2a44,#121b30)}
+.shop-stall.stall-phrases .stall-item{background:none;border:0;box-shadow:none;align-items:stretch}
+.shop-stall.stall-phrases .phrase-scroll-wrap{display:flex;flex-direction:column;align-items:flex-start;gap:4px;padding:6px 2px 4px}
+.chat-msg{display:flex;align-items:flex-end;gap:5px;max-width:100%}
+.chat-av{flex:0 0 auto;width:20px;height:20px;border-radius:50%;display:grid;place-items:center;font:800 10px var(--f-display);font-style:normal;color:#fff;background:var(--c)}
+.chat-bubble{position:relative;padding:7px 10px;border-radius:14px 14px 14px 4px;background:linear-gradient(180deg,#ffffff,#e8eefc);color:#1b2440;font-size:12px;font-weight:600;line-height:1.25;text-align:left;box-shadow:0 4px 8px -4px rgba(0,0,0,.6);word-break:break-word}
+.chat-bubble::before{content:"";position:absolute;left:-5px;bottom:0;width:10px;height:10px;background:#e8eefc;clip-path:polygon(100% 0,100% 100%,0 100%)}
+.shop-stall.stall-phrases .r-rare .chat-bubble,.shop-stall.stall-phrases .r-rare .chat-bubble::before{background:#dbe8ff}
+.shop-stall.stall-phrases .r-rare .chat-bubble{background:linear-gradient(180deg,#e9f1ff,#cfe0ff);box-shadow:0 0 0 1.5px #4c8dff,0 4px 8px -4px rgba(0,0,0,.6)}
+.shop-stall.stall-phrases .r-epic .chat-bubble,.shop-stall.stall-phrases .r-epic .chat-bubble::before{background:#ecdcff}
+.shop-stall.stall-phrases .r-epic .chat-bubble{background:linear-gradient(180deg,#f6eeff,#e2cdfc);box-shadow:0 0 0 1.5px #b06cf0,0 4px 8px -4px rgba(0,0,0,.6)}
+.shop-stall.stall-phrases .stall-rar-tag{margin-left:25px}
+
+/* Confirmations (confirmBox): a small card, the question and two buttons side by side */
+#confirmBox{background:rgba(6,10,24,.55);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px)}
+#confirmBox .ocard{max-width:300px;display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:18px 16px 16px;border-radius:20px;border:1px solid rgba(255,255,255,.12);border-top-color:rgba(255,230,150,.45);box-shadow:0 18px 40px rgba(0,0,0,.6)}
+#confirmBox h3,#confirmBox p{grid-column:1/-1}
+#confirmBox h3{font:700 16px/1.3 var(--f-display);padding:0 4px}
+#confirmBox p{margin:-4px 0 4px!important;font-size:13px!important}
+#confirmBox .cta,#confirmBox .ghostbtn{width:auto;min-height:42px;height:42px;margin:0;padding:0 10px;border-radius:13px;font-size:14px}
+#confirmBox .cta{order:2}
+#confirmBox .ghostbtn{order:1;background:rgba(255,255,255,.07);border:1px solid rgba(255,255,255,.14)}
+
+.shop-stall.stall-phrases .stall-counter{grid-template-columns:repeat(2,minmax(0,1fr))}
+.chat-bubble{word-break:normal;overflow-wrap:anywhere;hyphens:auto}
+.shop-stall.stall-statuses .stall-chip{white-space:normal;overflow:visible;text-overflow:clip;max-width:100%;font-size:11.5px;line-height:1.15;padding:7px 14px}
+
+/* Profile pictures (src/state/avatars.js): the picture fills the avatar, the frame (a border) follows any shape */
+.av.pic{background:var(--pic) var(--pp,50% 16%)/cover no-repeat,var(--c);color:transparent;text-shadow:none;font-size:0}
+.av.fr.pic{background:var(--pic) var(--pp,50% 16%)/cover no-repeat padding-box,var(--fr) border-box}
+.av.sh-square{border-radius:24%}
+.av.sh-rect{border-radius:16%;width:auto!important;aspect-ratio:2/1}
+.av.pic.sh-rect{--pp:50% 30%}
+.avpick{display:flex;flex-direction:column;gap:10px}
+.avpick .avsh,.avpick .avpics{display:flex;flex-wrap:wrap;gap:8px}
+.avpick button{display:flex;flex-direction:column;align-items:center;gap:4px;padding:8px;border-radius:14px;background:rgba(255,255,255,.05);border:1.5px solid rgba(255,255,255,.1);color:var(--ink);font:600 11px var(--f-body,inherit);cursor:pointer}
+.avpick button.sel{border-color:var(--brass);background:rgba(242,184,75,.12)}
+.avpick button .av{width:40px;height:40px}
+.avpick .avsh button .av{width:34px;height:34px}
+.shop-stall.stall-avatars .stall-counter{background:linear-gradient(180deg,#2a2342,#191428)}
+.shop-stall.stall-avatars .stall-item{background:radial-gradient(70% 55% at 50% 30%,rgba(190,160,255,.18),transparent 70%),linear-gradient(180deg,rgba(255,255,255,.05),rgba(0,0,0,.22));border-color:rgba(190,160,255,.25)}
+.shop-stall.stall-avatars .av-pedestal{display:grid;place-items:center;height:62px}
+.shop-stall.stall-avatars .av{width:52px;height:52px;box-shadow:0 6px 12px -4px rgba(0,0,0,.7)}
+.shop-stall.stall-avatars .av.sh-rect{height:40px}

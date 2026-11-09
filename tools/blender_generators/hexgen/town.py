@@ -575,7 +575,7 @@ class Town:
         self.n = self.T['n']
         self.rg = random.Random(sum(ord(ch) * (i + 11) for i, ch in enumerate(ctx.id + '/town')))
         self.poly = ctx.town_poly
-        self.sides = [d for d in range(6) if ctx.e[d] == 'c']
+        self.sides = [d for d in range(len(ctx.e)) if ctx.e[d] == 'c']
         self.walls = [quad(tuple(a), tuple(c), tuple(b), 48) for a, c, b in self.T['walls']]
         self.B = Batch()
         self.wind = self.rg.uniform(0, 2 * math.pi)

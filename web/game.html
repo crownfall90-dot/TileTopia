@@ -26,7 +26,7 @@
 
       <nav class="bnav" id="bnav" hidden aria-label="Разделы">
         <button data-nav="menu" aria-label="Главная"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11l8-6.5 8 6.5"/><path d="M6 9.5V19a1 1 0 001 1h3.5v-5h3v5H17a1 1 0 001-1V9.5"/></svg><span>Главная</span></button>
-        <button data-nav="progress" id="progBtn" aria-label="Задания и дорога прогресса"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span class="fnav-label">Задания<i class="fnav-dot" id="progNavDot" hidden></i></span></button>
+        <button data-nav="progress" id="progBtn" aria-label="Прогресс: дорога прогресса и задания"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="5"/><circle cx="12" cy="12" r="1.5"/></svg><span class="fnav-label">Прогресс<i class="fnav-dot" id="progNavDot" hidden></i></span></button>
         <button data-nav="friends" id="friendsBtn" aria-label="Друзья"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><circle cx="9" cy="8" r="3.2"/><path d="M3 19.5c.6-3.3 3-5 6-5s5.4 1.7 6 5"/><path d="M18 8v6M15 11h6"/></svg><span class="fnav-label">Друзья<i class="fnav-dot" id="fNavDot" hidden></i></span></button>
         <button data-nav="shop" id="navShop" aria-label="Витрина"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 9h16l-1.2 10.2a2 2 0 01-2 1.8H7.2a2 2 0 01-2-1.8z"/><path d="M8.5 9V7a3.5 3.5 0 017 0v2"/></svg><span>Витрина</span></button>
       </nav>
@@ -234,7 +234,7 @@
       <section class="screen scroll" id="scr-items" hidden>
         <div class="lb">
           <div class="ltop"><button class="iconbtn" data-go="profile" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Мои предметы</b></div>
-          <div class="seg itabs" id="itabs"><button data-it="st" aria-pressed="true">Статусы</button><button data-it="fr" aria-pressed="false">Рамки</button><button data-it="fg" aria-pressed="false">Фигурки</button><button data-it="em" aria-pressed="false">Эмоции</button><button data-it="lc" aria-pressed="false">Локации</button></div>
+          <div class="seg itabs" id="itabs"><button data-it="st" aria-pressed="true">Статусы</button><button data-it="fr" aria-pressed="false">Рамки</button><button data-it="fg" aria-pressed="false">Фигурки</button><button data-it="av" aria-pressed="false">Аватар</button><button data-it="em" aria-pressed="false">Эмоции</button><button data-it="lc" aria-pressed="false">Локации</button></div>
           <div class="col" id="itemsBody"></div>
         </div>
       </section>
@@ -262,7 +262,7 @@
           <div class="seg rtabs" id="rtabs"><button data-rt="basics" aria-pressed="true">Основы</button><button data-rt="score" aria-pressed="false">Очки</button><button data-rt="meeple" aria-pressed="false">Фишки</button><button data-rt="more" aria-pressed="false">Ещё</button><button data-rt="modes" aria-pressed="false">Награды</button></div>
 
           <div class="rpane" data-rp="basics">
-            <div class="rgoal"><span>🏰</span><div><b>Плиточная стратегия</b><p>Tiletopia — пошаговая плиточная стратегия. Игроки по очереди берут квадратные плитки из общего запаса и выкладывают на стол, развивая города, дороги и особые объекты. Выбранная локация стола меняет мир плиток и добавляет свои уникальные особенности. <b>Побеждает сильнейший тактик!</b></p></div></div>
+            <div class="rgoal"><span>🏰</span><div><b>Плиточная стратегия</b><p>Tiletopia — пошаговая плиточная стратегия. Игроки по очереди берут плитки из общего запаса (в «Классике 2.0» — шестиугольные) и выкладывают на стол, развивая города, дороги и особые объекты. Выбранная локация стола меняет мир плиток и добавляет свои уникальные особенности. <b>Побеждает сильнейший тактик!</b></p></div></div>
             <div class="hitem" style="border:1.5px solid rgba(242,184,75,.4);background:rgba(242,184,75,.08)"><span class="hic">⚔️</span><div><b>Никаких ничьих — победа обязательна!</b><p>В игре полностью исключены ничьи. Если в конце партии счёт очков равный, победитель определяется тай-брейком: завершивший больше объектов ➔ сохранивший больше миплов ➔ по очерёдности за столом. Кто-то обязан победить!</p></div></div>
             <div class="h3">Ваш ход — три действия</div>
             <ol class="rsteps">
@@ -310,7 +310,7 @@
             <div class="h3">Прогресс</div>
             <div class="hitem"><span class="hic">🎯</span><div><b>Задания</b><p>Три задания в день и цели недели. Одно задание в день можно заменить. За все цели недели — большой сундук.</p></div></div>
             <div class="hitem"><span class="hic">🗺</span><div><b>Дорога прогресса</b><p>Опыт за партии поднимает уровень. На дороге — награды за уровни и кубки: тайлы, звёзды, статусы, рамки, фигурки.</p></div></div>
-            <div class="hitem"><span class="hic">🏆</span><div><b>Кубки и рейтинг</b><p>Онлайн-партии на кубки: за 1 место +30, за 2 +15, за 3 +5, за ничью +10. Лучшие игроки — в рейтинге.</p></div></div>
+            <div class="hitem"><span class="hic">🏆</span><div><b>Кубки и рейтинг</b><p>Онлайн-партии на кубки: за 1 место +10, за 2 +5, за 3 +2, ничьих нет. У «Классики 2.0» свои кубки и свой рейтинг.</p></div></div>
           </div>
           <div class="rpane" data-rp="more" hidden>
             <div class="h3">Особые карты</div>
@@ -737,7 +737,7 @@ const KIND = {c:'Город',r:'Дорога',f:'Монастырь'};
 // Seeded randomness lives in src/engine/rng.js (bundled into window.PG by scripts/wrap-web.sh).
 const {rng, hash} = PG.engine;
 // Two currencies (src/state/coins.js): tiles are wallet.gold; the dearest things are paid in stars (wallet.stars).
-const COINS = PG.state.coins;
+const COINS = PG.state.coins, AV = PG.state.avatars;
 let net = null;
 let queue = [], applied = 0, gameLog = null, ending = false;
 // catchUp: moves taken from the history (coming back to a game) are applied at once, without animation, sound or
@@ -1082,7 +1082,9 @@ function cityD(E, S) {
   return {fill: fill + 'Z', wall};
 }
 function ownSvg(t, list) {
-  if (HEX) return hexOwnSvg(t, list);
+  if (HEX) return hexOwnSvg(t, list, HX);
+  // classic cards rendered from src/engine/square.js shapes: the colours lie on those shapes, as on Classic 2.0
+  if (PG.engine.square && PG.engine.square.RENDERED.has(t.type)) return hexOwnSvg(t, list, PG.engine.square);
   if (PG.ui && PG.ui.hud) return PG.ui.hud.ownSvg(t, list, TYPES[t.type] ? TYPES[t.type].e : null);
   const mid = [[50,0],[100,50],[50,100],[0,50]];
   let out = '';
@@ -1108,13 +1110,13 @@ function ownSvg(t, list) {
 }
 // The owner colours on a six-sided tile, drawn in the tile type's own frame (the picture turns with the face), on the
 // shapes the tile renders are built from (src/engine/hex.js shapes): its roads, the town's wall curves, the monastery.
-function hexOwnSvg(t, list) {
-  const R = HX.GEO.R, S = HX.shapes(t.type), P = p => p[0].toFixed(4) + ' ' + p[1].toFixed(4);
+function hexOwnSvg(t, list, M) {
+  const R = M.GEO.R, S = M.shapes(t.type), NS = M.N, P = p => p[0].toFixed(4) + ' ' + p[1].toFixed(4);
   const line = path => path.length === 4 ? `M${P(path[0])}C${P(path[1])} ${P(path[2])} ${P(path[3])}` : `M${P(path[0])}L${P(path[1])}`;
   const strokes = (d, cols, w) => cols.map((c, i) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="${cols.length > 1 ? 'butt' : 'round'}"${cols.length > 1 ? ` stroke-dasharray=".07 ${.07 * (cols.length - 1)}" stroke-dashoffset="${-.07 * i}"` : ''}/>`).join('');
   let out = '';
   for (const it of list) {
-    const base = it.edges.map(d => (d - t.r + 6) % 6).sort();
+    const base = it.edges.map(d => (d - t.r + NS) % NS).sort();
     if (it.kind === 'r') {
       const road = S.roads.find(x => x.edges.slice().sort().join() === base.join());
       if (!road) continue;
@@ -2471,7 +2473,7 @@ function buyReaction(kind, id) {
   const R = PG.state.reactions, p = R.price(kind, id), what = kind === 'emote' ? `эмодзи ${id}` : `фразу «${id}»`;
   if (R.isOwned(wallet, kind, id)) return;
   if (!COINS.canPay(wallet, p)) return toastAny(COINS.lackText(wallet, p));
-  confirmBox(`Купить ${what} за ${p} тайлов? Останется ${wallet.gold - p}.`, 'Купить', () => {
+  confirmBox(`Купить ${what} за ${COINS.priceText(p)}? Потом ${COINS.leftText(wallet, p)}.`, 'Купить', () => {
     const res = R.buy(wallet, kind, id); if (!res.ok) return;
     beep('coin'); track('spend_virtual_currency', {item_name: kind + '_' + R.ALL_EMOTES.concat(R.ALL_PHRASES).indexOf(id), virtual_currency_name: 'gold', value: res.price});
     // a bought line goes straight into the deck while there is room
@@ -2492,7 +2494,7 @@ const _frg = $('#frgrid'); if (_frg) _frg.addEventListener('click', e => {
   if (f.earn && !owned.includes(k)) return toastAny('Рамка за достижение. Получить: ' + f.earn);
   if (!f.price || owned.includes(k)) return pick();
   if (!COINS.canPay(wallet, f.price)) return toastAny(COINS.lackText(wallet, f.price));
-  confirmBox(`Купить рамку «${f.name}» за ${f.price} тайлов?`, 'Купить', () => {
+  confirmBox(`Купить рамку «${f.name}» за ${COINS.priceText(f.price)}?`, 'Купить', () => {
     if ((wallet.frames || []).includes(k) || !COINS.canPay(wallet, f.price)) return;
     COINS.pay(wallet, f.price); wallet.frames = [...(wallet.frames || []), k]; beep('coin');
     track('spend_virtual_currency', {item_name: 'frame_' + k, virtual_currency_name: 'gold', value: f.price});
@@ -2515,7 +2517,7 @@ function pickFig(k) {
 // Buying spends gold, so it asks first: the figure, its price and what is left afterwards.
 function confirmBuy(k) {
   const f = FIGS[k], box = document.createElement('div'); box.className = 'over'; box.style.position = 'fixed';
-  box.innerHTML = `<div class="ocard"><img src="${figPreview(k)}" alt="" style="width:64px;height:84px;margin:0 auto;display:block"><h3>Купить «${f.name}»?</h3><p>Цена: <b><i class="coin" style="display:inline-block;vertical-align:-3px"></i> ${f.price}</b> · останется ${wallet.gold - f.price} тайлов</p><button class="cta wide" data-b="yes">Купить</button><button class="ghostbtn" data-b="no">Отмена</button></div>`;
+  box.innerHTML = `<div class="ocard"><img src="${figPreview(k)}" alt="" style="width:64px;height:84px;margin:0 auto;display:block"><h3>Купить «${f.name}»?</h3><p>Цена: <b>${COINS.priceText(f.price)}</b> · ${COINS.leftText(wallet, f.price)}</p><button class="cta wide" data-b="yes">Купить</button><button class="ghostbtn" data-b="no">Отмена</button></div>`;
   document.body.append(box);
   box.onclick = e => {
     const b = e.target.closest('[data-b]'); if (!b && e.target !== box) return;
@@ -4564,7 +4566,8 @@ function renderMenuProfile() {
   try { earnedCheck(); } catch (_) {}
   const need = xpNeed(PROG.lvl), name = profileName(), pct = Math.max(0, Math.min(100, 100 * PROG.xp / need));
   // The plate says who you are and how far to the next level, in words: «Уровень 3», «120 / 200 опыта», a bar.
-  el.innerHTML = `<span class="av${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${(name[0] || '?').toUpperCase()}</span>`
+  const lk = AV.look(wallet);
+  el.innerHTML = `<span class="av${myRing() ? ' fr' : ''}${lk.cls}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}${lk.style}">${(name[0] || '?').toUpperCase()}</span>`
     + `<span class="mpi"><b>${name}</b><span class="mpl"><em>Уровень ${PROG.lvl}</em><small>${PROG.xp} / ${need} опыта</small></span>`
     + `<i class="mxp" role="progressbar" aria-valuemin="0" aria-valuemax="${need}" aria-valuenow="${PROG.xp}" aria-label="Опыт до уровня ${PROG.lvl + 1}"><i style="width:${pct.toFixed(1)}%"></i></i></span>`;
   fitNick(el.querySelector('.mpi b'));
@@ -5551,10 +5554,10 @@ function renderStatusShop() {
   const box = $('#stgrid'); if (!box) return;
   const own = ST().ownedStatuses(wallet), worn = wallet.statusKey || '';
   box.innerHTML = (typeof PG !== 'undefined' && PG.ui && PG.ui.shop && PG.ui.shop.renderStatusShopHtml)
-    ? PG.ui.shop.renderStatusShopHtml({shopStatuses: ST().SHOP_STATUSES, ownedStatuses: own, wornKey: worn, gold: wallet.gold, stBadgeFn: stBadge})
+    ? PG.ui.shop.renderStatusShopHtml({shopStatuses: ST().SHOP_STATUSES, ownedStatuses: own, wornKey: worn, gold: wallet.gold, stars: wallet.stars, stBadgeFn: stBadge})
     : ST().SHOP_STATUSES.map(x => {
         const k = 'sh:' + x.id, has = own.includes(k), poor = !has && !COINS.canPay(wallet, x.price);
-        return `<button class="stb${worn === k ? ' sel' : ''}${poor ? ' poor' : ''}" data-stb="${x.id}">${stBadge(x.text)}<small>${worn === k ? 'Надет' : has ? 'Надеть' : `<i class="coin"></i>${x.price}`}</small></button>`;
+        return `<button class="stb${worn === k ? ' sel' : ''}${poor ? ' poor' : ''}" data-stb="${x.id}">${stBadge(x.text)}<small>${worn === k ? 'Надет' : has ? 'Надеть' : COINS.priceTag(x.price)}</small></button>`;
       }).join('');
 }
 const STATUS_ERR = {short: 'Слишком короткий статус', long: 'Не больше 15 символов', bad: 'Такой текст нельзя: выберите другой', owned: 'Такой статус у вас уже есть', gold: 'Не хватает золота'};
@@ -5564,7 +5567,7 @@ const _stg = $('#stgrid'); if (_stg) _stg.addEventListener('click', e => {
   const x = ST().SHOP_STATUSES.find(q => q.id === b.dataset.stb), k = 'sh:' + x.id;
   if (ST().ownedStatuses(wallet).includes(k)) { ST().wearStatus(wallet, wallet.statusKey === k ? null : k); return afterStatusChange(); }
   if (!COINS.canPay(wallet, x.price)) return toastAny(COINS.lackText(wallet, x.price));
-  confirmBox(`Купить статус «${x.text}» за ${x.price} тайлов?`, 'Купить', () => {
+  confirmBox(`Купить статус «${x.text}» за ${COINS.priceText(x.price)}?`, 'Купить', () => {
     const r = ST().buyShopStatus(wallet, x.id);
     if (!r.ok) return toastAny(STATUS_ERR[r.reason] || 'Не получилось');
     ST().wearStatus(wallet, r.key); beep('coin');
@@ -5578,7 +5581,7 @@ $('#stBuy').onclick = () => {
   if (t.length < 2) return toastAny(STATUS_ERR.short);
   if (ST().isBadStatus(t)) return toastAny(STATUS_ERR.bad);
   if (!COINS.canPay(wallet, ST().CUSTOM_PRICE)) return toastAny(COINS.lackText(wallet, ST().CUSTOM_PRICE));
-  confirmBox(`Свой статус «${t}» за ${ST().CUSTOM_PRICE} тайлов?`, 'Купить', () => {
+  confirmBox(`Свой статус «${t}» за ${COINS.priceText(ST().CUSTOM_PRICE)}?`, 'Купить', () => {
     const r = ST().buyCustomStatus(wallet, t);
     if (!r.ok) return toastAny(STATUS_ERR[r.reason] || 'Не получилось');
     ST().wearStatus(wallet, r.key); beep('coin'); inp.value = '';
@@ -5611,7 +5614,7 @@ function renderPlayerShowcaseHtml() {
     </div>
     <div class="psc-body">
       <div class="psc-av-wrap">
-        <span class="av${frameObj.ring ? ' fr' : ''}" style="--c:${wallet.color};${frameObj.ring ? `--fr:${frameObj.ring}` : ''}">${initial}</span>
+        <span class="av${frameObj.ring ? ' fr' : ''}${AV.look(wallet).cls}" style="--c:${wallet.color};${frameObj.ring ? `--fr:${frameObj.ring}` : ''}${AV.look(wallet).style}">${initial}</span>
       </div>
       <div class="psc-info">
         <div class="psc-name-line">
@@ -5629,6 +5632,38 @@ function renderPlayerShowcaseHtml() {
     </div>
   </div>`;
 }
+
+// Profile picture tab: the shape (round for everyone, square and banner bought) and the worn portrait / banner.
+function avPickerHtml() {
+  const ini = (profileName()[0] || '?').toUpperCase(), ring = myRing(), base = `--c:${wallet.color};${ring ? `--fr:${ring};` : ''}`;
+  const av = (cls, style) => `<span class="av${ring ? ' fr' : ''}${cls}" style="${base}${style}">${ini}</span>`;
+  const shapeBtn = k => { const o = AV.owns(wallet, 'shape', k), x = AV.SHAPES[k]; return `<button class="${(wallet.avShape || 'round') === k ? 'sel' : ''}" ${o ? `data-avwear="shape|${k}"` : `data-avbuy="shape|${k}"`}>${av(k === 'round' ? '' : ' sh-' + k, '')}<span>${x.name}</span>${o ? '' : `<small>${COINS.priceTag(x.price)}</small>`}</button>`; };
+  const picBtn = (kind, k, it, shape) => `<button class="${(kind === 'pic' ? wallet.avatar : wallet.banner) === k ? 'sel' : ''}" data-avwear="${kind}|${k}">${av(` pic${shape}`, `--pic:url(${it.src});--pp:${it.pos};`)}<span>${it.name}</span></button>`;
+  const mine = (kind, P, shape) => Object.entries(P).filter(([k]) => AV.owns(wallet, kind, k)).map(([k, it]) => picBtn(kind, k, it, shape)).join('');
+  const none = kind => `<button class="${(kind === 'pic' ? wallet.avatar : wallet.banner) ? '' : 'sel'}" data-avwear="${kind}|">${av(kind === 'banner' ? ' sh-rect' : '', '')}<span>Без картинки</span></button>`;
+  return `<div class="avpick"><div class="h3 sec">Форма</div><div class="avsh">${['round', 'square', 'rect'].map(shapeBtn).join('')}</div>`
+    + `<div class="h3 sec">Аватарки</div><div class="avpics">${none('pic')}${mine('pic', AV.PICS, '')}</div>`
+    + `<div class="h3 sec">Баннеры</div><div class="avpics">${none('banner')}${mine('banner', AV.BANNERS, ' sh-rect')}</div>`
+    + `<small class="rs-note">Новые аватарки, баннеры и формы — в витрине, на прилавке «Картинки профиля».</small></div>`;
+}
+function buyAvatarItem(kind, id) {
+  const P = kind === 'shape' ? AV.SHAPES : kind === 'banner' ? AV.BANNERS : AV.PICS, it = P[id]; if (!it || AV.owns(wallet, kind, id)) return;
+  if (!COINS.canPay(wallet, it.price)) return toastAny(COINS.lackText(wallet, it.price));
+  const what = kind === 'shape' ? `форму «${it.name}»` : kind === 'banner' ? `баннер «${it.name}»` : `аватарку «${it.name}»`;
+  confirmBox(`Купить ${what} за ${COINS.priceText(it.price)}?`, 'Купить', () => {
+    if (!AV.buy(wallet, kind, id).ok) return;
+    AV.wear(wallet, kind, id); if (kind === 'banner') AV.wear(wallet, 'shape', 'rect');
+    beep('coin'); track('spend_virtual_currency', {item_name: 'av_' + kind + '_' + id, virtual_currency_name: 'gold', value: it.price});
+    saveWallet(); renderShop(); renderMenuProfile(); if (!$('#scr-items') || !$('#scr-items').hidden) renderItems();
+    toastAny(`Куплено: ${it.name}`);
+  });
+}
+document.addEventListener('click', e => {
+  const b = e.target.closest('[data-avbuy],[data-avwear]'); if (!b) return;
+  if (b.dataset.avbuy) { const [k, id] = b.dataset.avbuy.split('|'); return buyAvatarItem(k, id); }
+  const [k, id] = b.dataset.avwear.split('|'); AV.wear(wallet, k, id); if (k === 'banner' && id) AV.wear(wallet, 'shape', 'rect');
+  saveWallet(); renderMenuProfile(); renderItems();
+});
 
 function renderItems() {
   const box = $('#itemsBody'); if (!box) return;
@@ -5657,6 +5692,8 @@ function renderItems() {
             wallet
           })
         : '<p>Загрузка реакций...</p>';
+    } else if (itab === 'av') {
+      tabContent = avPickerHtml();
     } else {
       tabContent = PG.ui.shop.renderItemsLocsHtml(LOCS);
     }
@@ -5678,12 +5715,12 @@ function renderItems() {
     const lock = Object.entries(FRAMES).filter(([k, f]) => !ownFr.includes(k));
     const effFr = previewFrameKey || wallet.frame || 'none';
     box.innerHTML = showcase + `<div class="icount">Собрано <b>${have}</b> из ${total}</div><div class="frgrid">${ownFr.map(k => { const f = FRAMES[k], sel = effFr === k; return `<button class="frb${sel ? ' sel' : ''}" data-ifr="${k}"><span class="av${f.ring ? ' fr' : ''}" style="--c:${wallet.color};${f.ring ? `--fr:${f.ring}` : ''}">${(profileName()[0] || '?').toUpperCase()}</span><span>${f.name}</span><small>${sel ? 'Надета' : 'Надеть'}</small></button>`; }).join('')}</div>`
-      + (lock.length ? `<div class="h3 sec">Ещё не открыты (нажмите для примерки)</div><div class="frgrid">${lock.map(([k, f]) => `<button class="frb lockd${previewFrameKey === k ? ' sel' : ''}" data-pfr="${k}" title="Нажмите для примерки"><span class="av fr" style="--c:#2a3254;--fr:${f.ring}">?</span><span>${f.name}</span><small>${previewFrameKey === k ? 'Примерка' : (f.earn ? '🔒 ' + f.earn : `<i class="coin"></i>${f.price}`)}</small></button>`).join('')}</div>` : '')
+      + (lock.length ? `<div class="h3 sec">Ещё не открыты (нажмите для примерки)</div><div class="frgrid">${lock.map(([k, f]) => `<button class="frb lockd${previewFrameKey === k ? ' sel' : ''}" data-pfr="${k}" title="Нажмите для примерки"><span class="av fr" style="--c:#2a3254;--fr:${f.ring}">?</span><span>${f.name}</span><small>${previewFrameKey === k ? 'Примерка' : (f.earn ? '🔒 ' + f.earn : COINS.priceTag(f.price))}</small></button>`).join('')}</div>` : '')
       + '<button class="ghostbtn wide" data-ishop>В магазин</button>';
   } else if (itab === 'fg') {
     const ownF = Object.keys(FIGS).filter(k => wallet.owned.includes(k)), lock = Object.keys(FIGS).filter(k => !wallet.owned.includes(k));
     box.innerHTML = showcase + `<div class="icount">Собрано <b>${ownF.length}</b> из ${Object.keys(FIGS).length}</div><div class="figgrid">${ownF.map(k => `<button class="fig${wallet.fig === k ? ' sel' : ''}" data-ifig="${k}"><img src="${figPreview(k)}" alt=""><b>${FIGS[k].name}</b><small>${wallet.fig === k ? 'Выбрана' : 'Выбрать'}</small></button>`).join('')}</div>`
-      + (lock.length ? `<div class="h3 sec">Ещё не куплены</div><div class="figgrid">${lock.map(k => `<div class="fig poor lockd"><img src="${figPreview(k)}" alt="" style="filter:grayscale(1) brightness(.6)"><b>${FIGS[k].name}</b><small><i class="coin"></i>${FIGS[k].price}</small></div>`).join('')}</div>` : '')
+      + (lock.length ? `<div class="h3 sec">Ещё не куплены</div><div class="figgrid">${lock.map(k => `<div class="fig poor lockd"><img src="${figPreview(k)}" alt="" style="filter:grayscale(1) brightness(.6)"><b>${FIGS[k].name}</b><small>${COINS.priceTag(FIGS[k].price)}</small></div>`).join('')}</div>` : '')
       + '<button class="ghostbtn wide" data-ishop>В магазин</button>';
   } else {
     box.innerHTML = showcase + `<div class="icount">Открыто <b>${LOCS.filter(l => l.open).length}</b> из ${LOCS.length}</div><div class="locgrid">${LOCS.map(l => `<div class="loccard${l.open ? ' active' : ' locked'}"><div class="locart"><svg viewBox="0 0 160 90" aria-hidden="true">${l.art}</svg><span class="locbadge ${l.open ? 'open' : 'soon'}">${l.open ? '✓ Активна' : 'Скоро'}</span></div><div class="locinfo"><b>${l.name}</b><small>${l.desc || ''}</small></div></div>`).join('')}</div>`;
@@ -8025,11 +8062,12 @@ initMenuHub();
       const parts = buyBtn.dataset.dailyBuy.split('|');
       const kind = parts[0], key = kind === 'status' ? parts[1].replace(/^sh:/, '') : parts[1], price = +parts[2];
       if (kind === 'emote' || kind === 'phrase') return buyReaction(kind, key);
+      if (kind === 'av') { const [k, id] = key.split(':'); return buyAvatarItem(k, id); }
       if (!COINS.canPay(wallet, price)) return toastAny(COINS.lackText(wallet, price));
 
       if (kind === 'fig') {
         const f = FIGS[key];
-        confirmBox(`Купить фигурку «${f ? f.name : key}» за ${price} тайлов?`, 'Купить', () => {
+        confirmBox(`Купить фигурку «${f ? f.name : key}» за ${COINS.priceText(price)}?`, 'Купить', () => {
           if (!COINS.canPay(wallet, price) || wallet.owned.includes(key)) return;
           COINS.pay(wallet, price); wallet.owned.push(key);
           beep('coin'); pickFig(key);
@@ -8037,7 +8075,7 @@ initMenuHub();
         });
       } else if (kind === 'frame') {
         const f = FRAMES[key];
-        confirmBox(`Купить рамку «${f ? f.name : key}» за ${price} тайлов?`, 'Купить', () => {
+        confirmBox(`Купить рамку «${f ? f.name : key}» за ${COINS.priceText(price)}?`, 'Купить', () => {
           if (!COINS.canPay(wallet, price) || (wallet.frames || []).includes(key)) return;
           COINS.pay(wallet, price); wallet.frames = [...(wallet.frames || []), key];
           wallet.frame = key; beep('coin');
@@ -8047,7 +8085,7 @@ initMenuHub();
       } else if (kind === 'status') {
         const st = PG.state.status.SHOP_STATUSES.find(s => s.id === key);
         const name = st ? st.text : key;
-        confirmBox(`Купить статус «${name}» за ${price} тайлов?`, 'Купить', () => {
+        confirmBox(`Купить статус «${name}» за ${COINS.priceText(price)}?`, 'Купить', () => {
           const fullKey = 'sh:' + key;
           if (!COINS.canPay(wallet, price) || (wallet.statuses || []).includes(fullKey)) return;
           COINS.pay(wallet, price); wallet.statuses = [...(wallet.statuses || []), fullKey];
