@@ -41,6 +41,7 @@ jobs:
           # Move agent data to temporary location
           mkdir -p /tmp/agent_data_export
           cp -r agent_data/* /tmp/agent_data_export/
+          rm -rf agent_data
           
           # Check out or create orphan branch telemetry/agent-hub
           if git show-ref --quiet refs/remotes/origin/telemetry/agent-hub; then
