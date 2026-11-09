@@ -1,7 +1,7 @@
 # Tiletopia — Инструкции для разработчиков и агентов (Claude Opus 5.5 / Antigravity)
 
 > **Статус проекта: АКТИВЕН.** Все 299 unit-тестов проходят успешно (`node --test tests/*.test.cjs`).
-> **Текущая боевая версия (Production):** `v273` (APK `app.crownfall.tiletopia`)
+> **Текущая боевая версия (Production):** `v274` (APK `app.crownfall.tiletopia`)
 > **Тестовая среда (Staging):** отдельное изолированное приложение **«Tiletopia Test»** (`app.crownfall.tiletopia.test`), публикуется в релиз `staging-latest`.
 > **Встроенный авто-апдейтер:** работает из коробки в тестовом приложении и обновляет APK без необходимости ручного скачивания из браузера.
 
