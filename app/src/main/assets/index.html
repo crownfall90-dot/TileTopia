@@ -2,34 +2,22 @@
 <html lang="ru"><head><meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">
 <link rel="stylesheet" href="fonts/fonts.css">
-<script>/* Runs before the game script (scripts/wrap-web.sh puts it in the page head). If the game cannot start — an error while
-   it sets itself up, or no sign of life in 20 s — the player gets a way out instead of an endless loading screen:
-   the update the app found (the game's own update window is in the script that failed), a check for one, a retry.
-   The game sets window.__ready = true at the very end of its start-up and then replaces window.onUpdateAvailable. */
+<script>
+/* If the game cannot start (usually an outdated Android System WebView), say how to fix it instead of a blank screen. */
 (function () {
-  var shown = false;
-  // Until the game takes over, an update found by the app is kept here (the game picks it up, see game.html).
-  window.onUpdateAvailable = function (info) { window.__upd = info; if (shown) fail(); };
-  function btn(id, text, main) {
-    return '<button id="' + id + '" style="background:' + (main ? '#f2b84b;color:#2a1a02' : 'rgba(255,255,255,.08);color:#eef1f8') + ';border:none;padding:13px 24px;border-radius:14px;font:700 15px sans-serif;cursor:pointer;margin:0 0 10px;min-width:240px">' + text + '</button>';
-  }
   function fail() {
     if (window.__ready) return;
-    shown = true;
-    var u = window.__upd, a = window.AndroidApp, canUpdate = !!(u && u.url && a && a.startUpdate), canCheck = !!(a && a.checkUpdates);
-    document.body.innerHTML = '<div style="font:16px sans-serif;color:#eef1f8;background:#101729;position:fixed;top:0;left:0;right:0;bottom:0;padding:32px;line-height:1.5;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center;z-index:99999">' +
-      '<div style="font-size:48px;margin-bottom:12px">🧩</div><h2 style="margin:0 0 10px">Не удалось запустить игру</h2>' +
-      '<p style="max-width:360px;color:#94a3b8;margin:0 0 22px">' + (canUpdate ? 'Вышла исправленная версия' + (u.version ? ' ' + u.version : '') + '. Обновите игру — прогресс сохранится.' : 'Проверьте обновление игры или попробуйте ещё раз.') + '</p>' +
-      (canUpdate ? btn('bootUpd', 'Обновить игру', true) : canCheck ? btn('bootChk', 'Проверить обновление', true) : '') +
-      btn('bootRetry', 'Попробовать снова', !canUpdate && !canCheck) +
-      (a ? '<p style="font-size:13px;margin:8px 0 0"><a style="color:#8db4ff" href="https://play.google.com/store/apps/details?id=com.google.android.webview">Обновить Android System WebView</a></p>' : '') + '</div>';
-    var b = document.getElementById('bootUpd'), c = document.getElementById('bootChk');
-    if (b) b.onclick = function () { b.disabled = true; b.textContent = 'Загружаем обновление…'; try { a.startUpdate(u.url); } catch (e) {} };
-    if (c) c.onclick = function () { c.textContent = 'Проверяем…'; try { a.checkUpdates(); } catch (e) {} setTimeout(function () { if (!window.__upd) c.textContent = 'Обновлений нет · проверить снова'; }, 6000); };
-    document.getElementById('bootRetry').onclick = function () { location.reload(); };
+    if (document.getElementById('boot') || document.getElementById('bnav') || document.querySelector('.screen:not([hidden])')) {
+      window.__ready = true;
+      return;
+    }
+    document.body.innerHTML = '<div style="font:16px sans-serif;color:#eef1f8;background:#101729;position:fixed;top:0;left:0;right:0;bottom:0;padding:32px;line-height:1.5;display:flex;flex-direction:column;align-items:center;justify-content:center;text-align:center">' +
+      '<div style="font-size:48px;margin-bottom:16px">🧩</div>' +
+      '<h2 style="margin:0 0 12px">Не удалось запустить игру</h2>' +
+      '<p style="max-width:380px;color:#94a3b8;margin:0 0 20px">Произошла задержка при инициализации компонентов. Попробуйте перезапустить игру или обновить системный компонент WebView.</p>' +
+      '<button onclick="location.reload()" style="background:#4f8ef7;color:#fff;border:none;padding:12px 24px;border-radius:12px;font-size:15px;font-weight:600;cursor:pointer;margin-bottom:16px">Попробовать снова</button>' +
+      '<p style="font-size:13px;color:#64748b;margin:0"><a style="color:#f2b84b;text-decoration:none" href="https://play.google.com/store/apps/details?id=com.google.android.webview">Обновить Android System WebView в Google Play</a></p></div>';
   }
-  // an error while the game sets itself up means it will not start: say so at once (after a moment for the page to settle)
-  window.addEventListener('error', function () { if (!window.__ready) setTimeout(fail, 1500); });
   setTimeout(fail, 20000);
 })();
 </script>
@@ -344,7 +332,31 @@
     </div>
     <button class="cta wide" id="fbSend">Отправить${e?" (+10 тайлов)":""}</button>
     <button class="ghostbtn" id="fbCancel">Отмена</button>
-  </div>`}const yr=Object.freeze(Object.defineProperty({__proto__:null,FEEDBACK_CATS:Ia,FEEDBACK_COLORS:Ha,FEEDBACK_PLACEHOLDERS:hr,FEEDBACK_STAR_LABELS:br,formatFeedbackPayload:mr,renderFeedbackCardHtml:gr},Symbol.toStringTag,{value:"Module"}));function za(e,t=100){const n=[0,1,2,3].filter(w=>e[w]==="c"),l=n.length,i=t/2,o=[[0,0],[t,0],[t,t],[0,t]],r=[[t/2,0],[t,t/2],[t/2,t],[0,t/2]],c=w=>w[0].toFixed(1)+" "+w[1].toFixed(1);if(l===4)return{fill:`M0 0H${t}V${t}H0Z`,wall:""};if(l===1){const w=n[0],S=([C,P])=>{let b=C-i,L=P-i;for(let a=0;a<w;a++)[b,L]=[-L,b];return[i+b,i+L]},H=S([0,0]),$=S([t,0]),k=S([t/2,t*.64]);return{fill:`M${c(H)}L${c($)}Q${c(k)} ${c(H)}Z`,wall:`M${c($)}Q${c(k)} ${c(H)}`}}const d=n.find(w=>e[(w+3)%4]!=="c");let f=`M${c(o[d])}`,u="",y=d,g=0;for(;g<4;){if(e[y]==="c"){f+=`L${c(o[(y+1)%4])}`,y=(y+1)%4,g++;continue}let w=0;for(;e[(y+w)%4]!=="c";)w++;const S=o[y],H=o[(y+w)%4],$=w===1?r[y]:o[(y+1)%4],k=w===1?.88:.86,C=[$[0]+(i-$[0])*k,$[1]+(i-$[1])*k];f+=`Q${c(C)} ${c(H)}`,u+=`M${c(S)}Q${c(C)} ${c(H)}`,y=(y+w)%4,g+=w}return{fill:f+"Z",wall:u}}function vr(e,t,n=null){const l=[[50,0],[100,50],[50,100],[0,50]];let i="";const o=(r,c,d,f="")=>c.map((u,y)=>`<path d="${r}" fill="none" stroke="${u}" stroke-width="${d}" stroke-linecap="${c.length>1?"butt":"round"}"${c.length>1?` stroke-dasharray="7 ${7*(c.length-1)}" stroke-dashoffset="${-7*y}"`:""} ${f}/>`).join("");for(const r of t){const c=r.edges.map(d=>(d-(e.r||0)+4)%4);if(r.kind==="r"){const[d,f]=c.map(y=>l[y].join(" ")),u=c.length===2?`M${d}Q50 50 ${f}`:`M${d}L50 50`;i+=`<path d="${u}" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="10" stroke-linecap="round"/>`+o(u,r.cols,6.5)}else if(r.kind==="c"){const d=za(n||["c","f","f","f"],100);i+=`<path d="${d.fill}" fill="${r.cols[0]}" fill-opacity="${r.cols.length>1?.12:.22}"/>`,d.wall?i+=`<path d="${d.wall}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="7" stroke-linecap="round"/>`+o(d.wall,r.cols,4.5):i+=o("M3 3H97V97H3Z",r.cols,4.5)}else if(r.kind==="f"){const d="M50 20A30 30 0 1 1 49.9 20Z";i+=`<path d="${d}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="7"/>`+o(d,r.cols,4.5)}}return"data:image/svg+xml,"+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${i}</svg>`)}function $r(e,t){const{turn:n,phase:l,bump:i,isMe:o,myRing:r,meeplesTotal:c,turnTag:d,clockHtml:f}=t;return(e||[]).map((u,y)=>{const g=y===n&&l!=="end"?" active":"",w=i&&i.includes(y)?" bump":"",S=u.resigned?" out":"",H=u.uid&&!o(u)?` data-pl="${String(u.uid).replace(/[^\w-]/g,"").slice(0,64)}" data-n="${u.name}" data-c="${u.col}"`:"",$=o(u)&&r()?` fr" style="--fr:${r()}`:"",k=u.resigned?"сдался":u.missed>=1?"🤖 "+u.name:u.name,C=!u.human&&!u.ghost?' <span class="botpill">бот</span>':"",P=u.st?`<span class="pst">${u.st}</span>`:"",L=Array.from({length:c||6},(B,O)=>`<i${O<u.meeples?"":' class="off"'}></i>`).join(""),a=f?f(y):"";return`<div${H} class="pl${g}${w}${S}" style="--c:${u.col}"><span class="tg">${d(y)}</span><span class="av${$}">${u.init}</span><span class="pi"><span class="nm">${k}${C}</span>${P}<span class="pline"><b class="sc">${u.score}</b><span class="mp">${L}</span></span></span>${a}</div>`}).join("")}const kr=Object.freeze(Object.defineProperty({__proto__:null,cityD:za,ownSvg:vr,renderPlayersListHtml:$r},Symbol.toStringTag,{value:"Module"}));function Sr(e,t,n=!1){return e?t?n?"Победа!":"Победил "+e.name:"Лидирует "+e.name:""}function wr(e,t){return e.map(([n,l,i])=>{const o=l===1?" first":"",r=t?t(n.i):"",c=n.human?"":' <span class="botpill">бот</span>';return`<div class="pc${o}">${r}<b>${n.name}${c}</b><span class="pts">${n.score}</span><div class="blk" style="height:${i}px">${l}</div></div>`}).join("")}function Mr(e){return e.map(t=>{const n=t.human?"":' <span class="botpill">бот</span>',l=t.stats||{c:0,r:0,f:0,t:0};return`<tr style="--c:${t.col}"><td><span class="dot"></span>${t.name}${n}</td><td>${l.c}</td><td>${l.r}</td><td>${l.f}</td><td>${l.t||0}</td><td>${t.score}</td></tr>`}).join("")}function xr({tilesCount:e,movesCount:t,figsCount:n,deckCount:l}){return`<span><b>${e}</b>карт на поле</span><span><b>${t}</b>ходов</span><span><b>${n}</b>фишек выставлено</span><span><b>${l}</b>карт в стопке</span>`}const Tr={c:["город","города"],r:["дорога","дороги"],f:["монастырь","монастыря"]},_r=e=>e%10===1&&e%100!==11?"карты":"карт";function Pr(e){let t=null;for(const i of e)i.best&&i.best.pts>0&&(!t||i.best.pts>t.best.pts)&&(t=i);if(!t)return"";const n=Tr[t.best.kind]||["объект"],l=t.best.kind==="f"?n[0]:`${n[0]} из ${t.best.n} ${_r(t.best.n)}`;return`<div class="bestmove" style="--c:${t.col}"><span>Лучший ход</span><b>${t.name}</b> — ${l}, +${t.best.pts}</div>`}const Ar=Object.freeze(Object.defineProperty({__proto__:null,renderBestMoveHtml:Pr,renderBreakdownTableHtml:Mr,renderPodiumHtml:wr,renderSummaryLineHtml:xr,winTitle:Sr},Symbol.toStringTag,{value:"Module"})),Na={fast:"⚡",classic:"⚖️",epic:"🏰",hex:"⬢"};function Cr(e,t,n=!1){return e?`<div class="modecards">${Object.entries(e).map(([l,i])=>{const o=t===l,r=Na[l]||"🎮",c=i.desc?i.desc.split(" · ").slice(0,2).join(" · "):"";return`<button class="mcard" data-setmode="${l}" aria-pressed="${o}"${n?" disabled":""}><i>${r}</i><b>${i.label}</b><small>${c}</small></button>`}).join("")}</div>`:""}function Er(e,t={},{isOnline:n=!1,isRoom:l=!1}={}){return Array.isArray(e)?e.filter(i=>i.k!=="mode"&&(!i.room||l)).map(i=>{const o=i.opts.map(([r,c],d)=>{if(n&&i.k==="timer"&&!r)return"";const f=t[i.k]===r||n&&i.k==="timer"&&r===60&&!t.timer;return`<button data-i="${d}" aria-pressed="${f}">${c}</button>`}).join("");return`<div class="opt"><span>${i.label}</span><span class="mseg" data-k="${i.k}">${o}</span></div>`}).join(""):""}const Rr={bots:{title:"Игра с ботами",go:"Начать партию",hint:"Одиночная игра против ботов."},local:{title:"На одном телефоне",go:"Начать партию",hint:"Передавайте устройство перед каждым ходом."},online:{title:"Игра онлайн",go:"Начать игру",hint:"",seg:"Игроков в матче"},friends:{title:"Комната для друзей",go:"Создать комнату",hint:"",seg:"Вместимость комнаты"}};function Or(e){return{bots:["#3fc27a","🤖","Против компьютера","Тренировка: боты ходят сами"],local:["#b06cf0","📱","На одном телефоне","Передавайте телефон по очереди"],online:["gold","🌐","Рейтинг и кубки","Соперники со всего мира"],friends:["#4c8dff","👥","Игра с друзьями","Код комнаты — друзьям"]}[e]||["#4c8dff","🧩","",""]}function Lr(e,t,n=l=>(l||"").trim()){const l=n(e&&e[0]&&e[0].name);return n(t&&t.name)||n(t&&t.guest)||(l&&l!=="Вы"&&l!=="Игрок"?l:"")||"nickname"}function jr(e,t,n=[]){!Array.isArray(e)||t!=="bots"&&t!=="local"||e.forEach((l,i)=>{l.human=t==="local"||i===0;const o=n[i]?n[i].name:"Бот "+(i+1);t==="local"&&i&&l.name===o&&(l.name="Игрок "+(i+1)),t==="bots"&&i&&l.name==="Игрок "+(i+1)&&(l.name=o)})}function vn(e,t=[],n=[]){return Array.isArray(n)?`<span class="swatches">${n.map(l=>`<button class="sw${l.col===e?" on":""}" style="--c:${l.col}" data-sw="${l.col}" ${t.includes(l.col)?"disabled":""} aria-label="${l.name}"></button>`).join("")}</span>`:""}function Dr(e,t,n=[]){const l=(e||"?")[0]||"?",i=vn(t,[],n);return{infoHtml:`<span class="av" style="--c:${t}">${l}</span><b>${e}</b><small>изменить — в настройках</small>`,swHtml:i}}function Ir(e,t,{profileName:n="nickname",colorEdit:l=-1,palette:i=[]}={}){if(!Array.isArray(e))return"";const o=e.slice(0,t);return o.map((r,c)=>{const f=((c?r.name:n)||"").replace(/"/g,"&quot;"),u=o.filter((w,S)=>S!==c).map(w=>w.col),y=l===c?vn(r.col,u,i):"",g=r.human?"":'<span class="botmark" title="Бот">🤖 бот</span>';return`<li class="seat"><button class="av colbtn" style="--c:${r.col}" data-col="${c}" aria-label="Цвет игрока ${c+1}">${c+1}</button><span class="who"><input id="pn${c}" value="${f}" maxlength="12" aria-label="Имя игрока ${c+1}"${c?"":" readonly"}></span>${g}${y}</li>`}).join("")}const Hr=Object.freeze(Object.defineProperty({__proto__:null,SETUP_ICONS:Na,SETUP_MODES:Rr,adjustSeatsForMode:jr,formatProfileName:Lr,getSetupHeroMeta:Or,renderModeCardsHtml:Cr,renderRuleRowsHtml:Er,renderSetupMeHtml:Dr,renderSetupSeatsHtml:Ir,renderSwatchesHtml:vn},Symbol.toStringTag,{value:"Module"}));function zr({online:e,live:t,seat:n,allBots:l}){const i=e?"Онлайн-партия":t?"Пауза":"Меню",o=e?"Партия идёт, пока вы в меню":t?"Боты ждут, время хода остановлено":"",r=!!(e&&t&&n>=0&&!l),c=!!(!e&&t||l),d=r?'<button class="ghostbtn danger wide" data-a="resign">Сдаться</button>':"",f=c?'<button class="ghostbtn danger" data-a="cancel">Отменить партию</button>':"";return`<div class="ocard"><h3>${i}</h3>`+(o?`<p>${o}</p>`:"<p></p>")+'<button class="cta wide" data-a="resume">Продолжить</button><button class="ghostbtn" data-a="settings">Настройки</button>'+d+f+'<button class="ghostbtn" data-a="menu">Выйти в главное меню</button></div>'}function Nr(e,t,n){return Array.isArray(e)?e.every(l=>l===n||typeof t=="function"&&t(l)):!1}const Br=Object.freeze(Object.defineProperty({__proto__:null,areAllOpponentsAway:Nr,formatGameMenuHtml:zr},Symbol.toStringTag,{value:"Module"})),$n=[{id:"notif_old_status",category:"rewards",icon:"🗿",badge:"Эксклюзив",badgeClass:"b-gold",requires:"registered",title:"Статус «Олд» — за регистрацию",date:"Награда",desc:"Спасибо, что вы с нами с самого начала! Статус «Олд» получают только игроки, которые завели профиль до 2027 года. Его видят соперники в партиях и в рейтинге.",rewardType:"status",rewardKey:"ex:old",rewardTitle:"Статус «Олд»",actionLabel:"Забрать статус"},{id:"notif_name_proposal_reward",category:"rewards",icon:"💡",badge:"Награда",badgeClass:"b-gold",title:"Награда: +300 тайлов за название игры",date:"Награда",desc:"Благодарим вас за предложение названия для нашей игры! Конкурс завершён, игра официально называется Tiletopia. В награду вам начислено 300 тайлов.",rewardType:"gold",rewardAmount:300,rewardTitle:"+300 тайлов",actionLabel:"Забрать 300 тайлов"},{id:"notif_welcome_gold",category:"rewards",icon:"🪙",badge:"Подарок",badgeClass:"b-gold",title:"Подарок: +500 тайлов",date:"Награда",desc:"Тайлы на витрину: фигурки, рамки, картинки профиля и статусы.",rewardType:"gold",rewardAmount:500,rewardTitle:"+500 тайлов",actionLabel:"Забрать 500 тайлов"},{id:"notif_news_seasons",category:"news",icon:"🏆",badge:"Сезоны",badgeClass:"b-gold",title:"Чемпионы каждые две недели",date:"10.11.2026",desc:"Раз в две недели лучшие игроки рейтинга получают звания: «Чемпион», «Чемпион ×2» и дальше, а места со второго по третье — «Призёр». Рейтинг при этом не сбрасывается.",actionLabel:"Открыть рейтинг",actionLink:"rating"},{id:"notif_news_tiles",category:"news",icon:"🏰",badge:"Обновление",badgeClass:"b-purple",title:"Новые плитки и картинки профиля",date:"10.11.2026",desc:"Плитки «Классики» перерисованы так же подробно, как в «Классике 2.0». В витрине появились аватарки и баннеры, а у аватара — квадратная форма и форма-баннер.",actionLabel:"В витрину",actionLink:"shop"}],Ba=(e,t)=>e.filter(n=>n.requires!=="registered"||t);function Wr(e=[],t=[],n=[],l=!1){const i=Ba($n,l).filter(r=>!!(r.rewardType&&!e.includes(r.id)||!r.rewardType&&!t.includes(r.id))).length,o=Array.isArray(n)?n.length:0;return i+o}function Gr({items:e=$n,claimed:t=[],filter:n="rewards",friendRequests:l=[],registered:i=!1}){const o=Ba(e,i).filter(f=>n==="all"||f.category===n),r=(n==="all"||n==="rewards")&&Array.isArray(l)&&l.length>0;let c="";if(r&&(c=l.map(([f,u])=>{const y=f.slice(0,-2),g=String(u&&u.n?u.n:"Игрок").replace(/[<>&"']/g,"").slice(0,20);return`
+  </div>`}const yr=Object.freeze(Object.defineProperty({__proto__:null,FEEDBACK_CATS:Ia,FEEDBACK_COLORS:Ha,FEEDBACK_PLACEHOLDERS:hr,FEEDBACK_STAR_LABELS:br,formatFeedbackPayload:mr,renderFeedbackCardHtml:gr},Symbol.toStringTag,{value:"Module"}));function za(e,t=100){const n=[0,1,2,3].filter(w=>e[w]==="c"),l=n.length,i=t/2,o=[[0,0],[t,0],[t,t],[0,t]],r=[[t/2,0],[t,t/2],[t/2,t],[0,t/2]],c=w=>w[0].toFixed(1)+" "+w[1].toFixed(1);if(l===4)return{fill:`M0 0H${t}V${t}H0Z`,wall:""};if(l===1){const w=n[0],S=([C,P])=>{let b=C-i,L=P-i;for(let a=0;a<w;a++)[b,L]=[-L,b];return[i+b,i+L]},H=S([0,0]),$=S([t,0]),k=S([t/2,t*.64]);return{fill:`M${c(H)}L${c($)}Q${c(k)} ${c(H)}Z`,wall:`M${c($)}Q${c(k)} ${c(H)}`}}const d=n.find(w=>e[(w+3)%4]!=="c");let f=`M${c(o[d])}`,u="",y=d,g=0;for(;g<4;){if(e[y]==="c"){f+=`L${c(o[(y+1)%4])}`,y=(y+1)%4,g++;continue}let w=0;for(;e[(y+w)%4]!=="c";)w++;const S=o[y],H=o[(y+w)%4],$=w===1?r[y]:o[(y+1)%4],k=w===1?.88:.86,C=[$[0]+(i-$[0])*k,$[1]+(i-$[1])*k];f+=`Q${c(C)} ${c(H)}`,u+=`M${c(S)}Q${c(C)} ${c(H)}`,y=(y+w)%4,g+=w}return{fill:f+"Z",wall:u}}function vr(e,t,n=null){const l=[[50,0],[100,50],[50,100],[0,50]];let i="";const o=(r,c,d,f="")=>c.map((u,y)=>`<path d="${r}" fill="none" stroke="${u}" stroke-width="${d}" stroke-linecap="${c.length>1?"butt":"round"}"${c.length>1?` stroke-dasharray="7 ${7*(c.length-1)}" stroke-dashoffset="${-7*y}"`:""} ${f}/>`).join("");for(const r of t){const c=r.edges.map(d=>(d-(e.r||0)+4)%4);if(r.kind==="r"){const[d,f]=c.map(y=>l[y].join(" ")),u=c.length===2?`M${d}Q50 50 ${f}`:`M${d}L50 50`;i+=`<path d="${u}" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width="10" stroke-linecap="round"/>`+o(u,r.cols,6.5)}else if(r.kind==="c"){const d=za(n||["c","f","f","f"],100);i+=`<path d="${d.fill}" fill="${r.cols[0]}" fill-opacity="${r.cols.length>1?.12:.22}"/>`,d.wall?i+=`<path d="${d.wall}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="7" stroke-linecap="round"/>`+o(d.wall,r.cols,4.5):i+=o("M3 3H97V97H3Z",r.cols,4.5)}else if(r.kind==="f"){const d="M50 20A30 30 0 1 1 49.9 20Z";i+=`<path d="${d}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width="7"/>`+o(d,r.cols,4.5)}}return"data:image/svg+xml,"+encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${i}</svg>`)}function $r(e,t){const{turn:n,phase:l,bump:i,isMe:o,myRing:r,meeplesTotal:c,turnTag:d,clockHtml:f}=t;return(e||[]).map((u,y)=>{const g=y===n&&l!=="end"?" active":"",w=i&&i.includes(y)?" bump":"",S=u.resigned?" out":"",H=u.uid&&!o(u)?` data-pl="${String(u.uid).replace(/[^\w-]/g,"").slice(0,64)}" data-n="${u.name}" data-c="${u.col}"`:"",$=o(u)&&r()?` fr" style="--fr:${r()}`:"",k=u.resigned?"сдался":u.missed>=1?"🤖 "+u.name:u.name,C=!u.human&&!u.ghost?' <span class="botpill">бот</span>':"",P=u.st?`<span class="pst">${u.st}</span>`:"",L=Array.from({length:c||6},(B,O)=>`<i${O<u.meeples?"":' class="off"'}></i>`).join(""),a=f?f(y):"";return`<div${H} class="pl${g}${w}${S}" style="--c:${u.col}"><span class="tg">${d(y)}</span><span class="av${$}">${u.init}</span><span class="pi"><span class="nm">${k}${C}</span>${P}<span class="pline"><b class="sc">${u.score}</b><span class="mp">${L}</span></span></span>${a}</div>`}).join("")}const kr=Object.freeze(Object.defineProperty({__proto__:null,cityD:za,ownSvg:vr,renderPlayersListHtml:$r},Symbol.toStringTag,{value:"Module"}));function Sr(e,t,n=!1){return e?t?n?"Победа!":"Победил "+e.name:"Лидирует "+e.name:""}function wr(e,t){return e.map(([n,l,i])=>{const o=l===1?" first":"",r=t?t(n.i):"",c=n.human?"":' <span class="botpill">бот</span>';return`<div class="pc${o}">${r}<b>${n.name}${c}</b><span class="pts">${n.score}</span><div class="blk" style="height:${i}px">${l}</div></div>`}).join("")}function Mr(e){return e.map(t=>{const n=t.human?"":' <span class="botpill">бот</span>',l=t.stats||{c:0,r:0,f:0,t:0};return`<tr style="--c:${t.col}"><td><span class="dot"></span>${t.name}${n}</td><td>${l.c}</td><td>${l.r}</td><td>${l.f}</td><td>${l.t||0}</td><td>${t.score}</td></tr>`}).join("")}function xr({tilesCount:e,movesCount:t,figsCount:n,deckCount:l}){return`<span><b>${e}</b>карт на поле</span><span><b>${t}</b>ходов</span><span><b>${n}</b>фишек выставлено</span><span><b>${l}</b>карт в стопке</span>`}const Tr={c:["город","города"],r:["дорога","дороги"],f:["монастырь","монастыря"]},_r=e=>e%10===1&&e%100!==11?"карты":"карт";function Pr(e){let t=null;for(const i of e)i.best&&i.best.pts>0&&(!t||i.best.pts>t.best.pts)&&(t=i);if(!t)return"";const n=Tr[t.best.kind]||["объект"],l=t.best.kind==="f"?n[0]:`${n[0]} из ${t.best.n} ${_r(t.best.n)}`;return`<div class="bestmove" style="--c:${t.col}"><span>Лучший ход</span><b>${t.name}</b> — ${l}, +${t.best.pts}</div>`}const Ar=Object.freeze(Object.defineProperty({__proto__:null,renderBestMoveHtml:Pr,renderBreakdownTableHtml:Mr,renderPodiumHtml:wr,renderSummaryLineHtml:xr,winTitle:Sr},Symbol.toStringTag,{value:"Module"})),Na={fast:"⚡",classic:"⚖️",epic:"🏰",hex:"⬢"};function Cr(e,t,n=!1){return e?`<div class="modecards">${Object.entries(e).map(([l,i])=>{const o=t===l,r=Na[l]||"🎮",c=i.desc?i.desc.split(" · ").slice(0,2).join(" · "):"";return`<button class="mcard" data-setmode="${l}" aria-pressed="${o}"${n?" disabled":""}><i>${r}</i><b>${i.label}</b><small>${c}</small></button>`}).join("")}</div>`:""}function Er(e,t={},{isOnline:n=!1,isRoom:l=!1}={}){return Array.isArray(e)?e.filter(i=>i.k!=="mode"&&(!i.room||l)).map(i=>{const o=i.opts.map(([r,c],d)=>{if(n&&i.k==="timer"&&!r)return"";const f=t[i.k]===r||n&&i.k==="timer"&&r===60&&!t.timer;return`<button data-i="${d}" aria-pressed="${f}">${c}</button>`}).join("");return`<div class="opt"><span>${i.label}</span><span class="mseg" data-k="${i.k}">${o}</span></div>`}).join(""):""}const Rr={bots:{title:"Игра с ботами",go:"Начать партию",hint:"Одиночная игра против ботов."},local:{title:"На одном телефоне",go:"Начать партию",hint:"Передавайте устройство перед каждым ходом."},online:{title:"Игра онлайн",go:"Начать игру",hint:"",seg:"Игроков в матче"},friends:{title:"Комната для друзей",go:"Создать комнату",hint:"",seg:"Вместимость комнаты"}};function Or(e){return{bots:["#3fc27a","🤖","Против компьютера","Тренировка: боты ходят сами"],local:["#b06cf0","📱","На одном телефоне","Передавайте телефон по очереди"],online:["gold","🌐","Рейтинг и кубки","Соперники со всего мира"],friends:["#4c8dff","👥","Игра с друзьями","Код комнаты — друзьям"]}[e]||["#4c8dff","🧩","",""]}function Lr(e,t,n=l=>(l||"").trim()){const l=n(e&&e[0]&&e[0].name);return n(t&&t.name)||n(t&&t.guest)||(l&&l!=="Вы"&&l!=="Игрок"?l:"")||"nickname"}function jr(e,t,n=[]){!Array.isArray(e)||t!=="bots"&&t!=="local"||e.forEach((l,i)=>{l.human=t==="local"||i===0;const o=n[i]?n[i].name:"Бот "+(i+1);t==="local"&&i&&l.name===o&&(l.name="Игрок "+(i+1)),t==="bots"&&i&&l.name==="Игрок "+(i+1)&&(l.name=o)})}function vn(e,t=[],n=[]){return Array.isArray(n)?`<span class="swatches">${n.map(l=>`<button class="sw${l.col===e?" on":""}" style="--c:${l.col}" data-sw="${l.col}" ${t.includes(l.col)?"disabled":""} aria-label="${l.name}"></button>`).join("")}</span>`:""}function Dr(e,t,n=[]){const l=(e||"?")[0]||"?",i=vn(t,[],n);return{infoHtml:`<span class="av" style="--c:${t}">${l}</span><b>${e}</b><small>изменить — в настройках</small>`,swHtml:i}}function Ir(e,t,{profileName:n="nickname",colorEdit:l=-1,palette:i=[]}={}){if(!Array.isArray(e))return"";const o=e.slice(0,t);return o.map((r,c)=>{const f=((c?r.name:n)||"").replace(/"/g,"&quot;"),u=o.filter((w,S)=>S!==c).map(w=>w.col),y=l===c?vn(r.col,u,i):"",g=r.human?"":'<span class="botmark" title="Бот">🤖 бот</span>';return`<li class="seat"><button class="av colbtn" style="--c:${r.col}" data-col="${c}" aria-label="Цвет игрока ${c+1}">${c+1}</button><span class="who"><input id="pn${c}" value="${f}" maxlength="12" aria-label="Имя игрока ${c+1}"${c?"":" readonly"}></span>${g}${y}</li>`}).join("")}const Hr=Object.freeze(Object.defineProperty({__proto__:null,SETUP_ICONS:Na,SETUP_MODES:Rr,adjustSeatsForMode:jr,formatProfileName:Lr,getSetupHeroMeta:Or,renderModeCardsHtml:Cr,renderRuleRowsHtml:Er,renderSetupMeHtml:Dr,renderSetupSeatsHtml:Ir,renderSwatchesHtml:vn},Symbol.toStringTag,{value:"Module"}));function zr({online:e,live:t,seat:n,allBots:l}){const i=e?"Онлайн-партия":t?"Пауза":"Меню",o=e?"Партия идёт, пока вы в меню":t?"Боты ждут, время хода остановлено":"",r=!!(e&&t&&n>=0&&!l),c=!!(!e&&t||l),d=r?'<button class="ghostbtn danger wide" data-a="resign">Сдаться</button>':"",f=c?'<button class="ghostbtn danger" data-a="cancel">Отменить партию</button>':"";return`<div class="ocard"><h3>${i}</h3>`+(o?`<p>${o}</p>`:"<p></p>")+'<button class="cta wide" data-a="resume">Продолжить</button><button class="ghostbtn" data-a="settings">Настройки</button>'+d+f+'<button class="ghostbtn" data-a="menu">Выйти в главное меню</button></div>'}function Nr(e,t,n){return Array.isArray(e)?e.every(l=>l===n||typeof t=="function"&&t(l)):!1}const Br=Object.freeze(Object.defineProperty({__proto__:null,areAllOpponentsAway:Nr,formatGameMenuHtml:zr},Symbol.toStringTag,{value:"Module"})),$n=[{id:"notif_old_status",category:"rewards",icon:"🗿",badge:"Эксклюзив",badgeClass:"b-gold",requires:"registered",title:"Статус «Олд» — за регистрацию",date:"Награда",desc:"Спасибо, что вы с нами с самого начала! Статус «Олд» получают только игроки, которые завели профиль до 2027 года. Его видят соперники в партиях и в рейтинге.",rewardType:"status",rewardKey:"ex:old",rewardTitle:"Статус «Олд»",actionLabel:"Забрать статус"},{id:"notif_name_proposal_reward",category:"rewards",icon:"💡",badge:"Награда",badgeClass:"b-gold",title:"Награда: +300 тайлов за название игры",date:"Награда",desc:"Благодарим вас за предложение названия для нашей игры! Конкурс завершён, игра официально называется Tiletopia. В награду вам начислено 300 тайлов.",rewardType:"gold",rewardAmount:300,rewardTitle:"+300 тайлов",actionLabel:"Забрать 300 тайлов"},{id:"notif_welcome_gold",category:"rewards",icon:"🪙",badge:"Подарок",badgeClass:"b-gold",title:"Подарок: +500 тайлов",date:"Награда",desc:"Тайлы на витрину: фигурки, рамки, картинки профиля и статусы.",rewardType:"gold",rewardAmount:500,rewardTitle:"+500 тайлов",actionLabel:"Забрать 500 тайлов"},{id:"notif_news_v286",category:"news",icon:"🚀",badge:"Версия 1.0.286",badgeClass:"b-gold",title:"Большое обновление: свайпы, витрина и баланс",date:"10.11.2026",desc:"Встречайте масштабное обновление Tiletopia! Плавные свайпы между экранами, обновлённая витрина с подсказками, аутентичные плитки без пазлов и награды за название игры.",fullText:`Встречайте масштабное обновление Tiletopia 1.0.286!
+
+✨ Главные новшества:
+
+• Плавный свайп: кинематографичная анимация переходов между разделами меню и вкладками.
+• Редизайн «Как играть»: идеальные отступы, структурированные блоки и наглядные карточки правил.
+• Витрина предметов: по 1 аккуратной кнопке «Что это?» на прилавок с подробным описанием свойств и редкостей.
+• Прямоугольный баннер героя: элегантный формат аватара с видами замка и тракта.
+• Аутентичные плитки на столе: квадратные в классике и 6-гранные в 2.0 без пазлов и выступов.
+• Дорога прогресса: карта плавно продолжается под нижней панелью, стоянки перенесены в живописные места у моста, монастыря и крепости.
+• Награда за конкурс названия: всем авторам предложений начислено по 300 тайлов.`,actionLabel:"Изучить обновление",actionLink:"rules"},{id:"notif_news_seasons",category:"news",icon:"🏆",badge:"Сезоны",badgeClass:"b-gold",title:"Чемпионы каждые две недели",date:"10.11.2026",desc:"Раз в две недели лучшие игроки рейтинга получают звания: «Чемпион», «Чемпион ×2» и дальше, а места со второго по третье — «Призёр». Рейтинг при этом не сбрасывается.",fullText:`В игре запущена система регулярных двухнедельных сезонов!
+
+👑 Награды для лучших тактиков:
+
+• 1-е место в рейтинге получает престижное звание «Чемпион» (а при повторных победах — «Чемпион ×2», «Чемпион ×3» и далее).
+• 2-е и 3-е места награждаются постоянным званием «Призёр».
+• Звания отображаются в вашем профиле, в карточке игрока и за игровым столом.
+• Кубки не сбрасываются: вы сохраняете заработанный рейтинг и продолжаете соревноваться за лидерство.`,actionLabel:"Открыть рейтинг",actionLink:"rating"},{id:"notif_news_tiles",category:"news",icon:"🏰",badge:"Обновление",badgeClass:"b-purple",title:"Новые плитки и картинки профиля",date:"10.11.2026",desc:"Плитки «Классики» перерисованы так же подробно, как в «Классике 2.0». В витрине появились аватарки и баннеры, а у аватара — квадратная форма и форма-баннер.",fullText:`Королевство преобразилось!
+
+🎨 Визуальные улучшения и кастомизация:
+
+• Карты «Классики» полностью перерисованы в высоком разрешении с детализацией дорог, крепостей и водоёмов.
+• Новая форма аватара: прямоугольный «Баннер» и стильный «Квадрат».
+• Эксклюзивные пейзажи замка и тракта для формы баннера.
+• Новые рамки и редкие статусы на витрине за тайлы и звёзды.`,actionLabel:"В витрину",actionLink:"shop"}],Ba=(e,t)=>e.filter(n=>n.requires!=="registered"||t);function Wr(e=[],t=[],n=[],l=!1){const i=Ba($n,l).filter(r=>!!(r.rewardType&&!e.includes(r.id)||!r.rewardType&&!t.includes(r.id))).length,o=Array.isArray(n)?n.length:0;return i+o}function Gr({items:e=$n,claimed:t=[],filter:n="rewards",friendRequests:l=[],registered:i=!1}){const o=Ba(e,i).filter(f=>n==="all"||f.category===n),r=(n==="all"||n==="rewards")&&Array.isArray(l)&&l.length>0;let c="";if(r&&(c=l.map(([f,u])=>{const y=f.slice(0,-2),g=String(u&&u.n?u.n:"Игрок").replace(/[<>&"']/g,"").slice(0,20);return`
         <div class="notif-card friends notif-friend-card" data-fkey="${f}">
           <div class="nc-top">
             <div class="nc-header">
@@ -409,8 +421,8 @@
               ${u?"✓ Забрано":`🎁 ${f.actionLabel}`}
             </button>
           `:`
-            <button class="nc-link-btn" data-notif-link="${f.actionLink||"menu"}">
-              ${f.actionLabel} →
+            <button class="nc-link-btn notif-read-btn" data-open-news="${f.id}" data-notif-link="${f.actionLink||"menu"}">
+              Читать подробнее →
             </button>
           `}
         </div>
@@ -8263,67 +8275,44 @@ button:disabled:active,
 
 /* ==================== FEATURE ENHANCEMENTS BATCH 2026 ==================== */
 
-/* 1. Profile & Main Menu Banner Backdrops */
-.pctop.has-banner {
-  position: relative;
-  background-image: var(--banner-bg) !important;
-  background-position: var(--banner-pos, center) !important;
-  background-size: cover !important;
-  background-repeat: no-repeat !important;
-  border-radius: 24px;
-  overflow: hidden;
-  border: 1px solid rgba(242, 184, 75, 0.45);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.18);
-  min-height: 120px;
+/* 1. Rectangle Banner Shape Styling (Hero Avatar) */
+.av.sh-rect {
+  border-radius: 12px !important;
+  aspect-ratio: 2.2 / 1 !important;
+  width: auto !important;
+  height: 100% !important;
+  max-width: 130px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), inset 0 0 0 1.5px rgba(242, 184, 75, 0.45);
 }
-.pctop.has-banner .prof-banner-shade {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(14, 20, 36, 0.4) 0%, rgba(14, 20, 36, 0.88) 100%);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-  z-index: 1;
+.mprof .av.sh-rect {
+  height: 42px !important;
+  width: 92px !important;
+  max-width: 92px !important;
 }
-.pctop.has-banner .prof-hero-row {
-  position: relative;
-  z-index: 2;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+.pctop .av.big.sh-rect {
+  height: 52px !important;
+  width: 114px !important;
+  max-width: 114px !important;
+  border-radius: 14px !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5), inset 0 0 0 2px rgba(242, 184, 75, 0.55);
 }
-.pctop.has-banner .pnick {
-  color: #fff !important;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95), 0 0 12px rgba(242, 184, 75, 0.4);
+.pcard .av.big.sh-rect {
+  height: 54px !important;
+  width: 118px !important;
+  max-width: 118px !important;
+  border-radius: 14px !important;
 }
-.pctop.has-banner .fst {
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+.shop-stall.stall-avatars .av.sh-rect {
+  height: 38px !important;
+  width: 84px !important;
 }
-.pctop.has-banner .pmail {
-  color: rgba(255, 255, 255, 0.75) !important;
+.avpick button .av.sh-rect {
+  height: 34px !important;
+  width: 75px !important;
 }
-
-#mprof.has-banner {
-  position: relative;
-  background-image: var(--mbanner-bg) !important;
-  background-position: var(--mbanner-pos, center) !important;
-  background-size: cover !important;
-  background-repeat: no-repeat !important;
-  border-radius: 20px;
-  overflow: hidden;
-  border: 1.5px solid rgba(242, 184, 75, 0.45);
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
-}
-#mprof.has-banner .mprof-shade {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(14, 20, 36, 0.35) 0%, rgba(14, 20, 36, 0.85) 100%);
-  backdrop-filter: blur(1.5px);
-  -webkit-backdrop-filter: blur(1.5px);
-  z-index: 1;
-}
-#mprof.has-banner .mprof-content,
-#mprof.has-banner > * {
-  position: relative;
-  z-index: 2;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+.avpick .avsh button .av.sh-rect {
+  height: 30px !important;
+  width: 66px !important;
 }
 
 /* 2. Stall Category Hints & Banner Purchase Lock */
@@ -8428,48 +8417,49 @@ button:disabled:active,
   position: absolute;
   top: 8px;
   right: 8px;
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: rgba(239, 83, 80, 0.88);
   color: #fff;
-  font: 800 10px var(--f-body, sans-serif);
+  font: 700 10.5px var(--f-body, sans-serif);
   padding: 3px 8px;
-  border-radius: 8px;
-  letter-spacing: 0.3px;
+  border-radius: 999px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-  z-index: 2;
+  z-index: 3;
 }
 .stall-buy-btn.locked {
-  background: rgba(255, 255, 255, 0.06) !important;
-  border-color: rgba(255, 255, 255, 0.12) !important;
-  color: rgba(255, 255, 255, 0.5) !important;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.4);
+  border-color: rgba(255, 255, 255, 0.1);
   cursor: not-allowed;
   filter: none !important;
 }
 
 /* 3. Screen Swipe Slide Animations */
 .screen.slide-left {
-  animation: screenSlideLeft 0.26s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: screenSlideLeft 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
 }
 .screen.slide-right {
-  animation: screenSlideRight 0.26s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: screenSlideRight 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
 }
 @keyframes screenSlideLeft {
   0% {
-    opacity: 0.7;
-    transform: translate3d(24px, 0, 0);
+    opacity: 0;
+    transform: translate3d(32px, 0, 0) scale(0.985);
   }
   100% {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 @keyframes screenSlideRight {
   0% {
-    opacity: 0.7;
-    transform: translate3d(-24px, 0, 0);
+    opacity: 0;
+    transform: translate3d(-32px, 0, 0) scale(0.985);
   }
   100% {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -8482,8 +8472,8 @@ button:disabled:active,
 /* 4. Match Bottom Tray Nickname Legibility */
 .turnfig {
   flex: 0 0 auto;
-  min-width: 68px;
-  max-width: 110px;
+  min-width: 72px;
+  max-width: 140px;
   width: auto;
   padding: 0 4px;
   display: flex;
@@ -8493,25 +8483,49 @@ button:disabled:active,
   filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
 }
 .turnfig small {
-  max-width: 104px;
+  max-width: 135px;
   font: 700 11.5px var(--f-display, sans-serif);
   color: var(--c);
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;
   text-align: center;
 }
 #cname {
   font-size: 13.5px;
   font-weight: 700;
-  max-width: 130px;
+  max-width: none;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;
+}
+#cname small {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #a8b6d4;
+  white-space: nowrap;
 }
 
-/* 5. Progress Road Grand Bridge & Scenery */
+/* 5. Authentic Table Tiles (Stack & Shuffle) */
+.cback.hex {
+  clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+  border-radius: 0;
+  border: none;
+  background: radial-gradient(circle at 50% 50%, #f2d68a 0 14%, transparent 15%),
+              radial-gradient(circle at 50% 50%, #7a5a2a 0 19%, transparent 20%),
+              repeating-linear-gradient(60deg, #5d9d40 0 6px, #6aab4a 6px 12px);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.45));
+}
+.cback.sq {
+  border-radius: 8px;
+  background: radial-gradient(circle at 50% 50%, #f2d68a 0 14%, transparent 15%),
+              radial-gradient(circle at 50% 50%, #7a5a2a 0 19%, transparent 20%),
+              repeating-linear-gradient(45deg, #5d9d40 0 6px, #6aab4a 6px 12px);
+  border: 2.5px solid #ead9b0;
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.15), 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* 6. Progress Road Scenery & Smooth Progression */
 .rd-grand-bridge {
   filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.55));
 }
@@ -8519,43 +8533,185 @@ button:disabled:active,
   stroke: rgba(140, 150, 175, 0.65);
   stroke-dasharray: 2 4;
 }
+#scr-progress .lb {
+  padding-bottom: calc(var(--nav-h, 64px) + 24px);
+}
+.roadwrap {
+  padding-bottom: calc(var(--nav-h, 64px) + 32px);
+}
 
-/* 6. Spacing Consistency & Rules Polish */
+/* 7. Spacing Consistency & Rules Screen Polish */
+#scr-rules .lb {
+  padding-bottom: 36px;
+}
+#scr-rules .h3 {
+  margin: 16px 0 10px 4px !important;
+}
+.rpane {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.rpane > * {
+  margin: 0 !important;
+}
 .hitem {
-  margin-bottom: 12px;
-  padding: 13px 15px;
-  line-height: 1.48;
-}
-.hitem p {
-  margin: 4px 0 0;
-  font-size: 13px;
-  line-height: 1.46;
-  color: rgba(255, 255, 255, 0.84);
-}
-.hitem b {
-  font-size: 14px;
-  color: #fff;
-}
-.rgoal {
-  margin-bottom: 14px;
+  display: grid;
+  grid-template-columns: 50px 1fr;
+  gap: 14px;
+  align-items: start;
   padding: 14px 16px;
   border-radius: 18px;
+  background: linear-gradient(175deg, rgba(30, 42, 80, 0.85) 0%, rgba(14, 20, 44, 0.92) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1.5px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  box-sizing: border-box;
+}
+.hitem b {
+  font: 800 15px var(--f-display, sans-serif);
+  color: #fff;
+  display: block;
+  margin-bottom: 4px;
+  line-height: 1.35;
+}
+.hitem p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: rgba(220, 229, 245, 0.92);
+}
+.hitem em {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(242, 184, 75, 0.12);
+  border: 1px solid rgba(242, 184, 75, 0.3);
+  font: 700 12px var(--f-body, sans-serif);
+  font-style: normal;
+  color: #ffd877;
+}
+.rgoal {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 16px;
+  border-radius: 20px;
+  background: linear-gradient(160deg, rgba(242, 184, 75, 0.18), rgba(255, 255, 255, 0.05));
+  border: 1.5px solid rgba(242, 184, 75, 0.4);
+  box-sizing: border-box;
+}
+.rgoal > span {
+  font-size: 38px;
+  line-height: 1;
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+.rgoal b {
+  font: 800 16px var(--f-display, sans-serif);
+  color: #fff;
+  display: block;
+  margin-bottom: 6px;
+}
+.rgoal p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #dbe2f4;
+}
+.rsteps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 .rsteps li {
-  margin-bottom: 10px;
+  position: relative;
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 14px;
+  align-items: center;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid var(--line);
+  box-sizing: border-box;
 }
-.rsteps li p {
-  margin: 3px 0 0;
+.rsteps li > i {
+  position: absolute;
+  left: -1px;
+  top: -1px;
+  width: 24px;
+  height: 24px;
+  border-radius: 18px 0 12px 0;
+  display: grid;
+  place-items: center;
+  font: 800 12px var(--f-display);
+  font-style: normal;
+  background: var(--brass);
+  color: var(--brass-ink);
+}
+.rsteps .ric {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-size: 26px;
+  background: rgba(255, 255, 255, 0.07);
+}
+.rsteps b {
+  font: 700 14.5px var(--f-display, sans-serif);
+  color: #fff;
+  display: block;
+  margin-bottom: 3px;
+}
+.rsteps p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #d5dcf0;
+}
+.goldrow {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+.goldrow span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 4px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line);
+  font-size: 16px;
+}
+.goldrow b {
+  font: 800 13px var(--f-display);
+  color: var(--brass);
+  margin-top: 4px;
+}
+.rnote {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
   font-size: 12.5px;
-  line-height: 1.42;
+  line-height: 1.5;
 }
 
-/* 7. News Reader Modal */
+/* 8. News Reader Modal */
 .news-reader-modal {
   position: fixed;
   inset: 0;
   z-index: 140;
-  background: rgba(5, 8, 18, 0.82);
+  background: rgba(5, 8, 18, 0.85);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   display: flex;
@@ -8568,25 +8724,33 @@ button:disabled:active,
   max-width: 480px;
   max-height: 85vh;
   overflow-y: auto;
-  background: linear-gradient(175deg, #1a2542 0%, #0d1424 100%);
+  background: linear-gradient(175deg, #18233e 0%, #0c1322 100%);
   border: 1.5px solid rgba(242, 184, 75, 0.5);
   border-radius: 24px;
-  padding: 24px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(242, 184, 75, 0.2);
+  padding: 22px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.75), 0 0 40px rgba(242, 184, 75, 0.2);
   display: flex;
   flex-direction: column;
-  gap: 16px;
-}
-.nm-head {
-  display: flex;
-  align-items: center;
   gap: 14px;
 }
-.nm-icon {
+.nrm-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 12px;
+}
+.nrm-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.nrm-icon {
   font-size: 28px;
-  width: 48px;
-  height: 48px;
-  border-radius: 16px;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
   background: rgba(242, 184, 75, 0.16);
   border: 1px solid rgba(242, 184, 75, 0.35);
   display: flex;
@@ -8594,33 +8758,59 @@ button:disabled:active,
   justify-content: center;
   flex-shrink: 0;
 }
-.nm-title {
+.nrm-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.nrm-title {
   font: 800 18px var(--f-display, sans-serif);
   color: #fff;
   margin: 0;
+  line-height: 1.35;
 }
-.nm-date {
-  font: 600 12px var(--f-body, sans-serif);
-  color: var(--muted, #8ea1c1);
-}
-.nm-body {
+.nrm-body {
   font: 500 14px/1.6 var(--f-body, sans-serif);
   color: rgba(255, 255, 255, 0.9);
-  padding: 12px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
-.nm-body p {
-  margin: 0 0 10px;
+.nrm-body p {
+  margin: 0;
+  line-height: 1.55;
 }
-.nm-body p:last-child {
-  margin-bottom: 0;
+.nrm-list {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
-.nm-close {
-  width: 100%;
+.nrm-list li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: #e2e8f0;
+}
+.nrm-list li::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 0.55em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--brass, #f2b84b);
+  box-shadow: 0 0 6px rgba(242, 184, 75, 0.6);
+}
+.nrm-close {
+  flex: 0 0 auto;
 }
 
-/* 8. My Items ("Мои предметы") Overhaul */
+/* 9. My Items ("Мои предметы") Overhaul */
 #scr-items .icount {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
@@ -8666,6 +8856,7 @@ button:disabled:active,
   background: linear-gradient(145deg, rgba(242, 184, 75, 0.2), rgba(242, 184, 75, 0.06));
   box-shadow: 0 4px 16px rgba(242, 184, 75, 0.2);
 }
+
 </style>
 
 <div class="page">
@@ -8918,7 +9109,7 @@ button:disabled:active,
         <div class="lb rules">
           <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Как играть</b></div>
           <button class="tutcard" id="tutBtn"><span>🎓</span><span><b>Обучение за 2 минуты</b><small>Сыграйте первую партию с подсказками · +30 тайлов</small></span><i class="tgo">›</i></button>
-          <div class="seg rtabs" id="rtabs"><button data-rt="basics" aria-pressed="true">Основы</button><button data-rt="score" aria-pressed="false">Очки</button><button data-rt="meeple" aria-pressed="false">Фишки</button><button data-rt="more" aria-pressed="false">Ещё</button><button data-rt="modes" aria-pressed="false">Награды</button></div>
+          <div class="seg rtabs" id="rtabs"><button data-rt="basics" aria-pressed="true">Основы</button><button data-rt="score" aria-pressed="false">Очки</button><button data-rt="meeple" aria-pressed="false">Фишки</button><button data-rt="modes" aria-pressed="false">Режимы</button><button data-rt="more" aria-pressed="false">Ещё</button></div>
 
           <div class="rpane" data-rp="basics">
             <div class="rgoal"><span>🏰</span><div><b>Плиточная стратегия</b><p>Tiletopia — пошаговая плиточная стратегия. Игроки по очереди берут плитки из общего запаса (в «Классике 2.0» — шестиугольные) и выкладывают на стол, развивая города, дороги и особые объекты. Выбранная локация стола меняет мир плиток и добавляет свои уникальные особенности. <b>Побеждает сильнейший тактик!</b></p></div></div>
@@ -8926,8 +9117,8 @@ button:disabled:active,
             <div class="h3">Ваш ход — три действия</div>
             <ol class="rsteps">
               <li><i>1</i><span class="ric">🧩</span><div><b>Возьмите плитку</b><p>Плитка из запаса показана внизу экрана. Её можно поворачивать кнопкой «Повернуть».</p></div></li>
-              <li><i>2</i><span class="ric">🗺️</span><div><b>Приложите к полю</b><p>Все края обязаны совпасть с соседями: город к городу, дорога к дороге, река к реке. Доступные места подсвечены.</p></div></div>
-              <li><i>3</i><span class="ric">🧍</span><div><b>Выставьте мипла (подданного)</b><p>По желанию отправьте мипла на объект только что выставленной плитки (рыцарь в город, разбойник на дорогу, монах в монастырь). Затем — «Поставить».</p></div></div>
+              <li><i>2</i><span class="ric">🗺️</span><div><b>Приложите к полю</b><p>Все края обязаны совпасть с соседями: город к городу, дорога к дороге, река к реке. Доступные места подсвечены.</p></div></li>
+              <li><i>3</i><span class="ric">🧍</span><div><b>Выставьте мипла (подданного)</b><p>По желанию отправьте мипла на объект только что выставленной плитки (рыцарь в город, разбойник на дорогу, монах в монастырь). Затем — «Поставить».</p></div></li>
             </ol>
             <div class="h3">Умные подсказки</div>
             <div class="hitem"><span class="hic">💡</span><div><b>Подсказка лучшего хода</b><p>Игра анализирует поле и может подсказать самое выгодное место для плитки с расчётом будущих очков. Лампочка справа от стола ставит плитку на оптимальную позицию.</p><em>В настройках: «Всегда», «По кнопке» или «Выкл»</em></div></div>
@@ -11011,7 +11202,7 @@ const meepleImg = i => SPR['m' + i] ? `<img src="${SPR['m' + i].url}" alt="">` :
 // The shop shows each figure as a little 3D character (tools/blender_generators/generate_figurines.py, assets/figs);
 // a figure without one is drawn as on the board.
 const FIG_ART = ['classic', 'peasant', 'monk', 'knight', 'archer', 'wizard', 'ninja', 'paladin', 'king', 'queen'];
-const figPreview = (() => { const cache = {}; return fig => FIG_ART.includes(fig) ? `figs/${fig}.webp` : cache[fig] || (cache[fig] = (() => { const [c, g] = cv(40, 52, 3); drawFigure(g, 40, 52, '#ef5350', fig); return c.toDataURL(); })()); })();
+const figPreview = (() => { const cache = {}; return fig => FIG_ART.includes(fig) ? `figs/${fig}.webp` : cache[fig] || (cache[fig] = (() => { try { const [c, g] = cv(40, 52, 3); drawFigure(g, 40, 52, '#ef5350', fig); return c.toDataURL(); } catch (_) { return ''; } })()); })();
 
 async function redeemPromo(code) {
   code = (code || '').trim().toUpperCase();
@@ -13410,9 +13601,7 @@ function renderProfile() {
   const mail = fbAuth && fbAuth.email ? String(fbAuth.email).replace(/[<>&"]/g, '') : 'Профиль не сохранён';
   const profEl = $('#profile');
   if (profEl) {
-    const curBanner = wallet.banner && AV.BANNERS[wallet.banner] && AV.owns(wallet, 'banner', wallet.banner) ? AV.BANNERS[wallet.banner] : null;
-    const bannerStyle = curBanner ? `--banner-bg:url(${curBanner.src});--banner-pos:${curBanner.pos || 'center'};` : '';
-    profEl.innerHTML = `<div class="pctop${curBanner ? ' has-banner' : ''}" style="${bannerStyle}"><div class="prof-banner-shade"></div><div class="prof-hero-row"><span class="av big${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${(name[0] || '?').toUpperCase()}</span><span class="pwho"><b class="pnick">${name}</b>${myStatus() ? `<em class="fst">${myStatus()}</em>` : ''}<small class="pmail">${mail}</small></span><button class="iconbtn" id="profEdit" aria-label="Редактировать профиль"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button></div></div><div class="pclvl"><div class="lvl">${ring(PROG.xp / need)}<b>${PROG.lvl}</b></div><div class="pi"><b class="pl1">Уровень ${PROG.lvl}</b><div class="xpbar"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></div><small>${PROG.xp} / ${need} опыта до ${PROG.lvl + 1} уровня</small></div></div><div class="pchips"><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><path d="M8 21h8M12 17v4M5 4h14v4a7 7 0 01-14 0V4z"/><path d="M5 6H3a2 2 0 00-2 2v1a4 4 0 004 4h0M19 6h2a2 2 0 012 2v1a4 4 0 01-4 4h0"/></svg><b>${PROG.cups}</b> <small>кубков</small></span><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><circle cx="12" cy="14" r="6"/><path d="M8.5 8.5L7 3l5 3 5-3-1.5 5.5"/></svg><b>${ACH.filter(a => PROG.ach[a.id] === 'got').length}</b>/${ACH.length} <small>наград</small></span></div><div class="pcoins"><span class="cu"><i class="coin c-tile"></i><b>${COINS.balance(wallet, 'tile')}</b><small>тайлы</small></span><span class="au"><i class="coin c-star"></i><b>${COINS.balance(wallet, 'star')}</b><small>звёзды</small></span></div>${FB ? `<div class="pacts">${fbAuth && fbAuth.email ? '<button class="chip" data-hacct="out">Выйти из аккаунта</button>' : '<button class="chip pri" data-hacct="in">Войти или создать профиль</button>'}</div>` : ''}`;
+    profEl.innerHTML = `<div class="pctop"><div class="prof-banner-shade"></div><div class="prof-hero-row"><span class="av big${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${(name[0] || '?').toUpperCase()}</span><span class="pwho"><b class="pnick">${name}</b>${myStatus() ? `<em class="fst">${myStatus()}</em>` : ''}<small class="pmail">${mail}</small></span><button class="iconbtn" id="profEdit" aria-label="Редактировать профиль"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button></div></div><div class="pclvl"><div class="lvl">${ring(PROG.xp / need)}<b>${PROG.lvl}</b></div><div class="pi"><b class="pl1">Уровень ${PROG.lvl}</b><div class="xpbar"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></div><small>${PROG.xp} / ${need} опыта до ${PROG.lvl + 1} уровня</small></div></div><div class="pchips"><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><path d="M8 21h8M12 17v4M5 4h14v4a7 7 0 01-14 0V4z"/><path d="M5 6H3a2 2 0 00-2 2v1a4 4 0 004 4h0M19 6h2a2 2 0 012 2v1a4 4 0 01-4 4h0"/></svg><b>${PROG.cups}</b> <small>кубков</small></span><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><circle cx="12" cy="14" r="6"/><path d="M8.5 8.5L7 3l5 3 5-3-1.5 5.5"/></svg><b>${ACH.filter(a => PROG.ach[a.id] === 'got').length}</b>/${ACH.length} <small>наград</small></span></div><div class="pcoins"><span class="cu"><i class="coin c-tile"></i><b>${COINS.balance(wallet, 'tile')}</b><small>тайлы</small></span><span class="au"><i class="coin c-star"></i><b>${COINS.balance(wallet, 'star')}</b><small>звёзды</small></span></div>${FB ? `<div class="pacts">${fbAuth && fbAuth.email ? '<button class="chip" data-hacct="out">Выйти из аккаунта</button>' : '<button class="chip pri" data-hacct="in">Войти или создать профиль</button>'}</div>` : ''}`;
     const pe = $('#profEdit');
     if (pe) pe.onclick = editProfile;
     profEl.querySelectorAll('[data-hacct]').forEach(b => { b.onclick = () => { const t = $(b.dataset.hacct === 'out' ? '#acLogout' : '#acLogin'); if (t) t.click(); }; });
@@ -16138,20 +16327,42 @@ let ntab = 'rewards';
 
 function openNewsReaderModal(item) {
   const old = document.getElementById('newsReaderModal'); if (old) old.remove();
+  wallet.inbox = wallet.inbox || { claimed: [], read: [] };
+  if (!wallet.inbox.read.includes(item.id)) {
+    wallet.inbox.read.push(item.id);
+    saveWallet();
+    updateNotifBadge();
+  }
   const m = document.createElement('div');
   m.id = 'newsReaderModal';
   m.className = 'over news-reader-modal';
   m.style.position = 'fixed';
+
+  const rawText = item.fullText || item.desc || '';
+  const paras = rawText.split('\n\n').map(p => {
+    const lines = p.split('\n');
+    if (lines.length > 1 && lines.some(l => l.trim().startsWith('•') || l.trim().startsWith('-'))) {
+      return '<ul class="nrm-list">' + lines.map(l => {
+        const cleanLine = clean(l.replace(/^[•\-]\s*/, ''));
+        return cleanLine ? '<li>' + cleanLine + '</li>' : '';
+      }).filter(Boolean).join('') + '</ul>';
+    }
+    return '<p>' + lines.map(clean).join('<br>') + '</p>';
+  }).join('');
+
   m.innerHTML = '<div class="ocard news-modal-card">'
-    + '<div class="nrm-top"><span class="nrm-icon">' + item.icon + '</span><span class="nc-badge ' + (item.badgeClass || '') + '">' + clean(item.badge) + '</span><span class="nc-date">' + clean(item.date) + '</span></div>'
+    + '<div class="nrm-head">'
+    + '  <div class="nrm-top"><span class="nrm-icon">' + (item.icon || '📣') + '</span><div class="nrm-meta"><span class="nc-badge ' + (item.badgeClass || 'b-gold') + '">' + clean(item.badge || 'Новость') + '</span><span class="nc-date">' + clean(item.date || '') + '</span></div></div>'
+    + '  <button class="iconbtn nrm-close" id="nrmClose" aria-label="Закрыть"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg></button>'
+    + '</div>'
     + '<h3 class="nrm-title">' + clean(item.title) + '</h3>'
-    + '<div class="nrm-body"><p>' + clean(item.desc).replace(/\n/g, '<br>') + '</p></div>'
+    + '<div class="nrm-body">' + paras + '</div>'
     + '<div class="nrm-foot"><button class="cta wide" id="nrmAction">' + (item.actionLabel || 'Понятно') + '</button></div>'
     + '</div>';
   document.body.append(m);
-  const close = () => m.remove();
+  const close = () => { m.remove(); updateNotifBadge(); };
   m.onclick = e => {
-    if (e.target === m) return close();
+    if (e.target === m || e.target.closest('#nrmClose')) return close();
     if (e.target.closest('#nrmAction')) {
       close();
       if (item.actionLink) show(item.actionLink);
@@ -16200,6 +16411,16 @@ document.addEventListener('click', e => {
     return;
   }
 
+  // Clicking [data-open-news] button on news card
+  const openNewsBtn = e.target.closest('[data-open-news]');
+  if (openNewsBtn) {
+    const nid = openNewsBtn.dataset.openNews;
+    const item = (typeof PG !== 'undefined' && PG.ui && PG.ui.inbox && PG.ui.inbox.INBOX_ITEMS)
+      ? PG.ui.inbox.INBOX_ITEMS.find(x => x.id === nid)
+      : null;
+    if (item) { openNewsReaderModal(item); return; }
+  }
+
   // Clicking any notification or news card marks it read and clears badge
   const notifCard = e.target.closest('.notif-card[data-nid]');
   if (notifCard) {
@@ -16210,13 +16431,12 @@ document.addEventListener('click', e => {
       saveWallet();
       updateNotifBadge();
     }
-    // If news card clicked (not on an action button), open the full news reading modal
-    if (!e.target.closest('button, a') && notifCard.classList.contains('news')) {
+    // If news card clicked, open the full news reading modal
+    if (notifCard.classList.contains('news') && !e.target.closest('[data-claim-notif]')) {
       const item = (typeof PG !== 'undefined' && PG.ui && PG.ui.inbox && PG.ui.inbox.INBOX_ITEMS)
         ? PG.ui.inbox.INBOX_ITEMS.find(x => x.id === nid)
         : null;
-      if (item) openNewsReaderModal(item);
-      return;
+      if (item) { openNewsReaderModal(item); return; }
     }
   }
 
@@ -16346,9 +16566,18 @@ function show(name) {
   const curScr = document.querySelector('.screen:not([hidden])');
   const curName = curScr ? curScr.id.replace('scr-', '') : '';
   const ORDER = ['menu', 'progress', 'friends', 'shop'];
+  const SUB_SCREENS = ['rules', 'rating', 'settings', 'items', 'inbox', 'history', 'achievements', 'mastery', 'setup', 'lobby', 'profile'];
   let animCls = '';
-  if (curName && curName !== name && ORDER.includes(curName) && ORDER.includes(name)) {
-    animCls = ORDER.indexOf(name) > ORDER.indexOf(curName) ? 'slide-left' : 'slide-right';
+  if (curName && curName !== name) {
+    if (ORDER.includes(curName) && ORDER.includes(name)) {
+      animCls = ORDER.indexOf(name) > ORDER.indexOf(curName) ? 'slide-left' : 'slide-right';
+    } else if (ORDER.includes(curName) && SUB_SCREENS.includes(name)) {
+      animCls = 'slide-left';
+    } else if (SUB_SCREENS.includes(curName) && ORDER.includes(name)) {
+      animCls = 'slide-right';
+    } else if (SUB_SCREENS.includes(curName) && SUB_SCREENS.includes(name)) {
+      animCls = SUB_SCREENS.indexOf(name) > SUB_SCREENS.indexOf(curName) ? 'slide-left' : 'slide-right';
+    }
   }
   document.querySelectorAll('.screen').forEach(s => {
     const isTarget = s.id === 'scr-' + name;
@@ -16417,7 +16646,7 @@ function showStagingWatermark() {
   document.body.appendChild(mark);
 }
 function initStagingGate() {
-  if (!window.IS_STAGING) return;
+  if (!window.IS_STAGING || (typeof window !== 'undefined' && window.AndroidApp)) return;
   let unlocked = false;
   try { unlocked = sessionStorage.getItem('pg_staging_pin_ok') === '1'; } catch (_) {}
   if (unlocked) {
@@ -16888,10 +17117,16 @@ function loaderLayout() {
   return solve(0) ? grid : null;
 }
 function pieceUrl({type, r}) {
-  const img = loaderImgs[type]; if (!img || !img.complete) return TILE_URL[type];
+  const img = loaderImgs[type];
+  if (!img || !img.complete || !img.naturalWidth) return TILE_URL[type] || '';
   const c = document.createElement('canvas'); c.width = c.height = 96; const g = c.getContext('2d');
-  g.translate(48, 48); g.rotate(r * Math.PI / 2); g.drawImage(img, -48, -48, 96, 96);
-  try { return c.toDataURL('image/jpeg', .85); } catch (_) { return (img && img.src) || ''; }
+  g.translate(48, 48); g.rotate(r * Math.PI / 2);
+  try {
+    g.drawImage(img, -48, -48, 96, 96);
+    return c.toDataURL('image/jpeg', .85);
+  } catch (_) {
+    return (img && img.src) || TILE_URL[type] || '';
+  }
 }
 function relayLoader(pz) {
   const grid = loaderLayout(); if (!grid) return;

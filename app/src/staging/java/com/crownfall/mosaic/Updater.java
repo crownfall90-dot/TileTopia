@@ -95,7 +95,17 @@ class Updater {
         }
         try {
             JSONObject rel = new JSONObject(get("https://api.github.com/repos/" + BuildConfig.UPDATE_REPO + "/releases/tags/staging-latest", "application/vnd.github+json"));
-            int code = Integer.parseInt(rel.getString("tag_name").replaceAll("[^0-9]", ""));
+            int code = 0;
+            String tagNum = rel.optString("tag_name", "").replaceAll("[^0-9]", "");
+            if (!tagNum.isEmpty()) {
+                try { code = Integer.parseInt(tagNum); } catch (Exception ignored) {}
+            }
+            if (code == 0) {
+                String nameNum = rel.optString("name", "").replaceAll("[^0-9]", "");
+                if (!nameNum.isEmpty()) {
+                    try { code = Integer.parseInt(nameNum); } catch (Exception ignored) {}
+                }
+            }
             if (code <= BuildConfig.VERSION_CODE) return null;
             String url = null;
             JSONArray assets = rel.getJSONArray("assets");

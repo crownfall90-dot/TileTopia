@@ -7659,67 +7659,44 @@ button:disabled:active,
 
 /* ==================== FEATURE ENHANCEMENTS BATCH 2026 ==================== */
 
-/* 1. Profile & Main Menu Banner Backdrops */
-.pctop.has-banner {
-  position: relative;
-  background-image: var(--banner-bg) !important;
-  background-position: var(--banner-pos, center) !important;
-  background-size: cover !important;
-  background-repeat: no-repeat !important;
-  border-radius: 24px;
-  overflow: hidden;
-  border: 1px solid rgba(242, 184, 75, 0.45);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.18);
-  min-height: 120px;
+/* 1. Rectangle Banner Shape Styling (Hero Avatar) */
+.av.sh-rect {
+  border-radius: 12px !important;
+  aspect-ratio: 2.2 / 1 !important;
+  width: auto !important;
+  height: 100% !important;
+  max-width: 130px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), inset 0 0 0 1.5px rgba(242, 184, 75, 0.45);
 }
-.pctop.has-banner .prof-banner-shade {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(14, 20, 36, 0.4) 0%, rgba(14, 20, 36, 0.88) 100%);
-  backdrop-filter: blur(2px);
-  -webkit-backdrop-filter: blur(2px);
-  z-index: 1;
+.mprof .av.sh-rect {
+  height: 42px !important;
+  width: 92px !important;
+  max-width: 92px !important;
 }
-.pctop.has-banner .prof-hero-row {
-  position: relative;
-  z-index: 2;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+.pctop .av.big.sh-rect {
+  height: 52px !important;
+  width: 114px !important;
+  max-width: 114px !important;
+  border-radius: 14px !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5), inset 0 0 0 2px rgba(242, 184, 75, 0.55);
 }
-.pctop.has-banner .pnick {
-  color: #fff !important;
-  text-shadow: 0 2px 8px rgba(0, 0, 0, 0.95), 0 0 12px rgba(242, 184, 75, 0.4);
+.pcard .av.big.sh-rect {
+  height: 54px !important;
+  width: 118px !important;
+  max-width: 118px !important;
+  border-radius: 14px !important;
 }
-.pctop.has-banner .fst {
-  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+.shop-stall.stall-avatars .av.sh-rect {
+  height: 38px !important;
+  width: 84px !important;
 }
-.pctop.has-banner .pmail {
-  color: rgba(255, 255, 255, 0.75) !important;
+.avpick button .av.sh-rect {
+  height: 34px !important;
+  width: 75px !important;
 }
-
-#mprof.has-banner {
-  position: relative;
-  background-image: var(--mbanner-bg) !important;
-  background-position: var(--mbanner-pos, center) !important;
-  background-size: cover !important;
-  background-repeat: no-repeat !important;
-  border-radius: 20px;
-  overflow: hidden;
-  border: 1.5px solid rgba(242, 184, 75, 0.45);
-  box-shadow: 0 6px 24px rgba(0, 0, 0, 0.35);
-}
-#mprof.has-banner .mprof-shade {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(180deg, rgba(14, 20, 36, 0.35) 0%, rgba(14, 20, 36, 0.85) 100%);
-  backdrop-filter: blur(1.5px);
-  -webkit-backdrop-filter: blur(1.5px);
-  z-index: 1;
-}
-#mprof.has-banner .mprof-content,
-#mprof.has-banner > * {
-  position: relative;
-  z-index: 2;
-  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.9);
+.avpick .avsh button .av.sh-rect {
+  height: 30px !important;
+  width: 66px !important;
 }
 
 /* 2. Stall Category Hints & Banner Purchase Lock */
@@ -7824,48 +7801,49 @@ button:disabled:active,
   position: absolute;
   top: 8px;
   right: 8px;
-  background: linear-gradient(135deg, #d32f2f, #b71c1c);
+  background: rgba(239, 83, 80, 0.88);
   color: #fff;
-  font: 800 10px var(--f-body, sans-serif);
+  font: 700 10.5px var(--f-body, sans-serif);
   padding: 3px 8px;
-  border-radius: 8px;
-  letter-spacing: 0.3px;
+  border-radius: 999px;
   box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
-  z-index: 2;
+  z-index: 3;
 }
 .stall-buy-btn.locked {
-  background: rgba(255, 255, 255, 0.06) !important;
-  border-color: rgba(255, 255, 255, 0.12) !important;
-  color: rgba(255, 255, 255, 0.5) !important;
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.4);
+  border-color: rgba(255, 255, 255, 0.1);
   cursor: not-allowed;
   filter: none !important;
 }
 
 /* 3. Screen Swipe Slide Animations */
 .screen.slide-left {
-  animation: screenSlideLeft 0.26s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: screenSlideLeft 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
 }
 .screen.slide-right {
-  animation: screenSlideRight 0.26s cubic-bezier(0.16, 1, 0.3, 1) both;
+  animation: screenSlideRight 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
 }
 @keyframes screenSlideLeft {
   0% {
-    opacity: 0.7;
-    transform: translate3d(24px, 0, 0);
+    opacity: 0;
+    transform: translate3d(32px, 0, 0) scale(0.985);
   }
   100% {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 @keyframes screenSlideRight {
   0% {
-    opacity: 0.7;
-    transform: translate3d(-24px, 0, 0);
+    opacity: 0;
+    transform: translate3d(-32px, 0, 0) scale(0.985);
   }
   100% {
     opacity: 1;
-    transform: translate3d(0, 0, 0);
+    transform: translate3d(0, 0, 0) scale(1);
   }
 }
 @media (prefers-reduced-motion: reduce) {
@@ -7878,8 +7856,8 @@ button:disabled:active,
 /* 4. Match Bottom Tray Nickname Legibility */
 .turnfig {
   flex: 0 0 auto;
-  min-width: 68px;
-  max-width: 110px;
+  min-width: 72px;
+  max-width: 140px;
   width: auto;
   padding: 0 4px;
   display: flex;
@@ -7889,25 +7867,49 @@ button:disabled:active,
   filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
 }
 .turnfig small {
-  max-width: 104px;
+  max-width: 135px;
   font: 700 11.5px var(--f-display, sans-serif);
   color: var(--c);
   text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;
   text-align: center;
 }
 #cname {
   font-size: 13.5px;
   font-weight: 700;
-  max-width: 130px;
+  max-width: none;
   white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
+  overflow: visible;
+}
+#cname small {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #a8b6d4;
+  white-space: nowrap;
 }
 
-/* 5. Progress Road Grand Bridge & Scenery */
+/* 5. Authentic Table Tiles (Stack & Shuffle) */
+.cback.hex {
+  clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+  border-radius: 0;
+  border: none;
+  background: radial-gradient(circle at 50% 50%, #f2d68a 0 14%, transparent 15%),
+              radial-gradient(circle at 50% 50%, #7a5a2a 0 19%, transparent 20%),
+              repeating-linear-gradient(60deg, #5d9d40 0 6px, #6aab4a 6px 12px);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.45));
+}
+.cback.sq {
+  border-radius: 8px;
+  background: radial-gradient(circle at 50% 50%, #f2d68a 0 14%, transparent 15%),
+              radial-gradient(circle at 50% 50%, #7a5a2a 0 19%, transparent 20%),
+              repeating-linear-gradient(45deg, #5d9d40 0 6px, #6aab4a 6px 12px);
+  border: 2.5px solid #ead9b0;
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.15), 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* 6. Progress Road Scenery & Smooth Progression */
 .rd-grand-bridge {
   filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.55));
 }
@@ -7915,43 +7917,185 @@ button:disabled:active,
   stroke: rgba(140, 150, 175, 0.65);
   stroke-dasharray: 2 4;
 }
+#scr-progress .lb {
+  padding-bottom: calc(var(--nav-h, 64px) + 24px);
+}
+.roadwrap {
+  padding-bottom: calc(var(--nav-h, 64px) + 32px);
+}
 
-/* 6. Spacing Consistency & Rules Polish */
+/* 7. Spacing Consistency & Rules Screen Polish */
+#scr-rules .lb {
+  padding-bottom: 36px;
+}
+#scr-rules .h3 {
+  margin: 16px 0 10px 4px !important;
+}
+.rpane {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.rpane > * {
+  margin: 0 !important;
+}
 .hitem {
-  margin-bottom: 12px;
-  padding: 13px 15px;
-  line-height: 1.48;
-}
-.hitem p {
-  margin: 4px 0 0;
-  font-size: 13px;
-  line-height: 1.46;
-  color: rgba(255, 255, 255, 0.84);
-}
-.hitem b {
-  font-size: 14px;
-  color: #fff;
-}
-.rgoal {
-  margin-bottom: 14px;
+  display: grid;
+  grid-template-columns: 50px 1fr;
+  gap: 14px;
+  align-items: start;
   padding: 14px 16px;
   border-radius: 18px;
+  background: linear-gradient(175deg, rgba(30, 42, 80, 0.85) 0%, rgba(14, 20, 44, 0.92) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1.5px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  box-sizing: border-box;
+}
+.hitem b {
+  font: 800 15px var(--f-display, sans-serif);
+  color: #fff;
+  display: block;
+  margin-bottom: 4px;
+  line-height: 1.35;
+}
+.hitem p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: rgba(220, 229, 245, 0.92);
+}
+.hitem em {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(242, 184, 75, 0.12);
+  border: 1px solid rgba(242, 184, 75, 0.3);
+  font: 700 12px var(--f-body, sans-serif);
+  font-style: normal;
+  color: #ffd877;
+}
+.rgoal {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 16px;
+  border-radius: 20px;
+  background: linear-gradient(160deg, rgba(242, 184, 75, 0.18), rgba(255, 255, 255, 0.05));
+  border: 1.5px solid rgba(242, 184, 75, 0.4);
+  box-sizing: border-box;
+}
+.rgoal > span {
+  font-size: 38px;
+  line-height: 1;
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+.rgoal b {
+  font: 800 16px var(--f-display, sans-serif);
+  color: #fff;
+  display: block;
+  margin-bottom: 6px;
+}
+.rgoal p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #dbe2f4;
+}
+.rsteps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
 }
 .rsteps li {
-  margin-bottom: 10px;
+  position: relative;
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 14px;
+  align-items: center;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid var(--line);
+  box-sizing: border-box;
 }
-.rsteps li p {
-  margin: 3px 0 0;
+.rsteps li > i {
+  position: absolute;
+  left: -1px;
+  top: -1px;
+  width: 24px;
+  height: 24px;
+  border-radius: 18px 0 12px 0;
+  display: grid;
+  place-items: center;
+  font: 800 12px var(--f-display);
+  font-style: normal;
+  background: var(--brass);
+  color: var(--brass-ink);
+}
+.rsteps .ric {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-size: 26px;
+  background: rgba(255, 255, 255, 0.07);
+}
+.rsteps b {
+  font: 700 14.5px var(--f-display, sans-serif);
+  color: #fff;
+  display: block;
+  margin-bottom: 3px;
+}
+.rsteps p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #d5dcf0;
+}
+.goldrow {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+.goldrow span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 4px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line);
+  font-size: 16px;
+}
+.goldrow b {
+  font: 800 13px var(--f-display);
+  color: var(--brass);
+  margin-top: 4px;
+}
+.rnote {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
   font-size: 12.5px;
-  line-height: 1.42;
+  line-height: 1.5;
 }
 
-/* 7. News Reader Modal */
+/* 8. News Reader Modal */
 .news-reader-modal {
   position: fixed;
   inset: 0;
   z-index: 140;
-  background: rgba(5, 8, 18, 0.82);
+  background: rgba(5, 8, 18, 0.85);
   backdrop-filter: blur(14px);
   -webkit-backdrop-filter: blur(14px);
   display: flex;
@@ -7964,25 +8108,33 @@ button:disabled:active,
   max-width: 480px;
   max-height: 85vh;
   overflow-y: auto;
-  background: linear-gradient(175deg, #1a2542 0%, #0d1424 100%);
+  background: linear-gradient(175deg, #18233e 0%, #0c1322 100%);
   border: 1.5px solid rgba(242, 184, 75, 0.5);
   border-radius: 24px;
-  padding: 24px;
-  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.7), 0 0 40px rgba(242, 184, 75, 0.2);
+  padding: 22px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.75), 0 0 40px rgba(242, 184, 75, 0.2);
   display: flex;
   flex-direction: column;
-  gap: 16px;
-}
-.nm-head {
-  display: flex;
-  align-items: center;
   gap: 14px;
 }
-.nm-icon {
+.nrm-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 12px;
+}
+.nrm-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.nrm-icon {
   font-size: 28px;
-  width: 48px;
-  height: 48px;
-  border-radius: 16px;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
   background: rgba(242, 184, 75, 0.16);
   border: 1px solid rgba(242, 184, 75, 0.35);
   display: flex;
@@ -7990,33 +8142,59 @@ button:disabled:active,
   justify-content: center;
   flex-shrink: 0;
 }
-.nm-title {
+.nrm-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.nrm-title {
   font: 800 18px var(--f-display, sans-serif);
   color: #fff;
   margin: 0;
+  line-height: 1.35;
 }
-.nm-date {
-  font: 600 12px var(--f-body, sans-serif);
-  color: var(--muted, #8ea1c1);
-}
-.nm-body {
+.nrm-body {
   font: 500 14px/1.6 var(--f-body, sans-serif);
   color: rgba(255, 255, 255, 0.9);
-  padding: 12px 0;
-  border-top: 1px solid rgba(255, 255, 255, 0.08);
-  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
 }
-.nm-body p {
-  margin: 0 0 10px;
+.nrm-body p {
+  margin: 0;
+  line-height: 1.55;
 }
-.nm-body p:last-child {
-  margin-bottom: 0;
+.nrm-list {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
 }
-.nm-close {
-  width: 100%;
+.nrm-list li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: #e2e8f0;
+}
+.nrm-list li::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 0.55em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--brass, #f2b84b);
+  box-shadow: 0 0 6px rgba(242, 184, 75, 0.6);
+}
+.nrm-close {
+  flex: 0 0 auto;
 }
 
-/* 8. My Items ("Мои предметы") Overhaul */
+/* 9. My Items ("Мои предметы") Overhaul */
 #scr-items .icount {
   background: rgba(255, 255, 255, 0.04);
   border: 1px solid rgba(255, 255, 255, 0.08);
