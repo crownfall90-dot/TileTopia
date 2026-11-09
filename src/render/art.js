@@ -647,6 +647,36 @@ function drawSprites() {
     g.strokeStyle = '#4f8e33'; g.lineWidth = .9; for (const x of [3, 37, 22]) { for (let k = -1; k <= 1; k++) { g.beginPath(); g.moveTo(x + k, h - 1.5); g.lineTo(x + k * 1.6, h - 5.5); g.stroke(); } }
   });
   /* Stone keep: coursed masonry, a shaded right side, battlements with depth, slits, a gate, a flag. */
+  // A small fortress for the progress map: a curtain wall with a gate between two crenellated towers, red roofs, a banner.
+  sprite('keep', 64, 52, (g) => {
+    shadow(g, 32, 50.5, 30, 3, .3);
+    const stone = (x0, x1) => lin(g, x0, 0, x1, 0, [[0, '#d5ccb8'], [.6, '#b9b09c'], [1, '#8f8775']]);
+    poly(g, [[12, 50], [12, 30], [52, 30], [52, 50]], stone(12, 52), OUT);                                         // curtain wall
+    for (let x = 12; x < 52; x += 5) poly(g, [[x, 30.2], [x, 26.5], [x + 3, 26.5], [x + 3, 30.2]], stone(x, x + 3), OUT);
+    g.fillStyle = '#8a8270'; g.beginPath(); g.moveTo(26, 50); g.lineTo(26, 41); g.arc(32, 41, 6, Math.PI, 0); g.lineTo(38, 50); g.fill();
+    g.fillStyle = lin(g, 27, 0, 37, 0, [[0, '#6a4426'], [1, '#43291a']]); g.beginPath(); g.moveTo(27.2, 50); g.lineTo(27.2, 41.4); g.arc(32, 41.4, 4.8, Math.PI, 0); g.lineTo(36.8, 50); g.fill();
+    for (const x of [2, 46]) {                                                                                       // two towers
+      poly(g, [[x, 50.5], [x, 18], [x + 16, 18], [x + 16, 50.5]], stone(x, x + 16), OUT);
+      poly(g, [[x - 1.5, 18.5], [x + 8, 4], [x + 17.5, 18.5]], lin(g, x, 0, x + 16, 0, [[0, '#e0634a'], [1, '#9c3424']]), OUT);
+      g.fillStyle = '#231b16'; g.fillRect(x + 7, 26, 2, 6); g.fillStyle = '#ffd877'; g.fillRect(x + 7.4, 37, 1.4, 3);
+    }
+    g.strokeStyle = '#3a2c20'; g.lineWidth = 1; g.beginPath(); g.moveTo(10, 4.5); g.lineTo(10, -1); g.stroke();
+    poly(g, [[10.5, -.5], [17, 1.2], [10.5, 3]], '#f2b84b', 'rgba(0,0,0,.35)');
+  });
+  // A monastery for the progress map: a chapel with a bell tower, a round window, a low wall and a garden plot.
+  sprite('abbey', 60, 54, (g) => {
+    shadow(g, 30, 52.5, 28, 3, .3);
+    poly(g, [[4, 52], [4, 46], [56, 46], [56, 52]], '#bfb39a', OUT);                                                 // low wall
+    g.fillStyle = '#5e8f3a'; g.fillRect(40, 47, 14, 4); g.fillStyle = '#7a5a36'; for (let i = 0; i < 4; i++) g.fillRect(41 + i * 3.3, 47.5, 1.4, 3);
+    poly(g, [[12, 47], [12, 26], [40, 26], [40, 47]], lin(g, 12, 0, 40, 0, [[0, '#f4ead2'], [.65, '#ddd0b2'], [1, '#bfae8c']]), OUT);   // nave
+    poly(g, [[10, 26.5], [26, 14], [42, 26.5]], lin(g, 10, 0, 42, 0, [[0, '#d0573e'], [1, '#8f2f1f']]), OUT);
+    g.fillStyle = '#7a4f2c'; g.beginPath(); g.moveTo(22, 47); g.lineTo(22, 40); g.arc(26, 40, 4, Math.PI, 0); g.lineTo(30, 47); g.fill();
+    g.fillStyle = '#5b86c4'; g.beginPath(); g.arc(26, 31, 2.6, 0, 7); g.fill(); g.strokeStyle = '#3a2c20'; g.lineWidth = .5; g.stroke();
+    poly(g, [[38, 47], [38, 12], [48, 12], [48, 47]], lin(g, 38, 0, 48, 0, [[0, '#efe3c8'], [1, '#bfae8c']]), OUT);   // bell tower
+    poly(g, [[36.5, 12.5], [43, 1.5], [49.5, 12.5]], lin(g, 36, 0, 50, 0, [[0, '#d0573e'], [1, '#8f2f1f']]), OUT);
+    g.fillStyle = '#231b16'; g.fillRect(41.5, 16, 3, 5); g.fillStyle = '#d9a63c'; g.beginPath(); g.arc(43, 19.5, 1.2, 0, 7); g.fill();
+    g.strokeStyle = '#d9a63c'; g.lineWidth = .9; g.beginPath(); g.moveTo(43, 1.5); g.lineTo(43, -2.5); g.moveTo(41.6, -1); g.lineTo(44.4, -1); g.stroke();
+  });
   sprite('tower', 38, 60, (g) => {
     shadow(g, 19, 58.2, 16, 2.6, .32);
     poly(g, [[6, 58.5], [7.5, 54], [30.5, 54], [32, 58.5]], '#8d8676', OUT);                                    // plinth

@@ -4372,7 +4372,7 @@ const PROGRESS_ROAD_MILESTONES = [
   { id: 'm40', lvl: 40, cups: 2000, title: 'Гроссмейстер', desc: 'Статус «Гроссмейстер», +300 тайлов, фраза и +2 звезды', reward: { status: 'Гроссмейстер', gold: 300, stars: 2, phrase: 'Ну ты гроссмейстер! 👑' }, ic: '👑' },
   { id: 'm45', lvl: 45, cups: 2250, title: 'Легенда', desc: '+400 тайлов, статус «Легенда» и +2 звезды', reward: { status: 'Легенда', gold: 400, stars: 2 }, ic: '⚔️' },
   { id: 'm50', lvl: 50, cups: 2500, title: 'Чемпион', desc: 'Кубок Чемпиона, рамка, +600 тайлов и +3 звезды', reward: { frame: 'gold', gold: 600, stars: 3, emote: '🏆' }, ic: '🏆' },
-];
+].filter(m => m.lvl <= 30);   // the road goes up to level 30 for now
 
 function progressDot() {
   const b = $('#progBtn');
@@ -4414,6 +4414,13 @@ function renderMenuQuestBanner() {
 /* The progress road as a map in the game's own style: level 1 top left, level 2 at the right edge, level 3 left again...
    a cobbled road winds from one to the next, rivers cross it under little bridges, villages, woods and a castle stand
    between. Everything is placed from a fixed seed, so the map is the same every time it is opened. */
+// The map is drawn 360 wide and stretched to the screen: turn each bridge to the road's direction as it looks on screen.
+function roadBridges() {
+  const map = document.querySelector('.rd-map'); if (!map || !map.clientWidth) return;
+  const sx = map.clientWidth / 360;
+  map.querySelectorAll('.rd-bridge').forEach(b => b.style.setProperty('--a', (Math.atan2(+b.dataset.dy, +b.dataset.dx * sx) * 180 / Math.PI).toFixed(1) + 'deg'));
+}
+addEventListener('resize', roadBridges);
 function roadMapHtml(ms, unlockedFn, claimed) {
   const W = 360, ROW = 176, TOP = 130, n = ms.length, H = TOP + (n - 1) * ROW + 150;
   const P = ms.map((m, i) => ({x: i % 2 ? 284 : 76, y: TOP + i * ROW}));
@@ -4435,10 +4442,12 @@ function roadMapHtml(ms, unlockedFn, claimed) {
   const rivers = [];
   [1, 4, 7].filter(k => k < segs.length).forEach(k => {
     const c = segs[k], m = cub(c[0], c[1], c[2], c[3], .5), t1 = cub(c[0], c[1], c[2], c[3], .53), t0 = cub(c[0], c[1], c[2], c[3], .47);
-    const flip = k % 2 ? -1 : 1;
-    const r1 = [[-20, m[1] - 40 * flip], [70, m[1] - 78 * flip], [120, m[1] + 36 * flip], [m[0], m[1]]];
-    const r2 = [[m[0], m[1]], [2 * m[0] - 120, 2 * m[1] - (m[1] + 36 * flip)], [300, m[1] - 56 * flip], [380, m[1] + 30 * flip]];
-    rivers.push({r1, r2, m, ang: Math.atan2(t1[1] - t0[1], t1[0] - t0[0])});
+    // the river crosses the road square-on at the bridge, then bends away to both edges of the map
+    const tx = t1[0] - t0[0], ty = t1[1] - t0[1], tl = Math.hypot(tx, ty) || 1, px = -ty / tl, py = tx / tl, s0 = py > 0 ? 1 : -1;
+    const a = [m[0] - px * 46 * s0, m[1] - py * 46 * s0], b = [m[0] + px * 46 * s0, m[1] + py * 46 * s0];
+    const r1 = [[-24, m[1] - 70], [40, m[1] - 70], [a[0] - px * 40 * s0, a[1] - py * 40 * s0], [m[0], m[1]]];
+    const r2 = [[m[0], m[1]], [b[0] + px * 40 * s0, b[1] + py * 40 * s0], [320, m[1] + 70], [384, m[1] + 70]];
+    rivers.push({r1, r2, m, dx: tx, dy: ty});
   });
   const riverSamples = []; rivers.forEach(r => [r.r1, r.r2].forEach(c => { for (let k = 0; k <= 30; k++) riverSamples.push(cub(c[0], c[1], c[2], c[3], k / 30)); }));
   const riverD = r => `M${r.r1[0][0]} ${r.r1[0][1]}C${r.r1[1][0]} ${r.r1[1][1]} ${r.r1[2][0]} ${r.r1[2][1]} ${r.r1[3][0]} ${r.r1[3][1]}C${r.r2[1][0]} ${r.r2[1][1]} ${r.r2[2][0]} ${r.r2[2][1]} ${r.r2[3][0]} ${r.r2[3][1]}`;
@@ -4449,7 +4458,9 @@ function roadMapHtml(ms, unlockedFn, claimed) {
     svg += stroke(d, 44, 'rgba(30,70,20,.35)') + stroke(d, 38, '#a8975f') + stroke(d, 35, '#d6c48e') + stroke(d, 31, 'rgba(240,252,255,.85)') + stroke(d, 29, '#46b3d3') + stroke(d, 22, '#2f93c8') + stroke(d, 12, '#2276b8') + stroke(d, 2, 'rgba(235,250,255,.7)', 'stroke-dasharray="6 14"');
   }
   const road = all.map(pathD).join('');
-  svg += stroke(road, 34, 'rgba(60,90,30,.35)') + stroke(road, 28, '#80653e') + stroke(road, 24, '#d9bf88') + stroke(road, 17, '#c7a874') + stroke(road, 11, '#e2cb98') + stroke(road, 2, 'rgba(150,120,70,.5)', 'stroke-dasharray="3 10"');
+  // a paved road: a soft verge, a kerb of stones, cobbles in rows, worn lighter down the middle
+  svg += stroke(road, 40, 'rgba(40,70,20,.28)') + stroke(road, 32, '#6e5434') + stroke(road, 30, '#b59a68', 'stroke-dasharray="7 3"') + stroke(road, 25, '#cfb27a')
+    + stroke(road, 23, '#bfa06a', 'stroke-dasharray="5 4"') + stroke(road, 17, '#dcc493', 'stroke-dasharray="6 3" stroke-dashoffset="3"') + stroke(road, 9, 'rgba(240,226,190,.75)') + stroke(road, 2, 'rgba(120,95,55,.35)', 'stroke-dasharray="2 9"');
   if (walked) svg += stroke(walked, 4, '#f2b84b', 'stroke-dasharray="1 9" opacity=".95"');
   svg += '</svg>';
   // scenery: sprites of the game (houses, trees, hay, rocks, a keep), placed where there is room
@@ -4457,14 +4468,23 @@ function roadMapHtml(ms, unlockedFn, claimed) {
   const placed = [], spr = [];
   const nodeBox = P.map(q => q);
   const free = (x, y, r) => samples.every(q => dist(q, [x, y]) > r + 14) && riverSamples.every(q => dist(q, [x, y]) > r + 26)
-    && nodeBox.every(q => Math.abs(x - q.x) > 86 + r * .3 || y < q.y - 100 || y > q.y + 62) && placed.every(q => dist(q, [x, y]) > (r + q[2]) * .85) && x > 12 && x < W - 12 && y > 14 && y < H - 8;
-  const put = (k, x, y, r) => { if (!free(x, y, r)) return false; placed.push([x, y, r]); const d = SPR[k]; if (d) spr.push({k, x, y, w: Math.round(d.w * 1.7), h: Math.round(d.h * 1.7)}); return true; };
-  // villages: a cluster of houses and hay near the outer side of some levels, a keep at the end
-  [2, 4, 6, 8].filter(i => i < n).forEach((i, vi) => {
-    const side = P[i].x < W / 2 ? 1 : -1, cx = P[i].x + side * 112 - (side > 0 ? 0 : 0), cy = P[i].y + 70;
-    ['house', 'house2', 'house3', 'house4', 'house', 'hay'].forEach((k, j) => { for (let t = 0; t < 14; t++) { if (put(k, cx + (R() - .5) * 120, cy + (R() - .5) * 90, k === 'hay' ? 12 : 22)) break; } });
+    && nodeBox.every(q => Math.abs(x - q.x) > 86 + r * .3 || y < q.y - 100 || y > q.y + 62) && placed.every(q => dist(q, [x, y]) > (r + q[2]) * .85) && x > 12 && x < W - 12 && y > 70 && y < H - 8;   // nothing tall at the very top, where it would be cut
+  // a sprite stands on (x, y) and rises above it: the middle of its picture must be free too (tall buildings)
+  const BIG = {keep: 1.25, abbey: 1.25, tower: 1.3, mine: 1.4};
+  const put = (k, x, y, r) => { const d = SPR[k], sc = BIG[k] || 1.7, mid = d ? d.h * sc * .5 : 0; if (!free(x, y, r) || (mid > 30 && !free(x, y - mid, r * .6))) return false; placed.push([x, y, r], [x, y - mid, r]); if (d) spr.push({k, x, y, w: Math.round(d.w * sc), h: Math.round(d.h * sc)}); return true; };
+  // every reward stands somewhere of its own, never the same as the one before: by the road, in a village, at a
+  // monastery, at a fortress, at a mine, by a watchtower. The scene sits beside the reward, toward the middle of the map.
+  const SCENES = ['road', 'village', 'abbey', 'keep', 'mine', 'tower'];
+  const near = (k, cx, cy, r, spread = 44) => { for (let t = 0; t < 90; t++) if (put(k, cx + (R() - .5) * spread, cy + (R() - .5) * spread, r)) return true; return false; };
+  P.forEach((q, i) => {
+    const side = q.x < W / 2 ? 1 : -1, cx = q.x + side * 6, cy = q.y + 118, sc = SCENES[i % SCENES.length];   // under the reward, where the road has turned away
+    if (sc === 'road') { near('rock', q.x + side * 40, q.y + 34, 8, 16); near('bush', q.x - side * 36, q.y + 30, 8, 16); }
+    else if (sc === 'village') ['house', 'house3', 'house2', 'hay'].forEach((k, j) => near(k, cx + (j % 2 ? 26 : -18), cy + (j < 2 ? -16 : 22), k === 'hay' ? 10 : 18, 24));
+    else if (sc === 'abbey') { near('abbey', cx, cy, 24); near('bush', cx - 30, cy + 30, 8); }
+    else if (sc === 'keep') { near('keep', cx, cy - 6, 26); near('house4', cx + 26, cy + 32, 16, 20); }
+    else if (sc === 'mine') { near('mine', cx, cy, 18); near('boulders', cx + 26, cy + 18, 12, 20); near('rock', cx - 24, cy + 20, 8, 16); }
+    else if (sc === 'tower') { near('tower', cx, cy - 4, 20); near('hay', cx + 26, cy + 26, 10, 18); }
   });
-  { const q = P[n - 1], side = q.x < W / 2 ? 1 : -1; for (let t = 0; t < 30; t++) if (put('tower', q.x + side * (90 + R() * 20), q.y + 8 + R() * 30, 30)) break; }
   for (let t = 0; t < 700 && spr.length < 90; t++) {
     const x = 10 + R() * (W - 20), y = 10 + R() * (H - 20), v = R();
     const k = v < .34 ? 'pine' : v < .56 ? 'oak' : v < .66 ? 'birch' : v < .73 ? 'poplar' : v < .88 ? 'bush' : v < .95 ? 'rock' : 'hay';
@@ -4472,7 +4492,8 @@ function roadMapHtml(ms, unlockedFn, claimed) {
   }
   spr.sort((a, b) => a.y - b.y);
   const sprHtml = spr.map(o => `<i class="rd-spr s-${o.k}" style="left:${(100 * o.x / W).toFixed(2)}%;top:${o.y}px;width:${o.w}px;height:${o.h}px"></i>`).join('');
-  const bridges = rivers.map(r => `<i class="rd-bridge" style="left:${(100 * r.m[0] / W).toFixed(2)}%;top:${Math.round(r.m[1])}px;--a:${(r.ang * 180 / Math.PI).toFixed(1)}deg"></i>`).join('');
+  // the bridge lies along the road; its angle on screen depends on how wide the map is drawn (roadBridges sets it)
+  const bridges = rivers.map(r => `<i class="rd-bridge" data-dx="${r.dx.toFixed(2)}" data-dy="${r.dy.toFixed(2)}" style="left:${(100 * r.m[0] / W).toFixed(2)}%;top:${Math.round(r.m[1])}px"></i>`).join('');
   // the levels
   const nodes = ms.map((m, i) => {
     const open = unlockedFn(m), got = claimed.includes(m.id), q = P[i];
@@ -4547,6 +4568,7 @@ function renderProgressRoad() {
     + `<div class="xpbar"><i style="width:${pct.toFixed(1)}%"></i></div><small>${PROG.xp} / ${need} опыта до ${myLvl + 1} уровня · 🏆 ${myCups}</small></div></div>`
     + `<p class="rd-next">${next ? `Следующая награда: <b>${next.title}</b> — ${next.cups ? next.cups + ' 🏆 или ' : ''}${next.lvl} уровень` : 'Вы прошли всю дорогу, дальше — новые сезоны'}</p>`;
   track.innerHTML = head + roadMapHtml(PROGRESS_ROAD_MILESTONES, unlocked, claimed);
+  roadBridges();
   if (roadScroll) {   // opening the tab: bring the level the player is at into view
     roadScroll = false;
     const el = track.querySelector('.rd-n.unlocked') || track.querySelector('.rd-n.next') || track.querySelector('.rd-n:last-child');

@@ -5559,7 +5559,7 @@ html body .rd-map{position:relative;margin:6px -2px 0;border-radius:20px;overflo
   background:radial-gradient(60px 50px at 20% 12%,rgba(40,90,25,.2),transparent 70%),radial-gradient(80px 60px at 78% 38%,rgba(200,230,120,.16),transparent 70%),radial-gradient(70px 60px at 30% 70%,rgba(40,90,25,.18),transparent 70%),radial-gradient(90px 70px at 74% 88%,rgba(200,230,120,.14),transparent 70%),linear-gradient(160deg,#80be56,#62a242)}
 html body .rd-svg{position:absolute;inset:0;width:100%;height:100%;display:block}
 html body .rd-spr{position:absolute;background-size:100% 100%;background-repeat:no-repeat;transform:translate(-50%,-100%);pointer-events:none}
-html body .rd-bridge{position:absolute;width:54px;height:30px;transform:translate(-50%,-50%) rotate(calc(var(--a,0deg) + 90deg));border-radius:4px;background:repeating-linear-gradient(90deg,#a06a3a 0 5px,#7d4f28 5px 6px);border:2px solid #4b2f18;box-shadow:0 3px 6px rgba(0,0,0,.35);pointer-events:none}
+html body .rd-bridge{position:absolute;width:64px;height:26px;transform:translate(-50%,-50%) rotate(var(--a,0deg));border-radius:4px;background:repeating-linear-gradient(90deg,#a06a3a 0 5px,#7d4f28 5px 6px);border:2px solid #4b2f18;box-shadow:0 3px 6px rgba(0,0,0,.35);pointer-events:none}
 html body .rd-bridge::before,html body .rd-bridge::after{content:"";position:absolute;left:-2px;right:-2px;height:4px;background:#5a3a20;border-radius:2px}
 html body .rd-bridge::before{top:-5px}
 html body .rd-bridge::after{bottom:-5px}
