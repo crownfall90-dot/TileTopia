@@ -1250,7 +1250,7 @@ function renderTray() {
   ct.style.setProperty('--c', solo ? 'transparent' : players[turn].col);
   cname.innerHTML = `<b>${TY(current.type).name}</b><small>${solo ? 'Ваша карта' : 'Карта: ' + players[turn].name}</small>`;
   // whose turn it is, big on the left: that player's own figure in their colour
-  const tf = $('#turnFig'); tf.style.setProperty('--c', players[turn].col); tf.innerHTML = `${meepleImg(turn)}<small>${players[turn].name}</small>`;
+  const tf = $('#turnFig'); tf.style.setProperty('--c', players[turn].col); const curFig = (players[turn] && players[turn].fig) || 'classic'; tf.innerHTML = `<img src="${figPreview(curFig)}" alt="${players[turn].name}"><small>${players[turn].name}</small>`;
   if (!RM) ct.animate([{transform: 'rotateX(26deg) translateY(26px) scale(.7)', opacity: 0}, {transform: 'rotateX(26deg)', opacity: 1}], {duration: 320, easing: 'cubic-bezier(.3,1.4,.5,1)'});
 }
 function setRot(nr) {
@@ -2285,7 +2285,9 @@ function drawFigure(g, w, h, fill, fig, ghost) {
   } else if (fig === 'wizard') {
     shape('#5b2d86', () => { g.moveTo(24, 18); g.quadraticCurveTo(50, -28, 60, -26); g.quadraticCurveTo(56, -4, 76, 18); g.closePath(); });
     g.fillStyle = '#ffd54f'; g.beginPath(); g.arc(50, 6, 3, 0, 7); g.fill();
-    g.fillStyle = '#00e5ff'; g.beginPath(); g.arc(84, 45, 5, 0, 7); g.fill();
+    g.strokeStyle = '#5d4037'; g.lineWidth = 3; g.beginPath(); g.moveTo(84, 46); g.lineTo(84, 96); g.stroke();
+    g.fillStyle = '#00e5ff'; g.beginPath(); g.arc(84, 45, 5.5, 0, 7); g.fill();
+    g.fillStyle = '#fff'; g.beginPath(); g.arc(82.5, 43.5, 2, 0, 7); g.fill();
   } else if (fig === 'ninja') {
     shape('#1c202a', () => { g.moveTo(30, 24); g.lineTo(30, 8); g.quadraticCurveTo(30, -6, 50, -6); g.quadraticCurveTo(70, -6, 70, 8); g.lineTo(70, 24); g.closePath(); });
     shape('#e53935', () => { g.moveTo(28, 12); g.lineTo(72, 12); g.lineTo(72, 16); g.lineTo(28, 16); g.closePath(); });
@@ -2294,6 +2296,8 @@ function drawFigure(g, w, h, fill, fig, ghost) {
     shape('#d8e0e8', () => { g.moveTo(30, 26); g.lineTo(30, 10); g.quadraticCurveTo(30, -4, 50, -4); g.quadraticCurveTo(70, -4, 70, 10); g.lineTo(70, 26); g.closePath(); });
     shape('#fbc02d', () => { g.moveTo(48, -4); g.lineTo(52, -4); g.lineTo(52, -18); g.lineTo(48, -18); g.closePath(); });
     g.fillStyle = '#fbc02d'; g.fillRect(35, 12, 30, 3.5);
+    shape('#90a4ae', () => { g.moveTo(74, 50); g.lineTo(84, 50); g.lineTo(84, 75); g.lineTo(79, 82); g.lineTo(74, 75); g.closePath(); });
+    g.fillStyle = '#ffd54f'; g.fillRect(77, 56, 4, 14); g.fillRect(75, 61, 8, 4);
   } else if (fig === 'king') {
     shape('#f2c230', () => { g.moveTo(32, 10); g.lineTo(32, -6); g.lineTo(41, 3); g.lineTo(50, -10); g.lineTo(59, 3); g.lineTo(68, -6); g.lineTo(68, 10); g.closePath(); });
     g.fillStyle = '#d6303f'; g.beginPath(); g.arc(50, 4, 3, 0, 7); g.fill();
@@ -2304,12 +2308,12 @@ function drawFigure(g, w, h, fill, fig, ghost) {
   }
   g.restore();
 }
-const FIG_W = 20, FIG_H = 26;
+const FIG_W = 22, FIG_H = 28;
 let figStyle = null;
 function paintFigures() {
   let css = '';
   players.forEach((p, i) => {
-    const [c, g] = cv(FIG_W, FIG_H, 3); drawFigure(g, FIG_W, FIG_H, p.col, p.fig);
+    const [c, g] = cv(FIG_W, FIG_H, 4); drawFigure(g, FIG_W, FIG_H, p.col, p.fig);
     SPR['m' + i] = {url: c.toDataURL(), w: FIG_W, h: FIG_H};
     css += `.s-m${i}{background-image:url(${SPR['m' + i].url})}`;
   });
@@ -5677,7 +5681,7 @@ function renderPlayerShowcaseHtml() {
 
   return `<div class="player-showcase-card" id="playerShowcase">
     <div class="psc-top">
-      <span>👁️ Так вас видят в игре</span>
+      <span><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="vertical-align:-2px;margin-right:4px"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>Так вас видят в игре</span>
       ${canEquip ? `<button class="chip go psc-apply" data-applyframe="${effFrameKey}">Надеть эту рамку</button>` : isPreviewing ? `<button class="chip x psc-apply" data-resetframe="1">Сбросить примерку</button>` : ''}
     </div>
     <div class="psc-body">
