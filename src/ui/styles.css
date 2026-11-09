@@ -1847,7 +1847,7 @@ html.flat .ct .face{border-radius:4px;box-shadow:none}
 
 .tile .sd.e.fall::before,.tile .sd.w.fall::before{top:calc(50% - 6.5px);height:13px;left:0;right:0;background:repeating-linear-gradient(90deg,#9fd8ff 0 3px,#4ea2e4 3px 7px,#3b88cf 7px 10px);background-size:10px 100%;animation-name:fallX}
 
-.face.t-wLake::after,.face.t-wTee::after{content:"";position:absolute;inset:8%;border-radius:34%;background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.3) 50%,transparent 62%) 0 0/260% 100%;mix-blend-mode:screen;pointer-events:none;animation:lakeFlow 3.6s steps(36) infinite}
+.face.t-wLake::after,.face.t-wTee::after{content:"";position:absolute;inset:8%;border-radius:34%;background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.3) 50%,transparent 62%) 0 0/260% 100%;pointer-events:none;animation:lakeFlow 3.6s steps(36) infinite}
 
 @keyframes lakeFlow{from{background-position:130% 0}to{background-position:-30% 0}}
 
@@ -5638,7 +5638,7 @@ html.hexg .ct .face{border-radius:0;box-shadow:none;clip-path:polygon(25% 0,75% 
 html.hexg .ct::after{display:none}
 /* the rendered cards: a slow glint over the water of river cards (masked to the water, see art.js hexWaterMask);
    it stops with the rest of the board's motion (calm, dragging) and on economy graphics */
-.tile.hex .face[class*="t-hW"]::after{content:"";position:absolute;inset:0;-webkit-mask-size:100% 100%;mask-size:100% 100%;background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.5) 50%,transparent 62%) 0 0/260% 100%;mix-blend-mode:screen;pointer-events:none;animation:lakeFlow 4.2s steps(42) infinite}
+.tile.hex .face[class*="t-hW"]::after{content:"";position:absolute;inset:0;-webkit-mask-size:100% 100%;mask-size:100% 100%;background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.5) 50%,transparent 62%) 0 0/260% 100%;pointer-events:none;animation:lakeFlow 4.2s steps(42) infinite}
 html.calm .tile.hex .face[class*="t-hW"]::after,.board.dragging .tile.hex .face[class*="t-hW"]::after{animation-play-state:paused}
 html.lowgfx .tile.hex .face[class*="t-hW"]::after{display:none}
 .mcard[data-setmode="hex"] i{font-size:0;width:38px;height:33px;background:url(hex/hC2r.webp) center/contain no-repeat}
