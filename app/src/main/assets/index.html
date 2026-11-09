@@ -7716,6 +7716,12 @@ html body .tile-toast,html body .note{position:fixed;right:10px;left:auto;z-inde
 /* The fortnight's challenge: a gold card that pays in stars */
 .qk-list.qk-rare .qk{border:1.5px solid rgba(255,213,99,.65);background:linear-gradient(135deg,rgba(255,213,99,.16),rgba(176,108,240,.12));box-shadow:0 0 18px rgba(255,200,80,.18)}
 .qk-list.qk-rare .qk-ic{background:radial-gradient(circle at 35% 30%,#ffe9a8,#e0a93a)}
+
+/* Main menu buttons: «Задания» and «Режим» take the width of their words, «Играть» the rest; the row is centred */
+html body .menu-action-row.compact-action-row{justify-content:center;align-items:stretch;gap:8px}
+html body .tile-btn.tile-quest{flex:0 0 auto;min-width:max-content;padding-left:10px;padding-right:10px}
+html body .tile-btn.tile-quest #mqTitle,html body .tile-btn.tile-quest #mqSub{overflow:visible;text-overflow:clip}
+html body .tile-btn.tile-play{flex:1 1 auto;min-width:0}
 </style>
 
 <div class="page">
