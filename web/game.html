@@ -256,7 +256,7 @@
         <div class="lb rules">
           <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Как играть</b></div>
           <button class="tutcard" id="tutBtn"><span>🎓</span><span><b>Обучение за 2 минуты</b><small>Сыграйте первую партию с подсказками · +30 тайлов</small></span><i class="tgo">›</i></button>
-          <div class="seg rtabs" id="rtabs"><button data-rt="basics" aria-pressed="true">Основы</button><button data-rt="score" aria-pressed="false">Очки</button><button data-rt="meeple" aria-pressed="false">Фишки</button><button data-rt="modes" aria-pressed="false">Режимы</button><button data-rt="more" aria-pressed="false">Ещё</button></div>
+          <div class="seg rtabs" id="rtabs"><button data-rt="basics" aria-pressed="true">Основы</button><button data-rt="score" aria-pressed="false">Очки</button><button data-rt="meeple" aria-pressed="false">Фишки</button><button data-rt="modes" aria-pressed="false">Режимы</button></div>
 
           <div class="rpane" data-rp="basics">
             <div class="rgoal"><span>🏰</span><div><b>Плиточная стратегия</b><p>Tiletopia — пошаговая плиточная стратегия. Игроки по очереди берут плитки из общего запаса (в «Классике 2.0» — шестиугольные) и выкладывают на стол, развивая города, дороги и особые объекты. Выбранная локация стола меняет мир плиток и добавляет свои уникальные особенности. <b>Побеждает сильнейший тактик!</b></p></div></div>
@@ -280,9 +280,15 @@
             <div class="hitem"><span class="rimg t-fort"></span><div><b>⛪ Монастырь</b><p>Завершается, когда монастырь полностью окружён 8 соседними плитками (включая диагонали).</p><em>9 очков (1 очко за плитку монастыря + по 1 за каждого соседа)</em></div></div>
             <div class="hitem"><span class="rimg t-brHalf"></span><div><b>🌉 Большой каменный мост</b><p>Соедините две половины моста — дорога через него становится вдвое прибыльнее!</p><em>очки за весь тракт удваиваются (×2)</em></div></div>
             <div class="hitem"><span class="hic">⏳</span><div><b>Недостроенные объекты в финале</b><p>Когда запас плиток исчерпан, все недостроенные владения приносят половинную ценность.</p><em>по 1 очку за каждую плитку города, дороги или монастыря</em></div></div>
-            <div class="h3">Награды за победу</div>
-            <div class="goldrow"><span>🥇<b>+10 🏆</b></span><span>🥈<b>+5 🏆</b></span><span>🥉<b>+2 🏆</b></span><span>4<b>0 🏆</b></span><span>5<b>0 🏆</b></span></div>
-            <p class="rnote">Максимум 10 кубков за победу в рейтинге! Дополнительно начисляются тайлы: 🥇 +15💰, 🥈 +10💰, 🥉 +5💰</p>
+            <div class="h3">Кубки за рейтинг (с любым числом игроков)</div>
+            <div class="cup-rules-table">
+              <div class="crt-row crt-head"><span>Стол</span><span>1 место</span><span>2 место</span><span>3 место</span><span>4 место</span><span>5 место</span></div>
+              <div class="crt-row"><b>2 игрока</b><span class="pos">+10 🏆</span><span class="neg">−7 🏆</span><span class="nil">—</span><span class="nil">—</span><span class="nil">—</span></div>
+              <div class="crt-row"><b>3 игрока</b><span class="pos">+10 🏆</span><span class="pos">+2 🏆</span><span class="neg">−7 🏆</span><span class="nil">—</span><span class="nil">—</span></div>
+              <div class="crt-row"><b>4 игрока</b><span class="pos">+10 🏆</span><span class="pos">+4 🏆</span><span class="neg">−3 🏆</span><span class="neg">−7 🏆</span><span class="nil">—</span></div>
+              <div class="crt-row"><b>5 игроков</b><span class="pos">+10 🏆</span><span class="pos">+5 🏆</span><span class="neu">0 🏆</span><span class="neg">−4 🏆</span><span class="neg">−8 🏆</span></div>
+            </div>
+            <p class="rnote">За победу начисляется +10 кубков, за низкие места списываются кубки (баланс кубков защищён от ухода в минус: минимум 0). Дополнительно за призовые места начисляются тайлы: 🥇 +15💰, 🥈 +10💰, 🥉 +5💰.</p>
           </div>
 
           <div class="rpane" data-rp="meeple" hidden>
@@ -296,29 +302,27 @@
           </div>
 
           <div class="rpane" data-rp="modes" hidden>
-            <div class="h3">Режимы</div>
-            <div class="hitem"><span class="hic">⚡</span><div><b>Быстрая</b><p>30 плиток, 4 фишки, партия минут на 8.</p></div></div>
-            <div class="hitem"><span class="hic">⚖️</span><div><b>Классика</b><p>50 плиток, 6 фишек, около 15 минут.</p></div></div>
-            <div class="hitem"><span class="hic">🏰</span><div><b>Большая</b><p>100 плиток, 8 фишек и редкие карты, около получаса.</p></div></div>
-            <div class="hitem"><span class="hic">⬢</span><div><b>Классика 2.0</b><p>Шестиугольные плитки: у каждой шесть соседей, города и дороги поворачивают как угодно. Монастырь окружают шесть плиток — тогда он даёт 9 очков.</p></div></div>
-            <div class="h3">Монеты</div>
-            <div class="hitem"><span class="hic"><i class="coin c-tile"></i></span><div><b>Тайлы</b><p>Главная валюта. За партии, задания, подарки и достижения. На тайлы покупаются фигурки, рамки, статусы и эмодзи.</p></div></div>
-            <div class="hitem"><span class="hic"><i class="coin c-star"></i></span><div><b>Звёзды</b><p>Редкая валюта. Их дают только золотые достижения. За звёзды покупаются самые редкие вещи. Обмена между валютами нет.</p></div></div>
-            <div class="h3">Прогресс</div>
-            <div class="hitem"><span class="hic">🎯</span><div><b>Задания</b><p>Три задания в день и цели недели. Не нравится задание — любое одно из трёх можно раз в день заменить на новое кнопкой ↻. За все цели недели — большой сундук.</p></div></div>
-            <div class="hitem"><span class="hic">🗺</span><div><b>Дорога прогресса</b><p>Опыт за партии поднимает уровень. На дороге — награды за уровни и кубки: тайлы, звёзды, статусы, рамки, фигурки.</p></div></div>
-            <div class="hitem"><span class="hic">🏆</span><div><b>Кубки и рейтинг</b><p>Онлайн-партии на кубки: за 1 место +10, за 2 +5, за 3 +2, ничьих нет. У «Классики 2.0» свои кубки и свой рейтинг.</p></div></div>
-          </div>
-          <div class="rpane" data-rp="more" hidden>
-            <div class="h3">Особые карты</div>
-            <div class="hitem"><span class="hic">🌊</span><div><b>Озеро</b><p>Занимает всю карту, и во все стороны в него впадают реки.</p></div></div>
-            <div class="hitem"><span class="hic">⛲</span><div><b>Исток</b><p>Река начинается из родника: с другой стороны карты воды нет.</p></div></div>
-            <div class="hitem"><span class="hic">🚧</span><div><b>Обрыв</b><p>Дорога к обрыву: за обрывом ставить можно только обрыв, видна половина карты.</p></div></div>
+            <div class="h3">Режимы партий</div>
+            <div class="hitem"><span class="hic">⚡</span><div><b>Быстрая</b><p>30 плиток, 4 фишки, динамичная партия около 8 минут.</p></div></div>
+            <div class="hitem"><span class="hic">⚖️</span><div><b>Классика</b><p>50 плиток, 6 фишек, турнирный баланс на 15 минут.</p></div></div>
+            <div class="hitem"><span class="hic">🏰</span><div><b>Большая</b><p>100 плиток, 8 фишек и редкие плитки, глубокая стратегия на полчаса.</p></div></div>
+            <div class="hitem"><span class="hic">⬢</span><div><b>Классика 2.0</b><p>Шестиугольные плитки: у каждой 6 соседей, свободные повороты дорог и рек. Монастырь окружают 6 плиток и дают 9 очков. Свой отдельный рейтинг кубков!</p></div></div>
+
+            <div class="h3">Особые карты стола</div>
+            <div class="hitem"><span class="hic">🌊</span><div><b>Озеро</b><p>Занимает всю плитку, реки впадают в него со всех сторон.</p></div></div>
+            <div class="hitem"><span class="hic">⛲</span><div><b>Исток</b><p>Река начинается из чистого родника — с противоположной стороны плитки суша.</p></div></div>
+            <div class="hitem"><span class="hic">🚧</span><div><b>Обрыв</b><p>Дорога уходит в обрыв: продолжить её можно только встречным обрывом.</p></div></div>
+
+            <div class="h3">Валюта и Прогресс</div>
+            <div class="hitem"><span class="hic"><i class="coin c-tile"></i></span><div><b>Тайлы</b><p>Основная валюта за партии, задания, сундуки и достижения. В лавке на них открываются фигурки, оправы, статусы и эмодзи.</p></div></div>
+            <div class="hitem"><span class="hic"><i class="coin c-star"></i></span><div><b>Звёзды</b><p>Редчайшая валюта за золотые подвиги. За неё покупаются эксклюзивные реликвии. Обмена между валютами нет.</p></div></div>
+            <div class="hitem"><span class="hic">🎯</span><div><b>Задания и Дорога прогресса</b><p>Ежедневные и еженедельные цели. Повышайте уровень и продвигайтесь по Дороге наград к новым сундукам.</p></div></div>
+
             <div class="h3">Онлайн и друзья</div>
-            <div class="hitem"><span class="hic">⚡</span><div><b>Быстрая игра</b><p>Сразу к первой игре, где ждут игроков. Все онлайн-партии идут на рейтинг: 1-е место +10 кубков, 2-е +5, 3-е +2 (ничьих нет!).</p></div></div>
-            <div class="hitem"><span class="hic">👀</span><div><b>Видно ход соперника</b><p>Ещё до подтверждения вы видите, куда игрок хочет поставить карту и как её поворачивает. Карта подсвечена цветом игрока.</p></div></div>
-            <div class="hitem"><span class="hic">💬</span><div><b>Фразы и эмодзи</b><p>Быстрые фразы — не чаще раза в несколько секунд.</p></div></div>
-            <div class="hitem"><span class="hic">💤</span><div><b>Игра свёрнута</b><p>Если игра свёрнута больше минуты, вас выводит из онлайн-партии. Вернуться можно.</p></div></div>
+            <div class="hitem"><span class="hic">⚡</span><div><b>Быстрая онлайн-игра</b><p>Мгновенный подбор реальных соперников. Все онлайн-матчи идут в кубковый рейтинг с тай-брейком без ничьих!</p></div></div>
+            <div class="hitem"><span class="hic">👀</span><div><b>Живой ход соперника</b><p>В реальном времени видно, куда соперник примеряет плитку и как её крутит, подсвечено его цветом.</p></div></div>
+            <div class="hitem"><span class="hic">💬</span><div><b>Фразы и эмоции</b><p>Отправляйте быстрые реплики и живые эмодзи в процессе партии.</p></div></div>
+            <div class="hitem"><span class="hic">💤</span><div><b>Защита от AFK</b><p>При сворачивании игры более чем на минуту ход передаётся боту для непрерывности партии.</p></div></div>
           </div>
 
           
@@ -1958,7 +1962,7 @@ function rewardChips(g) {
   if (!g) return '';
   const rw = g.rw || {}, sign = n => (n > 0 ? '+' : n < 0 ? '−' : '') + Math.abs(n);
   const chips = [];
-  if (rw.rated) chips.push(`<div class="rchip cup${rw.cups ? '' : ' zero'}" style="--i:0"><b>🏆 ${sign(rw.cups)}</b><small>${rw.hex ? 'кубков Классики 2.0' : 'кубков'} · всего ${rw.hex ? PROG.hcups || 0 : PROG.cups}</small></div>`);
+  if (rw.rated) { const cupCls = rw.cups < 0 ? ' neg' : rw.cups === 0 ? ' zero' : ''; chips.push(`<div class="rchip cup${cupCls}" style="--i:0"><b>🏆 ${sign(rw.cups)}</b><small>${rw.hex ? 'кубков Классики 2.0' : 'кубков'} · всего ${rw.hex ? PROG.hcups || 0 : PROG.cups}</small></div>`); }
   else if (net && players.some(p => !p.human)) chips.push(`<div class="rchip dim" style="--i:0"><b>🏆 —</b><small>${players.some(p => p.ghost) ? 'партия без рейтинга' : 'без кубков: игра с ботом'}</small></div>`);
   else if (net && !net.quick) chips.push(`<div class="rchip dim" style="--i:0"><b>🏆 —</b><small>без кубков: игра с друзьями</small></div>`);
   chips.push(`<div class="rchip gold${g.delta < 0 ? ' neg' : ''}" style="--i:1"><b><i class="coin"></i> ${sign(g.delta)}</b><small>тайлов · всего ${wallet.gold}</small></div>`);
@@ -4360,9 +4364,12 @@ function gameDone(place, score) {
   const privCups = !!(net && !net.quick && gameRules.cups && players.filter(p => p.human).length >= 2 && !hasBots);
   if (privCups) { const d = today(); if (PROG.pc && PROG.pc.d === d) PROG.pc.n++; else PROG.pc = {d, n: 1}; }
   const rated = !!(!hasBots && net && (net.quick || (privCups && PROG.pc.n <= 5)));
-  const cups = rated ? ([10, 5, 2, 0, 0][place] || 0) : 0;
+  const CUP_TABLE_BY_PLAYERS = { 2: [10, -7], 3: [10, 2, -7], 4: [10, 4, -3, -7], 5: [10, 5, 0, -4, -8] };
+  const rawDelta = rated ? ((CUP_TABLE_BY_PLAYERS[players.length] || CUP_TABLE_BY_PLAYERS[4])[place] ?? (place === 0 ? 10 : -5)) : 0;
   // Classic 2.0 has a rating of its own: its cups go to a separate board (/leaders_hex).
   const hexRated = !!(gameRules && gameRules.mode === 'hex');
+  const curCups = hexRated ? (PROG.hcups || 0) : (PROG.cups || 0);
+  const cups = (curCups + rawDelta < 0) ? -curCups : rawDelta;
   if (rated && hexRated) { PROG.hcups = (PROG.hcups || 0) + cups; syncRating(false, 'hex'); }
   else if (rated) { PROG.cups += cups; syncRating(); }
   saveWallet(); progressDot();
@@ -4717,9 +4724,10 @@ function renderMenuProfile() {
   const need = xpNeed(PROG.lvl), name = profileName(), pct = Math.max(0, Math.min(100, 100 * PROG.xp / need));
   // The plate says who you are and how far to the next level, in words: «Уровень 3», «120 / 200 опыта», a bar.
   const lk = AV.look(wallet);
-  const curBanner = wallet.banner && AV.BANNERS[wallet.banner] && AV.owns(wallet, 'banner', wallet.banner) ? AV.BANNERS[wallet.banner] : null;
-  el.classList.toggle('has-banner', !!curBanner);
-  if (curBanner) {
+  const isBannerShape = (wallet.avShape === 'rect');
+  const curBanner = isBannerShape && wallet.banner && AV.BANNERS[wallet.banner] && AV.owns(wallet, 'banner', wallet.banner) ? AV.BANNERS[wallet.banner] : null;
+  el.classList.toggle('has-banner', isBannerShape && !!curBanner);
+  if (isBannerShape && curBanner) {
     el.style.setProperty('--banner-bg', `url(${curBanner.src})`);
     el.style.setProperty('--banner-pos', curBanner.pos || 'center');
   } else {
@@ -4748,7 +4756,29 @@ function renderProfile() {
   const mail = fbAuth && fbAuth.email ? String(fbAuth.email).replace(/[<>&"]/g, '') : 'Профиль не сохранён';
   const profEl = $('#profile');
   if (profEl) {
-    profEl.innerHTML = `<div class="pctop"><div class="prof-banner-shade"></div><div class="prof-hero-row"><span class="av big${myRing() ? ' fr' : ''}" style="--c:${wallet.color};${myRing() ? `--fr:${myRing()}` : ''}">${(name[0] || '?').toUpperCase()}</span><span class="pwho"><b class="pnick">${name}</b>${myStatus() ? `<em class="fst">${myStatus()}</em>` : ''}<small class="pmail">${mail}</small></span><button class="iconbtn" id="profEdit" aria-label="Редактировать профиль"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button></div></div><div class="pclvl"><div class="lvl">${ring(PROG.xp / need)}<b>${PROG.lvl}</b></div><div class="pi"><b class="pl1">Уровень ${PROG.lvl}</b><div class="xpbar"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></div><small>${PROG.xp} / ${need} опыта до ${PROG.lvl + 1} уровня</small></div></div><div class="pchips"><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><path d="M8 21h8M12 17v4M5 4h14v4a7 7 0 01-14 0V4z"/><path d="M5 6H3a2 2 0 00-2 2v1a4 4 0 004 4h0M19 6h2a2 2 0 012 2v1a4 4 0 01-4 4h0"/></svg><b>${PROG.cups}</b> <small>кубков</small></span><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><circle cx="12" cy="14" r="6"/><path d="M8.5 8.5L7 3l5 3 5-3-1.5 5.5"/></svg><b>${ACH.filter(a => PROG.ach[a.id] === 'got').length}</b>/${ACH.length} <small>наград</small></span></div><div class="pcoins"><span class="cu"><i class="coin c-tile"></i><b>${COINS.balance(wallet, 'tile')}</b><small>тайлы</small></span><span class="au"><i class="coin c-star"></i><b>${COINS.balance(wallet, 'star')}</b><small>звёзды</small></span></div>${FB ? `<div class="pacts">${fbAuth && fbAuth.email ? '<button class="chip" data-hacct="out">Выйти из аккаунта</button>' : '<button class="chip pri" data-hacct="in">Войти или создать профиль</button>'}</div>` : ''}`;
+    const isBannerShape = (wallet.avShape === 'rect');
+    const curBanner = isBannerShape && wallet.banner && AV.BANNERS[wallet.banner] && AV.owns(wallet, 'banner', wallet.banner) ? AV.BANNERS[wallet.banner] : null;
+    const bannerSrc = curBanner ? curBanner.src : (isBannerShape ? 'tiles/rC.webp' : '');
+    const bannerPos = curBanner ? (curBanner.pos || 'center') : 'center';
+
+    profEl.classList.toggle('has-banner', isBannerShape);
+    if (isBannerShape) {
+      profEl.style.setProperty('--banner-bg', `url(${bannerSrc})`);
+      profEl.style.setProperty('--banner-pos', bannerPos);
+    } else {
+      profEl.style.removeProperty('--banner-bg');
+      profEl.style.removeProperty('--banner-pos');
+    }
+
+    const lk = AV.look(wallet);
+    const avCls = isBannerShape
+      ? `av big banner-crest${myRing() ? ' fr' : ''}`
+      : `av big${myRing() ? ' fr' : ''}${lk.cls}`;
+    const avStyle = isBannerShape
+      ? `--c:${wallet.color};${myRing() ? `--fr:${myRing()};` : ''}`
+      : `--c:${wallet.color};${myRing() ? `--fr:${myRing()};` : ''}${lk.style}`;
+
+    profEl.innerHTML = `<div class="pctop"><div class="prof-banner-shade"></div><div class="prof-hero-row"><span class="${avCls}" style="${avStyle}">${(name[0] || '?').toUpperCase()}</span><span class="pwho"><b class="pnick">${name}</b>${myStatus() ? `<em class="fst">${myStatus()}</em>` : ''}<small class="pmail">${mail}</small></span><button class="iconbtn" id="profEdit" aria-label="Редактировать профиль"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button></div></div><div class="pclvl"><div class="lvl">${ring(PROG.xp / need)}<b>${PROG.lvl}</b></div><div class="pi"><b class="pl1">Уровень ${PROG.lvl}</b><div class="xpbar"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></div><small>${PROG.xp} / ${need} опыта до ${PROG.lvl + 1} уровня</small></div></div><div class="pchips"><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><path d="M8 21h8M12 17v4M5 4h14v4a7 7 0 01-14 0V4z"/><path d="M5 6H3a2 2 0 00-2 2v1a4 4 0 004 4h0M19 6h2a2 2 0 012 2v1a4 4 0 01-4 4h0"/></svg><b>${PROG.cups}</b> <small>кубков</small></span><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><circle cx="12" cy="14" r="6"/><path d="M8.5 8.5L7 3l5 3 5-3-1.5 5.5"/></svg><b>${ACH.filter(a => PROG.ach[a.id] === 'got').length}</b>/${ACH.length} <small>наград</small></span></div><div class="pcoins"><span class="cu"><i class="coin c-tile"></i><b>${COINS.balance(wallet, 'tile')}</b><small>тайлы</small></span><span class="au"><i class="coin c-star"></i><b>${COINS.balance(wallet, 'star')}</b><small>звёзды</small></span></div>${FB ? `<div class="pacts">${fbAuth && fbAuth.email ? '<button class="chip" data-hacct="out">Выйти из аккаунта</button>' : '<button class="chip pri" data-hacct="in">Войти или создать профиль</button>'}</div>` : ''}`;
     const pe = $('#profEdit');
     if (pe) pe.onclick = editProfile;
     profEl.querySelectorAll('[data-hacct]').forEach(b => { b.onclick = () => { const t = $(b.dataset.hacct === 'out' ? '#acLogout' : '#acLogin'); if (t) t.click(); }; });
@@ -7707,33 +7737,70 @@ async function usageFlush(keepalive) {
 }
 document.addEventListener('click', e => { const f = PG.state.usage.featureOf(e.target); if (f) useCount(f); }, true);
 document.addEventListener('visibilitychange', () => { if (document.hidden) usageFlush(true); });
+let _screenAnimTimer = null;
+let _outgoingScr = null;
+
+function clearScreenTransitions() {
+  if (_screenAnimTimer) { clearTimeout(_screenAnimTimer); _screenAnimTimer = null; }
+  if (_outgoingScr) {
+    _outgoingScr.hidden = true;
+    _outgoingScr.classList.remove('screen-exit-to-left', 'screen-exit-to-right', 'screen-enter-from-left', 'screen-enter-from-right');
+    _outgoingScr = null;
+  }
+  document.querySelectorAll('.screen').forEach(s => {
+    s.classList.remove('screen-exit-to-left', 'screen-exit-to-right', 'screen-enter-from-left', 'screen-enter-from-right');
+  });
+}
+
 function show(name) {
   useCount('screen:' + name);
   if (typeof recordAction === 'function') recordAction('show:' + name);
-  const curScr = document.querySelector('.screen:not([hidden])');
+  const curScr = document.querySelector('.screen:not([hidden]):not(.screen-exit-to-left):not(.screen-exit-to-right)');
   const curName = curScr ? curScr.id.replace('scr-', '') : '';
   const ORDER = ['menu', 'progress', 'friends', 'shop'];
   const SUB_SCREENS = ['rules', 'rating', 'settings', 'items', 'inbox', 'history', 'achievements', 'mastery', 'setup', 'lobby', 'profile'];
-  let animCls = '';
-  if (curName && curName !== name) {
+  let animDir = '';
+  if (curName && curName !== name && curScr) {
     if (ORDER.includes(curName) && ORDER.includes(name)) {
-      animCls = ORDER.indexOf(name) > ORDER.indexOf(curName) ? 'slide-left' : 'slide-right';
+      animDir = ORDER.indexOf(name) > ORDER.indexOf(curName) ? 'left' : 'right';
     } else if (ORDER.includes(curName) && SUB_SCREENS.includes(name)) {
-      animCls = 'slide-left';
+      animDir = 'left';
     } else if (SUB_SCREENS.includes(curName) && ORDER.includes(name)) {
-      animCls = 'slide-right';
+      animDir = 'right';
     } else if (SUB_SCREENS.includes(curName) && SUB_SCREENS.includes(name)) {
-      animCls = SUB_SCREENS.indexOf(name) > SUB_SCREENS.indexOf(curName) ? 'slide-left' : 'slide-right';
+      animDir = SUB_SCREENS.indexOf(name) > SUB_SCREENS.indexOf(curName) ? 'left' : 'right';
     }
   }
-  document.querySelectorAll('.screen').forEach(s => {
-    const isTarget = s.id === 'scr-' + name;
-    s.hidden = !isTarget;
-    if (isTarget) {
-      s.classList.remove('slide-left', 'slide-right');
-      if (animCls) { void s.offsetWidth; s.classList.add(animCls); }
+
+  const targetScr = $('#scr-' + name);
+  if (animDir && curScr && targetScr && curScr !== targetScr) {
+    clearScreenTransitions();
+    _outgoingScr = curScr;
+    curScr.hidden = false;
+    targetScr.hidden = false;
+
+    if (animDir === 'left') {
+      curScr.classList.add('screen-exit-to-left');
+      targetScr.classList.add('screen-enter-from-right');
+    } else {
+      curScr.classList.add('screen-exit-to-right');
+      targetScr.classList.add('screen-enter-from-left');
     }
-  });
+
+    document.querySelectorAll('.screen').forEach(s => {
+      if (s !== curScr && s !== targetScr) s.hidden = true;
+    });
+
+    _screenAnimTimer = setTimeout(() => {
+      clearScreenTransitions();
+      if (targetScr) targetScr.hidden = false;
+    }, 280);
+  } else {
+    clearScreenTransitions();
+    document.querySelectorAll('.screen').forEach(s => {
+      s.hidden = (s !== targetScr);
+    });
+  }
   const nav = $('#bnav'), onNav = ['menu', 'progress', 'friends', 'shop'].includes(name);
   nav.hidden = !onNav; nav.parentNode.classList.toggle('hasnav', onNav);
   nav.querySelectorAll('[data-nav]').forEach(b => b.classList.toggle('on', b.dataset.nav === name));
@@ -8419,15 +8486,15 @@ function showStallCategoryModal(info) {
   m.className = 'over stall-hint-modal';
   m.style.position = 'fixed';
   m.innerHTML = '<div class="ocard stall-hint-card">'
-    + '<div class="shm-head"><div class="shm-icon">ℹ️</div><h3>' + clean(info.title) + '</h3></div>'
+    + '<div class="shm-head"><div class="shm-icon">' + (info.icon || 'ℹ️') + '</div><h3>' + clean(info.title) + '</h3></div>'
     + '<div class="shm-body">'
-    + '<div class="shm-sec"><b>Что это такое:</b><p>' + clean(info.what) + '</p></div>'
-    + '<div class="shm-sec"><b>Где увидят:</b><p>' + clean(info.where) + '</p></div>'
+    + '<div class="shm-row"><b>Что это такое:</b><p>' + clean(info.what) + '</p></div>'
+    + '<div class="shm-row"><b>Где увидят:</b><p>' + clean(info.where) + '</p></div>'
     + '</div>'
-    + '<button class="cta wide" id="shmClose">Понятно</button>'
+    + '<button class="cta wide shm-btn" id="shmClose">Понятно</button>'
     + '</div>';
   document.body.append(m);
-  const close = () => m.remove();
+  const close = () => { m.classList.add('fading'); setTimeout(() => m.remove(), 160); };
   m.onclick = e => { if (e.target === m || e.target.closest('#shmClose')) close(); };
 }
 
@@ -8618,7 +8685,68 @@ function showShopItemModal(kind, key, name, price) {
 }
 
 (function initDailyShop() {
+  const STALL_CAT_INFO = {
+    'stall-avatars': {
+      icon: '🖼️',
+      title: 'Прилавок картинок профиля',
+      what: 'Аватарки, уникальные прямоугольные баннеры и новые формы обрамления аватара.',
+      where: 'В главном меню, окне профиля и карточке игрока для всех соперников.'
+    },
+    'stall-figures': {
+      icon: '♟️',
+      title: 'Прилавок резных фигурок',
+      what: 'Уникальные фигурки персонажей (миплы), которыми вы совершаете ходы и занимаете владения.',
+      where: 'На игровом столе во время партий и на пьедестале в карточке профиля.'
+    },
+    'stall-frames': {
+      icon: '👑',
+      title: 'Прилавок благородных рамок',
+      what: 'Художественные золотые, серебряные, резные и мистические оправы для аватара.',
+      where: 'Вокруг вашего аватара в меню, профиле, чате и за игровым столом.'
+    },
+    'stall-statuses': {
+      icon: '📜',
+      title: 'Прилавок почётных статусов',
+      what: 'Благородные титулы и почётные звания, подчёркивающие ваш опыт и характер.',
+      where: 'Под вашим именем в главном меню, профиле и списке игроков в лобби.'
+    },
+    'stall-emotes': {
+      icon: '🎭',
+      title: 'Прилавок живых эмоций',
+      what: 'Быстрые анимированные реакции для живого выражения эмоций в партии.',
+      where: 'В круговом меню реакций во время онлайн и локальных партий.'
+    },
+    'stall-phrases': {
+      icon: '💬',
+      title: 'Прилавок крылатых фраз',
+      what: 'Тактические реплики и остроумные цитаты для общения с соперниками.',
+      where: 'В быстром чате во время партии над вашим аватаром.'
+    }
+  };
+
   document.addEventListener('click', e => {
+    const hintBtn = e.target.closest('[data-stall-hint], .stall-hint-btn');
+    if (hintBtn) {
+      e.preventDefault();
+      e.stopPropagation();
+      let cat = hintBtn.dataset.stallHint || '';
+      if (!cat) {
+        const stallEl = hintBtn.closest('.shop-stall');
+        if (stallEl) {
+          const match = stallEl.className.match(/stall-[a-z]+/);
+          if (match) cat = match[0];
+        }
+      }
+      const info = STALL_CAT_INFO[cat] || {
+        icon: 'ℹ️',
+        title: 'О прилавке',
+        what: 'Уникальные предметы для украшения профиля и игрового стола.',
+        where: 'В вашем профиле и во время партий.'
+      };
+      showStallCategoryModal(info);
+      return;
+    }
+
     const buyBtn = e.target.closest('[data-daily-buy]');
     if (buyBtn) {
       const parts = buyBtn.dataset.dailyBuy.split('|');
@@ -8666,7 +8794,7 @@ function showShopItemModal(kind, key, name, price) {
   });
 })();
 
-window.show = show;
+window.show = show; window.wallet = wallet; window.renderProfile = renderProfile; window.saveWallet = saveWallet;
 window.openSetup = openSetup;
 show(isApp ? 'menu' : 'game');
 })();
