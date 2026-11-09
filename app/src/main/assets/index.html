@@ -872,6 +872,12 @@ html.app input,html.app textarea,html.app a,html.app [contenteditable],html.app 
 
 .mini{position:absolute;left:50%;top:58%;width:0;height:0;transform-style:preserve-3d;--tilt:56deg;animation:sway 9s ease-in-out infinite}
 
+/* Menu demo game (buildMini): Classic 2.0 cards laid in turn; the new card glows in its player's colour. */
+.mini.demo{top:54%;transition:opacity .8s ease}
+.mini.demo.fade{opacity:0}
+.mini.demo .tile.hex::before{content:"";position:absolute;inset:-4px -4.6px;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);background:var(--pc);opacity:0;transition:opacity .5s ease}
+.mini.demo .tile.hex.mdrop::before{opacity:.9}
+
 @keyframes sway{0%,100%{transform:rotateX(56deg) rotateZ(-12deg) scale3d(.8,.8,.8)}50%{transform:rotateX(56deg) rotateZ(10deg) scale3d(.8,.8,.8)}}
 
 .mbody{position:relative;flex:0 0 auto;display:flex;flex-direction:column;align-items:stretch;gap:12px;padding:0 18px calc(14px + var(--ib,0px));width:100%;max-width:440px;margin:0 auto;box-sizing:border-box}
@@ -9590,10 +9596,51 @@ function drawFx() {
   const dx = to.left - from.left + (to.width - 22) / 2, dy = to.top - from.top + (to.height - 22) / 2, sc = to.width / 22;
   c.animate([{transform: 'translate(0,0) scale(1)'}, {transform: `translate(${dx * .5}px,${dy * .5 - 60}px) scale(${sc * .7}) rotate(-12deg)`, offset: .5}, {transform: `translate(${dx}px,${dy}px) scale(${sc})`, opacity: .2}], {duration: 520, easing: 'cubic-bezier(.4,0,.3,1)'}).finished.then(() => c.remove(), () => c.remove());
 }
+// The menu plays a small game of Classic 2.0 on its own: players lay six-sided cards in turn, each card drops onto
+// the table with its player's colour, and once the little kingdom is built it fades and a new one begins.
+// It is only scenery: the cards follow the rules (src/engine/hex.js) but nothing is scored or saved.
+let demoT = 0, demoOn = false;
 function buildMini() {
-  const mini = $('#mini'); mini.innerHTML = '';
-  const inMini = (x, y) => Math.abs(x) <= 1 && Math.abs(y - .5) <= 1.5 && tiles.has(key(x, y));
-  for (const t of tiles.values()) if (inMini(t.x, t.y)) { const el = tileEl(t); mini.append(el); walls({...t, el}, inMini); }
+  if (demoOn) return;
+  demoOn = true; injectHexArt(); demoGame();
+}
+function demoGame() {
+  const mini = $('#mini'), board = new Map(), dist = (x, y) => (Math.abs(x) + Math.abs(y) + Math.abs(x + y)) / 2;
+  mini.innerHTML = ''; mini.classList.add('demo'); mini.classList.remove('fade');
+  const deck = HX.deckList({rivers: true});
+  for (let i = deck.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [deck[i], deck[j]] = [deck[j], deck[i]]; }
+  let turnNo = 0;
+  const shown = () => !$('#scr-menu').hidden && !document.hidden;
+  const sides = t => t.el.querySelectorAll('.sd').forEach((sd, d) => { sd.hidden = board.has(HX.key(t.x + HX.DX[d], t.y + HX.DY[d])); });
+  const lay = (t, col) => {
+    const el = document.createElement('div'); el.className = 'tile hex';
+    const [X, Y] = HX.cellXY(t.x, t.y); el.style.left = (X * T - HW / 2) + 'px'; el.style.top = (Y * T - T / 2) + 'px';
+    el.style.setProperty('--pc', col);
+    el.innerHTML = HEX_SIDES + `<div class="face t-${t.type}" style="--r:${t.r * 60}deg"></div>`;
+    t.el = el; board.set(HX.key(t.x, t.y), t); mini.append(el);
+    for (const n of board.values()) sides(n);
+    if (RM) return;
+    el.animate([{transform: 'translateZ(160px) rotateZ(-14deg)', opacity: 0}, {transform: 'translateZ(160px) rotateZ(-14deg)', opacity: 1, offset: .15},
+      {transform: 'translateZ(-4px) rotateZ(0)', offset: .8}, {transform: 'translateZ(0)'}], {duration: 700, easing: 'cubic-bezier(.45,0,.75,.45)'});
+    el.classList.add('mdrop'); setTimeout(() => el.classList.remove('mdrop'), 1300);
+  };
+  const step = () => {
+    if (!demoOn) return;
+    if (!shown()) { demoT = setTimeout(step, 1000); return; }
+    const col = PL0[turnNo % 4].col;
+    if (!board.size) { lay({x: 0, y: 0, type: deck.pop(), r: (Math.random() * 6) | 0}, col); turnNo++; demoT = setTimeout(step, 1100); return; }
+    // the next card from the stack that has a place near the middle; the closer to the middle and to more cards, the better
+    let move = null;
+    for (let k = 0; k < 12 && deck.length && !move; k++) {
+      const type = deck.pop();
+      const ms = HX.allMoves(board, type).filter(m => dist(m.x, m.y) <= 1);
+      if (ms.length) { const sc = m => HX.neighbours(board, m.x, m.y) * 2 - dist(m.x, m.y) * 1.5 + Math.random(); move = {...ms.reduce((a, b) => sc(b) > sc(a) ? b : a), type}; }
+    }
+    if (move) { lay(move, col); turnNo++; demoT = setTimeout(step, 1250); return; }
+    // the kingdom is built: hold it a moment, fade it out and start a new game
+    demoT = setTimeout(() => { mini.classList.add('fade'); demoT = setTimeout(() => { if (demoOn) demoGame(); }, 900); }, 2600);
+  };
+  demoT = setTimeout(step, 400);
 }
 let lastGold = null;
 // What the match gave: cups (rated online games), gold, experience, a new level.
@@ -15311,7 +15358,8 @@ window.onUpdateAvailable = (info, manual) => {
   document.body.append(box);
   if (!isMandatory) {
     const ltr = box.querySelector('#updLater');
-    if (ltr) ltr.onclick = () => { box.remove(); bootHide(); };
+    // "Later" on the splash: the splash waited for this answer (boot.update), so let it go now.
+    if (ltr) ltr.onclick = () => { box.remove(); boot.update = false; bootHide(); };
   }
   // Offered on the splash: the dialog sits above it.
   if (!boot.gone) {

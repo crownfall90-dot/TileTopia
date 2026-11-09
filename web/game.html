@@ -7757,7 +7757,8 @@ window.onUpdateAvailable = (info, manual) => {
   document.body.append(box);
   if (!isMandatory) {
     const ltr = box.querySelector('#updLater');
-    if (ltr) ltr.onclick = () => { box.remove(); bootHide(); };
+    // "Later" on the splash: the splash waited for this answer (boot.update), so let it go now.
+    if (ltr) ltr.onclick = () => { box.remove(); boot.update = false; bootHide(); };
   }
   // Offered on the splash: the dialog sits above it.
   if (!boot.gone) {
