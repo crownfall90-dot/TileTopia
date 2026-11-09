@@ -2338,7 +2338,8 @@ function paintFigures() {
   let css = '';
   players.forEach((p, i) => {
     const [c, g] = cv(FIG_W, FIG_H, 4); drawFigure(g, FIG_W, FIG_H, p.col, p.fig);
-    SPR['m' + i] = {url: c.toDataURL(), w: FIG_W, h: FIG_H};
+    let dataUrl = ''; try { dataUrl = c.toDataURL(); } catch (_) {}
+    SPR['m' + i] = {url: dataUrl, w: FIG_W, h: FIG_H};
     css += `.s-m${i}{background-image:url(${SPR['m' + i].url})}`;
   });
   if (!figStyle) { figStyle = document.createElement('style'); document.head.appendChild(figStyle); }
@@ -4108,7 +4109,7 @@ function matchRender() {
       })();
   if ($('#mSeats').innerHTML !== html) $('#mSeats').innerHTML = html; // re-rendering restarts the pop-in
   // Nobody for our size yet, but a room of the same mode waits for another number of players.
-  const alt = !full && seats.length <= 1 && Date.now() - mm.t0 > 4000 ? [...mm.other].filter(([c, o]) => !mm.closed.has(c) && !mm.skip.has(c) && Date.now() - o.ts < SEEK_FRESH && o.n < o.want).sort((a, b) => b[1].n - a[1].n)[0] : null;
+  const alt = !status.full && seats.length <= 1 && Date.now() - mm.t0 > 4000 ? [...mm.other].filter(([c, o]) => !mm.closed.has(c) && !mm.skip.has(c) && Date.now() - o.ts < SEEK_FRESH && o.n < o.want).sort((a, b) => b[1].n - a[1].n)[0] : null;
   renderLobbyFriends();
   $('#mOther').hidden = !alt;
   if (alt) { $('#mOther').textContent = `Есть партия на ${alt[1].want} — присоединиться (${alt[1].n} из ${alt[1].want})`; $('#mOther').dataset.code = alt[0]; $('#mOther').dataset.want = alt[1].want; }
@@ -8228,7 +8229,7 @@ function pieceUrl({type, r}) {
   const img = loaderImgs[type]; if (!img || !img.complete) return TILE_URL[type];
   const c = document.createElement('canvas'); c.width = c.height = 96; const g = c.getContext('2d');
   g.translate(48, 48); g.rotate(r * Math.PI / 2); g.drawImage(img, -48, -48, 96, 96);
-  return c.toDataURL('image/jpeg', .85);
+  try { return c.toDataURL('image/jpeg', .85); } catch (_) { return (img && img.src) || ''; }
 }
 function relayLoader(pz) {
   const grid = loaderLayout(); if (!grid) return;
