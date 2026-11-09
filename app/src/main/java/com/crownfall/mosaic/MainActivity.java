@@ -46,11 +46,24 @@ public class MainActivity extends Activity {
     private boolean pageReady;
     /** An invite link the game was opened with; handed to the page once it has loaded. */
     private String pendingLink;
+    /** Game updates over the air (ContentUpdater): the downloaded page, its start watchdog. */
+    private ContentUpdater ota;
+    private boolean contentStarted;
+    private final Runnable otaWatch = () -> {
+        // the downloaded page did not start in time: drop it and start the APK's own
+        if (contentStarted || ota == null || ota.loaded == 0 || web == null) return;
+        report(new IllegalStateException("OTA page " + ota.loaded + " did not start"));
+        ota.markBad(ota.loaded);
+        ota.loaded = 0;
+        pageReady = false;
+        web.loadUrl(ContentUpdater.BUNDLED);
+    };
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         updater = new Updater(this);
+        ota = new ContentUpdater(this);
         // Background helpers must never stop the game from opening.
         try {
             UpdateNotifier.schedule(this);
@@ -83,6 +96,7 @@ public class MainActivity extends Activity {
         hideSystemBars();
         createWebView();
         grabLink(getIntent());
+        registerBack();
     }
 
     @Override
@@ -254,7 +268,19 @@ public class MainActivity extends Activity {
             }
         });
         root.addView(web, new FrameLayout.LayoutParams(-1, -1));
-        web.loadUrl("file:///android_asset/index.html");
+        // the newest good game page downloaded over the air, else the APK's own (same address: same saves and storage)
+        contentStarted = false;
+        handler.removeCallbacks(otaWatch);
+        String page = null;
+        try {
+            page = ota.pageToLoad();
+        } catch (Exception e) {
+            report(e);
+        }
+        if (page != null) {
+            web.loadDataWithBaseURL(ContentUpdater.BUNDLED, page, "text/html", "utf-8", null);
+            handler.postDelayed(otaWatch, ContentUpdater.READY_MS);
+        } else web.loadUrl(ContentUpdater.BUNDLED);
     }
 
     @Override
@@ -290,6 +316,7 @@ public class MainActivity extends Activity {
     void checkSoon() {
         handler.removeCallbacks(recheck);
         try {
+            ota.checkInBackground();
             updater.check(false);
         } catch (Exception e) {
             report(e);
@@ -297,9 +324,23 @@ public class MainActivity extends Activity {
         handler.postDelayed(recheck, RECHECK_MS);
     }
 
+    /* Android 13+ (and always from targetSdk 36): back comes through OnBackInvokedCallback, onBackPressed is no longer
+       called (manifest: enableOnBackInvokedCallback). Older phones still use onBackPressed. */
+    private void registerBack() {
+        if (Build.VERSION.SDK_INT >= 33) {
+            getOnBackInvokedDispatcher().registerOnBackInvokedCallback(
+                    android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT, this::handleBack);
+        }
+    }
+
     @Override
+    @SuppressWarnings("deprecation")
     public void onBackPressed() {
-        if (web == null || !pageReady) { super.onBackPressed(); return; }
+        handleBack();
+    }
+
+    private void handleBack() {
+        if (web == null || !pageReady) { finish(); return; }
         // The game decides: close a dialog, open the game menu, go back a screen, or let the app close.
         web.evaluateJavascript("window.onBack ? window.onBack() : false", handled -> {
             if (!"true".equals(handled)) finish();
@@ -333,6 +374,22 @@ public class MainActivity extends Activity {
     }
 
     private class Bridge {
+        /** The game has started (end of its start-up): a page downloaded over the air is good. */
+        @JavascriptInterface
+        public void contentReady() {
+            runOnUiThread(() -> {
+                contentStarted = true;
+                handler.removeCallbacks(otaWatch);
+                if (ota != null) ota.ready();
+            });
+        }
+
+        /** The version of the game page running now: 0 for the APK's own, else the downloaded one's release code. */
+        @JavascriptInterface
+        public int contentCode() {
+            return ota == null ? 0 : ota.loaded;
+        }
+
         /** The system page of this app (with its "Uninstall" button): used for the one-time reinstall after a key change. */
         @JavascriptInterface
         public void openAppSettings() {
@@ -484,6 +541,17 @@ public class MainActivity extends Activity {
                     else b.putString(k, String.valueOf(v));
                 }
                 com.google.firebase.analytics.FirebaseAnalytics.getInstance(MainActivity.this).logEvent(name, b);
+            } catch (Exception e) {
+                report(e);
+            }
+        }
+
+        /** Statistics consent: Firebase Analytics collects only after the player agreed (off by default, see the manifest). */
+        @JavascriptInterface
+        public void setAnalytics(boolean on) {
+            try {
+                if (FirebaseApp.getApps(MainActivity.this).isEmpty()) return;
+                com.google.firebase.analytics.FirebaseAnalytics.getInstance(MainActivity.this).setAnalyticsCollectionEnabled(on);
             } catch (Exception e) {
                 report(e);
             }

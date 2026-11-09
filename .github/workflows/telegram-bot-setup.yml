@@ -6,7 +6,7 @@ on:
       web_url:
         description: 'Web App URL'
         required: false
-        default: 'https://crownfall90-dot.github.io/play/'
+        default: 'https://crownfall90-dot.github.io/TileTopia/'
 
 permissions:
   contents: read

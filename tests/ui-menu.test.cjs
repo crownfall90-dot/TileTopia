@@ -19,7 +19,7 @@ test('ui/menu: formatGameMenuHtml formats offline pause menu', () => {
   assert.ok(!html.includes('data-a="draw"'));
 });
 
-test('ui/menu: formatGameMenuHtml formats online game menu with resign & draw', () => {
+test('ui/menu: formatGameMenuHtml formats online game menu with resign (no draw)', () => {
   const html = menu.formatGameMenuHtml({
     online: true,
     live: true,
@@ -29,7 +29,7 @@ test('ui/menu: formatGameMenuHtml formats online game menu with resign & draw', 
 
   assert.ok(html.includes('Онлайн-партия'));
   assert.ok(html.includes('Партия идёт, пока вы в меню'));
-  assert.ok(html.includes('data-a="draw"'));
+  assert.ok(!html.includes('data-a="draw"'));
   assert.ok(html.includes('data-a="resign"'));
   assert.ok(!html.includes('data-a="cancel"'));
 });

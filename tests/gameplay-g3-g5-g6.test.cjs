@@ -1,4 +1,4 @@
-// Tests for G-3 (Adaptive difficulty), G-5 (Rare cards and events in Big mode), G-6 (1v1 Duel on Time)
+// Tests for G-3 (Adaptive difficulty), G-5 (Rare cards and events in Big mode), G-6 (the duel mode was removed)
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
@@ -53,41 +53,24 @@ test('G-5: Big game mode (epic) includes rare cards and triggers event celebrati
   const rareCount = epicDeck.filter(t => TYPES[t] && TYPES[t].rare).length;
   assert.ok(rareCount > 0, 'epic deck must contain rare tiles');
 
-  // Fast & duel decks do not contain rare tiles
+  // The fast deck does not contain rare tiles
   const fastDeck = deckList({mode: 'fast', rivers: true});
   assert.equal(fastDeck.filter(t => isRareTile(t)).length, 0);
 
-  const duelDeck = deckList({mode: 'duel', rivers: true});
-  assert.equal(duelDeck.filter(t => isRareTile(t)).length, 0);
-
   // In game.html: rare tile placement and big feature completion toasts
-  assert.match(html, /gameRules\.mode === 'epic' && TYPES\[t\.type\] && TYPES\[t\.type\]\.rare/);
+  assert.match(html, /gameRules\.mode === 'epic' && TY\(t\.type\) && TY\(t\.type\)\.rare/);
   assert.match(html, /🌟 Событие в Большой игре/);
 });
 
-test('G-6: Duel 1v1 on time mode configuration and progress tracking', async () => {
+test('G-6: the duel mode is gone — no setting, no card, no counters', async () => {
   const {MODES} = await import('../src/state/config.js');
-  const {normalizeStats, recordGameMode} = await import('../src/state/progress.js');
+  const {normalizeStats, recordGameMode, QUESTS, ACH} = await import('../src/state/progress.js');
   const html = fs.readFileSync(GAME_PATH, 'utf8');
-
-  // Config parameters
-  assert.ok(MODES.duel, 'MODES.duel defined');
-  assert.equal(MODES.duel.set.deck, 30);
-  assert.equal(MODES.duel.set.timer, 20);
-  assert.equal(MODES.duel.set.meeples, 5);
-
-  // Progress tracking
-  const st = normalizeStats({});
-  assert.ok(st.byMode.duel, 'normalizeStats includes duel');
-  assert.equal(st.byMode.duel.games, 0);
-
+  assert.deepEqual(Object.keys(MODES), ['fast', 'classic', 'epic', 'hex']);
+  const st = normalizeStats({byMode: {duel: {games: 5, wins: 4, best: 55}}, duelwin: 3});
+  assert.ok(!('duel' in st.byMode) && !('duelwin' in st), 'old duel numbers are dropped');
   recordGameMode(st, 'duel', true, 45);
-  assert.equal(st.byMode.duel.games, 1);
-  assert.equal(st.byMode.duel.wins, 1);
-  assert.equal(st.byMode.duel.best, 45);
-
-  // game.html UI integration
-  assert.match(html, /duel:\s*'⚔️'/);
-  assert.match(html, /bm\.duel/);
-  assert.match(html, /gameRules\.mode === 'duel'/);
+  assert.equal(st.byMode.bots.games, 1, 'a stray old «duel» result counts as a game with bots');
+  assert.ok(!QUESTS.some(q => /duel/.test(q.k)) && !ACH.some(a => /дуэл/i.test(a.d + a.t)), 'no duel quest or achievement');
+  assert.ok(!/duel|Дуэль|дуэл/i.test(html), 'nothing about the duel is left in the game page');
 });

@@ -1,0 +1,224 @@
+[
+ {
+  "id": "cap",
+  "tris": 1412,
+  "fall_tris": 0,
+  "glb_kb": 77.1
+ },
+ {
+  "id": "capRS",
+  "tris": 1352,
+  "fall_tris": 0,
+  "glb_kb": 74.1
+ },
+ {
+  "id": "capRL",
+  "tris": 1280,
+  "fall_tris": 0,
+  "glb_kb": 70.3
+ },
+ {
+  "id": "capRR",
+  "tris": 1370,
+  "fall_tris": 0,
+  "glb_kb": 74.4
+ },
+ {
+  "id": "c2",
+  "tris": 1800,
+  "fall_tris": 0,
+  "glb_kb": 93.0
+ },
+ {
+  "id": "c2r",
+  "tris": 1662,
+  "fall_tris": 0,
+  "glb_kb": 86.4
+ },
+ {
+  "id": "band",
+  "tris": 2147,
+  "fall_tris": 0,
+  "glb_kb": 114.5
+ },
+ {
+  "id": "c3",
+  "tris": 1622,
+  "fall_tris": 0,
+  "glb_kb": 86.6
+ },
+ {
+  "id": "c3r",
+  "tris": 1622,
+  "fall_tris": 0,
+  "glb_kb": 86.6
+ },
+ {
+  "id": "c4",
+  "tris": 1097,
+  "fall_tris": 0,
+  "glb_kb": 55.8
+ },
+ {
+  "id": "rS",
+  "tris": 416,
+  "fall_tris": 0,
+  "glb_kb": 22.1
+ },
+ {
+  "id": "rC",
+  "tris": 598,
+  "fall_tris": 0,
+  "glb_kb": 32.5
+ },
+ {
+  "id": "r3",
+  "tris": 418,
+  "fall_tris": 0,
+  "glb_kb": 23.4
+ },
+ {
+  "id": "r4",
+  "tris": 256,
+  "fall_tris": 0,
+  "glb_kb": 15.4
+ },
+ {
+  "id": "fort",
+  "tris": 1094,
+  "fall_tris": 0,
+  "glb_kb": 56.2
+ },
+ {
+  "id": "fortR",
+  "tris": 1336,
+  "fall_tris": 0,
+  "glb_kb": 69.5
+ },
+ {
+  "id": "wS",
+  "tris": 300,
+  "fall_tris": 136,
+  "glb_kb": 23.4
+ },
+ {
+  "id": "wC",
+  "tris": 356,
+  "fall_tris": 136,
+  "glb_kb": 29.8
+ },
+ {
+  "id": "wBr",
+  "tris": 706,
+  "fall_tris": 136,
+  "glb_kb": 44.3
+ },
+ {
+  "id": "brHalf",
+  "tris": 500,
+  "fall_tris": 0,
+  "glb_kb": 26.9
+ },
+ {
+  "id": "wCity",
+  "tris": 1312,
+  "fall_tris": 136,
+  "glb_kb": 80.9
+ },
+ {
+  "id": "wEnd",
+  "tris": 418,
+  "fall_tris": 68,
+  "glb_kb": 25.7
+ },
+ {
+  "id": "wRC",
+  "tris": 462,
+  "fall_tris": 136,
+  "glb_kb": 35.9
+ },
+ {
+  "id": "wLake",
+  "tris": 398,
+  "fall_tris": 272,
+  "glb_kb": 39.5
+ },
+ {
+  "id": "wTee",
+  "tris": 558,
+  "fall_tris": 204,
+  "glb_kb": 43.5
+ },
+ {
+  "id": "rRock",
+  "tris": 480,
+  "fall_tris": 0,
+  "glb_kb": 25.5
+ },
+ {
+  "id": "rMine",
+  "tris": 488,
+  "fall_tris": 0,
+  "glb_kb": 26.4
+ },
+ {
+  "id": "rEnd",
+  "tris": 912,
+  "fall_tris": 0,
+  "glb_kb": 49.1
+ },
+ {
+  "id": "rocks",
+  "tris": 758,
+  "fall_tris": 0,
+  "glb_kb": 39.7
+ },
+ {
+  "id": "xccrf",
+  "tris": 1680,
+  "fall_tris": 0,
+  "glb_kb": 87.6
+ },
+ {
+  "id": "xccfr",
+  "tris": 1800,
+  "fall_tris": 0,
+  "glb_kb": 93.2
+ },
+ {
+  "id": "xcrcr",
+  "tris": 2147,
+  "fall_tris": 0,
+  "glb_kb": 114.7
+ },
+ {
+  "id": "xcrcf",
+  "tris": 2147,
+  "fall_tris": 0,
+  "glb_kb": 114.4
+ },
+ {
+  "id": "xcrrr",
+  "tris": 1370,
+  "fall_tris": 0,
+  "glb_kb": 74.6
+ },
+ {
+  "id": "xcrff",
+  "tris": 1660,
+  "fall_tris": 0,
+  "glb_kb": 89.1
+ },
+ {
+  "id": "xcfrf",
+  "tris": 1354,
+  "fall_tris": 0,
+  "glb_kb": 73.8
+ },
+ {
+  "id": "xcffr",
+  "tris": 1370,
+  "fall_tris": 0,
+  "glb_kb": 74.8
+ }
+]

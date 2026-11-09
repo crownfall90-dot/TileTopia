@@ -1,0 +1,213 @@
+#!/usr/bin/env python3
+"""
+Generates the new TileTopia launcher icon as a premium strategy game tile:
+- Rich 3D tile with beveled border and tactile depth
+- Vibrant landscape: emerald meadow, winding sapphire river, golden road, castle tower, cottage
+- Golden heraldic banner with stylized 'Tt' monogram and 'TileTopia' title
+- Adaptive icon foreground & background for Android (108x108 viewport, 72x72 safezone)
+"""
+import pathlib
+
+root = pathlib.Path(__file__).resolve().parent.parent
+src_dir = root / 'store' / 'src'
+src_dir.mkdir(parents=True, exist_ok=True)
+
+# 1. Background for adaptive icon (108x108)
+bg_svg = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="108" height="108">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#2a3b68"/>
+      <stop offset="60%" stop-color="#151d38"/>
+      <stop offset="100%" stop-color="#0b1021"/>
+    </radialGradient>
+    <pattern id="bgGrid" width="12" height="12" patternUnits="userSpaceOnUse">
+      <path d="M 12 0 L 0 0 0 12" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="0.8"/>
+    </pattern>
+  </defs>
+  <rect width="108" height="108" fill="url(#bgGrad)"/>
+  <rect width="108" height="108" fill="url(#bgGrid)"/>
+</svg>"""
+
+# 2. Foreground for adaptive icon (108x108, centered inside safe zone ~72x72)
+fg_svg = """<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="108" height="108">
+  <defs>
+    <!-- Tile Gradients -->
+    <linearGradient id="tileBorder" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#e8cf99"/>
+      <stop offset="50%" stop-color="#b89358"/>
+      <stop offset="100%" stop-color="#735227"/>
+    </linearGradient>
+    <linearGradient id="tileGrass" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#8fd458"/>
+      <stop offset="50%" stop-color="#6bb83b"/>
+      <stop offset="100%" stop-color="#4e8c28"/>
+    </linearGradient>
+    <linearGradient id="riverGrad" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#6cd5f7"/>
+      <stop offset="50%" stop-color="#2897d4"/>
+      <stop offset="100%" stop-color="#16629e"/>
+    </linearGradient>
+    <linearGradient id="roadGrad" x1="0" y1="0" x2="1" y2="0">
+      <stop offset="0%" stop-color="#d9be87"/>
+      <stop offset="50%" stop-color="#edd8aa"/>
+      <stop offset="100%" stop-color="#c9ab71"/>
+    </linearGradient>
+    <linearGradient id="goldBanner" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#fff2ad"/>
+      <stop offset="45%" stop-color="#f5c04e"/>
+      <stop offset="100%" stop-color="#b87814"/>
+    </linearGradient>
+    <radialGradient id="treeGrad" cx="35%" cy="35%" r="70%">
+      <stop offset="0%" stop-color="#78c948"/>
+      <stop offset="100%" stop-color="#226929"/>
+    </radialGradient>
+    <filter id="tileShadow" x="-20%" y="-20%" width="150%" height="150%">
+      <feDropShadow dx="0" dy="4" stdDeviation="4" flood-color="#000" flood-opacity="0.55"/>
+      <feDropShadow dx="0" dy="1.5" stdDeviation="1.5" flood-color="#000" flood-opacity="0.35"/>
+    </filter>
+    <filter id="badgeShadow" x="-30%" y="-30%" width="160%" height="160%">
+      <feDropShadow dx="0" dy="2.5" stdDeviation="2.5" flood-color="#000" flood-opacity="0.45"/>
+    </filter>
+    <clipPath id="tileClip">
+      <rect x="22" y="22" width="64" height="64" rx="14"/>
+    </clipPath>
+  </defs>
+
+  <!-- 3D Tile Container -->
+  <g filter="url(#tileShadow)">
+    <!-- Tile 3D Depth Bottom Edge -->
+    <rect x="20.5" y="24" width="67" height="67" rx="15" fill="#4d3516"/>
+    <!-- Tile Beveled Outer Frame -->
+    <rect x="20.5" y="20.5" width="67" height="67" rx="15" fill="url(#tileBorder)" stroke="#3d270e" stroke-width="0.8"/>
+    <!-- Tile Inner Inset Border -->
+    <rect x="22" y="22" width="64" height="64" rx="14" fill="#2d4218"/>
+
+    <!-- Tile Landscape (Clipped) -->
+    <g clip-path="url(#tileClip)">
+      <!-- Lush Meadow Base -->
+      <rect x="22" y="22" width="64" height="64" fill="url(#tileGrass)"/>
+
+      <!-- Subtle grass texture -->
+      <circle cx="30" cy="32" r="1" fill="#fff6d8" opacity="0.8"/>
+      <circle cx="44" cy="28" r="1.2" fill="#ffd75e" opacity="0.7"/>
+      <circle cx="74" cy="74" r="1" fill="#fff6d8" opacity="0.8"/>
+      <circle cx="34" cy="76" r="1.1" fill="#ffd75e" opacity="0.7"/>
+
+      <!-- Winding Sapphire River -->
+      <path d="M 18 58 Q 38 72 54 52 T 90 62" fill="none" stroke="rgba(20,50,20,0.3)" stroke-width="14"/>
+      <path d="M 18 58 Q 38 72 54 52 T 90 62" fill="none" stroke="#a2e2f7" stroke-width="11"/>
+      <path d="M 18 58 Q 38 72 54 52 T 90 62" fill="none" stroke="url(#riverGrad)" stroke-width="8.5"/>
+      <path d="M 22 58 Q 38 72 54 52" fill="none" stroke="rgba(255,255,255,0.7)" stroke-width="1.2" stroke-dasharray="4 6"/>
+
+      <!-- Golden Road -->
+      <path d="M 52 18 Q 50 36 62 48 T 58 90" fill="none" stroke="rgba(40,30,10,0.35)" stroke-width="9"/>
+      <path d="M 52 18 Q 50 36 62 48 T 58 90" fill="none" stroke="#7a582c" stroke-width="7"/>
+      <path d="M 52 18 Q 50 36 62 48 T 58 90" fill="none" stroke="url(#roadGrad)" stroke-width="5"/>
+      <path d="M 52 18 Q 50 36 62 48 T 58 90" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.9" stroke-dasharray="3 4"/>
+
+      <!-- Stone Bridge over River -->
+      <g transform="translate(50, 48)">
+        <rect x="-3" y="-5" width="10" height="10" rx="2" fill="#695c4e" stroke="#3b3228" stroke-width="0.8"/>
+        <rect x="-1.5" y="-3.5" width="7" height="7" rx="1.2" fill="#d4c5a9"/>
+        <line x1="-3" y1="0" x2="7" y2="0" stroke="#8c7e6c" stroke-width="0.6"/>
+      </g>
+
+      <!-- Medieval Castle Fortress (Top Left) -->
+      <g transform="translate(22, 22)">
+        <path d="M 0 0 L 26 0 Q 25 18 0 25 Z" fill="#cfb686" stroke="#5a3d1c" stroke-width="1.5"/>
+        <rect x="3" y="3" width="5" height="3" rx="0.5" fill="#c4553a"/>
+        <rect x="10" y="3" width="5" height="3" rx="0.5" fill="#c4553a"/>
+        <rect x="17" y="3" width="5" height="3" rx="0.5" fill="#c4553a"/>
+        <rect x="6" y="8" width="5" height="3" rx="0.5" fill="#c4553a"/>
+        <rect x="13" y="8" width="5" height="3" rx="0.5" fill="#c4553a"/>
+        <!-- Tower -->
+        <circle cx="23" cy="5" r="4.5" fill="#a8854e" stroke="#4a3114" stroke-width="1"/>
+        <polygon points="19,5 23,-2 27,5" fill="#c73c24" stroke="#6b1e10" stroke-width="0.7"/>
+      </g>
+
+      <!-- Little Cottage (Bottom Left) -->
+      <g transform="translate(26, 68)">
+        <rect x="0" y="3" width="9" height="7" rx="0.6" fill="#f0e2c8" stroke="#6e5130" stroke-width="0.7"/>
+        <polygon points="-1,3 4.5,-2 10,3" fill="#c4553a" stroke="#6b1e10" stroke-width="0.7"/>
+        <rect x="3.2" y="5.5" width="2.5" height="4.5" fill="#5a3d1c"/>
+      </g>
+
+      <!-- Trees -->
+      <g transform="translate(73, 33)">
+        <ellipse cx="1" cy="4" rx="4.5" ry="2" fill="rgba(15,45,15,0.3)"/>
+        <circle cx="0" cy="0" r="4.5" fill="url(#treeGrad)" stroke="#1a5420" stroke-width="0.7"/>
+        <circle cx="-1.2" cy="-1.5" r="1.5" fill="rgba(215,255,170,0.5)"/>
+      </g>
+      <g transform="translate(77, 41)">
+        <ellipse cx="1" cy="3.5" rx="3.8" ry="1.8" fill="rgba(15,45,15,0.3)"/>
+        <circle cx="0" cy="0" r="3.8" fill="url(#treeGrad)" stroke="#1a5420" stroke-width="0.7"/>
+        <circle cx="-1" cy="-1.2" r="1.2" fill="rgba(215,255,170,0.5)"/>
+      </g>
+      <g transform="translate(68, 72)">
+        <ellipse cx="1" cy="3.5" rx="4" ry="1.8" fill="rgba(15,45,15,0.3)"/>
+        <circle cx="0" cy="0" r="4" fill="url(#treeGrad)" stroke="#1a5420" stroke-width="0.7"/>
+      </g>
+
+      <!-- Light gloss overlay on tile -->
+      <path d="M 22 22 L 86 22 L 22 86 Z" fill="rgba(255,255,255,0.14)"/>
+    </g>
+
+    <!-- Inner Golden Edge Highlight -->
+    <rect x="22.5" y="22.5" width="63" height="63" rx="13.5" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" pointer-events="none"/>
+  </g>
+
+  <!-- Central Tile Emblem Badge: 'Tt' Monogram & 'TileTopia' -->
+  <g filter="url(#badgeShadow)">
+    <!-- Slanted Trapezoid Tile Emblem Plate -->
+    <g transform="translate(54, 54)">
+      <!-- Badge Base -->
+      <rect x="-24" y="-14" width="48" height="28" rx="7" transform="skewX(-10)" fill="#11182c" stroke="#3b4d7c" stroke-width="1.2"/>
+      <!-- Gold Inner Border -->
+      <rect x="-22" y="-12.5" width="44" height="25" rx="5.5" transform="skewX(-10)" fill="url(#goldBanner)" stroke="#fff" stroke-width="0.7"/>
+
+      <!-- Red Regal Ribbon Inset -->
+      <rect x="-20" y="-10.5" width="40" height="21" rx="4.5" transform="skewX(-10)" fill="#8c1d1d" stroke="#520e0e" stroke-width="0.8"/>
+      
+      <!-- 'Tt' Monogram with 3D Gold effect -->
+      <!-- Drop shadow for text -->
+      <text x="0" y="4.5" text-anchor="middle" font-family="'Unbounded', 'Arial Black', sans-serif" font-weight="900" font-size="14" fill="#3b0a0a" letter-spacing="-0.5px">Tt</text>
+      <!-- Gold fill text -->
+      <text x="0" y="3.5" text-anchor="middle" font-family="'Unbounded', 'Arial Black', sans-serif" font-weight="900" font-size="14" fill="url(#goldBanner)" letter-spacing="-0.5px">Tt</text>
+      <!-- Tiny Crown above Tt -->
+      <path d="M -4 -6.5 L -2 -4 L 0 -7 L 2 -4 L 4 -6.5 L 3.5 -3 L -3.5 -3 Z" fill="url(#goldBanner)" stroke="#520e0e" stroke-width="0.4"/>
+      
+      <!-- Subtitle 'TILETOPIA' beneath -->
+      <text x="0" y="8.8" text-anchor="middle" font-family="'Onest', sans-serif" font-weight="800" font-size="4.2" fill="#fff" letter-spacing="1px" opacity="0.95">TILETOPIA</text>
+    </g>
+  </g>
+</svg>"""
+
+# 3. Full Standalone Icon (512x512) for Store and PWA
+icon_512_svg = f"""<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="512" height="512">
+  <defs>
+    <radialGradient id="bgGradFull" cx="50%" cy="38%" r="70%">
+      <stop offset="0%" stop-color="#2d4072"/>
+      <stop offset="55%" stop-color="#141c38"/>
+      <stop offset="100%" stop-color="#080c1a"/>
+    </radialGradient>
+    <pattern id="bgGridFull" width="10" height="10" patternUnits="userSpaceOnUse">
+      <path d="M 10 0 L 0 0 0 10" fill="none" stroke="rgba(255,255,255,0.035)" stroke-width="0.7"/>
+    </pattern>
+  </defs>
+  <!-- Full Background -->
+  <rect width="108" height="108" rx="24" fill="url(#bgGradFull)"/>
+  <rect width="108" height="108" rx="24" fill="url(#bgGridFull)"/>
+  <rect width="106" height="106" x="1" y="1" rx="23" fill="none" stroke="rgba(255,255,255,0.12)" stroke-width="1.2"/>
+  
+  <!-- Foreground graphics -->
+  {fg_svg[fg_svg.find('<defs>'):fg_svg.rfind('</svg>')]}
+</svg>"""
+
+# Save SVG files
+(src_dir / 'icon-background.svg').write_text(bg_svg, encoding='utf-8')
+(src_dir / 'icon-foreground.svg').write_text(fg_svg, encoding='utf-8')
+(src_dir / 'icon.svg').write_text(icon_512_svg, encoding='utf-8')
+
+print("OK Generated store/src/icon-background.svg")
+print("OK Generated store/src/icon-foreground.svg")
+print("OK Generated store/src/icon.svg")

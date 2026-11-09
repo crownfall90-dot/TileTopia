@@ -2,16 +2,16 @@
 """Configures the Telegram Bot to launch Tiletopia as a Telegram Mini App.
 
 Sets:
-1. Default chat Menu Button -> WebApp (https://crownfall90-dot.github.io/play/)
-2. Bot commands (/play, /help)
-3. Bot description & short description
+1. Default chat Menu Button -> WebApp (https://crownfall90-dot.github.io/TileTopia/) with text «🎮 Открыть игру»
+2. Bot commands (/start, /play, /rules, /help)
+3. Bot description & short description positioning as a Tile Strategy with customizable locations
 
 Usage:
   TELEGRAM_BOT_TOKEN=... python3 scripts/telegram-setup-bot.py [WEB_APP_URL]
 """
 import json, os, sys, urllib.request
 
-DEFAULT_WEB_URL = 'https://crownfall90-dot.github.io/play/'
+DEFAULT_WEB_URL = 'https://crownfall90-dot.github.io/TileTopia/'
 
 def api_call(token: str, method: str, data: dict = None) -> dict:
     url = f'https://api.telegram.org/bot{token}/{method}'
@@ -39,7 +39,7 @@ def setup_bot(token: str, web_url: str = DEFAULT_WEB_URL) -> bool:
     menu_btn = {
         'menu_button': {
             'type': 'web_app',
-            'text': 'Играть 🧩',
+            'text': '🎮 Открыть игру',
             'web_app': {'url': web_url}
         }
     }
@@ -49,21 +49,25 @@ def setup_bot(token: str, web_url: str = DEFAULT_WEB_URL) -> bool:
     # 3. Set bot commands
     commands = {
         'commands': [
-            {'command': 'play', 'description': 'Запустить игру Tiletopia (Mini App)'},
-            {'command': 'help', 'description': 'Как играть, правила и ссылки'}
+            {'command': 'start', 'description': 'Запустить плиточную стратегию Tiletopia'},
+            {'command': 'play', 'description': 'Открыть игру (Tiletopia Mini App)'},
+            {'command': 'rules', 'description': 'Правила плиточной стратегии, миплы и подсчёт очков'},
+            {'command': 'help', 'description': 'Как играть, сообщество и поддержка'}
         ]
     }
     r_cmds = api_call(token, 'setMyCommands', commands)
     print(f"Set bot commands: {'OK' if r_cmds.get('ok') else 'Failed'}")
 
-    # 4. Set bot descriptions
+    # 4. Set bot descriptions (Tile Strategy with table locations)
     desc = {
         'description': (
-            '🧩 Tiletopia — средневековая стратегическая настольная игра прямо в Telegram!\n\n'
-            '• Стройте города, дороги и монастыри\n'
-            '• Играйте онлайн с друзьями и в быстрых матчах\n'
-            '• Умные боты, коллекция фишек и рамок\n\n'
-            'Нажмите «Играть 🧩» внизу экрана, чтобы начать!'
+            '🧩 Tiletopia — увлекательная плиточная стратегия прямо в Telegram!\n\n'
+            '• Выкладывайте плитки на стол, развивайте города, дороги и особые объекты\n'
+            '• Управляйте миплами и боритесь за контроль над владениями\n'
+            '• Разные локации стола меняют мир плиток и открывают уникальные особенности\n'
+            '• Рейтинговые онлайн-партии и умные боты для тренировок\n'
+            '• До +10 кубков за победу. Никаких ничьих — побеждает сильнейший тактик!\n\n'
+            'Нажмите «🎮 Открыть игру» внизу экрана, чтобы начать!'
         )
     }
     try:
@@ -72,7 +76,7 @@ def setup_bot(token: str, web_url: str = DEFAULT_WEB_URL) -> bool:
         pass
 
     short_desc = {
-        'short_description': '🧩 Tiletopia — играй в средневековую мозаику онлайн с друзьями прямо в Telegram!'
+        'short_description': '🧩 Tiletopia — плиточная стратегия онлайн прямо в Telegram!'
     }
     try:
         api_call(token, 'setMyShortDescription', short_desc)

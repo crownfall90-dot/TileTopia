@@ -2,9 +2,8 @@
 
 > **Версия приложения:** 1.0.260  
 > **Платформы:** Android (APK / AAB), Web (PWA / GitHub Pages), Telegram Mini App  
-> **Приватный сайт для дизайнера (Staging):** [https://crownfall90-dot.github.io/play/staging/](https://crownfall90-dot.github.io/play/staging/) *(PIN-код для входа: `2026`)*  
-> **Интерактивная веб-галерея плиток:** [https://crownfall90-dot.github.io/play/tiles/](https://crownfall90-dot.github.io/play/tiles/)  
-> **Архив со всеми плитками 512×512 (ZIP):** [Скачать архивом (1.7 MB)](https://github.com/crownfall90-dot/play/raw/main/assets/tiles/tiletopia-all-tiles-512x512.zip)
+> **Приватный сайт для дизайнера (Staging):** [https://crownfall90-dot.github.io/TileTopia/staging/](https://crownfall90-dot.github.io/TileTopia/staging/) *(PIN-код для входа: `2026`)*  
+> **Интерактивная веб-галерея плиток:** [https://crownfall90-dot.github.io/TileTopia/tiles/](https://crownfall90-dot.github.io/TileTopia/tiles/)  
 
 ---
 
@@ -12,8 +11,8 @@
 
 - Все плитки игры экспортированы отдельными изображениями высокого разрешения **512×512 px** в папку [`assets/tiles/`](file:///E:/play/assets/tiles/).
 - Для просмотра плиток в браузере откройте [`tools/export-tiles.html`](file:///E:/play/tools/export-tiles.html) или онлайн-галерею по ссылке выше.
-- Каждую плитку можно дорабатывать в Photoshop, Figma или Aseprite, сохраняя оригинальные названия (`tile_cap.png`, `tile_rS.png` и т.д.).
-- Чтобы посмотреть, как интерфейс выглядит на реальном устройстве, перейдите в [Staging-версию](https://crownfall90-dot.github.io/play/staging/) и введите код `2026`.
+- Каждую плитку можно дорабатывать в Photoshop, Figma или Aseprite, сохраняя оригинальные названия (`cap.jpg`, `rS.jpg` и т.д.).
+- Чтобы посмотреть, как интерфейс выглядит на реальном устройстве, перейдите в [Staging-версию](https://crownfall90-dot.github.io/TileTopia/staging/) и введите код `2026`.
 
 ---
 
@@ -157,43 +156,43 @@
 
 | Превью | Имя файла | Тип плитки | Стороны (N E S W) | Описание |
 |:---:|:---|:---|:---:|:---|
-| <img src="../assets/tiles/tile_cap.png" width="48"> | `tile_cap.png` | `cap` | `cfff` | Край города |
-| <img src="../assets/tiles/tile_capRS.png" width="48"> | `tile_capRS.png` | `capRS` | `crfr` | Город и прямая дорога |
-| <img src="../assets/tiles/tile_capRL.png" width="48"> | `tile_capRL.png` | `capRL` | `cfrr` | Город и поворот дороги |
-| <img src="../assets/tiles/tile_capRR.png" width="48"> | `tile_capRR.png` | `capRR` | `crrf` | Город и поворот дороги |
-| <img src="../assets/tiles/tile_c2.png" width="48"> | `tile_c2.png` | `c2` | `ccff` | Угол города |
-| <img src="../assets/tiles/tile_c2r.png" width="48"> | `tile_c2r.png` | `c2r` | `ccrr` | Угол города с дорогой |
-| <img src="../assets/tiles/tile_band.png" width="48"> | `tile_band.png` | `band` | `fcfc` | Городская улица |
-| <img src="../assets/tiles/tile_c3.png" width="48"> | `tile_c3.png` | `c3` | `cccf` | Большой город |
-| <img src="../assets/tiles/tile_c3r.png" width="48"> | `tile_c3r.png` | `c3r` | `cccr` | Город с воротами |
-| <img src="../assets/tiles/tile_c4.png" width="48"> | `tile_c4.png` | `c4` | `cccc` | Центр города |
-| <img src="../assets/tiles/tile_rS.png" width="48"> | `tile_rS.png` | `rS` | `rfrf` | Прямая дорога |
-| <img src="../assets/tiles/tile_rC.png" width="48"> | `tile_rC.png` | `rC` | `ffrr` | Поворот дороги |
-| <img src="../assets/tiles/tile_r3.png" width="48"> | `tile_r3.png` | `r3` | `frrr` | Развилка дороги |
-| <img src="../assets/tiles/tile_r4.png" width="48"> | `tile_r4.png` | `r4` | `rrrr` | Перекрёсток 4 дорог |
-| <img src="../assets/tiles/tile_fort.png" width="48"> | `tile_fort.png` | `fort` | `ffff` | Монастырь / Крепость в поле |
-| <img src="../assets/tiles/tile_fortR.png" width="48"> | `tile_fortR.png` | `fortR` | `ffrf` | Монастырь с подъездной дорогой |
-| <img src="../assets/tiles/tile_wS.png" width="48"> | `tile_wS.png` | `wS` | `wfwf` | Прямое русло реки |
-| <img src="../assets/tiles/tile_wC.png" width="48"> | `tile_wC.png` | `wC` | `wwff` | Излучина реки |
-| <img src="../assets/tiles/tile_wBr.png" width="48"> | `tile_wBr.png` | `wBr` | `wrwr` | Мост через реку |
-| <img src="../assets/tiles/tile_brHalf.png" width="48"> | `tile_brHalf.png` | `brHalf` | `fbfr` | Половина большого моста |
-| <img src="../assets/tiles/tile_wCity.png" width="48"> | `tile_wCity.png` | `wCity` | `wcwf` | Город у реки |
-| <img src="../assets/tiles/tile_wEnd.png" width="48"> | `tile_wEnd.png` | `wEnd` | `wfff` | Исток реки |
-| <img src="../assets/tiles/tile_wRC.png" width="48"> | `tile_wRC.png` | `wRC` | `wwrr` | Излучина реки и поворот дороги |
-| <img src="../assets/tiles/tile_wLake.png" width="48"> | `tile_wLake.png` | `wLake` | `wwww` | Разлив реки (Озеро) |
-| <img src="../assets/tiles/tile_wTee.png" width="48"> | `tile_wTee.png` | `wTee` | `wwwf` | Заводь с протокой |
-| <img src="../assets/tiles/tile_rRock.png" width="48"> | `tile_rRock.png` | `rRock` | `rfff` | Тупик дороги у валунов |
-| <img src="../assets/tiles/tile_rMine.png" width="48"> | `tile_rMine.png` | `rMine` | `rfff` | Вход в шахту |
-| <img src="../assets/tiles/tile_rEnd.png" width="48"> | `tile_rEnd.png` | `rEnd` | `rfxf` | Дорога к обрыву (прозрачный каньон) |
-| <img src="../assets/tiles/tile_rocks.png" width="48"> | `tile_rocks.png` | `rocks` | `ffff` | Валуны в поле |
-| <img src="../assets/tiles/tile_xccfr.png" width="48"> | `tile_xccfr.png` | `xccfr` | `ccfr` | Редкая: угол города и дорога |
-| <img src="../assets/tiles/tile_xccrf.png" width="48"> | `tile_xccrf.png` | `xccrf` | `ccrf` | Редкая: угол города и дорога |
-| <img src="../assets/tiles/tile_xcffr.png" width="48"> | `tile_xcffr.png` | `xcffr` | `cffr` | Редкая: край города и дорога слева |
-| <img src="../assets/tiles/tile_xcfrf.png" width="48"> | `tile_xcfrf.png` | `xcfrf` | `cfrf` | Редкая: край города и дорога напротив |
-| <img src="../assets/tiles/tile_xcrcf.png" width="48"> | `tile_xcrcf.png` | `xcrcf` | `crcf` | Редкая: два противоположных города с дорогой |
-| <img src="../assets/tiles/tile_xcrcr.png" width="48"> | `tile_xcrcr.png` | `xcrcr` | `crcr` | Редкая: два города и сквозная дорога |
-| <img src="../assets/tiles/tile_xcrff.png" width="48"> | `tile_xcrff.png` | `xcrff` | `crff` | Редкая: край города и дорога справа |
-| <img src="../assets/tiles/tile_xcrrr.png" width="48"> | `tile_xcrrr.png` | `xcrrr` | `crrr` | Редкая: край города и развилка дорог |
+| <img src="../assets/tiles3d/faces/cap.jpg" width="48"> | `cap.jpg` | `cap` | `cfff` | Край города |
+| <img src="../assets/tiles3d/faces/capRS.jpg" width="48"> | `capRS.jpg` | `capRS` | `crfr` | Город и прямая дорога |
+| <img src="../assets/tiles3d/faces/capRL.jpg" width="48"> | `capRL.jpg` | `capRL` | `cfrr` | Город и поворот дороги |
+| <img src="../assets/tiles3d/faces/capRR.jpg" width="48"> | `capRR.jpg` | `capRR` | `crrf` | Город и поворот дороги |
+| <img src="../assets/tiles3d/faces/c2.jpg" width="48"> | `c2.jpg` | `c2` | `ccff` | Угол города |
+| <img src="../assets/tiles3d/faces/c2r.jpg" width="48"> | `c2r.jpg` | `c2r` | `ccrr` | Угол города с дорогой |
+| <img src="../assets/tiles3d/faces/band.jpg" width="48"> | `band.jpg` | `band` | `fcfc` | Городская улица |
+| <img src="../assets/tiles3d/faces/c3.jpg" width="48"> | `c3.jpg` | `c3` | `cccf` | Большой город |
+| <img src="../assets/tiles3d/faces/c3r.jpg" width="48"> | `c3r.jpg` | `c3r` | `cccr` | Город с воротами |
+| <img src="../assets/tiles3d/faces/c4.jpg" width="48"> | `c4.jpg` | `c4` | `cccc` | Центр города |
+| <img src="../assets/tiles3d/faces/rS.jpg" width="48"> | `rS.jpg` | `rS` | `rfrf` | Прямая дорога |
+| <img src="../assets/tiles3d/faces/rC.jpg" width="48"> | `rC.jpg` | `rC` | `ffrr` | Поворот дороги |
+| <img src="../assets/tiles3d/faces/r3.jpg" width="48"> | `r3.jpg` | `r3` | `frrr` | Развилка дороги |
+| <img src="../assets/tiles3d/faces/r4.jpg" width="48"> | `r4.jpg` | `r4` | `rrrr` | Перекрёсток 4 дорог |
+| <img src="../assets/tiles3d/faces/fort.jpg" width="48"> | `fort.jpg` | `fort` | `ffff` | Монастырь / Крепость в поле |
+| <img src="../assets/tiles3d/faces/fortR.jpg" width="48"> | `fortR.jpg` | `fortR` | `ffrf` | Монастырь с подъездной дорогой |
+| <img src="../assets/tiles3d/faces/wS.jpg" width="48"> | `wS.jpg` | `wS` | `wfwf` | Прямое русло реки |
+| <img src="../assets/tiles3d/faces/wC.jpg" width="48"> | `wC.jpg` | `wC` | `wwff` | Излучина реки |
+| <img src="../assets/tiles3d/faces/wBr.jpg" width="48"> | `wBr.jpg` | `wBr` | `wrwr` | Мост через реку |
+| <img src="../assets/tiles3d/faces/brHalf.jpg" width="48"> | `brHalf.jpg` | `brHalf` | `fbfr` | Половина большого моста |
+| <img src="../assets/tiles3d/faces/wCity.jpg" width="48"> | `wCity.jpg` | `wCity` | `wcwf` | Город у реки |
+| <img src="../assets/tiles3d/faces/wEnd.jpg" width="48"> | `wEnd.jpg` | `wEnd` | `wfff` | Исток реки |
+| <img src="../assets/tiles3d/faces/wRC.jpg" width="48"> | `wRC.jpg` | `wRC` | `wwrr` | Излучина реки и поворот дороги |
+| <img src="../assets/tiles3d/faces/wLake.jpg" width="48"> | `wLake.jpg` | `wLake` | `wwww` | Разлив реки (Озеро) |
+| <img src="../assets/tiles3d/faces/wTee.jpg" width="48"> | `wTee.jpg` | `wTee` | `wwwf` | Заводь с протокой |
+| <img src="../assets/tiles3d/faces/rRock.jpg" width="48"> | `rRock.jpg` | `rRock` | `rfff` | Тупик дороги у валунов |
+| <img src="../assets/tiles3d/faces/rMine.jpg" width="48"> | `rMine.jpg` | `rMine` | `rfff` | Вход в шахту |
+| <img src="../assets/tiles3d/faces/rEnd.png" width="48"> | `rEnd.png` | `rEnd` | `rfxf` | Дорога к обрыву (прозрачный каньон) |
+| <img src="../assets/tiles3d/faces/rocks.jpg" width="48"> | `rocks.jpg` | `rocks` | `ffff` | Валуны в поле |
+| <img src="../assets/tiles3d/faces/xccfr.jpg" width="48"> | `xccfr.jpg` | `xccfr` | `ccfr` | Редкая: угол города и дорога |
+| <img src="../assets/tiles3d/faces/xccrf.jpg" width="48"> | `xccrf.jpg` | `xccrf` | `ccrf` | Редкая: угол города и дорога |
+| <img src="../assets/tiles3d/faces/xcffr.jpg" width="48"> | `xcffr.jpg` | `xcffr` | `cffr` | Редкая: край города и дорога слева |
+| <img src="../assets/tiles3d/faces/xcfrf.jpg" width="48"> | `xcfrf.jpg` | `xcfrf` | `cfrf` | Редкая: край города и дорога напротив |
+| <img src="../assets/tiles3d/faces/xcrcf.jpg" width="48"> | `xcrcf.jpg` | `xcrcf` | `crcf` | Редкая: два противоположных города с дорогой |
+| <img src="../assets/tiles3d/faces/xcrcr.jpg" width="48"> | `xcrcr.jpg` | `xcrcr` | `crcr` | Редкая: два города и сквозная дорога |
+| <img src="../assets/tiles3d/faces/xcrff.jpg" width="48"> | `xcrff.jpg` | `xcrff` | `crff` | Редкая: край города и дорога справа |
+| <img src="../assets/tiles3d/faces/xcrrr.jpg" width="48"> | `xcrrr.jpg` | `xcrrr` | `crrr` | Редкая: край города и развилка дорог |
 
 ---
 

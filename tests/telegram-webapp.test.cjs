@@ -111,7 +111,7 @@ test('telegram: shareRoomToTelegram builds share URL with room code', async () =
   const shareUrl = shareRoomToTelegram('M4P7X', 'Сыграем в Tiletopia!');
   assert.ok(shareUrl.startsWith('https://t.me/share/url?'));
   assert.ok(shareUrl.includes('M4P7X'));
-  assert.ok(shareUrl.includes('crownfall90-dot.github.io%2Fplay'));
+  assert.ok(shareUrl.includes('crownfall90-dot.github.io%2FTileTopia'));
 });
 
 test('telegram: openTelegramChannel and claimTelegramReward granting 500 gold', async () => {

@@ -3,7 +3,8 @@
     "allow": [
       "mcp__github__merge_pull_request",
       "mcp__github__update_pull_request",
-      "mcp__github__actions_run_trigger"
+      "mcp__github__actions_run_trigger",
+      "Bash(git push -f origin origin/main:refs/heads/dev/test-features)"
     ]
   }
 }

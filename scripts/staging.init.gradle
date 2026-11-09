@@ -1,12 +1,8 @@
+// Staging persistent signing configuration.
+// The staging flavor itself is defined in app/build.gradle.
+// This init script only configures the signing key for CI (when STAGING_KEYSTORE_FILE is set).
 gradle.beforeProject { p ->
     p.pluginManager.withPlugin('com.android.application') {
-        p.android.productFlavors.create('staging') {
-            dimension 'store'
-            applicationIdSuffix '.test'
-            versionNameSuffix '-test.2'
-            buildConfigField 'String', 'UPDATE_REPO', '"crownfall90-dot/play"'
-            buildConfigField 'String', 'PUSH_TOPIC', '"updates-staging"'
-        }
         p.extensions.getByName('androidComponents').finalizeDsl { androidDsl ->
             def keyPath = System.getenv('STAGING_KEYSTORE_FILE')
             if (keyPath) {

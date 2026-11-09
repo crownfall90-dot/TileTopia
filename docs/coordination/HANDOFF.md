@@ -67,8 +67,8 @@
 - **Обновление вкладки «Локации»**:
   - Переработана сетка и оформление карточек: красивый предпросмотр SVG-арта, бейджи (`✓ Активна` / `В разработке`), названия и описания ландшафта, золотой акцент активной локации.
 - **Тестовый APK (Staging)**:
-  - Ссылка на актуальный релиз: `https://github.com/crownfall90-dot/play/releases/tag/staging-latest`
-  - Прямая ссылка на APK с интернетом: `https://github.com/crownfall90-dot/play/releases/download/staging-latest/Tiletopia-Staging.apk`
+  - Ссылка на актуальный релиз: `https://github.com/crownfall90-dot/TileTopia/releases/tag/staging-latest`
+  - Прямая ссылка на APK с интернетом: `https://github.com/crownfall90-dot/TileTopia/releases/download/staging-latest/Tiletopia-Staging.apk`
 
 ### 02.11.2026, ночь — Редизайн лобби, переключатель кубков, устранение лагов приглашений и форма обратной связи (Antigravity)
 - **Форма обратной связи («Написать разработчику»)**:
@@ -108,7 +108,7 @@
   - **CI Workflows & Скрипты**:
     - В `.github/workflows/staging.yml` и `.github/workflows/account-verify.yml` удалено удаление `app/google-services.json`. Тестовая сборка собирается с полной конфигурацией Firebase.
     - В `scripts/verify-staging.py` проверка изменена на обязательное наличие `android.permission.INTERNET` (`internet_permission_missing`).
-    - В `scripts/staging.init.gradle` добавлен `UPDATE_REPO = "crownfall90-dot/play"` в productFlavor `staging`.
+    - В `scripts/staging.init.gradle` добавлен `UPDATE_REPO = "crownfall90-dot/TileTopia"` в productFlavor `staging`.
     - Обновлена документация [docs/TESTING.md](file:///E:/play/docs/TESTING.md) и [docs/STAGING-SIGNING.md](file:///E:/play/docs/STAGING-SIGNING.md).
   - **Тесты**: все 188 тестов пройдены успешно (0 ошибок, 23 пропущено по playwright).
 
@@ -118,7 +118,7 @@
   - Запущен `promote-production.yml` (Run #41360134979, 1m59s).
   - Сборка боевого APK и AAB: успешно собраны и подписаны (`Tiletopia-1.0.250.apk`, `Tiletopia-1.0.250-google-play.aab`).
   - GitHub Release: опубликован релиз `1.0.250` с обновлением `latest.json` и заметками для игроков.
-  - Деплой Web на GitHub Pages: успешно опубликован (`https://crownfall90-dot.github.io/play/`).
+  - Деплой Web на GitHub Pages: успешно опубликован (`https://crownfall90-dot.github.io/TileTopia/`).
   - Оповещения: FCM отправлен (`HAS_FCM: true`), Telegram анонс отправлен (`Telegram: sent` в `@diarydevelopment`).
 - **Что вошло в релиз 1.0.250:**
   - Экран технических работ: кнопка «Попробовать снова» для быстрого перезапуска игры.
@@ -176,7 +176,7 @@
   - Запущен `promote-production.yml` (Run #41347758794, 2m22s).
   - Сборка боевого APK и AAB: успешно собраны и подписаны (`Tiletopia-1.0.249.apk`, `Tiletopia-1.0.249-google-play.aab`).
   - GitHub Release: опубликован релиз `1.0.249` с обновлением `latest.json` и заметками для игроков.
-  - Деплой Web на GitHub Pages: успешно опубликован (`https://crownfall90-dot.github.io/play/`).
+  - Деплой Web на GitHub Pages: успешно опубликован (`https://crownfall90-dot.github.io/TileTopia/`).
   - Оповещения: FCM отправлен (`HAS_FCM: true`), Telegram анонс отправлен (`Telegram: sent` в `@diarydevelopment`).
 - **Что вошло в релиз 1.0.249:**
   - Окно «Поддержка и отзывы» исправлено: ровная шапка во всю ширину и аккуратные цветные плитки категорий (Баг, Лаги, Идея, Другое).
@@ -184,10 +184,10 @@
 
 ### 01.11.2026, день — Релиз 1.0.248 (Promote to Production) (Antigravity)
 - **Выпуск 1.0.248 (тег `v245`) успешно опубликован в Production**:
-  - Run: [Run #41301818782](https://github.com/crownfall90-dot/play/actions/runs/41301818782) на ветке `main` (exit code 0, 2m26s).
+  - Run: [Run #41301818782](https://github.com/crownfall90-dot/TileTopia/actions/runs/41301818782) на ветке `main` (exit code 0, 2m26s).
   - Сборка боевого APK и AAB: успешно собраны и подписаны (`Tiletopia-1.0.248.apk`, `Tiletopia-1.0.248-google-play.aab`).
   - GitHub Release: опубликован релиз `1.0.248` с обновлением `latest.json` и заметками для игроков.
-  - Деплой GitHub Pages: обновлена веб-версия по адресу `https://crownfall90-dot.github.io/play/`.
+  - Деплой GitHub Pages: обновлена веб-версия по адресу `https://crownfall90-dot.github.io/TileTopia/`.
   - Push-уведомление игрокам: шаг `Notify players via FCM` выполнен успешно (`HAS_FCM: true`).
   - Анонс в Telegram: шаг `Announce in Telegram` выполнен успешно (`Telegram: sent` в канал `@diarydevelopment`).
 - **Что вошло в релиз 1.0.248:**
@@ -200,10 +200,10 @@
 
 ### 01.11.2026, утро — Релиз 1.0.244 (Promote to Production) (Antigravity)
 - **Выпуск 1.0.244 (тег `v244`) успешно опубликован в Production**:
-  - Run: [Run #41269034234](https://github.com/crownfall90-dot/play/actions/runs/41269034234) на ветке `main` (exit code 0, 2m02s).
+  - Run: [Run #41269034234](https://github.com/crownfall90-dot/TileTopia/actions/runs/41269034234) на ветке `main` (exit code 0, 2m02s).
   - Сборка боевого APK и AAB: успешно собраны и подписаны (`Tiletopia-1.0.244.apk`, `Tiletopia-1.0.244.aab`).
   - GitHub Release: опубликован релиз `1.0.244` со ссылками на скачивание и заметками для игроков.
-  - Деплой GitHub Pages: обновлена веб-версия по адресу `https://crownfall90-dot.github.io/play/`.
+  - Деплой GitHub Pages: обновлена веб-версия по адресу `https://crownfall90-dot.github.io/TileTopia/`.
   - Push-уведомление игрокам: шаг `Notify players via FCM` выполнен успешно (`HAS_FCM: true`).
   - Анонс в Telegram: шаг `Announce in Telegram` выполнен успешно (`Telegram: sent` в канал `@diarydevelopment`).
 - **Что вошло в релиз 1.0.244:**
@@ -497,7 +497,7 @@
   * Включён триггер на ветки разработки (`dev/**`), ручной запуск (`workflow_dispatch`) и права записи релизов.
   * Добавлена публикация постоянного GitHub Pre-Release `staging-latest` с прямым файлом `Tiletopia-Staging.apk` для мгновенной загрузки тестерами без логина на GitHub.
 * **`tools/founder-admin.html`**:
-  * Добавлены кнопки прямого открытия Staging Web (`https://crownfall90-dot.github.io/play/staging/`) и скачивания Staging APK.
+  * Добавлены кнопки прямого открытия Staging Web (`https://crownfall90-dot.github.io/TileTopia/staging/`) и скачивания Staging APK.
   * Добавлена кнопка «📋 Скопировать ссылку и PIN для тестера» — генерирует готовый текст приглашения в один клик.
 
 ### 6. TASK-006: Инструменты управления основателя (Kill-Switch, Промокоды, Мониторинг)
@@ -669,7 +669,7 @@ tests/
 
 ## iPhone, подсказки-тренер, экран партии (Claude)
 
-- **Google на iPhone (веб):** вместо всплывающего окна GIS — переход на страницу Google (OAuth `response_type=id_token`) и возврат с `#id_token`; принимается только ответ со своим `state` и `nonce` (`googleRedirect`/`googleReturn` в `web/game.html`, тест `tests/google-ios.test.cjs`). **Владельцу:** в Google Cloud → Credentials → веб-клиент → Authorized redirect URIs добавить `https://crownfall90-dot.github.io/play/` и `https://crownfall90-dot.github.io/play/staging/`.
+- **Google на iPhone (веб):** вместо всплывающего окна GIS — переход на страницу Google (OAuth `response_type=id_token`) и возврат с `#id_token`; принимается только ответ со своим `state` и `nonce` (`googleRedirect`/`googleReturn` в `web/game.html`, тест `tests/google-ios.test.cjs`). **Владельцу:** в Google Cloud → Credentials → веб-клиент → Authorized redirect URIs добавить `https://crownfall90-dot.github.io/TileTopia/` и `https://crownfall90-dot.github.io/TileTopia/staging/`.
 - **Размер на iPhone:** в `scripts/wrap-web.sh` ширина раскладки на iPhone = узкая сторона / clamp(w/460, .82, 1) — как zoom в Android.
 - **Тренер:** настройка `coach` (Всегда / По кнопке / Выкл). «Всегда» — на своём ходу золотая клетка и текст с очками и тем, что осталось достроить; у вариантов фишки — `featureNote()` (минимум очков, сколько краёв/клеток осталось).
 - **Экран партии:** сплошной фон, поле затухает к верху и низу (`.fog`), лоток без рамки, компактные плашки игроков (`.pi/.pline`), `ensureVisible` двигает камеру ровно настолько, насколько нужно, и учитывает кнопки справа.
@@ -883,3 +883,36 @@ tests/
    - Заполнить `release-notes.md` строками для игроков.
    - Оформить PR из `dev/stage2-account-network-20261029` в `main`.
    - Запустить промоушен «Promote to Production».
+
+
+---
+
+# СЕССИЯ 2026-11-06: ПЕРЕРАБОТКА МЕНЮ, РЕЙТИНГА, ЗАДАНИЙ И АВТО-ОБНОВЛЕНИЙ
+
+### Выполненные задачи:
+1. **Авто-обновление тестовой версии (Fix):**
+   - Проблема: `versionCode` в `staging.yml` вычислялся как `LAST_PROD + 1` (261 + 1 = 262) и не увеличивался между тестовыми коммитами. Из-за этого приложение с установленным кодом 262 считало, что более новой версии нет, и не предлагало обновление.
+   - Решение: В `.github/workflows/staging.yml` добавлено динамическое считывание `PREV_STAGING` из предыдущего `latest-staging.json` с гарантированным инкрементом `CODE = PREV_STAGING + 1` (263, 264...). В `latest-staging.json` добавлен `"mandatory": true`, а в `Updater.java` и `game.html` для сборок `-test` отключено подавление диалога обновления на старте.
+2. **Рейтинг на главной странице:**
+   - Удалён таб рейтинга из профиля.
+   - На главном экране `#scr-menu` размещена карточка `#btnMenuRatingCard` с кубками и сезоном.
+   - В шапке главного меню добавлена быстрая кнопка `#btnMenuRating` (`🏆`).
+   - Создан выделенный экран `#scr-rating` с пьедесталом Топ-3 (👑, 🥈, 🥉), списком Топ-20, фильтром «Все / Среди друзей» и модальным окном осмотра игрока.
+3. **Раздел «Задания и Прогресс» вместо Профиля в нижней навигации:**
+   - В `bnav` вкладка «Профиль» заменена на раздел «Задания» (`data-nav="progress"`).
+   - Экран `#scr-progress`:
+     - Реализована **Дорога прогресса** с вехами наград за кубки и уровни, индикацией статуса (unlocked, claimed, locked) и кнопками «Забрать».
+     - Раздел квестов: ежедневные квесты, недельные цели с «Большим сундуком недели» (+100 золота), достижения, тематические коллекции.
+     - Индикаторная точка на кнопке в навигации загорается при наличии готовых наград.
+4. **Выделенный Профиль игрока (`#scr-profile`):**
+   - Открывается по клику на `#mprof` (аватар в левом верхнем углу меню).
+   - Содержит только персональные данные: аватар, рамка, ник, статус, уровень с кольцом XP, рюкзак «🎒 Мои предметы», статистика винрейта, мастерство по режимам, постройки, вход/выход, история матчей.
+5. **Увеличенная кнопка «ИГРАТЬ»:**
+   - Пропорция `flex: 1.7` (против `0.75` у боковых кнопок), высота `54px` (против `42px`), жирный шрифт `18px 900` верхнего регистра, иконка `22px`, золотой 3D-градиент.
+6. **Компактная плашка уведомлений:**
+   - Тосты опущены на `top: max(64px, ...)` и уменьшены в ширину и отступы, больше не перекрывают элементы интерфейса.
+7. **Удалена кнопка «Сыграть с ботами» внизу экрана правил.**
+
+### Статус тестов и кода:
+- Все 212 тестов проходят: `node --test tests/*.test.cjs` (212 pass, 0 fail, 26 skipped).
+- Бандлы пересобраны через `wrap-web.sh`.

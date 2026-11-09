@@ -1,6 +1,9 @@
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),os=require('node:os'),path=require('node:path'),cp=require('node:child_process');
 const source='app/src/main/java/com/crownfall/mosaic/PushDiagnostics.java';
-test('actual Java diagnostics: success, failure, disable, stale completion, synchronous error, offline configuration',()=>{
+const hasJavac = (() => {
+  try { return cp.spawnSync('javac', ['-version']).status === 0; } catch (_) { return false; }
+})();
+test('actual Java diagnostics: success, failure, disable, stale completion, synchronous error, offline configuration', {skip: !hasJavac && 'javac is not installed'}, ()=>{
  const dir=fs.mkdtempSync(path.join(os.tmpdir(),'push-diagnostics-'));
  const sources={
  'android/content/Context.java':`package android.content; public class Context { public static final int MODE_PRIVATE=0; private final SharedPreferences p=new SharedPreferences(); public Context getApplicationContext(){return this;} public SharedPreferences getSharedPreferences(String n,int m){return p;} }`,

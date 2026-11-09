@@ -4,17 +4,45 @@ const test = require('node:test');
 const assert = require('node:assert/strict');
 
 test('ui/shop: renderGiftCard, renderFiguresGrid, renderFramesGrid, renderLocationsGrid', async () => {
-  const {renderGiftCard, renderFiguresGrid, renderFramesGrid, renderLocationsGrid} = await import('../src/ui/shop.js');
+  const {renderGiftCard, renderGiftTrioShowcase, renderFiguresGrid, renderFramesGrid, renderLocationsGrid} = await import('../src/ui/shop.js');
 
   // Gift card markup
   const readyCard = renderGiftCard({giftReady: true, chestSvg: '<svg>chest</svg>', boosts: {double: 2}});
   assert.ok(readyCard.includes('class="chest ready"'));
-  assert.ok(readyCard.includes('Двойное золото ×2'));
+  assert.ok(readyCard.includes('Двойные тайлы ×2'));
   assert.ok(readyCard.includes('<button class="cta" id="openGift">Открыть</button>'));
 
   const waitingCard = renderGiftCard({giftReady: false, chestSvg: '<svg>chest</svg>', boosts: {}});
   assert.ok(!waitingCard.includes('ready'));
   assert.ok(!waitingCard.includes('id="openGift"'));
+
+  // Trio showcase ready markup
+  const trioReady = renderGiftTrioShowcase({
+    giftReady: true,
+    day: 1,
+    streakDays: [15, 25, 40, 60],
+    chestSvg: '<svg>chest</svg>',
+    boosts: {double: 1}
+  });
+  assert.ok(trioReady.includes('Три сундука удачи'));
+  assert.ok(trioReady.includes('Выбрать 👆'));
+  assert.ok(trioReady.includes('data-gidx="0"'));
+  assert.ok(trioReady.includes('data-gidx="1"'));
+  assert.ok(trioReady.includes('data-gidx="2"'));
+
+  // Trio showcase claimed markup: single opened chest with return tomorrow message
+  const trioClaimed = renderGiftTrioShowcase({
+    giftReady: false,
+    options: [{title: '+35 золота'}, {title: '×2 золото'}, {title: '+1 фигурка'}],
+    chosenIdx: 0,
+    nextGiftTimeStr: '08:15:30',
+    chestSvg: '<svg>chest</svg>',
+    chestOpenedSvg: '<svg>open</svg>'
+  });
+  assert.ok(trioClaimed.includes('Подарок уже забран'));
+  assert.ok(trioClaimed.includes('Возвращайтесь завтра'));
+  assert.ok(trioClaimed.includes('08:15:30'));
+  assert.ok(trioClaimed.includes('gift-claimed-art'));
 
   // Figures grid markup
   const figs = {
@@ -84,10 +112,31 @@ test('ui/shop: renderGiftCard, renderFiguresGrid, renderFramesGrid, renderLocati
 
   const itemsLocsHtml = renderItemsLocsHtml(locs);
   assert.ok(itemsLocsHtml.includes('locgrid'));
+
+  // Emotes tab markup
+  const {renderItemsEmotesHtml, ALL_EMOTES, ALL_PHRASES, DEFAULT_EMOTES, DEFAULT_PHRASES} = await import('../src/ui/shop.js');
+  // three free of each; the rest are bought in the shop or earned (tests/reactions-shop.test.cjs)
+  assert.equal(DEFAULT_EMOTES.length, 3);
+  assert.equal(DEFAULT_PHRASES.length, 3);
+  assert.ok(ALL_EMOTES.length >= 20);
+  assert.ok(ALL_PHRASES.length >= 20);
+
+  const emotesHtml = renderItemsEmotesHtml({
+    allEmotes: ALL_EMOTES,
+    allPhrases: ALL_PHRASES,
+    selectedEmotes: ['👑', '🧩'],
+    selectedPhrases: ['Отличный ход!'],
+    maxEmotes: 5,
+    maxPhrases: 5
+  });
+  assert.ok(emotesHtml.includes('deck-summary-card'));
+  assert.ok(emotesHtml.includes('data-toggle-emote="👑"'));
+  assert.ok(emotesHtml.includes('data-toggle-phrase="Отличный ход!"'));
+  assert.ok(emotesHtml.includes('data-reset-deck'));
 });
 
-test('ui/progress: ringSvg, renderMasteryGrid, renderBuildingStats, renderCollectionCard', async () => {
-  const {ringSvg, renderMasteryGrid, renderBuildingStats, renderCollectionCard} = await import('../src/ui/progress.js');
+test('ui/progress: ringSvg, renderMasteryGrid, renderBuildingStats', async () => {
+  const {ringSvg, renderMasteryGrid, renderBuildingStats} = await import('../src/ui/progress.js');
 
   // Ring SVG
   const ring = ringSvg(0.5);
@@ -97,15 +146,13 @@ test('ui/progress: ringSvg, renderMasteryGrid, renderBuildingStats, renderCollec
   // Mastery grid
   const byMode = {
     bots: {games: 10, wins: 8, best: 70},
-    duel: {games: 5, wins: 4, best: 55},
     friends: {games: 2, wins: 1, best: 40},
     online: {games: 0, wins: 0, best: 0}
   };
   const masteryHtml = renderMasteryGrid(byMode);
   assert.ok(masteryHtml.includes('Боты'));
   assert.ok(masteryHtml.includes('80% (8/10) · рек. 70'));
-  assert.ok(masteryHtml.includes('Дуэль'));
-  assert.ok(masteryHtml.includes('80% (4/5) · рек. 55'));
+  assert.ok(!masteryHtml.includes('Дуэль'), 'no duel tile');
   assert.ok(masteryHtml.includes('Друзья'));
   assert.ok(masteryHtml.includes('Онлайн'));
 
@@ -114,34 +161,7 @@ test('ui/progress: ringSvg, renderMasteryGrid, renderBuildingStats, renderCollec
   assert.ok(buildHtml.includes('12</b> городов'));
   assert.ok(buildHtml.includes('рекорд: 14 карт'));
   assert.ok(buildHtml.includes('25</b> дорог'));
-  assert.ok(buildHtml.includes('4</b> крепостей'));
-
-  // Collection card
-  const col = {
-    id: 'court',
-    name: 'Королевский двор',
-    desc: 'Набор знати',
-    reward: 200,
-    ic: '👑',
-    figs: ['knight'],
-    frames: ['royal']
-  };
-  const prog = {
-    isComplete: true,
-    isClaimed: false,
-    done: 2,
-    total: 2,
-    figsDone: new Set(['knight']),
-    framesDone: new Set(['royal'])
-  };
-  const figs = {knight: {name: 'Рыцарь'}};
-  const frames = {royal: {name: 'Королевская', ring: 'gold'}};
-  const cardHtml = renderCollectionCard(col, prog, figs, frames, {color: '#ef5350'}, k => k, 'П');
-
-  assert.ok(cardHtml.includes('Королевский двор'));
-  assert.ok(cardHtml.includes('+200'));
-  assert.ok(cardHtml.includes('data-claimcol="court"'));
-  assert.ok(cardHtml.includes('Забрать +200'));
+  assert.ok(buildHtml.includes('4</b> монастырей'));
 
   // Rewards tab and history markup
   const {renderRewardsTabHtml, renderHistoryHtml} = await import('../src/ui/progress.js');
@@ -178,4 +198,57 @@ test('ui/progress: ringSvg, renderMasteryGrid, renderBuildingStats, renderCollec
   assert.ok(historyHtml.includes('Победа'));
   assert.ok(historyHtml.includes('онлайн'));
   assert.ok(historyHtml.includes('data-pl="u2"'));
+
+  // Dedicated achievements screen markup
+  const {renderAchievementsHtml} = await import('../src/ui/progress.js');
+  const achHtml = renderAchievementsHtml({
+    achDefs: [
+      {id: 'a1', ic: '🥇', t: 'Первая победа', d: 'Выиграйте матч', ok: () => true, g: 30, tier: 1},
+      {id: 'a2', ic: '👑', t: 'Король стола', d: 'Наберите 100 очков', ok: () => false, g: 50, tier: 3}
+    ],
+    progAch: {a1: 'got'},
+    progStats: {wins: 1},
+    progLvl: 2
+  });
+  assert.ok(achHtml.includes('Достижения'));
+  assert.ok(achHtml.includes('Первая победа'));
+  assert.ok(achHtml.includes('Король стола'));
+  assert.ok(achHtml.includes('Получено ✓'));
+  assert.ok(achHtml.includes('В процессе'));
+  assert.ok(achHtml.includes('tier-1'));
+
+  // Separate shop stalls showcase (5 stalls: figures, frames, statuses, emotes, phrases)
+  const {renderShopStallsShowcase, getStallUnownedItems} = await import('../src/ui/shop.js');
+  const unownedSample = [
+    {key: '1', price: 10}, {key: '2', price: 20}, {key: '3', price: 30},
+    {key: '4', price: 40}, {key: '5', price: 50}, {key: '6', price: 60},
+    {key: '7', price: 70}, {key: '8', price: 80}
+  ];
+  const picked6 = getStallUnownedItems(unownedSample, '2026-11-07:test', 6);
+  assert.equal(picked6.length, 6, 'max 6 items per stall');
+
+  const stallsHtml = renderShopStallsShowcase({
+    figs: {
+      guard: {name: 'Стражник', price: 100},
+      merchant: {name: 'Купец', price: 150}
+    },
+    frames: {
+      silver: {name: 'Серебряная', price: 80, ring: 'silver'}
+    },
+    statuses: [
+      {id: 'st1', text: 'Барон', price: 50}
+    ],
+    wallet: {gold: 500, owned: ['classic'], frames: [], statuses: []},
+    figPreview: k => `img/${k}.png`,
+    initial: 'П',
+    date: new Date('2026-11-07T12:00:00Z')
+  });
+
+  assert.ok(stallsHtml.includes('Прилавок фигурок'));
+  assert.ok(stallsHtml.includes('Прилавок рамок'));
+  assert.ok(stallsHtml.includes('Прилавок статусов'));
+  assert.ok(stallsHtml.includes('Прилавок эмодзи'));
+  assert.ok(stallsHtml.includes('Прилавок фраз'));
+  assert.ok(stallsHtml.includes('fig-pedestal-wrap'));
+  assert.ok(stallsHtml.includes('stall-3x2'));
 });

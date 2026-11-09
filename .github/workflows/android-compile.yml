@@ -1,10 +1,9 @@
 name: Android compile check
 
-# Compiles the Java of the github and play flavours (staging is compiled by account-verify) on each push that touches the app, so a Java mistake is caught before a release
+# Compiles the Java of all flavours (staging, github and play) on each push that touches the app, so a Java mistake is caught before a release
 # (the full signed build only runs at release time). No signing, no publishing.
 on:
   push:
-    branches: [dev/stage2-account-network-20261029]
     paths: ['app/**', '.github/workflows/android-compile.yml']
   workflow_dispatch:
 
@@ -23,4 +22,4 @@ jobs:
       - name: Compile all flavours
         run: |
           chmod +x gradlew
-          ./gradlew compileGithubReleaseJavaWithJavac compilePlayReleaseJavaWithJavac --no-daemon
+          ./gradlew compileStagingReleaseJavaWithJavac compileGithubReleaseJavaWithJavac compilePlayReleaseJavaWithJavac --no-daemon

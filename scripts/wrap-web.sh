@@ -34,6 +34,12 @@ if [ "$target" = web ]; then
   rm -rf "$site"; mkdir -p "$site/staging"
   cp -r app/src/main/assets/fonts "$site/fonts"
   cp -r app/src/main/assets/fonts "$site/staging/fonts"
+  cp -r app/src/main/assets/figs "$site/figs"            # shop characters (tools/blender_generators/generate_figurines.py)
+  cp -r app/src/main/assets/figs "$site/staging/figs"
+  if [ -d app/src/main/assets/hex ]; then              # Classic 2.0 cards (tools/blender_generators/generate_hex_tiles.py)
+    cp -r app/src/main/assets/hex "$site/hex"
+    cp -r app/src/main/assets/hex "$site/staging/hex"
+  fi
   cp -r web/icons "$site/icons"
   cp -r web/icons "$site/staging/icons"
   cp web/manifest.webmanifest "$site/"
@@ -46,6 +52,12 @@ if [ "$target" = web ]; then
   touch "$site/.nojekyll"
   touch "$site/staging/.nojekyll"
   "$PY_BIN" scripts/privacy-page.py "$site/privacy.html"
+  "$PY_BIN" -c "import PIL" >/dev/null 2>&1 || "$PY_BIN" -m pip install --quiet pillow >/dev/null 2>&1 || true   # for the About-page screenshots
+  "$PY_BIN" scripts/seo.py "$site"
+  "$PY_BIN" scripts/privacy-page.py "$site/privacy-en.html" docs/legal/privacy-policy-en.md "Privacy Policy — Tiletopia" en
+  "$PY_BIN" scripts/privacy-page.py "$site/terms.html" docs/legal/terms.md "Пользовательское соглашение — Tiletopia" ru
+  "$PY_BIN" scripts/privacy-page.py "$site/terms-en.html" docs/legal/terms-en.md "Terms of Use — Tiletopia" en
+  "$PY_BIN" scripts/privacy-page.py "$site/licenses.html" docs/legal/THIRD-PARTY.md "Сторонние материалы — Tiletopia" ru
   cp web/delete-account.html "$site/delete-account.html"
   # Owner pages (the in-game owner panel links here). No secrets inside: the data behind them is
   # admin-only in the Firebase rules. Kept out of search engines.
@@ -58,6 +70,10 @@ if [ "$target" = web ]; then
   if [ -d assets/tiles ]; then
     cp -r assets/tiles "$site/"
     cp -r assets/tiles/* "$site/tiles/"
+  fi
+  if [ -d store ]; then
+    cp -r store "$site/"
+    cp -r store "$site/staging/"
   fi
 else
   out=app/src/main/assets/index.html
@@ -98,6 +114,7 @@ build_page() {
       cat <<'HEAD'
 <meta name="theme-color" content="#101729">
 <script src="https://telegram.org/js/telegram-web-app.js"></script>
+<script>try{if(window.Telegram&&window.Telegram.WebApp){window.Telegram.WebApp.ready();window.Telegram.WebApp.expand();}}catch(_){}</script>
 <script>
 // iPhone: the same physical size as in the Android app (which zooms by the screen diagonal). Safari has no
 // diagonal, so the narrow side in points stands in for it: a wider layout, scaled down to fit the screen.
@@ -107,7 +124,11 @@ build_page() {
   if (z < .995) document.querySelector('meta[name=viewport]').setAttribute('content', 'width=' + Math.round(w / z) + ',viewport-fit=cover,user-scalable=no');
 })();
 </script>
-<meta name="description" content="Tiletopia — стройте города, дороги и крепости из общей стопки. Играйте онлайн, с друзьями и с ботами.">
+<meta name="description" content="Tiletopia — бесплатная настольная игра с плитками. Стройте города, дороги и монастыри из общей стопки, играйте онлайн с друзьями, с ботами или за одним телефоном. Без рекламы.">
+<link rel="canonical" href="https://crownfall90-dot.github.io/TileTopia/">
+<link rel="alternate" hreflang="ru" href="https://crownfall90-dot.github.io/TileTopia/about.html"><link rel="alternate" hreflang="en" href="https://crownfall90-dot.github.io/TileTopia/about-en.html">
+<meta property="og:type" content="website"><meta property="og:site_name" content="Tiletopia"><meta property="og:url" content="https://crownfall90-dot.github.io/TileTopia/"><meta property="og:locale" content="ru_RU">
+<meta name="twitter:card" content="summary">
 <link rel="manifest" href="manifest.webmanifest">
 <link rel="icon" type="image/png" sizes="32x32" href="icons/favicon-32.png">
 <link rel="apple-touch-icon" href="icons/apple-touch-icon.png">
@@ -115,37 +136,17 @@ build_page() {
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
 <meta name="apple-mobile-web-app-title" content="Tiletopia">
-<meta property="og:title" content="Tiletopia"><meta property="og:description" content="Стройте города, дороги и крепости — играйте с друзьями онлайн"><meta property="og:image" content="icons/icon-512.png">
-<script>
-(function () {
-  setTimeout(function () {
-    if (window.__ready) return;
-    document.body.innerHTML = '<div style="font:16px sans-serif;color:#eef1f8;background:#101729;position:fixed;inset:0;padding:32px;line-height:1.5"><h2 style="margin:0 0 12px">Не удалось запустить игру</h2><p>Обновите браузер (Safari, Chrome) до последней версии и откройте страницу снова.</p></div>';
-  }, 10000);
-})();
-</script>
+<meta property="og:title" content="Tiletopia — настольная игра с плитками"><meta property="og:description" content="Стройте города, дороги и монастыри — играйте с друзьями онлайн. Бесплатно, без рекламы."><meta property="og:image" content="https://crownfall90-dot.github.io/TileTopia/icons/icon-512.png">
 HEAD
+      printf '<script>'; cat web/boot-guard.js; printf '</script>\n'
       if [ "$staging" = "true" ]; then
         printf '<script>window.WEBAPP = true; window.IS_STAGING = true; window.WEB_VERSION = "%s";</script>\n' "$vstring"
+        printf '<meta name="robots" content="noindex,nofollow">\n'
       else
         printf '<script>window.WEBAPP = true; window.IS_STAGING = false; window.WEB_VERSION = "%s";</script>\n' "$vstring"
       fi
     else
-      cat <<'BOOT'
-<script>
-/* If the game cannot start (usually an outdated Android System WebView), say how to fix it instead of a blank screen. */
-(function () {
-  var m = /Chrome\/(\d+)/.exec(navigator.userAgent), old = m && +m[1] < 80;
-  function fail() {
-    if (window.__ready) return;
-    document.body.innerHTML = '<div style="font:16px sans-serif;color:#eef1f8;background:#101729;position:fixed;top:0;left:0;right:0;bottom:0;padding:32px;line-height:1.5">' +
-      '<h2 style="margin:0 0 12px">Не удалось запустить игру</h2><p>Обновите приложения «Android System WebView» и «Chrome» в Google Play и откройте игру снова.</p>' +
-      '<p><a style="color:#f2b84b" href="https://play.google.com/store/apps/details?id=com.google.android.webview">Открыть Android System WebView в Google Play</a></p></div>';
-  }
-  if (old) document.addEventListener('DOMContentLoaded', fail); else setTimeout(fail, 8000);
-})();
-</script>
-BOOT
+      printf '<script>'; cat web/boot-guard.js; printf '</script>\n'
     fi
     printf '<script>window.RELEASE_NOTES = %s; window.FIREBASE = %s;</script>\n' "$notes" "$firebase"
     printf '<script>'; cat build/bundle/pg.js; printf '</script>\n'

@@ -1,8 +1,14 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="108" height="108"><defs>
-<radialGradient id="ibg" cx="50%" cy="34%" r="78%"><stop offset="0" stop-color="#5a74c4"/><stop offset=".5" stop-color="#2a3a72"/><stop offset="1" stop-color="#0f1630"/></radialGradient>
-<radialGradient id="iglow" cx="50%" cy="50%" r="50%"><stop offset="0" stop-color="#ffd878" stop-opacity=".55"/><stop offset="1" stop-color="#ffd878" stop-opacity="0"/></radialGradient>
-<linearGradient id="igrass" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#80be56"/><stop offset="1" stop-color="#5a9a3c"/></linearGradient>
-<radialGradient id="itree" cx=".35" cy=".35" r=".8"><stop offset="0" stop-color="#7cc65a"/><stop offset="1" stop-color="#2f8a3e"/></radialGradient>
-<linearGradient id="igold" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#fff2c4"/><stop offset=".5" stop-color="#f2c45a"/><stop offset="1" stop-color="#d98e1f"/></linearGradient>
-<radialGradient id="ivig" cx=".5" cy=".42" r=".7"><stop offset=".62" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#0a1e08" stop-opacity=".3"/></radialGradient>
-<clipPath id="ipc"><path d="M24.88 31.12L41.38 31.12L41.38 29.12A7.5 7.5 0 1 1 54.38 29.12L54.38 31.12L70.88 31.12A5.5 5.5 0 0 1 76.38 36.62L76.38 53.12L78.38 53.12A7.5 7.5 0 1 1 78.38 66.12L76.38 66.12L76.38 82.62A5.5 5.5 0 0 1 70.88 88.12L54.38 88.12L54.38 86.12A7.5 7.5 0 1 0 41.38 86.12L41.38 88.12L24.88 88.12A5.5 5.5 0 0 1 19.38 82.62L19.38 66.12L21.38 66.12A7.5 7.5 0 1 0 21.38 53.12L19.38 53.12L19.38 36.62A5.5 5.5 0 0 1 24.88 31.12Z"/></clipPath></defs><rect width="108" height="108" fill="url(#ibg)"/><circle cx="54" cy="52" r="46" fill="url(#iglow)"/></svg>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 108 108" width="108" height="108">
+  <defs>
+    <radialGradient id="bgGrad" cx="50%" cy="40%" r="65%">
+      <stop offset="0%" stop-color="#2a3b68"/>
+      <stop offset="60%" stop-color="#151d38"/>
+      <stop offset="100%" stop-color="#0b1021"/>
+    </radialGradient>
+    <pattern id="bgGrid" width="12" height="12" patternUnits="userSpaceOnUse">
+      <path d="M 12 0 L 0 0 0 12" fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="0.8"/>
+    </pattern>
+  </defs>
+  <rect width="108" height="108" fill="url(#bgGrad)"/>
+  <rect width="108" height="108" fill="url(#bgGrid)"/>
+</svg>

@@ -27,14 +27,14 @@ test('player log: events leave in a batch, with no addresses', {skip: !pw && 'pl
     await page.goto(file);
     await page.waitForFunction(() => !!window.__pg, null, {timeout: 15000});
     // a dozen games start: the batch is sent at once (12 events)
-    await page.evaluate(g => { for (let i = 0; i < 12; i++) window.__pg.startGame(g.cfg, []); }, games[0]);
+    await page.evaluate(g => { window.__pg.wallet().stats = true; /* statistics need the player's consent */ for (let i = 0; i < 12; i++) window.__pg.startGame(g.cfg, []); }, games[0]);
     await page.waitForFunction(() => true); await page.waitForTimeout(1500);
     assert.ok(posts.length >= 1, 'a batch was sent');
     const first = posts[0], recs = Object.values(first.b);
     assert.match(first.u, /\/logs\/u1\.json\?auth=T/);
     assert.ok(recs.length >= 2 && recs.length <= 30);
     for (const r of recs) { assert.equal(typeof r.k, 'string'); assert.deepEqual(r.t, {'.sv': 'timestamp'}); assert.ok(!r.d || r.d.length <= 240); assert.ok(!/@/.test(r.d || ''), 'no address in ' + r.k); }
-    assert.ok(recs.some(r => r.k === 'open') && recs.some(r => r.k === 'game_start'));
+    assert.ok(recs.some(r => r.k === 'game_start')); // 'open' is logged before the player's consent, so it is not in the batch
     assert.deepEqual(errors, []);
     await ctx.close();
   } finally { await browser.close(); srv.close(); }

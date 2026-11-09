@@ -6,6 +6,7 @@ test('telegram: message lists changes, escapes HTML, links and platforms', () =>
   const r = py("import importlib.util as u;s=u.spec_from_file_location('t','scripts/telegram-notify.py');m=u.module_from_spec(s);s.loader.exec_module(m);print(m.build('1.0.9','- Новое <b>окно</b>\\n- Ещё','https://x/y/','https://x/a.apk','https://t.me/mybot'))");
   assert.equal(r.status, 0, r.stderr);
   assert.match(r.stdout, /Tiletopia 1\.0\.9/);
+  assert.match(r.stdout, /вышло обновление!/);
   assert.match(r.stdout, /• Новое &lt;b&gt;окно&lt;\/b&gt;/);
   assert.match(r.stdout, /Android:.*APK-приложение/);
   assert.match(r.stdout, /Все устройства.*сайт в браузере/);
@@ -39,7 +40,7 @@ test('telegram: formats new items with quotes, separates changes and removals, f
     '- Как вам обновленный профиль с кубками и статус друзей в сети?',
   ].join('\\n');
 
-  const r = py(`import importlib.util as u;s=u.spec_from_file_location('t','scripts/telegram-notify.py');m=u.module_from_spec(s);s.loader.exec_module(m);print(m.build('1.0.260',"""${notes}""",'https://crownfall90-dot.github.io/play/','https://github.com/crownfall90-dot/play/releases/download/v260/Tiletopia-1.0.260.apk','https://t.me/TiletopiaBot'))`);
+  const r = py(`import importlib.util as u;s=u.spec_from_file_location('t','scripts/telegram-notify.py');m=u.module_from_spec(s);s.loader.exec_module(m);print(m.build('1.0.260',"""${notes}""",'https://crownfall90-dot.github.io/play/','https://github.com/crownfall90-dot/TileTopia/releases/download/v260/Tiletopia-1.0.260.apk','https://t.me/TiletopiaBot'))`);
   assert.equal(r.status, 0, r.stderr);
 
   // 1. New items in blockquote
@@ -48,12 +49,12 @@ test('telegram: formats new items with quotes, separates changes and removals, f
   assert.match(r.stdout, /• Зеленый кружок онлайна/);
   assert.match(r.stdout, /• Время активности друзей/);
 
-  // 2. Changed items
-  assert.match(r.stdout, /🔧 <b>Что изменилось:<\/b>/);
+  // 2. Changed items in blockquote
+  assert.match(r.stdout, /🔧 <b>Что изменилось:<\/b>\r?\n<blockquote>/);
   assert.match(r.stdout, /• Кнопка удаления аккаунта перенесена/);
 
-  // 3. Removed items
-  assert.match(r.stdout, /🧹 <b>Что убрано:<\/b>/);
+  // 3. Removed items in blockquote
+  assert.match(r.stdout, /🧹 <b>Что убрано:<\/b>\r?\n<blockquote>/);
   assert.match(r.stdout, /• Убран счетчик игроков в сети/);
 
   // 4. Developer / internal items MUST BE FILTERED OUT
@@ -63,13 +64,13 @@ test('telegram: formats new items with quotes, separates changes and removals, f
   assert.doesNotMatch(r.stdout, /дизайнер/i);
   assert.doesNotMatch(r.stdout, /PIN-код/i);
 
-  // 5. 3 ways to play
+  // 5. 3 ways to play (clean links)
   assert.match(r.stdout, /🎮 <b>3 способа играть:<\/b>/);
   assert.match(r.stdout, /Android:.*APK-приложение/);
   assert.match(r.stdout, /Все устройства.*сайт в браузере/);
   assert.match(r.stdout, /Telegram:.*мини-приложение/);
 
-  // 6. Interactive poll / question for players
-  assert.match(r.stdout, /📊 <b>Вопрос для игроков и тестеров:<\/b>/);
-  assert.match(r.stdout, /Как вам обновленный профиль с кубками/);
+  // 6. Friendly ending without intrusive questions
+  assert.match(r.stdout, /Приятной игры в Tiletopia!/);
+  assert.doesNotMatch(r.stdout, /Вопрос для игроков и тестеров/);
 });
