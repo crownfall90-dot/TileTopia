@@ -94,16 +94,4 @@ test('game/world: calcWallVisibility detects hidden walls and waterfalls', () =>
   assert.equal(walls[1].hidden, false);
   assert.equal(walls[1].fall, false);
 
-  // generateDecorItems
-  const mockRng = () => () => 0.5;
-  const decor = world.generateDecorItems(
-    {type: 'cEnd', seed: 12345},
-    () => 'f',
-    mockRng,
-    false,
-    {cEnd: {fort: true, rocks: true}}
-  );
-  assert.ok(Array.isArray(decor.items));
-  assert.ok(decor.items.some(x => x[0] === 'tower'));
-  assert.ok(decor.items.some(x => x[0] === 'boulders'));
 });

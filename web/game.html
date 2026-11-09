@@ -827,64 +827,20 @@ function addSprite(parent, kind, x, y, cls, delay, scale = 1) {
   parent.append(b);
   return b;
 }
-const lowGfx = () => document.documentElement.classList.contains('lowgfx');
-const HOUSES = ['house', 'house2', 'house3', 'house4'];
-function addDecor(el, t, delay) {
-  let items, cityCount;
-  if (HEX) return;   // a six-sided card is a finished picture: its houses, trees and herds are rendered in
-  if (typeof PG !== 'undefined' && PG.game && PG.game.world && PG.game.world.generateDecorItems) {
-    const res = PG.game.world.generateDecorItems(t, edgeAt, rng, lowGfx(), TYPES);
-    items = res.items;
-    cityCount = res.cityCount;
-  } else {
-    const E = [0,1,2,3].map(d => edgeAt(t, d)), R = rng(t.seed);
-    items = [];
-    const city = [0,1,2,3].filter(d => E[d] === 'c');
-    cityCount = city.length;
-    if (city.length === 1) {
-      const [x, y] = V[city[0]], px = -y, py = x;
-      items.push([HOUSES[(R() * 4) | 0], x*.36 + px*.17, y*.36 + py*.17], [HOUSES[(R() * 4) | 0], x*.38 - px*.13, y*.38 - py*.13]);
-    } else if (city.length > 1) {
-      let sx = 0, sy = 0; city.forEach(d => { sx += V[d][0]; sy += V[d][1]; });
-      const cx = sx * .2, cy = sy * .2, pts = [[-.16,-.06],[.14,-.14],[.02,.1],[-.2,.16]];
-      const n = city.length >= 3 ? 4 : 3;
-      for (let i = 0; i < n; i++) items.push([i === 0 && city.length >= 3 ? 'tower' : HOUSES[(R() * 4) | 0], cx + pts[i][0], cy + pts[i][1]]);
-    }
-    if (TYPES[t.type].fort) items.push(['tower', 0, .2]);
-    const end = TYPES[t.type].end;
-    if (end && end !== 'cliff') { const d = E.indexOf('r'); items.push([end, -V[d][0] * .1, -V[d][1] * .1 + .06]); }
-    if (TYPES[t.type].rocks) items.push(['boulders', -.05, .05], ['rock', .22, -.12], ['rock', -.24, .26]);
-    for (const [a, b, sx, sy] of [[0,3,-1,-1],[0,1,1,-1],[1,2,1,1],[2,3,-1,1]]) {
-      if (E[a] === 'c' || E[b] === 'c' || E[a] === 'b' || E[b] === 'b' || lowGfx()) continue;
-      if (TYPES[t.type].end === 'cliff') { const dr = E.indexOf('r'); if (sx * -V[dr][0] + sy * -V[dr][1] > 0) continue; }
-      if (R() < .62) { const k = R(); items.push([k < .36 ? 'pine' : k < .62 ? 'oak' : k < .71 ? 'birch' : k < .78 ? 'poplar' : k < .88 ? 'bush' : k < .95 ? 'rock' : 'hay', sx * (.30 + R()*.05) + (R() - .5) * .05, sy * (.30 + R()*.05)]); }
-    }
-    items.forEach(it => { if (it[2] < -.2 && !['rock', 'boulders', 'hay', 'bush'].includes(it[0])) { it[2] = -.2 + (it[2] + .2) * .35; it[3] = 1; } });
-    items.sort((p, q) => p[2] - q[2]);
-  }
-  // Decor sits right after the card face, under the cliff pit, gravel and figures added later.
-  const box = document.createDocumentFragment();
-  items.forEach((it, i) => addSprite(box, it[0], it[1], it[2], 'dc', delay == null ? null : delay + i * .05, (it[0] === 'tower' && cityCount ? .8 : 1) * (it[3] && /^house|^tower/.test(it[0]) ? .85 : 1)));
-  el.querySelector('.face').after(box);
-}
-// Switching graphics redraws the decor of the cards already on the table; the game itself stays as it is.
-function redecorate() {
-  for (const t of tiles.values()) if (t.el) { t.el.querySelectorAll('.bb.dc').forEach(b => b.remove()); addDecor(t.el, t, null); }
-}
+// Cards carry no standing props (houses, trees, stones): those were flat pictures turned to face the camera, so they
+// swung round as the table turned. Everything on a card is in its face; only figures and flags stand up.
 // The six walls of a six-sided tile: side k runs from corner k to corner k + 1 and hangs down from it.
 const HEX_SIDES = [0, 1, 2, 3, 4, 5].map(k => { const a = (-120 + 60 * k) * Math.PI / 180; return `<i class="sd h${k}" style="left:${(HW / 2 + Math.cos(a) * HW / 2).toFixed(2)}px;top:${(T / 2 + Math.sin(a) * HW / 2).toFixed(2)}px;width:${(HW / 2 + .6).toFixed(2)}px;transform:rotateZ(${60 * k}deg) rotateX(-90deg)"></i>`; }).join('');
-function tileEl(t, decor, delay) {
+function tileEl(t) {
   if (HEX) {
     const el = document.createElement('div'); el.className = 'tile hex';
     const [l, tp] = cellLT(t.x, t.y); el.style.left = l + 'px'; el.style.top = tp + 'px';
     el.innerHTML = HEX_SIDES + `<div class="face t-${t.type}" style="--r:${t.r * 60}deg"></div>`;
-    if (decor) addDecor(el, t, delay);
     return el;
   }
   const el = document.createElement('div'); el.className = 'tile';
   el.style.left = (t.x * T - T / 2) + 'px'; el.style.top = (t.y * T - T / 2) + 'px';
   el.innerHTML = `<i class="sd n"></i><i class="sd e"></i><i class="sd s"></i><i class="sd w"></i><div class="face t-${t.type}" style="--r:${t.r * 90}deg"></div>`;
-  if (decor) addDecor(el, t, delay);
   if (TYPES[t.type].end === 'cliff') {
     const dr = [0, 1, 2, 3].find(d => edgeAt(t, d) === 'r');
     if (dr != null) {
@@ -920,18 +876,6 @@ function walls(t, has = (x, y) => tiles.has(key(x, y))) {
     sd[d].hidden = has(t.x + DX[d], t.y + DY[d]);
     // A river that runs off the edge of the kingdom pours down the wall as a waterfall.
     sd[d].classList.toggle('fall', !sd[d].hidden && edgeAt(t, d) === 'w');
-  }
-}
-// Where a road runs out into an empty cell, stones and gravel lie on the track; they go away once a card is put there.
-function refreshRoadEnds() {
-  for (const t of tiles.values()) {
-    if (!t.el) continue;
-    t.rw = t.rw || {};
-    for (let d = 0; d < NDIR(); d++) {
-      const open = edgeAt(t, d) === 'r' && !at(...nbXY(t.x, t.y, d));
-      if (open && !t.rw[d]) t.rw[d] = addSprite(t.el, 'gravel', VV()[d][0] * .4, VV()[d][1] * .4, '', fast() ? null : .05);
-      else if (!open && t.rw[d]) { t.rw[d].remove(); delete t.rw[d]; }
-    }
   }
 }
 function wallsAround(t) { walls(t); for (let d = 0; d < NDIR(); d++) { const n = at(...nbXY(t.x, t.y, d)); if (n) walls(n); } }
@@ -1328,7 +1272,7 @@ function renderSlots() {
   }
 }
 function placeGhost() {
-  if (!ghost) { ghostDeg = current.r * ROT(); ghost = tileEl({x: sel.x, y: sel.y, type: current.type, r: current.r}, false); ghost.classList.add('ghost'); world.append(ghost); }
+  if (!ghost) { ghostDeg = current.r * ROT(); ghost = tileEl({x: sel.x, y: sel.y, type: current.type, r: current.r}); ghost.classList.add('ghost'); world.append(ghost); }
   ghost.style.setProperty('--pc', players[turn].col);
   const [gl, gt] = cellLT(sel.x, sel.y); ghost.style.left = gl + 'px'; ghost.style.top = gt + 'px';
 }
@@ -1429,7 +1373,7 @@ async function dropAt(t) {
   ghost.classList.remove('ghost');
   if (!(RM || fast())) await ghost.animate([{transform: 'translateZ(26px)'}, {transform: 'translateZ(0)'}], {duration: 260, easing: 'cubic-bezier(.5,0,.8,.4)'}).finished;
   ghost.remove(); ghost = null; lastPlaced = t;
-  t.el = tileEl(t, true, fast() ? null : .02); world.append(t.el); tiles.set(key(t.x, t.y), t); wallsAround(t); refreshRoadEnds(); markOwn(); updateFog();
+  t.el = tileEl(t); world.append(t.el); tiles.set(key(t.x, t.y), t); wallsAround(t); markOwn(); updateFog();
   if (!fast()) beep('place');
   if (!fast()) { const pf = document.createElement('i'); pf.className = 'puff'; t.el.append(pf); setTimeout(() => pf.remove(), 600); }
   if (!fast()) { t.el.classList.add('puzzle-lock'); setTimeout(() => { if (t.el) t.el.classList.remove('puzzle-lock'); }, 350); }
@@ -1996,7 +1940,7 @@ function startGame(cfg, replay = []) {
   // Tutorial: the first piece counts as the player's own, so the town they close on move one can take a figure at once.
   if (cfg.tut) first.by = 0;
   tiles = new Map([[key(0, 0), first]]); G.tiles = tiles;
-  initFog(); first.el = tileEl(first, true, fast() ? null : .05); world.append(first.el); refreshRoadEnds(); updateFog();
+  initFog(); first.el = tileEl(first); world.append(first.el); updateFog();
   $('#over').hidden = true;
   // The first card's neighbours sit about 136 px per unit of zoom from the centre; keep them clear of the zoom buttons
   // on the right edge (48 px) on narrow phones, never above the usual 1.05.
@@ -2051,10 +1995,51 @@ function drawFx() {
   const dx = to.left - from.left + (to.width - 22) / 2, dy = to.top - from.top + (to.height - 22) / 2, sc = to.width / 22;
   c.animate([{transform: 'translate(0,0) scale(1)'}, {transform: `translate(${dx * .5}px,${dy * .5 - 60}px) scale(${sc * .7}) rotate(-12deg)`, offset: .5}, {transform: `translate(${dx}px,${dy}px) scale(${sc})`, opacity: .2}], {duration: 520, easing: 'cubic-bezier(.4,0,.3,1)'}).finished.then(() => c.remove(), () => c.remove());
 }
+// The menu plays a small game of Classic 2.0 on its own: players lay six-sided cards in turn, each card drops onto
+// the table with its player's colour, and once the little kingdom is built it fades and a new one begins.
+// It is only scenery: the cards follow the rules (src/engine/hex.js) but nothing is scored or saved.
+let demoT = 0, demoOn = false;
 function buildMini() {
-  const mini = $('#mini'); mini.innerHTML = '';
-  const inMini = (x, y) => Math.abs(x) <= 1 && Math.abs(y - .5) <= 1.5 && tiles.has(key(x, y));
-  for (const t of tiles.values()) if (inMini(t.x, t.y)) { const el = tileEl(t, true, null); mini.append(el); walls({...t, el}, inMini); }
+  if (demoOn) return;
+  demoOn = true; injectHexArt(); demoGame();
+}
+function demoGame() {
+  const mini = $('#mini'), board = new Map(), dist = (x, y) => (Math.abs(x) + Math.abs(y) + Math.abs(x + y)) / 2;
+  mini.innerHTML = ''; mini.classList.add('demo'); mini.classList.remove('fade');
+  const deck = HX.deckList({rivers: true});
+  for (let i = deck.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [deck[i], deck[j]] = [deck[j], deck[i]]; }
+  let turnNo = 0;
+  const shown = () => !$('#scr-menu').hidden && !document.hidden;
+  const sides = t => t.el.querySelectorAll('.sd').forEach((sd, d) => { sd.hidden = board.has(HX.key(t.x + HX.DX[d], t.y + HX.DY[d])); });
+  const lay = (t, col) => {
+    const el = document.createElement('div'); el.className = 'tile hex';
+    const [X, Y] = HX.cellXY(t.x, t.y); el.style.left = (X * T - HW / 2) + 'px'; el.style.top = (Y * T - T / 2) + 'px';
+    el.style.setProperty('--pc', col);
+    el.innerHTML = HEX_SIDES + `<div class="face t-${t.type}" style="--r:${t.r * 60}deg"></div>`;
+    t.el = el; board.set(HX.key(t.x, t.y), t); mini.append(el);
+    for (const n of board.values()) sides(n);
+    if (RM) return;
+    el.animate([{transform: 'translateZ(160px) rotateZ(-14deg)', opacity: 0}, {transform: 'translateZ(160px) rotateZ(-14deg)', opacity: 1, offset: .15},
+      {transform: 'translateZ(-4px) rotateZ(0)', offset: .8}, {transform: 'translateZ(0)'}], {duration: 700, easing: 'cubic-bezier(.45,0,.75,.45)'});
+    el.classList.add('mdrop'); setTimeout(() => el.classList.remove('mdrop'), 1300);
+  };
+  const step = () => {
+    if (!demoOn) return;
+    if (!shown()) { demoT = setTimeout(step, 1000); return; }
+    const col = PL0[turnNo % 4].col;
+    if (!board.size) { lay({x: 0, y: 0, type: deck.pop(), r: (Math.random() * 6) | 0}, col); turnNo++; demoT = setTimeout(step, 1100); return; }
+    // the next card from the stack that has a place near the middle; the closer to the middle and to more cards, the better
+    let move = null;
+    for (let k = 0; k < 12 && deck.length && !move; k++) {
+      const type = deck.pop();
+      const ms = HX.allMoves(board, type).filter(m => dist(m.x, m.y) <= 1);
+      if (ms.length) { const sc = m => HX.neighbours(board, m.x, m.y) * 2 - dist(m.x, m.y) * 1.5 + Math.random(); move = {...ms.reduce((a, b) => sc(b) > sc(a) ? b : a), type}; }
+    }
+    if (move) { lay(move, col); turnNo++; demoT = setTimeout(step, 1250); return; }
+    // the kingdom is built: hold it a moment, fade it out and start a new game
+    demoT = setTimeout(() => { mini.classList.add('fade'); demoT = setTimeout(() => { if (demoOn) demoGame(); }, 900); }, 2600);
+  };
+  demoT = setTimeout(step, 400);
 }
 let lastGold = null;
 // What the match gave: cups (rated online games), gold, experience, a new level.
@@ -2801,7 +2786,7 @@ $('#prefs').addEventListener('click', e => {
   if (r.k === 'stats') { wallet.statsAsked = true; saveWallet(); applyStatsConsent(); if (!wallet.stats) { usageState = null; try { localStorage.removeItem('usage'); } catch (_) {} } }
   if (r.k === 'view') setView(wallet.view);
   if (r.k === 'zones') { markOwn(); updateOwnership(); }
-  if (r.k === 'gfx') { applyGfx(); redecorate(); }
+  if (r.k === 'gfx') applyGfx();
 });
 
 // Only the label changes: replacing the button's text would wipe its icon and arrow.
@@ -3543,7 +3528,7 @@ function peekClear() { if (peekEl) { peekEl.remove(); peekEl = null; } clearTime
 function showPeek(m) {
   if (phase !== 'remote' || !current || m.n !== applied || m.p !== turn || isLocal(m.p) || !Number.isInteger(m.x) || !Number.isInteger(m.y) || !(m.r >= 0 && m.r < NDIR())) return;
   if (tiles.has(key(m.x, m.y)) || Math.abs(m.x) > 80 || Math.abs(m.y) > 80) return;
-  if (!peekEl) { peekDeg = m.r * ROT(); peekEl = tileEl({x: m.x, y: m.y, type: current.type, r: m.r}, false); peekEl.classList.add('ghost', 'peek'); world.append(peekEl); }
+  if (!peekEl) { peekDeg = m.r * ROT(); peekEl = tileEl({x: m.x, y: m.y, type: current.type, r: m.r}); peekEl.classList.add('ghost', 'peek'); world.append(peekEl); }
   else peekDeg += (((m.r * ROT() - peekDeg) % 360) + 540) % 360 - 180; // turn the short way
   peekEl.style.setProperty('--pc', players[m.p].col);
   const [pl, pt] = cellLT(m.x, m.y); peekEl.style.left = pl + 'px'; peekEl.style.top = pt + 'px';

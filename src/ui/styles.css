@@ -282,6 +282,12 @@ html.app input,html.app textarea,html.app a,html.app [contenteditable],html.app 
 
 .mini{position:absolute;left:50%;top:58%;width:0;height:0;transform-style:preserve-3d;--tilt:56deg;animation:sway 9s ease-in-out infinite}
 
+/* Menu demo game (buildMini): Classic 2.0 cards laid in turn; the new card glows in its player's colour. */
+.mini.demo{top:54%;transition:opacity .8s ease}
+.mini.demo.fade{opacity:0}
+.mini.demo .tile.hex::before{content:"";position:absolute;inset:-4px -4.6px;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);background:var(--pc);opacity:0;transition:opacity .5s ease}
+.mini.demo .tile.hex.mdrop::before{opacity:.9}
+
 @keyframes sway{0%,100%{transform:rotateX(56deg) rotateZ(-12deg) scale3d(.8,.8,.8)}50%{transform:rotateX(56deg) rotateZ(10deg) scale3d(.8,.8,.8)}}
 
 .mbody{position:relative;flex:0 0 auto;display:flex;flex-direction:column;align-items:stretch;gap:12px;padding:0 18px calc(14px + var(--ib,0px));width:100%;max-width:440px;margin:0 auto;box-sizing:border-box}
