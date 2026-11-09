@@ -71,6 +71,12 @@ def main():
     leaders_hex = fb_req('GET', 'leaders_hex') or {}
     presence = fb_req('GET', 'presence') or {}
     profiles = fb_req('GET', 'profiles') or {}
+
+    print(f'Leaderboard players count: {len(leaders)}')
+    for uid, v in leaders.items():
+        name = (v.get('n') or v.get('name') if isinstance(v, dict) else str(v)) or ''
+        cups = v.get('c') or v.get('cups') if isinstance(v, dict) else ''
+        print(f'  Leaderboard: uid={uid[:8]}... name={name!r} cups={cups}')
     
     daem_uids = set()
     
