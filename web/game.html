@@ -2062,7 +2062,7 @@ function rewardChips(g) {
   if (!g) return '';
   const rw = g.rw || {}, sign = n => (n > 0 ? '+' : n < 0 ? '−' : '') + Math.abs(n);
   const chips = [];
-  if (rw.rated) chips.push(`<div class="rchip cup${rw.cups ? '' : ' zero'}" style="--i:0"><b>🏆 ${sign(rw.cups)}</b><small>кубков · всего ${PROG.cups}</small></div>`);
+  if (rw.rated) chips.push(`<div class="rchip cup${rw.cups ? '' : ' zero'}" style="--i:0"><b>🏆 ${sign(rw.cups)}</b><small>${rw.hex ? 'кубков Классики 2.0' : 'кубков'} · всего ${rw.hex ? PROG.hcups || 0 : PROG.cups}</small></div>`);
   else if (net && players.some(p => !p.human)) chips.push(`<div class="rchip dim" style="--i:0"><b>🏆 —</b><small>${players.some(p => p.ghost) ? 'партия без рейтинга' : 'без кубков: игра с ботом'}</small></div>`);
   else if (net && !net.quick) chips.push(`<div class="rchip dim" style="--i:0"><b>🏆 —</b><small>без кубков: игра с друзьями</small></div>`);
   chips.push(`<div class="rchip gold${g.delta < 0 ? ' neg' : ''}" style="--i:1"><b><i class="coin"></i> ${sign(g.delta)}</b><small>тайлов · всего ${wallet.gold}</small></div>`);
@@ -4312,7 +4312,7 @@ const meCounted = () => { const me = players.findIndex(isMe); return me >= 0 && 
 const {xpNeed, QUESTS, ACH, WEEKLY_QUESTS, WEEKLY_CHEST_GOLD, weekId, normalizeStats, recordGameMode} = PG.state.progress;
 // every weekly goal there can be (three core ones and the extra of each week), to look a goal up by its id
 const WEEKLY_ALL = [...WEEKLY_QUESTS, ...(PG.state.progress.WEEKLY_EXTRA || [])];
-const PROG = Object.assign({xp: 0, lvl: 1, st: {}, day: '', q: [], ach: {}, cups: 0, up: 0, cupsSeen: 0, inTop10: false, topSeen: false}, wallet.prog);
+const PROG = Object.assign({xp: 0, lvl: 1, st: {}, day: '', q: [], ach: {}, cups: 0, up: 0, hcups: 0, hup: 0, cupsSeen: 0, inTop10: false, topSeen: false}, wallet.prog);
 PROG.st = normalizeStats(PROG.st);
 wallet.prog = PROG;
 function questsWeekly() {
@@ -4425,12 +4425,15 @@ function gameDone(place, score) {
   if (privCups) { const d = today(); if (PROG.pc && PROG.pc.d === d) PROG.pc.n++; else PROG.pc = {d, n: 1}; }
   const rated = !!(!hasBots && net && (net.quick || (privCups && PROG.pc.n <= 5)));
   const cups = rated ? ([10, 5, 2, 0, 0][place] || 0) : 0;
-  if (rated) { PROG.cups += cups; syncRating(); }
+  // Classic 2.0 has a rating of its own: its cups go to a separate board (/leaders_hex).
+  const hexRated = !!(gameRules && gameRules.mode === 'hex');
+  if (rated && hexRated) { PROG.hcups = (PROG.hcups || 0) + cups; syncRating(false, 'hex'); }
+  else if (rated) { PROG.cups += cups; syncRating(); }
   saveWallet(); progressDot();
   // experience and a new level are shown by the results board itself (rewardChips)
   const fresh = ACH.filter(a => !PROG.ach[a.id] && a.ok(PROG.st, PROG.lvl));
   if (fresh.length) setTimeout(() => toastAny(`Достижение: ${fresh[0].t}`), 3600);
-  return {rated, cups, xp, up, lvl: PROG.lvl, place};
+  return {rated, cups, hex: hexRated, xp, up, lvl: PROG.lvl, place};
 }
 const rewardReady = () => {
   questsToday();
@@ -4468,7 +4471,7 @@ const PROGRESS_ROAD_MILESTONES = [
 
 function progressDot() {
   const b = $('#progBtn');
-  const myLvl = PROG.lvl || 1, myCups = PROG.cups || 0;
+  const myLvl = PROG.lvl || 1, myCups = (PROG.cups || 0) + (PROG.hcups || 0);
   const claimed = wallet.roadClaimed || [];
   const roadReady = PROGRESS_ROAD_MILESTONES.some(m => (myLvl >= m.lvl || myCups >= m.cups) && !claimed.includes(m.id));
   const hasDot = rewardReady() || roadReady;
@@ -4625,7 +4628,7 @@ setTimeout(() => {
 function renderProgressRoad() {
   const track = $('#ptab');
   if (!track || ptab !== 'road') return;
-  const myLvl = PROG.lvl || 1, myCups = PROG.cups || 0, claimed = wallet.roadClaimed || [];
+  const myLvl = PROG.lvl || 1, myCups = (PROG.cups || 0) + (PROG.hcups || 0), claimed = wallet.roadClaimed || [];
   const need = xpNeed(myLvl), pct = Math.max(0, Math.min(100, 100 * PROG.xp / need));
   const unlocked = m => myLvl >= m.lvl || myCups >= m.cups;
   const next = PROGRESS_ROAD_MILESTONES.find(m => !unlocked(m));
@@ -4643,7 +4646,7 @@ function renderProgressRoad() {
 function claimRoadMilestone(id) {
   const m = PROGRESS_ROAD_MILESTONES.find(x => x.id === id);
   if (!m) return;
-  const myLvl = PROG.lvl || 1, myCups = PROG.cups || 0;
+  const myLvl = PROG.lvl || 1, myCups = (PROG.cups || 0) + (PROG.hcups || 0);
   const isUnlocked = myLvl >= m.lvl || myCups >= m.cups;
   wallet.roadClaimed = wallet.roadClaimed || [];
   if (!isUnlocked || wallet.roadClaimed.includes(id)) return;
@@ -5084,14 +5087,18 @@ if ($('#achievementsContent')) $('#achievementsContent').addEventListener('click
 /* Rating: cups from online games (1st +30, 2nd +15, 3rd +5, draw +10) in /leaders, top 50.
    The database rules let a player raise their own score by at most 30 a minute, so a big
    backlog goes up in steps. */
-async function syncRating(force) {
-  if (!FB || (PROG.up >= PROG.cups && !force)) return;
+// board 'hex' is the Classic 2.0 rating: its own cups (PROG.hcups), its own upload mark (PROG.hup), its own node.
+async function syncRating(force, board) {
+  const hex = board === 'hex', have = hex ? PROG.hcups || 0 : PROG.cups, sent = hex ? PROG.hup || 0 : PROG.up;
+  if (!FB || (sent >= have && !force)) return;
   try {
-    const tok = await fbToken(), target = Math.min(PROG.cups, PROG.up + 10);
-    const r = await fetch(`${FB.dbUrl}/leaders/${fbAuth.uid}.json?auth=${tok}`, {method: 'PUT', body: JSON.stringify({n: profileName(), st: myStatus(), c: validCol(wallet.color) ? wallet.color : '', r: target, w: PROG.st.owins, t: {'.sv': 'timestamp'}})});
+    const tok = await fbToken(), target = Math.min(have, sent + 10);
+    const r = await fetch(`${FB.dbUrl}/${hex ? 'leaders_hex' : 'leaders'}/${fbAuth.uid}.json?auth=${tok}`, {method: 'PUT', body: JSON.stringify({n: profileName(), st: myStatus(), c: validCol(wallet.color) ? wallet.color : '', r: target, w: PROG.st.owins, t: {'.sv': 'timestamp'}})});
     if (r.ok) {
-      PROG.up = target; saveWallet(); progressDot();
-      if (PROG.up < PROG.cups) setTimeout(syncRating, 61000);
+      if (hex) PROG.hup = target; else PROG.up = target;
+      saveWallet(); progressDot();
+      if (target < have) setTimeout(() => syncRating(false, board), 61000);
+      if (hex) return;
       try {
         const tr = await fetch(`${FB.dbUrl}/leaders.json?auth=${tok}&orderBy=%22r%22&limitToLast=10`);
         if (tr.ok) {
@@ -5105,7 +5112,7 @@ async function syncRating(force) {
     }
   } catch (_) {}
 }
-let topScope = 'all';
+let topScope = 'all', topBoard = 'classic';
 
 async function renderTop(customEl) {
   const el = customEl || $('#ratingContent') || $('#ptab');
@@ -5113,14 +5120,15 @@ async function renderTop(customEl) {
   const me = (fbAuth && fbAuth.uid) ? fbAuth.uid : 'me_player';
   const myName = profileName();
   const mySt = myStatus() || '';
-  const myCups = (PROG && PROG.cups) || 0;   // never a made-up number: a new player has 0 cups
+  const hexBoard = topBoard === 'hex';
+  const myCups = (PROG && (hexBoard ? PROG.hcups : PROG.cups)) || 0;   // never a made-up number: a new player has 0 cups
   const curWeek = (PG.state.progress && PG.state.progress.weekId) ? PG.state.progress.weekId() : 'Сезон 1';
 
   let rows = [];
   try {
     if (FB) {
       const tok = await fbToken();
-      const r = await fetch(`${FB.dbUrl}/leaders.json?auth=${tok}&orderBy=%22r%22&limitToLast=50`);
+      const r = await fetch(`${FB.dbUrl}/${hexBoard ? 'leaders_hex' : 'leaders'}.json?auth=${tok}&orderBy=%22r%22&limitToLast=50`);
       if (r.ok) {
         rows = Object.entries((await r.json()) || {}).map(([uid, v]) => ({uid, ...v})).filter(x => x.r > 0).sort((a, b) => b.r - a.r);
       }
@@ -5194,15 +5202,19 @@ async function renderTop(customEl) {
     ? `<div class="lead tile-lead-card me myrank" data-pl="${rows[mine].uid}" data-n="${clean(rows[mine].n)}" data-st="${rows[mine].st || ''}" data-cups="${rows[mine].r}" data-fr="${rows[mine].fr || ''}" data-c="${rows[mine].c || ''}"><i class="rank-num">${mine + 1}</i>${av(rows[mine], mine)}<div class="lead-player-info"><div class="lead-name-row"><b>Вы</b></div>${stBadge(rows[mine].st)}</div><div class="lead-cups-badge"><span class="cup-ic">🏆</span><b>${rows[mine].r}</b></div></div>`
     : '';
 
+  const boardTabs = `<div class="scope-tabs board-tabs"><button class="chip${hexBoard ? '' : ' pri'}" id="topBoardClassic">Классика</button><button class="chip${hexBoard ? ' pri' : ''}" id="topBoardHex">Классика 2.0</button></div>`;
   const scopeTabs = `<div class="scope-tabs"><button class="chip${topScope === 'all' ? ' pri' : ''}" id="topScopeAll">Все игроки (Топ-20)</button><button class="chip${topScope === 'friends' ? ' pri' : ''}" id="topScopeFriends">Среди друзей</button></div>`;
   const seasonTag = `<div style="text-align:center;color:var(--muted);font-size:12px;margin-bottom:8px">Лига · Сезон <b>${curWeek}</b></div>`;
 
   const emptyNote = rows.length < 4 ? `<p class="qnote" style="text-align:center">${boardLoaded ? 'Пока вас мало в таблице — играйте онлайн и поднимайтесь выше.' : 'Таблица игроков сейчас недоступна. Здесь ваши кубки; общий рейтинг появится, когда связь вернётся.'}</p>` : '';
-  el.innerHTML = seasonTag + scopeTabs + `<div class="podium">${podium}</div>` + `<div class="leader-tile-list">${list}</div>` + myRow + emptyNote + '<p class="qnote">Нажмите на игрока, чтобы посмотреть профиль · За победу в рейтинге +10 🏆</p>';
+  el.innerHTML = boardTabs + seasonTag + scopeTabs + `<div class="podium">${podium}</div>` + `<div class="leader-tile-list">${list}</div>` + myRow + emptyNote + '<p class="qnote">Нажмите на игрока, чтобы посмотреть профиль · За победу в рейтинге +10 🏆</p>';
 
   const btnAll = el.querySelector('#topScopeAll'), btnFriends = el.querySelector('#topScopeFriends');
   if (btnAll) btnAll.onclick = () => { topScope = 'all'; renderTop(); };
   if (btnFriends) btnFriends.onclick = () => { topScope = 'friends'; renderTop(); };
+  const bc = el.querySelector('#topBoardClassic'), bh = el.querySelector('#topBoardHex');
+  if (bc) bc.onclick = () => { topBoard = 'classic'; renderTop(customEl); };
+  if (bh) bh.onclick = () => { topBoard = 'hex'; renderTop(customEl); };
 
   // A tap on a player row or podium card opens the player card: the global [data-pl] handler does it
 }
@@ -6845,7 +6857,7 @@ async function finishGoogle(idToken, link, onFail) {
       toastAny(`С возвращением, ${profileName()}!`);
       const toFriends = !$('#scr-friends').hidden;
       renderAccount(); renderSetup(); renderShop && renderShop(); progressDot();
-      show(toFriends ? 'friends' : 'menu'); presenceMark(true); syncRating(); socialReset();
+      show(toFriends ? 'friends' : 'menu'); presenceMark(true); syncRating(); syncRating(false, 'hex'); socialReset();
       if (!wallet.name) finishSignup();
     } else {
       track('sign_up', {method: 'google'});
@@ -7223,7 +7235,7 @@ function accountDialog(mode, prefill) {
         wallet.tut = wallet.tutAsked = true; saveWallet();
         toastAny(ok ? `С возвращением, ${profileName()}!` : 'Вход выполнен');
         const toFriends = !$('#scr-friends').hidden;
-        renderAccount(); renderSetup(); renderShop && renderShop(); progressDot(); show(toFriends ? 'friends' : 'menu'); presenceMark(true); syncRating(); socialReset();
+        renderAccount(); renderSetup(); renderShop && renderShop(); progressDot(); show(toFriends ? 'friends' : 'menu'); presenceMark(true); syncRating(); syncRating(false, 'hex'); socialReset();
         if (!wallet.name) finishSignup();
       }
     } catch (j) { showErr(j); go.disabled = false; }
