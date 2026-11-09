@@ -2776,7 +2776,7 @@ function renderPrefs() {
     const ctl = sw
       ? `<button class="tgl" role="switch" data-pref="${r.k}" aria-checked="${!!wallet[r.k]}" aria-label="${r.label}"><span></span></button>`
       : `<span class="mseg" data-pref="${r.k}">${r.opts.map(([v, l], i) => `<button data-i="${i}" aria-pressed="${wallet[r.k] === v}">${l}</button>`).join('')}</span>`;
-    return `<div class="srow${sw ? '' : ' sseg'}"><span class="sic">${r.ic}</span><span class="stx"><b>${r.label}</b><small>${r.hint}</small></span>${ctl}</div>`;
+    return `<div class="srow${sw ? '' : ' sseg'}"><span class="sic">${(PG.ui.icons && PG.ui.icons.prefIcon(r.k)) || r.ic}</span><span class="stx"><b>${r.label}</b><small>${r.hint}</small></span>${ctl}</div>`;
   };
   $('#prefs').innerHTML = PREF_GROUPS.map(([title, keys]) => {
     const rows = keys.map(k => PREFS.find(r => r.k === k)).filter(r => !r.app || window.AndroidApp);

@@ -7004,3 +7004,5 @@ html body .pl-v2-stat-lbl{font-size:10.5px}
 /* results: the biggest single score of the game */
 #bestmove{margin:10px 0 0;padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-left:4px solid var(--c);font-size:13px;line-height:1.35;color:var(--ink)}
 #bestmove span{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.7;margin-bottom:2px}
+/* settings: drawn line icons instead of emoji */
+.sic svg{color:var(--ink);opacity:.9}
