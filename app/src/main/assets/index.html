@@ -12096,7 +12096,7 @@ function progressDot() {
   const b = $('#progBtn');
   const myLvl = PROG.lvl || 1, myCups = (PROG.cups || 0) + (PROG.hcups || 0);
   const claimed = wallet.roadClaimed || [];
-  const roadReady = PROGRESS_ROAD_MILESTONES.some(m => (myLvl >= m.lvl || myCups >= m.cups) && !claimed.includes(m.id));
+  const roadReady = PROGRESS_ROAD_MILESTONES.some(m => (myLvl >= m.lvl && myCups >= m.cups) && !claimed.includes(m.id));
   const hasDot = rewardReady() || roadReady;
   if (b) b.classList.toggle('hasdot', hasDot);
   const dotEl = $('#progNavDot');
@@ -12216,7 +12216,7 @@ function roadMapHtml(ms, unlockedFn, claimed) {
   const nodes = ms.map((m, i) => {
     const open = unlockedFn(m), got = claimed.includes(m.id), q = P[i];
     const cls = got ? 'claimed' : open ? 'unlocked' : 'locked';
-    const act = got ? '<span class="rd-tag">✓ Получено</span>' : open ? `<button class="chip pri" data-claimroad="${m.id}">Забрать</button>` : `<span class="rd-tag">🔒 ${m.cups ? m.cups + ' 🏆 или ' : ''}${m.lvl} ур.</span>`;
+    const act = got ? '<span class="rd-tag">✓ Получено</span>' : open ? `<button class="chip pri" data-claimroad="${m.id}">Забрать</button>` : `<span class="rd-tag">🔒 ${m.lvl} ур. и ${m.cups} 🏆</span>`;
     return `<div class="rd-n ${cls}${i === last + 1 || (last === n - 1 && i === n - 1) ? ' next' : ''}" style="left:${(100 * q.x / W).toFixed(2)}%;top:${q.y}px">`
       + `<div class="rd-sign"><b>${m.title}</b><small>${m.desc}</small></div>`
       + `<span class="rd-med"><em>${m.lvl}</em>${got ? '✓' : m.ic}</span>${act}</div>`;
@@ -12280,11 +12280,11 @@ function renderProgressRoad() {
   if (!track || ptab !== 'road') return;
   const myLvl = PROG.lvl || 1, myCups = (PROG.cups || 0) + (PROG.hcups || 0), claimed = wallet.roadClaimed || [];
   const need = xpNeed(myLvl), pct = Math.max(0, Math.min(100, 100 * PROG.xp / need));
-  const unlocked = m => myLvl >= m.lvl || myCups >= m.cups;
+  const unlocked = m => myLvl >= m.lvl && myCups >= m.cups;
   const next = PROGRESS_ROAD_MILESTONES.find(m => !unlocked(m));
   const head = `<div class="rd-head"><div class="rd-lvl"><b>${myLvl}</b><small>уровень</small></div><div class="rd-info"><b>Прогресс</b>`
     + `<div class="xpbar"><i style="width:${pct.toFixed(1)}%"></i></div><small>${PROG.xp} / ${need} опыта до ${myLvl + 1} уровня · 🏆 ${myCups}</small></div></div>`
-    + `<p class="rd-next">${next ? `Следующая награда: <b>${next.title}</b> — ${next.cups ? next.cups + ' 🏆 или ' : ''}${next.lvl} уровень` : 'Вы прошли всю дорогу, дальше — новые сезоны'}</p>`;
+    + `<p class="rd-next">${next ? `Следующая награда: <b>${next.title}</b> — ${next.lvl} уровень и ${next.cups} 🏆` : 'Вы прошли всю дорогу, дальше — новые сезоны'}</p>`;
   track.innerHTML = head + roadMapHtml(PROGRESS_ROAD_MILESTONES, unlocked, claimed);
   roadBridges();
   if (roadScroll) {   // opening the tab: bring the level the player is at into view
@@ -12298,7 +12298,7 @@ function claimRoadMilestone(id) {
   const m = PROGRESS_ROAD_MILESTONES.find(x => x.id === id);
   if (!m) return;
   const myLvl = PROG.lvl || 1, myCups = (PROG.cups || 0) + (PROG.hcups || 0);
-  const isUnlocked = myLvl >= m.lvl || myCups >= m.cups;
+  const isUnlocked = myLvl >= m.lvl && myCups >= m.cups;
   wallet.roadClaimed = wallet.roadClaimed || [];
   if (!isUnlocked || wallet.roadClaimed.includes(id)) return;
   wallet.roadClaimed.push(id);
