@@ -694,11 +694,13 @@ function drawSprites() {
   PL0.forEach((p, i) => sprite('m' + i, 20, 22, meeple(p.col, 'rgba(0,0,0,.4)')));
   sprite('mg', 20, 22, meeple('rgba(255,255,255,.7)', '#f2b84b'));
 }
-const TILE_URL = {};
+const TILE_URL = {}, DRAWN = {};
 function injectArt() {
   drawSprites();
   let css = '';
-  for (const id in TYPES) { TILE_URL[id] = drawTile(id); css += `.t-${id}{background-image:url(${TILE_URL[id]})}`; }
+  // The cards are the Blender renders in assets/tiles/ (tools/blender_generators/generate_tiles.py, seen from above),
+  // the same pictures as Classic 2.0; the drawn face lies under each, for a page whose app has no tiles/ folder yet.
+  for (const id in TYPES) { const drawn = DRAWN[id] = drawTile(id); TILE_URL[id] = `tiles/${id}.webp`; css += `.t-${id}{background-image:url(tiles/${id}.webp),url(${drawn})}`; }
   for (const k in SPR) css += `.s-${k}{background-image:url(${SPR[k].url})}`;
   const st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 }
@@ -715,5 +717,5 @@ function injectHexArt() {
 }
 
 
-  return {cv, drawTile, SPR, sprite, TILE_URL, injectArt, injectHexArt};
+  return {cv, drawTile, SPR, sprite, TILE_URL, DRAWN, injectArt, injectHexArt};
 }

@@ -36,6 +36,8 @@ if [ "$target" = web ]; then
   cp -r app/src/main/assets/fonts "$site/staging/fonts"
   cp -r app/src/main/assets/figs "$site/figs"            # shop characters (tools/blender_generators/generate_figurines.py)
   cp -r app/src/main/assets/figs "$site/staging/figs"
+  cp -r app/src/main/assets/tiles "$site/tiles"             # classic cards (Blender renders)
+  cp -r app/src/main/assets/tiles "$site/staging/tiles"
   if [ -d app/src/main/assets/hex ]; then              # Classic 2.0 cards (tools/blender_generators/generate_hex_tiles.py)
     cp -r app/src/main/assets/hex "$site/hex"
     cp -r app/src/main/assets/hex "$site/staging/hex"

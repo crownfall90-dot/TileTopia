@@ -754,7 +754,7 @@ const meepleSvg = col => `<svg viewBox="0 0 100 110"><path d="${MEEPLE_D}" fill=
 
 /* ---------------- art ---------------- */
 // Tile and sprite art live in src/render/art.js.
-const {cv, SPR, sprite, TILE_URL, injectArt, injectHexArt} = PG.render.createArt({S, V, PL0, MEEPLE_D});
+const {cv, SPR, sprite, TILE_URL, DRAWN, injectArt, injectHexArt} = PG.render.createArt({S, V, PL0, MEEPLE_D});
 /* ---------------- rules ---------------- */
 const G = (PG.game && PG.game.createGameState) ? PG.game.createGameState() : {
   tiles: new Map(), deck: [], meeples: [], players: [], turn: 0, phase: 'idle', current: null, sel: null
@@ -1194,7 +1194,7 @@ function updateOwnership() {
     perTile.get(t).push({kind: rest[0], edges: rest.slice(1).split('').map(Number), cols: f.cols});
   }
   for (const [t, list] of perTile) {
-    t.el.querySelector('.face').style.backgroundImage = `url("${ownSvg(t, list)}"), url(${TILE_URL[t.type]})`;
+    t.el.querySelector('.face').style.backgroundImage = `url("${ownSvg(t, list)}"), url(${TILE_URL[t.type]})` + (DRAWN[t.type] ? `, url(${DRAWN[t.type]})` : '');
     t.own = true;
   }
 }
