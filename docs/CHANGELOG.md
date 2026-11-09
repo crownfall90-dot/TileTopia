@@ -2534,3 +2534,17 @@
 - Merge main into dev/stage2
 - docs: record actual account regression and staging build results
 
+## 1.0.275 — 2026-11-09
+
+**Игрокам:**
+- ### ✨ Что нового
+- Отдельный рейтинг для «Классики 2.0»: свои кубки и своя таблица, переключатель на экране рейтинга
+
+**В коде:**
+- Merge pull request #260 from crownfall90-dot/dev/stage2-account-network-20261029
+- docs(release): заметки — только новое с 1.0.274
+- feat(rating): отдельный рейтинг для Классики 2.0 (/leaders_hex)
+- Merge pull request #259 from crownfall90-dot/dev/stage2-account-network-20261029
+- build: встроенные заметки к выпуску соответствуют 1.0.274
+- docs(release): журнал изменений и версия 1.0.274
+
