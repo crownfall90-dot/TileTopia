@@ -102,6 +102,7 @@ jobs:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
         run: |
           python3 scripts/fcm-send.py updates-github "$CODE" "1.0.$CODE" release-notes.md
+          python3 scripts/fcm-send.py updates-staging "$CODE" "1.0.$CODE" release-notes.md || true
 
       - name: Announce in Telegram
         # Only when asked for (the announce input); a Telegram failure never fails the release.

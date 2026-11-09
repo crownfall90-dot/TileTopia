@@ -8,8 +8,8 @@ on:
       store:
         description: Which players to notify
         type: choice
-        options: [play, github]
-        default: play
+        options: [play, github, staging]
+        default: github
       code:
         description: Version code that is now available (e.g. 107)
         required: true
