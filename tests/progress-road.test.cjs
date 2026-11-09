@@ -1,14 +1,18 @@
-// The progress road: every next stage is +5 levels and +250 cups.
+// The progress road: starts from level 1 (cups: 0), then each next stage is +5 levels and +250 cups.
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 
-test('progress road: each stage is +5 levels and +250 cups', () => {
+test('progress road: begins at level 1 and each next stage is +5 levels and +250 cups', () => {
   const src = fs.readFileSync(__dirname + '/../web/game.html', 'utf8');
   const m = [...src.matchAll(/id: 'm\d+', lvl: (\d+), cups: (\d+),/g)].map(x => [+x[1], +x[2]]);
   assert.ok(m.length >= 10, 'the road has its stages');
-  m.forEach(([lvl, cups], i) => { assert.equal(lvl, 5 * (i + 1)); assert.equal(cups, 250 * (i + 1)); });
+  assert.deepEqual(m[0], [1, 0], 'starts at level 1 with 0 cups for new players');
+  m.slice(1).forEach(([lvl, cups], i) => {
+    assert.equal(lvl, 5 * (i + 1));
+    assert.equal(cups, 250 * (i + 1));
+  });
 });
 
 test('rating: a tap on a player is left to the global player-card handler (no second modal)', () => {

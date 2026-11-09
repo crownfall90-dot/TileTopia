@@ -3029,6 +3029,8 @@ function toastAny(t, kind, title) {
   // Top right, just under whatever sits at the top of the open screen (its header, the players' row, the menu plate),
   // so it never covers a button and is always in sight; above any open dialog.
   d.style.top = toastTop() + 'px';
+  d.style.bottom = 'auto';
+  d.style.height = 'auto';
   document.body.append(d);
 
   const close = () => {
@@ -4364,8 +4366,9 @@ function ptabsDot() {
     b.classList.toggle('hasdot', pt === 'rewards' ? (qDot || wqDot || aDot) : pt === 'top' ? tDot : false);
   });
 }
-// every next stage: +5 levels and +250 cups
+// road begins at level 1 (cups: 0), then every next stage: +5 levels and +250 cups
 const PROGRESS_ROAD_MILESTONES = [
+  { id: 'm1', lvl: 1, cups: 0, title: 'Старт', desc: 'Первый шаг на Дороге прогресса · +30 тайлов', reward: { gold: 30 }, ic: '🚩' },
   { id: 'm5', lvl: 5, cups: 250, title: 'Новичок', desc: '+50 тайлов и эмодзи 😎', reward: { gold: 50, emote: '😎' }, ic: '🌱' },
   { id: 'm10', lvl: 10, cups: 500, title: 'Следопыт', desc: 'Статус «Следопыт» и +80 тайлов', reward: { status: 'Следопыт', gold: 80 }, ic: '🧭' },
   { id: 'm15', lvl: 15, cups: 750, title: 'Зодчий', desc: '+120 тайлов и эмодзи 🏰', reward: { gold: 120, emote: '🏰' }, ic: '🏰' },
@@ -4439,9 +4442,37 @@ function roadMapHtml(ms, unlockedFn, claimed) {
   const all = [head, ...segs, tail];
   const pathD = c => `M${c[0][0]} ${c[0][1]}C${c[1][0]} ${c[1][1]} ${c[2][0]} ${c[2][1]} ${c[3][0]} ${c[3][1]}`;
   const samples = []; all.forEach(c => { for (let k = 0; k <= 36; k++) samples.push(cub(c[0], c[1], c[2], c[3], k / 36)); });
-  // how far the player has walked: the road up to the last open level glows gold
-  let last = -1; ms.forEach((m, i) => { if (unlockedFn(m)) last = i; });
-  const walked = segs.slice(0, Math.max(0, last)).concat(last >= 0 ? [] : []).map(pathD).join('');
+  const myLvl = (typeof PROG !== 'undefined' && PROG.lvl) || 1;
+  const myCups = ((typeof PROG !== 'undefined' && PROG.cups) || 0) + ((typeof PROG !== 'undefined' && PROG.hcups) || 0);
+  let curIdx = 0;
+  for (let i = 0; i < n; i++) {
+    if (unlockedFn(ms[i])) curIdx = i;
+  }
+  let playerX = P[curIdx].x, playerY = P[curIdx].y;
+  let partialWalked = '';
+  if (curIdx < n - 1) {
+    const nextMs = ms[curIdx + 1], prevMs = ms[curIdx];
+    const lvlFrac = Math.max(0, Math.min(1, (myLvl - prevMs.lvl) / Math.max(1, nextMs.lvl - prevMs.lvl)));
+    const cupsFrac = Math.max(0, Math.min(1, (myCups - prevMs.cups) / Math.max(1, nextMs.cups - prevMs.cups)));
+    const progressFrac = Math.max(0, Math.min(0.92, (lvlFrac + cupsFrac) / 2));
+    if (progressFrac > 0.03) {
+      const seg = segs[curIdx];
+      const pt = cub(seg[0], seg[1], seg[2], seg[3], progressFrac);
+      playerX = pt[0];
+      playerY = pt[1];
+      const p0 = seg[0], p1 = seg[1], p2 = seg[2], p3 = seg[3];
+      const lerp = (a, b, s) => [a[0] + (b[0] - a[0]) * s, a[1] + (b[1] - a[1]) * s];
+      const p01 = lerp(p0, p1, progressFrac), p12 = lerp(p1, p2, progressFrac), p23 = lerp(p2, p3, progressFrac);
+      const p012 = lerp(p01, p12, progressFrac);
+      const p0123 = lerp(p012, lerp(p12, p23, progressFrac), progressFrac);
+      partialWalked = 'C' + p01[0].toFixed(1) + ' ' + p01[1].toFixed(1) + ' ' + p012[0].toFixed(1) + ' ' + p012[1].toFixed(1) + ' ' + p0123[0].toFixed(1) + ' ' + p0123[1].toFixed(1);
+    }
+  }
+  let last = curIdx;
+  let walked = segs.slice(0, Math.max(0, curIdx)).map(pathD).join('');
+  if (partialWalked) {
+    walked += 'M' + P[curIdx].x + ' ' + P[curIdx].y + partialWalked;
+  }
   // rivers cross the road in the middle of three of its stretches, under a little plank bridge
   const rivers = [];
   [1, 4, 7].filter(k => k < segs.length).forEach(k => {
@@ -4499,15 +4530,22 @@ function roadMapHtml(ms, unlockedFn, claimed) {
   // the bridge lies along the road; its angle on screen depends on how wide the map is drawn (roadBridges sets it)
   const bridges = rivers.map(r => `<i class="rd-bridge" data-dx="${r.dx.toFixed(2)}" data-dy="${r.dy.toFixed(2)}" style="left:${(100 * r.m[0] / W).toFixed(2)}%;top:${Math.round(r.m[1])}px"></i>`).join('');
   // the levels
+  const curFig = (typeof wallet !== 'undefined' && wallet.fig) || 'classic';
+  const playerFigUrl = typeof figPreview === 'function' ? figPreview(curFig) : '';
+  const playerMarkerHtml = '<div class="rd-player-marker" style="left:' + (100 * playerX / W).toFixed(2) + '%;top:' + playerY.toFixed(1) + 'px">'
+    + '<div class="rd-player-bubble"><span class="rd-player-dot"></span><b>Вы здесь</b><small>' + myLvl + ' ур.</small></div>'
+    + '<div class="rd-player-fig">' + (playerFigUrl ? '<img src="' + playerFigUrl + '" alt="">' : '<span style="font-size:20px">👤</span>') + '</div></div>';
   const nodes = ms.map((m, i) => {
     const open = unlockedFn(m), got = claimed.includes(m.id), q = P[i];
+    const isCur = i === curIdx;
     const cls = got ? 'claimed' : open ? 'unlocked' : 'locked';
+    const herePill = isCur ? '<span class="rd-here-pill">📍 Вы здесь</span>' : '';
     const act = got ? '<span class="rd-tag">✓ Получено</span>' : open ? `<button class="chip pri" data-claimroad="${m.id}">Забрать</button>` : `<span class="rd-tag">🔒 ${m.lvl} ур. и ${m.cups} 🏆</span>`;
-    return `<div class="rd-n ${cls}${i === last + 1 || (last === n - 1 && i === n - 1) ? ' next' : ''}" style="left:${(100 * q.x / W).toFixed(2)}%;top:${q.y}px">`
-      + `<div class="rd-sign"><b>${m.title}</b><small>${m.desc}</small></div>`
+    return `<div class="rd-n ${cls}${isCur ? ' current-milestone' : ''}${i === last + 1 || (last === n - 1 && i === n - 1) ? ' next' : ''}" style="left:${(100 * q.x / W).toFixed(2)}%;top:${q.y}px">`
+      + `<div class="rd-sign"><b>${m.title}</b><small>${m.desc}</small>${herePill}</div>`
       + `<span class="rd-med"><em>${m.lvl}</em>${got ? '✓' : m.ic}</span>${act}</div>`;
   }).join('');
-  return `<div class="rd-map" style="height:${H}px">${svg}${bridges}${sprHtml}${nodes}</div>`;
+  return `<div class="rd-map" style="height:${H}px">${svg}${bridges}${sprHtml}${playerMarkerHtml}${nodes}</div>`;
 }
 let roadScroll = false;
 function renderAchievements() {
@@ -4575,8 +4613,8 @@ function renderProgressRoad() {
   roadBridges();
   if (roadScroll) {   // opening the tab: bring the level the player is at into view
     roadScroll = false;
-    const el = track.querySelector('.rd-n.unlocked') || track.querySelector('.rd-n.next') || track.querySelector('.rd-n:last-child');
-    if (el) requestAnimationFrame(() => el.scrollIntoView({block: 'center'}));
+    const el = track.querySelector('.rd-player-marker') || track.querySelector('.rd-n.current-milestone') || track.querySelector('.rd-n.unlocked') || track.querySelector('.rd-n.next');
+    if (el) requestAnimationFrame(() => el.scrollIntoView({block: 'center', behavior: 'smooth'}));
   }
 }
 
