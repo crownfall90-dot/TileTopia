@@ -598,6 +598,10 @@ export function renderShopStallsShowcase({
                 <h3 class="stall-title">${title}</h3>
                 <p class="stall-sub">${sub}</p>
               </div>
+              <button class="stall-hint-btn" data-stall-hint="${stallClass}" type="button" aria-label="Что за прилавок?">
+                <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
+                <span>Что это?</span>
+              </button>
             </div>
             <div class="stall-post-right"></div>
           </div>
@@ -758,16 +762,19 @@ export function renderShopStallsShowcase({
     totalPoolSize: avItems.length,
     emptyText: 'Все картинки профиля собраны! Выбирайте в «Мои предметы» → «Аватар».',
     renderCardFn: item => {
-      const canAfford = canPay(wallet, item.price);
+      const needsBanner = item.kind === 'banner' && !AV.owns(w, 'shape', 'rect');
+      const canAfford = !needsBanner && canPay(wallet, item.price);
       const shape = item.kind === 'banner' || item.key === 'rect' ? ' sh-rect' : item.key === 'square' ? ' sh-square' : '';
       const pic = item.kind === 'shape' ? '' : ` pic" style="--c:${wallet.color || '#3a7bd5'};--pic:url(${item.src});--pp:${item.pos}`;
       const label = item.kind === 'shape' ? `Форма: ${item.name}` : item.kind === 'banner' ? `Баннер «${item.name}»` : item.name;
+      const btnText = needsBanner ? 'Нужен баннер' : priceTag(item.price);
       return `
-        <div class="stall-item avatar-stall-card" data-stall-card="1" data-kind="av" data-key="${item.kind}:${item.key}" data-name="${label}" data-price="${item.price}">
+        <div class="stall-item avatar-stall-card${needsBanner ? ' lock-need-banner' : ''}" data-stall-card="1" data-kind="av" data-key="${item.kind}:${item.key}" data-name="${label}" data-price="${item.price}" data-needs-banner="${needsBanner ? '1' : '0'}">
+          ${needsBanner ? '<span class="stall-need-pill">Сначала баннер</span>' : ''}
           <div class="av-pedestal"><span class="av${shape}${pic || `" style="--c:${wallet.color || '#3a7bd5'}`}">${fname}</span></div>
           <b class="stall-item-name">${label}</b>
-          <button class="stall-buy-btn${!canAfford ? ' poor' : ''}" data-daily-buy="av|${item.kind}:${item.key}|${item.price}">
-            ${priceTag(item.price)}
+          <button class="stall-buy-btn${!canAfford ? ' poor' : ''}${needsBanner ? ' locked' : ''}" data-daily-buy="av|${item.kind}:${item.key}|${item.price}" ${needsBanner ? 'disabled title="Сначала откройте форму баннера"' : ''}>
+            ${btnText}
           </button>
         </div>
       `;
@@ -828,3 +835,37 @@ export function getItemDescription(kind, key = '', name = '') {
     where: 'Видно всем игрокам при просмотре вашего профиля, в главном меню и в карточке игрока.'
   };
 }
+
+
+export const STALL_HINTS = {
+  'stall-avatars': {
+    title: 'Картинки профиля',
+    what: 'Формы аватарок (круг, квадрат, баннер), портреты героев и панорамы королевства.',
+    where: 'Отображаются в вашем профиле, на карточке игрока и в главном меню.'
+  },
+  'stall-figures': {
+    title: 'Фигурки героев',
+    what: 'Уникальные 3D-персонажи на игровом поле (рыцарь, маг, лучник и др.).',
+    where: 'Вашу фигурку видят все игроки за столом и в панели текущего хода.'
+  },
+  'stall-frames': {
+    title: 'Рамки аватара',
+    what: 'Драгоценные окаймления для аватарки с благородным сиянием.',
+    where: 'Украшают ваш профиль, карточку игрока и списки лидеров.'
+  },
+  'stall-statuses': {
+    title: 'Статусы игрока',
+    what: 'Почётные звания под вашим никнеймом («Гроссмейстер», «Тактик», «Зодчий»).',
+    where: 'Видны всем игрокам в партии, рейтинге и профиле.'
+  },
+  'stall-emotes': {
+    title: 'Эмодзи',
+    what: 'Быстрые визуальные реакции во время партии.',
+    where: 'Показываются над полем в реальном времени, когда вы реагируете на ходы.'
+  },
+  'stall-phrases': {
+    title: 'Боевые фразы',
+    what: 'Реплики для внутриигрового чата в партии.',
+    where: 'Отображаются в виде всплывающего облака диалога над вашей фигуркой.'
+  }
+};

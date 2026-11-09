@@ -8,6 +8,12 @@ export const INBOX_ITEMS = [
     rewardType: 'status', rewardKey: 'ex:old', rewardTitle: 'Статус «Олд»', actionLabel: 'Забрать статус'
   },
   {
+    id: 'notif_name_proposal_reward', category: 'rewards', icon: '💡', badge: 'Награда', badgeClass: 'b-gold',
+    title: 'Награда: +300 тайлов за название игры', date: 'Награда',
+    desc: 'Благодарим вас за предложение названия для нашей игры! Конкурс завершён, игра официально называется Tiletopia. В награду вам начислено 300 тайлов.',
+    rewardType: 'gold', rewardAmount: 300, rewardTitle: '+300 тайлов', actionLabel: 'Забрать 300 тайлов'
+  },
+  {
     id: 'notif_welcome_gold', category: 'rewards', icon: '🪙', badge: 'Подарок', badgeClass: 'b-gold',
     title: 'Подарок: +500 тайлов', date: 'Награда',
     desc: 'Тайлы на витрину: фигурки, рамки, картинки профиля и статусы.',

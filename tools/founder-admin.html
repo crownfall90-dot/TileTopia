@@ -375,6 +375,7 @@ body:not(.authed) main > .card:not(#loginCard) { display: none; }
       <button class="btn pl-filter-btn active" id="btnFilterEmpty">Скрывать пустых гостей</button>
       <button class="btn btn-purge" id="btnPurgeEmpty" title="Удалить пустые аккаунты nickname<№> без сыгранных партий и без профиля">🧹 Очистить пустых гостей</button>
       <button class="btn" id="btnErrors">⚠️ Последние ошибки</button>
+      <button class="btn btn-primary" id="btnExportLogsToAgents" title="Синхронизировать ошибки, логи и аналитику в отдельную ветку telemetry/agent-hub для агентов Antigravity и Claude">🚀 Данные агентам (telemetry/agent-hub)</button>
     </div>
     <div class="pl-list" id="plList"><div class="stat-sub">Загрузка…</div></div>
     <div id="plDetail" hidden></div>
@@ -488,6 +489,7 @@ body:not(.authed) main > .card:not(#loginCard) { display: none; }
       <button class="pill" data-st="new">Только новые</button><button class="pill" data-st="done">Готовые</button>
       <input class="field" id="fbSearch" placeholder="Поиск по тексту" style="max-width:220px;margin-left:auto">
       <button class="btn" id="btnFbReload">↻</button>
+      <button class="btn btn-primary" id="btnExportFeedbackToAgents" style="margin-left:8px">🚀 Отзывы и жалобы агентам</button>
     </div>
     <div id="fbList"><div class="stat-sub">Войдите, чтобы увидеть отзывы.</div></div>
   </div>
@@ -495,7 +497,7 @@ body:not(.authed) main > .card:not(#loginCard) { display: none; }
   <!-- 6.6 ПРЕДЛОЖЕНИЯ НОВОГО НАЗВАНИЯ -->
   <div class="card" id="nameSuggestionsCard" style="grid-column: 1 / -1">
     <div class="card-title">
-      <span>💡 Предложения нового названия игры</span>
+      <span>💡 Итоги конкурса названий (Tiletopia) & Награда 300 тайлов</span>
       <span style="font-size:12px;color:var(--muted)" id="nameSuggCount">—</span>
     </div>
     <div style="display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin-bottom:8px">
@@ -1341,7 +1343,7 @@ async function openPlayer(uid) {
     const frGames = (bm.friends && bm.friends.games) || 0;
     const btGames = (bm.bots && bm.bots.games) || (st.games ? Math.max(0, st.games - onGames - frGames) : 0);
 
-    box.innerHTML = `<div class="card-title" style="margin-top:6px"><span>${esc(pres.n || 'Игрок')}</span><span style="display:flex;gap:8px"><button class="btn" id="plResetStatus" style="color:var(--danger)">🚫 Сбросить статус</button><button class="btn" id="plDelete" style="color:var(--danger)">🗑 Удалить аккаунт</button><button class="btn" id="plClose">Закрыть</button></span></div>
+    box.innerHTML = `<div class="card-title" style="margin-top:6px"><span>${esc(pres.n || 'Игрок')}</span><span style="display:flex;gap:8px"><button class="btn" id="plResetStatus" style="color:var(--danger)">🚫 Сбросить статус</button><button class="btn" id="plGiveCoins" style="color:var(--accent)">💰 +300 тайлов</button><button class="btn" id="plResetRating" style="color:var(--warning)">🏅 Сбросить рейтинг</button><button class="btn" id="plDelete" style="color:var(--danger)">🗑 Удалить аккаунт</button><button class="btn" id="plClose">Закрыть</button></span></div>
       <div class="pl-info">${cell('Id игрока', uid)}${cell('Профиль', (pres.r || prof) ? 'сохранён' : 'гость')}${cell('Платформа', PLAT[pres.p] || pres.p)}${cell('Версия', pres.v)}${cell('Устройство', pres.m ? pres.m + (pres.i ? ' · ' + pres.i + '″' : '') : '')}${cell('Был в сети', fmtT(pres.t) + ' (' + ago(pres.t) + ')')}${cell('Сеть', pres.s)}${cell('Статус игрока', playerStatus ? `«${esc(playerStatus)}»` : '—')}
       ${cell('Первый день', pres.fs || '—')}${cell('Удержание D1', d1Label)}${cell('Удержание D7', d7Label)}
       ${cell('Кубки', lead && lead.r)}${cell('Побед онлайн', lead && lead.w)}${cell('Уровень', w.prog && w.prog.lvl)}${cell('Опыт', w.prog && w.prog.xp)}${cell('Золото', w.gold)}${cell('Фигурок куплено', w.owned && w.owned.length)}${cell('Всего партий', st.games)}${cell('Онлайн / Друзья / Боты', `${onGames} / ${frGames} / ${btGames}`)}${cell('Побед', st.wins)}${cell('Рекорд очков', st.best)}${cell('Синхр. профиля', prof && prof.t ? fmtT(prof.t) : '')}${cell('Обращений', fb ? Object.keys(fb).length : 0)}</div>
@@ -1394,6 +1396,78 @@ async function openPlayer(uid) {
     };
     $('plCopy').onclick = () => navigator.clipboard.writeText(`Игрок ${pres.n || ''} (${uid})\n` + rows.map(r => `${fmtT(r.t)}  ${r.k}  ${r.d || ''}`).join('\n')).then(() => log('Журнал скопирован')).catch(() => log('Не удалось скопировать'));
     $('plClear').onclick = async () => { if (!confirm('Очистить журнал этого игрока?')) return; try { await db('logs/' + uid, 'DELETE'); log('Журнал очищен'); openPlayer(uid); } catch (e) { log('Не вышло: ' + e.message); } };
+    
+    $('plClose').onclick = () => { box.hidden = true; };
+    $('plDelete').onclick = async () => {
+      if (!confirm(`Удалить игрока ${pres.n || uid} навсегда из игры, базы и всех рейтингов?`)) return;
+      $('plDelete').disabled = true;
+      $('plDelete').textContent = 'Удаляем…';
+      try {
+        const fcode = await db('fcodeOf/' + uid).catch(() => null);
+        const paths = [
+          'presence/' + uid,
+          'profiles/' + uid,
+          'leaders/' + uid,
+          'leaders_hex/' + uid,
+          'playerNo/' + uid,
+          'fcodeOf/' + uid,
+          'friends/' + uid,
+          'inbox/' + uid,
+          'titles/' + uid,
+          'logs/' + uid
+        ];
+        if (fcode) paths.push('fcodes/' + fcode);
+        await Promise.all(paths.map(p => db(p, 'DELETE')));
+        alert(`Игрок ${pres.n || uid} успешно удалён из игры и рейтинга!`);
+        box.hidden = true;
+        loadPlayers();
+      } catch (err) {
+        alert('Ошибка удаления: ' + err.message);
+        $('plDelete').disabled = false;
+        $('plDelete').textContent = '🗑 Удалить аккаунт';
+      }
+    };
+    $('plResetStatus').onclick = async () => {
+      if (!confirm(`Сбросить статус игрока ${pres.n || uid}?`)) return;
+      await Promise.all([
+        db('presence/' + uid + '/st', 'DELETE'),
+        db('leaders/' + uid + '/st', 'DELETE'),
+        db('leaders_hex/' + uid + '/st', 'DELETE')
+      ]);
+      alert('Статус игрока сброшен.');
+      openPlayer(uid);
+    };
+    if ($('plResetRating')) $('plResetRating').onclick = async () => {
+      if (!confirm(`Обнулить рейтинг (кубки) игрока ${pres.n || uid}?`)) return;
+      await Promise.all([
+        db('leaders/' + uid, 'DELETE'),
+        db('leaders_hex/' + uid, 'DELETE')
+      ]);
+      alert('Рейтинг обнулён.');
+      openPlayer(uid);
+    };
+    if ($('plGiveCoins')) $('plGiveCoins').onclick = async () => {
+      try {
+        let curW = {}; try { curW = JSON.parse((prof && prof.w) || '{}'); } catch (_) {}
+        curW.coins = curW.coins || {};
+        curW.coins.tile = (curW.coins.tile || curW.gold || 0) + 300;
+        curW.gold = curW.coins.tile;
+        await db('profiles/' + uid + '/w', 'PUT', JSON.stringify(curW));
+        await db('inbox/' + uid + '/admin_gift_' + Date.now(), 'PUT', {
+          id: 'admin_gift_' + Date.now(),
+          k: 'reward',
+          t: '🎁 Начислено +300 тайлов',
+          m: 'Вам начислено 300 тайлов на баланс игры!',
+          gold: 300,
+          coin: 'tile',
+          time: Date.now()
+        });
+        alert('Игроку успешно начислено 300 тайлов!');
+        openPlayer(uid);
+      } catch (err) {
+        alert('Ошибка начисления: ' + err.message);
+      }
+    };
     box.scrollIntoView({behavior: 'smooth', block: 'nearest'});
   } catch (e) { box.innerHTML = '<div class="stat-sub">' + esc(e.message) + '</div>'; }
 }
@@ -1402,7 +1476,7 @@ async function loadErrors() {
   try {
     const all = await db('errors?orderBy="$key"&limitToLast=80') || {};
     const rows = Object.values(all).filter(Boolean).sort((a, b) => (b.ts || 0) - (a.ts || 0));
-    box.innerHTML = `<div class="card-title" style="margin-top:6px"><span>⚠️ Последние ошибки (${rows.length})</span><button class="btn" id="plClose">Закрыть</button></div><div class="pl-log">${rows.map(r => `<div class="pl-log-item err"><div class="log-head"><span class="log-ic">⚠️</span><b class="log-title">${esc(r.ver || 'error')}</b><span class="log-tag">error</span><time class="log-time">${fmtT(r.ts)}</time></div><div class="log-desc"><span>${esc(r.m)}${r.uid ? ` · <a href="#" data-pl="${esc(r.uid)}" style="color:var(--accent)">игрок</a>` : ''}</span>${r.dev ? `<div style="font-size:11px;color:var(--muted);margin-top:2px">📱 ${esc(r.dev)}</div>` : ''}${r.trail ? `<div style="font-size:10.5px;color:var(--muted);opacity:.8">👣 ${esc(r.trail)}</div>` : ''}</div></div>`).join('') || '<div class="stat-sub">Ошибок нет</div>'}</div>`;
+    box.innerHTML = `<div class="card-title" style="margin-top:6px"><span>⚠️ Последние ошибки (${rows.length})</span><div style="display:flex;gap:8px"><button class="btn btn-primary" id="btnExportErrorsNow">🚀 Отправить агентам в telemetry/agent-hub</button><button class="btn" id="plClose">Закрыть</button></div></div>`;<div class="pl-log">${rows.map(r => `<div class="pl-log-item err"><div class="log-head"><span class="log-ic">⚠️</span><b class="log-title">${esc(r.ver || 'error')}</b><span class="log-tag">error</span><time class="log-time">${fmtT(r.ts)}</time></div><div class="log-desc"><span>${esc(r.m)}${r.uid ? ` · <a href="#" data-pl="${esc(r.uid)}" style="color:var(--accent)">игрок</a>` : ''}</span>${r.dev ? `<div style="font-size:11px;color:var(--muted);margin-top:2px">📱 ${esc(r.dev)}</div>` : ''}${r.trail ? `<div style="font-size:10.5px;color:var(--muted);opacity:.8">👣 ${esc(r.trail)}</div>` : ''}</div></div>`).join('') || '<div class="stat-sub">Ошибок нет</div>'}</div>`;
     $('plClose').onclick = () => { box.hidden = true; };
   } catch (e) { box.innerHTML = '<div class="stat-sub">' + esc(e.message) + '</div>'; }
 }

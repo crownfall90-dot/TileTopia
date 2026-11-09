@@ -1,0 +1,55 @@
+name: Agent Telemetry & Analytics Hub
+
+on:
+  schedule:
+    # Run twice daily to sync latest telemetry & player feedback to developer agents
+    - cron: '0 6,18 * * *'
+  workflow_dispatch:
+    inputs:
+      action:
+        description: 'Action to run (all, delete_daem, reward_names, export_only)'
+        type: string
+        default: 'all'
+
+permissions:
+  contents: write
+
+jobs:
+  telemetry:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Run maintenance and generate agent analytics
+        env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+          FIREBASE_DB_URL: 'https://puzzlegrad-default-rtdb.europe-west1.firebasedatabase.app'
+        run: |
+          python3 scripts/manage-maintenance.py "${{ inputs.action || 'all' }}" --apply
+
+      - name: Commit and push telemetry data to branch telemetry/agent-hub
+        run: |
+          git config user.name "TileTopia Agent Bot"
+          git config user.email "bot@tiletopia.app"
+          
+          # Check out or create orphan branch telemetry/agent-hub
+          if git show-ref --quiet refs/remotes/origin/telemetry/agent-hub; then
+            git checkout -B telemetry/agent-hub origin/telemetry/agent-hub
+          else
+            git checkout --orphan telemetry/agent-hub
+            git rm -rf . || true
+          fi
+          
+          # Copy agent data
+          mkdir -p agent_data
+          cp -r ../TileTopia/agent_data/* agent_data/ 2>/dev/null || cp -r agent_data/* . 2>/dev/null || true
+          
+          git add agent_data/ || git add .
+          git commit -m "chore(telemetry): update errors, player feedback, and analytics data [skip ci]" || echo "No changes to commit"
+          git push -u origin telemetry/agent-hub --force

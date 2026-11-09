@@ -33,6 +33,7 @@ export const ownsShape = (w, s) => owns(w, 'shape', s);
 
 /** Buys a portrait, a banner or a shape ('pic' | 'banner' | 'shape'). {ok} or {ok: false, reason: 'unknown' | 'owned' | 'gold'}. */
 export function buy(w, kind, id) {
+  if (kind === 'banner' && !owns(w, 'shape', 'rect')) return {ok: false, reason: 'need_banner'};
   const item = kind === 'shape' ? SHAPES[id] : POOL[kind] && POOL[kind][0][id];
   if (!item) return {ok: false, reason: 'unknown'};
   if (owns(w, kind, id)) return {ok: false, reason: 'owned'};
