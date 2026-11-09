@@ -1,9 +1,10 @@
 const test = require('node:test');
 const assert = require('node:assert');
 const path = require('node:path');
+const {pathToFileURL} = require('node:url');
 
 test('best move names the biggest single score and its object', async () => {
-  const {renderBestMoveHtml} = await import(path.join(__dirname, '..', 'src/ui/results.js'));
+  const {renderBestMoveHtml} = await import(pathToFileURL(path.join(__dirname, '..', 'src/ui/results.js')).href);
   const html = renderBestMoveHtml([
     {name: 'Аня', col: '#f00', best: {pts: 9, kind: 'r', n: 9}},
     {name: 'Боря', col: '#0f0', best: {pts: 14, kind: 'c', n: 7}},
@@ -15,6 +16,6 @@ test('best move names the biggest single score and its object', async () => {
 });
 
 test('no best move line when nobody scored an object', async () => {
-  const {renderBestMoveHtml} = await import(path.join(__dirname, '..', 'src/ui/results.js'));
+  const {renderBestMoveHtml} = await import(pathToFileURL(path.join(__dirname, '..', 'src/ui/results.js')).href);
   assert.strictEqual(renderBestMoveHtml([{name: 'А', col: '#000'}, {name: 'Б', col: '#111', best: {pts: 0, kind: 'c', n: 2}}]), '');
 });

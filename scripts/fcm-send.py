@@ -39,7 +39,7 @@ def main():
         data = {'type': 'news', 'title': os.environ['NEWS_TITLE'].strip()[:80], 'body': os.environ['NEWS_BODY'].strip()[:600]}
     else:
         topic, code, version, notes_file = sys.argv[1:5]
-        notes = open(notes_file, encoding='utf-8').read().strip()[:1500]
+        notes = "Доступно новое обновление"
         data = {'code': str(code), 'version': version, 'notes': notes}
     msg = {'message': {'topic': topic, 'android': {'priority': 'high'}, 'data': data}}
     req = urllib.request.Request(f"https://fcm.googleapis.com/v1/projects/{sa['project_id']}/messages:send",

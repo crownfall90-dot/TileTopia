@@ -1,5 +1,6 @@
 // Progress and profile UI helpers (E-1.4)
 // Renders level circles, mastery grids, and quests.
+import {uiIcon} from './icons.js';
 
 /** Generates circular SVG progress ring. */
 export function ringSvg(frac) {
@@ -17,16 +18,16 @@ export function renderMasteryGrid(byMode = {}) {
     const body = g ? `<small>${rate}% (${w}/${g}) · рек. ${m.best || 0}</small>` : '<small class="mnone">Сыграйте первую партию</small>';
     return `<div class="mcard${g ? '' : ' empty'}"><span class="mic">${ic}</span><div><b>${name}</b>${body}</div></div>`;
   };
-  return `<div class="mgrid">${tile('bots', '🤖', 'Боты')}${tile('friends', '👥', 'Друзья')}${tile('online', '🌐', 'Онлайн')}</div>`;
+  return `<div class="mgrid">${tile('bots', uiIcon('bot', 22), 'Боты')}${tile('friends', uiIcon('friends', 22), 'Друзья')}${tile('online', uiIcon('globe', 22), 'Онлайн')}</div>`;
 }
 
 /** Generates HTML markup for completed features summary (cities, roads, forts). */
 export function renderBuildingStats(st = {}) {
   const maxCityText = st.maxCity ? ` <small>(рекорд: ${st.maxCity} карт)</small>` : '';
   return `<div class="sbuild">` +
-    `<span>🏰 <b>${st.c || 0}</b> городов${maxCityText}</span>` +
-    `<span>🛤 <b>${st.r || 0}</b> дорог</span>` +
-    `<span>⛪ <b>${st.f || 0}</b> монастырей</span>` +
+    `<span>${uiIcon('castle', 18)} <b>${st.c || 0}</b> городов${maxCityText}</span>` +
+    `<span>${uiIcon('road', 18)} <b>${st.r || 0}</b> дорог</span>` +
+    `<span>${uiIcon('monastery', 18)} <b>${st.f || 0}</b> монастырей</span>` +
     `</div>`;
 }
 

@@ -625,7 +625,7 @@ export function renderShopStallsShowcase({
     renderCardFn: item => {
       const canAfford = canPay(wallet, item.price);
       return `
-        <div class="stall-item fig-stall-card">
+        <div class="stall-item fig-stall-card" data-stall-card="1" data-kind="fig" data-key="${item.key}" data-name="${item.name}" data-price="${item.price}">
           <div class="fig-pedestal-wrap">
             <div class="fig-shadow"></div>
             <img class="fig-art" src="${figPreview(item.key)}" alt="${item.name}">
@@ -653,7 +653,7 @@ export function renderShopStallsShowcase({
       const canAfford = canPay(wallet, item.price);
       const ring = item.ring || (frames[item.key] && frames[item.key].ring) || '';
       return `
-        <div class="stall-item frame-stall-card">
+        <div class="stall-item frame-stall-card" data-stall-card="1" data-kind="frame" data-key="${item.key}" data-name="${item.name}" data-price="${item.price}">
           <div class="frame-cushion-wrap">
             <span class="av${ring ? ' fr' : ''}" style="--c:${wallet.color || '#3a7bd5'};${ring ? `--fr:${ring}` : ''};width:46px;height:46px;font-size:18px">${fname}</span>
           </div>
@@ -678,7 +678,7 @@ export function renderShopStallsShowcase({
     renderCardFn: item => {
       const canAfford = canPay(wallet, item.price);
       return `
-        <div class="stall-item status-stall-card">
+        <div class="stall-item status-stall-card" data-stall-card="1" data-kind="status" data-key="${item.key}" data-name="${item.name}" data-price="${item.price}">
           <div class="status-plate-wrap">
             <span class="stchip stall-chip">${item.name}</span>
           </div>
@@ -703,7 +703,7 @@ export function renderShopStallsShowcase({
       const canAfford = canPay(wallet, item.price);
       const rarClass = item.rarity ? ' r-' + item.rarity : '';
       return `
-        <div class="stall-item emote-stall-card${rarClass}">
+        <div class="stall-item emote-stall-card${rarClass}" data-stall-card="1" data-kind="emote" data-key="${item.key}" data-name="${item.name}" data-price="${item.price}">
           <div class="emote-token-wrap">
             <span class="stall-emote-icon">${item.key}</span>
             <small class="stall-rar-tag">${item.name}</small>
@@ -729,7 +729,7 @@ export function renderShopStallsShowcase({
       const canAfford = canPay(wallet, item.price);
       const rarClass = item.rarity ? ' r-' + item.rarity : '';
       return `
-        <div class="stall-item phrase-stall-card${rarClass}">
+        <div class="stall-item phrase-stall-card${rarClass}" data-stall-card="1" data-kind="phrase" data-key="${item.key}" data-name="${item.name}" data-price="${item.price}">
           <div class="phrase-scroll-wrap">
             <span class="chat-msg"><i class="chat-av" style="--c:${wallet.color || '#3a7bd5'}">${fname}</i><span class="chat-bubble">${item.key}</span></span>
             <small class="stall-rar-tag">${item.name}</small>
@@ -763,7 +763,7 @@ export function renderShopStallsShowcase({
       const pic = item.kind === 'shape' ? '' : ` pic" style="--c:${wallet.color || '#3a7bd5'};--pic:url(${item.src});--pp:${item.pos}`;
       const label = item.kind === 'shape' ? `Форма: ${item.name}` : item.kind === 'banner' ? `Баннер «${item.name}»` : item.name;
       return `
-        <div class="stall-item avatar-stall-card">
+        <div class="stall-item avatar-stall-card" data-stall-card="1" data-kind="av" data-key="${item.kind}:${item.key}" data-name="${label}" data-price="${item.price}">
           <div class="av-pedestal"><span class="av${shape}${pic || `" style="--c:${wallet.color || '#3a7bd5'}`}">${fname}</span></div>
           <b class="stall-item-name">${label}</b>
           <button class="stall-buy-btn${!canAfford ? ' poor' : ''}" data-daily-buy="av|${item.kind}:${item.key}|${item.price}">
@@ -784,4 +784,47 @@ export function renderShopStallsShowcase({
       ${phraseStallHtml}
     </div>
   `;
+}
+
+export function getItemDescription(kind, key = '', name = '') {
+  if (kind === 'fig') {
+    return {
+      type: 'Фигурка персонажа',
+      what: 'Уникальный персонаж для игрового поля. Заменяет стандартного деревянного мипла при выставлении на карту.',
+      where: 'Увидят все игроки на карте во время партии, в списке участников стола и в вашем профиле.'
+    };
+  }
+  if (kind === 'frame') {
+    return {
+      type: 'Рамка аватара',
+      what: 'Декоративная оправа для аватарки, подчёркивающая мастерство и достижения.',
+      where: 'Видна всем игрокам в лобби, во время партии, в таблице лидеров и в вашей карточке игрока.'
+    };
+  }
+  if (kind === 'status') {
+    return {
+      type: 'Почётный статус',
+      what: 'Звание под никнеймом, отражающее ваш стиль игры и статус среди игроков.',
+      where: 'Отображается под вашим именем в главном меню, в профиле, в рейтинге и во время сетевой игры.'
+    };
+  }
+  if (kind === 'emote') {
+    return {
+      type: 'Быстрая эмоция',
+      what: 'Эмодзи для быстрой эмоциональной реакции на действия соперников без лишних слов.',
+      where: 'Всплывает крупным значком над вашей аватаркой во время партии для всех участников.'
+    };
+  }
+  if (kind === 'phrase') {
+    return {
+      type: 'Фраза для чата',
+      what: 'Колоритная готовая реплика для быстрого общения за игровым столом.',
+      where: 'Появляется в виде всплывающего речевого облачка над вашим персонажем во время игры.'
+    };
+  }
+  return {
+    type: 'Оформление профиля',
+    what: 'Портрет персонажа или форма значка для персонализации вашего профиля.',
+    where: 'Видно всем игрокам при просмотре вашего профиля, в главном меню и в карточке игрока.'
+  };
 }

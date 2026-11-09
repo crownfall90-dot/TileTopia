@@ -81,7 +81,7 @@ public class UpdateNotifier extends JobService {
         }
         PendingIntent open = PendingIntent.getActivity(c, 0, new Intent(c, MainActivity.class)
                 .addFlags(Intent.FLAG_ACTIVITY_NEW_TASK | Intent.FLAG_ACTIVITY_CLEAR_TOP), PendingIntent.FLAG_IMMUTABLE);
-        String text = notes == null || notes.isEmpty() ? "Откройте игру, чтобы обновиться" : notes;
+        String text = "Доступно новое обновление";
         Notification.Builder b = Build.VERSION.SDK_INT >= 26 ? new Notification.Builder(c, CHANNEL) : new Notification.Builder(c);
         try {
         nm.notify(1, b.setSmallIcon(R.drawable.ic_stat_update)
