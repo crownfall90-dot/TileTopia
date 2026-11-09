@@ -7006,3 +7006,6 @@ html body .pl-v2-stat-lbl{font-size:10.5px}
 #bestmove span{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.7;margin-bottom:2px}
 /* settings: drawn line icons instead of emoji */
 .sic svg{color:var(--ink);opacity:.9}
+
+/* rating: Classic / Classic 2.0 switch above the board */
+.board-tabs{margin-bottom:6px}
