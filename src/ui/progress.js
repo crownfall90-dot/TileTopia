@@ -84,7 +84,7 @@ export function renderRewardsTabHtml({
   const ringSvg = (got, all, label) => { const f = all ? got / all : 0, C = 2 * Math.PI * 22; return `<span class="qk-ring"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="22" class="bg"/><circle cx="26" cy="26" r="22" class="fg" stroke-dasharray="${(C * f).toFixed(1)} ${C.toFixed(1)}"/></svg><b>${got}/${all}</b><small>${label}</small></span>`; };
   const hero = `<div class="qk-hero">${ringSvg(qGot, progQuests.length, 'сегодня')}${ringSvg(wqGot, progWeekly.length, 'неделя')}<div class="qk-hero-txt">${goalLine}<small>${canReroll ? 'Не нравится задание? Любое одно из сегодняшних можно заменить на новое — нажмите ↻ рядом с ним. Замена одна в день.' : 'Замену на сегодня вы уже использовали — завтра будут новые задания и новая замена.'}</small></div></div>`;
 
-  // the fortnight's challenge: one long task for stars, highlighted
+  // the challenge (twice a week): one long task for stars, highlighted
   const rareRow = challenge && challengeDef ? `<div class="h3 sec">Испытание<em>${challengeLeft}</em></div><div class="qk-list qk-rare">${card({ic: challengeDef.ic, title: challengeDef.t.replace(/^Испытание: /, ''), n: challenge.n, need: challengeDef.n, reward: challengeDef.s, coin: 'star', got: challenge.got, claim: 'data-claimrq="1"', kind: 'rare'})}</div>` : '';
   return `${hero}<div class="h3 sec">Задания на сегодня<em>${qGot} / ${progQuests.length}</em></div><div class="qk-list">${qRows}</div><div class="h3 sec">Недельные цели<em>${wqGot} / ${progWeekly.length}</em></div><div class="qk-list">${wqRows}${chestRow}</div>${rareRow}`;
 }

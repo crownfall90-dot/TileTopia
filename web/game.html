@@ -4219,9 +4219,9 @@ function questsWeekly() {
   PROG.wq = PG.state.progress.weeklyQuests(curWeek).map(q => ({id: q.id, n: 0, got: false}));
   PROG.wchest = false;
 }
-// The fortnight's challenge (src/state/progress.js CHALLENGES): a new one every two weeks, whether the old was done or not.
+// The challenge (src/state/progress.js CHALLENGES): a new one twice a week, whether the old was done or not.
 function challengeNow() {
-  const P = PG.state.progress, fn = P.fortnightId(P.weekId());
+  const P = PG.state.progress, fn = P.challengePeriod();
   if (PROG.rfn !== fn || !PROG.rq) { PROG.rfn = fn; PROG.rq = {id: P.challengeOf(fn).id, n: 0, got: false}; }
   return PROG.rq;
 }
@@ -4535,9 +4535,9 @@ function renderRoadQuestsInSheet() {
   if (body) body.innerHTML = rewardsHtml();
 }
 // Daily quests, weekly goals with the big chest, achievements: the list in the quests sheet of the progress screen.
-// Days left of the fortnight: a fortnight ends on the Sunday of its second week.
+// Days left of the challenge: the first one of a week ends on Wednesday, the second on Sunday.
 function challengeLeftText() {
-  const d = new Date(), wk = +PG.state.progress.weekId(d).split('-W')[1], left = (wk % 2 ? 7 : 0) + (7 - ((d.getDay() + 6) % 7));
+  const d = new Date(), wd = (d.getDay() + 6) % 7, left = wd < 3 ? 3 - wd : 7 - wd;
   return left <= 1 ? 'последний день' : `ещё ${left} дн.`;
 }
 function rewardsHtml() {

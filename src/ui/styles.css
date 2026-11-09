@@ -7114,7 +7114,7 @@ html body .tile-btn.tile-mode .t-title{overflow:visible;text-overflow:clip}
 .shop-stall.stall-phrases .stall-rar-tag{text-align:left}
 /* Toasts: top right under the screen's header (toastTop sets top), above dialogs */
 html body .tile-toast,html body .note{position:fixed;right:10px;left:auto;z-index:200;max-width:min(280px,calc(100vw - 20px))}
-/* The fortnight's challenge: a gold card that pays in stars */
+/* The challenge (twice a week): a gold card that pays in stars */
 .qk-list.qk-rare .qk{border:1.5px solid rgba(255,213,99,.65);background:linear-gradient(135deg,rgba(255,213,99,.16),rgba(176,108,240,.12));box-shadow:0 0 18px rgba(255,200,80,.18)}
 .qk-list.qk-rare .qk-ic{background:radial-gradient(circle at 35% 30%,#ffe9a8,#e0a93a)}
 
