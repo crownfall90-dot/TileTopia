@@ -562,6 +562,7 @@
           <div class="goldres" id="goldres" hidden></div>
           <div id="rres" hidden></div>
           <table class="bd"><thead><tr><th>Игрок</th><th>Города</th><th>Дороги</th><th>Монастыри</th><th>Ходов</th><th>Всего</th></tr></thead><tbody id="bd"></tbody></table>
+          <div id="bestmove" hidden></div>
           <div class="sumline" id="sumline"></div>
           <div class="ract"><button class="cta wide" id="again">Ещё партию</button><button class="ghostbtn" data-go="menu">В меню</button></div>
         </div>
@@ -1568,7 +1569,7 @@ async function resolveFeature(c, final, placer) {
   setTimeout(() => c.tiles.forEach(x => x.el.classList.remove('glow')), 1100);
   if (!win.length) { toast(`${KIND[c.kind]} ${{c: 'достроен', r: 'достроена', f: 'окружена'}[c.kind]} · фишек нет, очков нет`); await wait(600); return; }
   win.forEach(i => { const m = c.meeples.find(x => x.p === i); floatText(m.t, groupPos(m.t, m.g), '+' + each, players[i].col); });
-  win.forEach(i => { players[i].score += each; players[i].stats[c.kind] += each; });
+  win.forEach(i => { players[i].score += each; players[i].stats[c.kind] += each; const b = players[i].best; if (!b || each > b.pts) players[i].best = {pts: each, kind: c.kind, n: c.tiles.length}; });
   if (!final) markDone(c, win.map(i => players[i].col));
   if (!final && !fast()) {
     const n = c.tiles.length;
@@ -2092,6 +2093,7 @@ function renderResults(final, gold) {
   $('#sumline').innerHTML = (PG.ui && PG.ui.results)
     ? PG.ui.results.renderSummaryLineHtml({tilesCount: tiles.size, movesCount: moves, figsCount: figs, deckCount: deck.length})
     : `<span><b>${tiles.size}</b>карт на поле</span><span><b>${moves}</b>ходов</span><span><b>${figs}</b>фишек выставлено</span><span><b>${deck.length}</b>карт в стопке</span>`;
+  { const bm = $('#bestmove'); if (bm) { const h = PG.ui && PG.ui.results && PG.ui.results.renderBestMoveHtml ? PG.ui.results.renderBestMoveHtml(oClean) : ''; bm.innerHTML = h; bm.hidden = !h; } }
   const ag = $('#again'); if (ag) { ag.textContent = net ? 'Реванш' : 'Ещё партию'; ag.disabled = false; }
 }
 
@@ -2752,13 +2754,20 @@ document.addEventListener('visibilitychange', () => {
 // Synthesised effects and music live in src/audio/sound.js.
 function musicLevel() { return !wallet.music ? 0 : document.hidden ? 0 : gameVisible ? .045 : .075; }
 const sound = PG.audio.createSound({sfxOn: () => !!wallet.sound && !fast(), musicLevel});
-const {audio, beep, musicUpdate} = sound;
+const {audio, beep: beepSound, musicUpdate} = sound;
+// The phone answers the key moments of a game with a short buzz of its own (Settings → Vibration).
+const BUZZ = {place: 18, meeple: [12, 30, 12], score: [20, 40, 20], big: [30, 50, 30, 50, 60], win: [40, 60, 40, 60, 120], lose: 90};
+function beep(kind) {
+  beepSound(kind);
+  if (!wallet.vib || fast() || !BUZZ[kind]) return;
+  try { if (navigator.vibrate) navigator.vibrate(BUZZ[kind]); } catch (_) {}
+}
 // A quiet click on menu buttons.
 document.addEventListener('click', e => { if (e.target.closest('button') && !e.target.closest('#scr-game .board')) beep('tap'); });
 /* ---------------- settings ---------------- */
 // Phones with little memory start on the light graphics (no tile sides, shadows and trees).
 const weakDevice = (navigator.deviceMemory || 4) <= 2 || (navigator.hardwareConcurrency || 4) <= 2;
-Object.assign(wallet, Object.assign({music: true, notify: true, coach: 'tip', view: '3d', botlvl: 'normal', speed: 'normal', gfx: weakDevice ? 'low' : 'high', zones: true, alert: true}, wallet));
+Object.assign(wallet, Object.assign({music: true, notify: true, coach: 'tip', view: '3d', botlvl: 'normal', speed: 'normal', gfx: weakDevice ? 'low' : 'high', zones: true, alert: true, vib: true}, wallet));
 const applyGfx = () => document.documentElement.classList.toggle('lowgfx', wallet.gfx === 'low');
 applyGfx();
 function renderPrefs() {
@@ -2767,7 +2776,7 @@ function renderPrefs() {
     const ctl = sw
       ? `<button class="tgl" role="switch" data-pref="${r.k}" aria-checked="${!!wallet[r.k]}" aria-label="${r.label}"><span></span></button>`
       : `<span class="mseg" data-pref="${r.k}">${r.opts.map(([v, l], i) => `<button data-i="${i}" aria-pressed="${wallet[r.k] === v}">${l}</button>`).join('')}</span>`;
-    return `<div class="srow${sw ? '' : ' sseg'}"><span class="sic">${r.ic}</span><span class="stx"><b>${r.label}</b><small>${r.hint}</small></span>${ctl}</div>`;
+    return `<div class="srow${sw ? '' : ' sseg'}"><span class="sic">${(PG.ui.icons && PG.ui.icons.prefIcon(r.k)) || r.ic}</span><span class="stx"><b>${r.label}</b><small>${r.hint}</small></span>${ctl}</div>`;
   };
   $('#prefs').innerHTML = PREF_GROUPS.map(([title, keys]) => {
     const rows = keys.map(k => PREFS.find(r => r.k === k)).filter(r => !r.app || window.AndroidApp);

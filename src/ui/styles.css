@@ -5838,7 +5838,7 @@ html body #btnMenuNotif .nb-icon svg {
   .ach-card { flex-wrap: wrap; }
   .ach-qt { min-width: 0; }
   .ach-action-wrap { flex: 1 0 100%; display: flex; }
-  .ach-action-wrap .ach-claim-btn, .ach-action-wrap .pill { flex: 1; min-height: 44px; justify-content: center; text-align: center; }
+  .ach-action-wrap .ach-claim-btn, .ach-action-wrap .pill { flex: 1; min-height: 44px; display: flex; align-items: center; justify-content: center; text-align: center; }
 }
 @media (prefers-reduced-motion: reduce) {
   .ach-claim-btn, .ach-card.ready-glow { animation: none; }
@@ -7001,3 +7001,8 @@ html body .pl-v2-stat-lbl{font-size:10.5px}
 .consent-lock { opacity: .45; pointer-events: none; filter: saturate(.6); }
 @keyframes consentShake { 20% { transform: translateX(-6px); } 40% { transform: translateX(5px); } 60% { transform: translateX(-3px); } 80% { transform: translateX(2px); } }
 @media (prefers-reduced-motion: reduce) { .consent-wrap.need .consent { animation: none; } .consent .cbox, .consent .cbox::after { transition: none; } }
+/* results: the biggest single score of the game */
+#bestmove{margin:10px 0 0;padding:10px 14px;border-radius:14px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.08);border-left:4px solid var(--c);font-size:13px;line-height:1.35;color:var(--ink)}
+#bestmove span{display:block;font-size:11px;letter-spacing:.06em;text-transform:uppercase;opacity:.7;margin-bottom:2px}
+/* settings: drawn line icons instead of emoji */
+.sic svg{color:var(--ink);opacity:.9}

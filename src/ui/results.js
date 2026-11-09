@@ -39,3 +39,19 @@ export function renderBreakdownTableHtml(rankedPlayers) {
 export function renderSummaryLineHtml({tilesCount, movesCount, figsCount, deckCount}) {
   return `<span><b>${tilesCount}</b>карт на поле</span><span><b>${movesCount}</b>ходов</span><span><b>${figsCount}</b>фишек выставлено</span><span><b>${deckCount}</b>карт в стопке</span>`;
 }
+
+const BEST_KIND = {c: ['город', 'города'], r: ['дорога', 'дороги'], f: ['монастырь', 'монастыря']};
+const cards = n => n % 10 === 1 && n % 100 !== 11 ? 'карты' : 'карт';
+/**
+ * The biggest single score of the game: "Лучший ход: Аня — город из 7 карт, +14".
+ * @param {{name: string, col: string, best?: {pts: number, kind: string, n: number}}[]} players
+ * @returns {string} HTML, or '' when nobody has scored an object.
+ */
+export function renderBestMoveHtml(players) {
+  let top = null;
+  for (const p of players) if (p.best && p.best.pts > 0 && (!top || p.best.pts > top.best.pts)) top = p;
+  if (!top) return '';
+  const k = BEST_KIND[top.best.kind] || ['объект'];
+  const what = top.best.kind === 'f' ? k[0] : `${k[0]} из ${top.best.n} ${cards(top.best.n)}`;
+  return `<div class="bestmove" style="--c:${top.col}"><span>Лучший ход</span><b>${top.name}</b> — ${what}, +${top.best.pts}</div>`;
+}
