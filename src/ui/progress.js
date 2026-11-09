@@ -39,13 +39,15 @@ export function renderRewardsTabHtml({
   weeklyDefs = [],
   weeklyChestGold = 100,
   weeklyChestClaimed = false,
+  challenge = null,
+  challengeDef = null,
+  challengeLeft = '',
   achDefs = [],
   progAch = {},
   progStats = {},
   progLvl = 1,
   rewardReady = false,
 }) {
-  const rank = (done, got) => got ? 2 : done ? 0 : 1;
   // one card: the icon tile, the title, a bar with the count in it, and on the right the reward, the claim button or a tick
   const card = ({ic, title, n, need, reward, coin = 'tile', got, claim, swap = '', kind = 'q'}) => {
     const done = n >= need, pct = Math.min(100, 100 * n / need);
@@ -56,14 +58,15 @@ export function renderRewardsTabHtml({
       + `<span class="qk-bar"><i style="width:${pct.toFixed(0)}%"></i><em>${Math.min(n, need)} / ${need}</em></span></span>${side}${swap}</div>`;
   };
   const qDone = q => { const Q = questDefs.find(x => x.id === q.id); return Q && q.n >= Q.n; };
-  const qRows = [...progQuests].sort((a, b) => rank(qDone(a), a.got) - rank(qDone(b), b.got)).map(q => {
+  // quests keep their places when done or claimed: the list never jumps under the finger
+  const qRows = progQuests.map(q => {
     const Q = questDefs.find(x => x.id === q.id) || {ic: '🎯', t: 'Задание', n: 1, g: 10};
     const swap = canReroll && !q.got && q.n < Q.n ? `<button class="qre" data-reroll="${q.id}" title="Заменить задание (раз в день)" aria-label="Заменить задание">↻</button>` : '';
     return card({ic: Q.ic, title: Q.t, n: q.n, need: Q.n, reward: Q.g, got: q.got, claim: `data-claimq="${q.id}"`, swap});
   }).join('');
 
   const wqDone = q => { const WQ = weeklyDefs.find(x => x.id === q.id); return WQ && q.n >= WQ.n; };
-  const wqRows = [...progWeekly].sort((a, b) => rank(wqDone(a), a.got) - rank(wqDone(b), b.got)).map(q => {
+  const wqRows = progWeekly.map(q => {
     const WQ = weeklyDefs.find(x => x.id === q.id) || {ic: '🎯', t: 'Цель', n: 1, g: 10};
     return card({ic: WQ.ic, title: WQ.t, n: q.n, need: WQ.n, reward: WQ.g, got: q.got, claim: `data-claimwq="${q.id}"`, kind: 'w'});
   }).join('');
@@ -79,9 +82,11 @@ export function renderRewardsTabHtml({
   const nearQ = progQuests.filter(q => !q.got).map(q => ({q, Q: questDefs.find(x => x.id === q.id)})).filter(x => x.Q).sort((a, b) => (a.Q.n - a.q.n) / a.Q.n - (b.Q.n - b.q.n) / b.Q.n)[0];
   const goalLine = rewardReady ? '<div class="goalline ready">🎁 Есть награды: заберите их ниже</div>' : nearQ ? `<div class="goalline">🎯 Ближайшая цель: <b>${nearQ.Q.t}</b> · ${nearQ.q.n}/${nearQ.Q.n}</div>` : '<div class="goalline">✅ Все задания на сегодня выполнены</div>';
   const ringSvg = (got, all, label) => { const f = all ? got / all : 0, C = 2 * Math.PI * 22; return `<span class="qk-ring"><svg viewBox="0 0 52 52"><circle cx="26" cy="26" r="22" class="bg"/><circle cx="26" cy="26" r="22" class="fg" stroke-dasharray="${(C * f).toFixed(1)} ${C.toFixed(1)}"/></svg><b>${got}/${all}</b><small>${label}</small></span>`; };
-  const hero = `<div class="qk-hero">${ringSvg(qGot, progQuests.length, 'сегодня')}${ringSvg(wqGot, progWeekly.length, 'неделя')}<div class="qk-hero-txt">${goalLine}<small>Новые задания каждый день · одно можно заменить ↻</small></div></div>`;
+  const hero = `<div class="qk-hero">${ringSvg(qGot, progQuests.length, 'сегодня')}${ringSvg(wqGot, progWeekly.length, 'неделя')}<div class="qk-hero-txt">${goalLine}<small>${canReroll ? 'Не нравится задание? Любое одно из сегодняшних можно заменить на новое — нажмите ↻ рядом с ним. Замена одна в день.' : 'Замену на сегодня вы уже использовали — завтра будут новые задания и новая замена.'}</small></div></div>`;
 
-  return `${hero}<div class="h3 sec">Задания на сегодня<em>${qGot} / ${progQuests.length}</em></div><div class="qk-list">${qRows}</div><div class="h3 sec">Недельные цели<em>${wqGot} / ${progWeekly.length}</em></div><div class="qk-list">${wqRows}${chestRow}</div>`;
+  // the fortnight's challenge: one long task for stars, highlighted
+  const rareRow = challenge && challengeDef ? `<div class="h3 sec">Испытание<em>${challengeLeft}</em></div><div class="qk-list qk-rare">${card({ic: challengeDef.ic, title: challengeDef.t.replace(/^Испытание: /, ''), n: challenge.n, need: challengeDef.n, reward: challengeDef.s, coin: 'star', got: challenge.got, claim: 'data-claimrq="1"', kind: 'rare'})}</div>` : '';
+  return `${hero}<div class="h3 sec">Задания на сегодня<em>${qGot} / ${progQuests.length}</em></div><div class="qk-list">${qRows}</div><div class="h3 sec">Недельные цели<em>${wqGot} / ${progWeekly.length}</em></div><div class="qk-list">${wqRows}${chestRow}</div>${rareRow}`;
 }
 
 /** Generates HTML markup for the dedicated Achievements screen. */

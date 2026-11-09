@@ -86,6 +86,23 @@ export function weeklyQuests(week) {
   let h = 0; for (const ch of String(week)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
   return [...WEEKLY_QUESTS, WEEKLY_EXTRA[h % WEEKLY_EXTRA.length]];
 }
+/* Challenges: one rare, long task every two weeks that pays in stars (the rare coin). Much harder than a weekly goal;
+   the player has the whole two weeks for it. The same challenge for everyone in those two weeks. */
+export const CHALLENGES = [
+  {id: 'r_win20', ic: '🏆', t: 'Испытание: 20 побед', k: 'win', n: 20, s: 2},
+  {id: 'r_c60', ic: '🏰', t: 'Испытание: достройте 60 городов', k: 'c', n: 60, s: 2},
+  {id: 'r_hard8', ic: '🔥', t: 'Испытание: 8 побед над сложными ботами', k: 'hardwin', n: 8, s: 3},
+  {id: 'r_tiles600', ic: '🧩', t: 'Испытание: выложите 600 плиток', k: 'tiles', n: 600, s: 1},
+  {id: 'r_f10', ic: '⛪', t: 'Испытание: окружите 10 монастырей', k: 'f', n: 10, s: 2},
+  {id: 'r_bigc10', ic: '🏯', t: 'Испытание: 10 больших городов', k: 'bigc', n: 10, s: 2},
+  {id: 'r_games40', ic: '🎲', t: 'Испытание: сыграйте 40 партий', k: 'games', n: 40, s: 1},
+];
+/** The two weeks a week belongs to ('2026-F23') and that fortnight's challenge. */
+export function fortnightId(week) { const m = /^(\d+)-W(\d+)$/.exec(String(week)); return m ? `${m[1]}-F${Math.ceil(+m[2] / 2)}` : 'F0'; }
+export function challengeOf(fortnight) {
+  let h = 0; for (const ch of String(fortnight)) h = (h * 31 + ch.charCodeAt(0)) >>> 0;
+  return CHALLENGES[h % CHALLENGES.length];
+}
 export const WEEKLY_CHEST_GOLD = 100;
 
 /** ISO-like week identifier: 'YYYY-Www' */

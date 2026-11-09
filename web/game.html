@@ -306,7 +306,7 @@
             <div class="hitem"><span class="hic"><i class="coin c-tile"></i></span><div><b>Тайлы</b><p>Главная валюта. За партии, задания, подарки и достижения. На тайлы покупаются фигурки, рамки, статусы и эмодзи.</p></div></div>
             <div class="hitem"><span class="hic"><i class="coin c-star"></i></span><div><b>Звёзды</b><p>Редкая валюта. Их дают только золотые достижения. За звёзды покупаются самые редкие вещи. Обмена между валютами нет.</p></div></div>
             <div class="h3">Прогресс</div>
-            <div class="hitem"><span class="hic">🎯</span><div><b>Задания</b><p>Три задания в день и цели недели. Одно задание в день можно заменить. За все цели недели — большой сундук.</p></div></div>
+            <div class="hitem"><span class="hic">🎯</span><div><b>Задания</b><p>Три задания в день и цели недели. Не нравится задание — любое одно из трёх можно раз в день заменить на новое кнопкой ↻. За все цели недели — большой сундук.</p></div></div>
             <div class="hitem"><span class="hic">🗺</span><div><b>Дорога прогресса</b><p>Опыт за партии поднимает уровень. На дороге — награды за уровни и кубки: тайлы, звёзды, статусы, рамки, фигурки.</p></div></div>
             <div class="hitem"><span class="hic">🏆</span><div><b>Кубки и рейтинг</b><p>Онлайн-партии на кубки: за 1 место +10, за 2 +5, за 3 +2, ничьих нет. У «Классики 2.0» свои кубки и свой рейтинг.</p></div></div>
           </div>
@@ -2994,6 +2994,13 @@ renderRules();
 // Results and warnings: one card in the middle of the screen (above the bottom bar and any dialog), in the game's own
 // style, with a sign for success, a problem or plain news. Tap it to close; long texts stay longer.
 const NOTE_BAD = /^(Не |Нет |Неверн|Ошибка|Сначала|Это ваш)|уже был|не удалось|не хватает|не найден|недоступ/i, NOTE_OK = /^🎉|^✅|активирован|добавлен|сохранён|отправлен|ваша|ваш!|Привет|С возвращением|скопирован/i;
+function toastTop() {
+  let y = 8;
+  const scr = document.querySelector('.screen:not([hidden])');
+  const tops = scr ? scr.querySelectorAll('.ltop, .mtop, .gtop, .top, .players, #players, .tbar, header') : [];
+  for (const el of tops) { const r = el.getBoundingClientRect(); if (r.height && r.top < 160 && r.bottom < innerHeight / 3) y = Math.max(y, r.bottom + 8); }
+  return Math.round(Math.max(y, (parseFloat(getComputedStyle(document.documentElement).getPropertyValue('--it')) || 0) + 8));
+}
 function toastAny(t, kind, title) {
   const old = document.getElementById('note'); if (old) old.remove();
   const text = String(t || '').replace(/^(🎉|✅|❌|ℹ️)\s*/, '');
@@ -3015,6 +3022,9 @@ function toastAny(t, kind, title) {
     <button class="tt-close" aria-label="Закрыть">✕</button>
   `;
   d.querySelector('.tt-msg').textContent = text;
+  // Top right, just under whatever sits at the top of the open screen (its header, the players' row, the menu plate),
+  // so it never covers a button and is always in sight; above any open dialog.
+  d.style.top = toastTop() + 'px';
   document.body.append(d);
 
   const close = () => {
@@ -4209,6 +4219,13 @@ function questsWeekly() {
   PROG.wq = PG.state.progress.weeklyQuests(curWeek).map(q => ({id: q.id, n: 0, got: false}));
   PROG.wchest = false;
 }
+// The fortnight's challenge (src/state/progress.js CHALLENGES): a new one every two weeks, whether the old was done or not.
+function challengeNow() {
+  const P = PG.state.progress, fn = P.fortnightId(P.weekId());
+  if (PROG.rfn !== fn || !PROG.rq) { PROG.rfn = fn; PROG.rq = {id: P.challengeOf(fn).id, n: 0, got: false}; }
+  return PROG.rq;
+}
+const challengeDef = () => PG.state.progress.CHALLENGES.find(x => x.id === challengeNow().id);
 // Three quests a day, the same for the whole day.
 function questsToday() {
   if (PROG.day === today() && (PROG.q || []).every(q => QUESTS.some(x => x.id === q.id))) return;   // a quest that no longer exists: pick the day again
@@ -4246,6 +4263,7 @@ function progress(d) {
     PROG.q.forEach(q => { const Q = QUESTS.find(x => x.id === q.id); if (Q && Q.k === k && !q.got) q.n = Math.min(Q.n, q.n + v); });
     if (PROG.wq) {
       PROG.wq.forEach(q => { const WQ = WEEKLY_ALL.find(x => x.id === q.id); if (WQ && WQ.k === k && !q.got) q.n = Math.min(WQ.n, q.n + v); });
+      const rq = challengeNow(), RQ = challengeDef(); if (RQ && RQ.k === k && !rq.got) rq.n = Math.min(RQ.n, rq.n + v);
     }
   }
   markQuestDay(); earnedCheck();
@@ -4326,7 +4344,7 @@ const rewardReady = () => {
   questsToday();
   questsWeekly();
   const qDot = PROG.q.some(q => !q.got && q.n >= QUESTS.find(x => x.id === q.id).n);
-  const wqDot = PROG.wq && (PROG.wq.some(q => !q.got && q.n >= (WEEKLY_ALL.find(x => x.id === q.id) || {}).n) || (!PROG.wchest && PROG.wq.every(q => q.got)));
+  const wqDot = PROG.wq && (PROG.wq.some(q => !q.got && q.n >= (WEEKLY_ALL.find(x => x.id === q.id) || {}).n) || (!PROG.wchest && PROG.wq.every(q => q.got))) || (() => { const rq = challengeNow(), RQ = challengeDef(); return !!(RQ && !rq.got && rq.n >= RQ.n); })();
   const aDot = ACH.some(a => a.ok(PROG.st, PROG.lvl) && PROG.ach[a.id] !== 'got');
   return qDot || wqDot || aDot || !!PROG.inTop10;
 };
@@ -4334,7 +4352,7 @@ function ptabsDot() {
   questsToday();
   questsWeekly();
   const qDot = PROG.q.some(q => !q.got && q.n >= QUESTS.find(x => x.id === q.id).n);
-  const wqDot = PROG.wq && (PROG.wq.some(q => !q.got && q.n >= (WEEKLY_ALL.find(x => x.id === q.id) || {}).n) || (!PROG.wchest && PROG.wq.every(q => q.got)));
+  const wqDot = PROG.wq && (PROG.wq.some(q => !q.got && q.n >= (WEEKLY_ALL.find(x => x.id === q.id) || {}).n) || (!PROG.wchest && PROG.wq.every(q => q.got))) || (() => { const rq = challengeNow(), RQ = challengeDef(); return !!(RQ && !rq.got && rq.n >= RQ.n); })();
   const aDot = ACH.some(a => a.ok(PROG.st, PROG.lvl) && PROG.ach[a.id] !== 'got');
   const tDot = !!PROG.inTop10;
   document.querySelectorAll('#ptabs button').forEach(b => {
@@ -4496,11 +4514,17 @@ function renderRoadQuestsInSheet() {
   if (body) body.innerHTML = rewardsHtml();
 }
 // Daily quests, weekly goals with the big chest, achievements: the list in the quests sheet of the progress screen.
+// Days left of the fortnight: a fortnight ends on the Sunday of its second week.
+function challengeLeftText() {
+  const d = new Date(), wk = +PG.state.progress.weekId(d).split('-W')[1], left = (wk % 2 ? 7 : 0) + (7 - ((d.getDay() + 6) % 7));
+  return left <= 1 ? 'последний день' : `ещё ${left} дн.`;
+}
 function rewardsHtml() {
   questsWeekly();
   return PG.ui.progress.renderRewardsTabHtml({
     progQuests: PROG.q || [], questDefs: QUESTS, canReroll: PROG.qre !== PROG.day,
     progWeekly: PROG.wq || [], weeklyDefs: WEEKLY_ALL, weeklyChestGold: WEEKLY_CHEST_GOLD || 100, weeklyChestClaimed: !!PROG.wchest,
+    challenge: challengeNow(), challengeDef: challengeDef(), challengeLeft: challengeLeftText(),
     achDefs: ACH, progAch: PROG.ach || {}, progStats: PROG.st || {}, progLvl: PROG.lvl || 1, rewardReady: rewardReady()
   });
 }
@@ -4955,6 +4979,11 @@ function onProgressClick(e) {
   const road = e.target.closest('[data-claimroad]');
   if (road) return claimRoadMilestone(road.dataset.claimroad);
   const q = e.target.closest('[data-claimq]'), a = e.target.closest('[data-claima]'), wq = e.target.closest('[data-claimwq]'), wch = e.target.closest('[data-claimwchest]');
+  if (e.target.closest('[data-claimrq]')) {
+    const rq = challengeNow(), RQ = challengeDef(); if (!RQ || rq.got || rq.n < RQ.n) return;
+    rq.got = true; COINS.give(wallet, RQ.s, 'star'); beep('coin'); saveWallet(); renderProgress(); renderMenuProfile();
+    toastAny(`Испытание пройдено! +${RQ.s} ${RQ.s === 1 ? 'звезда' : 'звезды'}`, 'ok', 'Награда'); return;
+  }
   const rr = e.target.closest('[data-reroll]');
   if (rr) {   // one free swap a day: the quest goes, a fresh one (not on today's list) takes its place
     const it = PROG.q.find(x => x.id === rr.dataset.reroll);
@@ -6659,6 +6688,27 @@ function jigsawFrame(host, o) {
   // Navigation tabs are styled with slanted strategy tiles via CSS
 })();
 $('#bnav').onclick = e => { const b = e.target.closest('[data-nav]'); if (!b) return; if (b.dataset.nav === 'friends') friendsBack = 'menu'; show(b.dataset.nav); };
+// Swipe left / right across a bottom-menu screen to the next / previous one, in the menu's order. Not on rows that
+// scroll sideways themselves (the progress road, tabs, stalls), not in dialogs, and only for a clearly sideways move.
+(function navSwipe() {
+  const ORDER = ['menu', 'progress', 'friends', 'shop'];
+  let x0 = 0, y0 = 0, t0 = 0, on = false;
+  const sideScroller = el => { for (; el && el !== document.body; el = el.parentElement) { if (el.scrollWidth > el.clientWidth + 4 && /auto|scroll/.test(getComputedStyle(el).overflowX)) return true; } return false; };
+  document.addEventListener('touchstart', e => {
+    const nav = $('#bnav'); on = false;
+    if (!nav || nav.hidden || e.touches.length !== 1 || e.target.closest('.over,input,textarea,.board') || sideScroller(e.target)) return;
+    on = true; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; t0 = Date.now();
+  }, {passive: true});
+  document.addEventListener('touchend', e => {
+    if (!on) return; on = false;
+    const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
+    if (Date.now() - t0 > 700 || Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.8) return;
+    const cur = ORDER.find(n => !$('#scr-' + n).hidden); if (!cur) return;
+    const next = ORDER[ORDER.indexOf(cur) + (dx < 0 ? 1 : -1)]; if (!next) return;
+    if (next === 'friends') friendsBack = 'menu';
+    show(next);
+  }, {passive: true});
+})();
 
 /* ---------------- account: keep the profile across reinstalls ----------------
    The anonymous Firebase account gets an e-mail and password ("protect the profile"); the whole
