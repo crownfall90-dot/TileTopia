@@ -35,6 +35,7 @@ export const RULES = [
 export const PREFS = [
   {k: 'sound', ic: '🔊', label: 'Звуки', hint: 'Звуковые эффекты', opts: [[true, 'Вкл'], [false, 'Выкл']]},
   {k: 'music', ic: '🎵', label: 'Музыка', hint: 'Фоновая музыка', opts: [[true, 'Вкл'], [false, 'Выкл']]},
+  {k: 'vib', ic: '📳', label: 'Вибрация', hint: 'Отклик на ход, очки и конец партии', opts: [[true, 'Вкл'], [false, 'Выкл']]},
   {k: 'view', ic: '🧊', label: 'Вид поля', hint: '3D перспектива или вид сверху', opts: [['3d', '3D'], ['top', 'Сверху']]},
   {k: 'botlvl', ic: '🤖', label: 'Сложность ботов', hint: 'Сложность алгоритма ботов', opts: [['easy', 'Лёгкие'], ['normal', 'Обычные'], ['hard', 'Сложные']]},
   {k: 'speed', ic: '⚡', label: 'Скорость ботов', hint: 'Скорость анимации ходов', opts: [['normal', 'Обычная'], ['fast', 'Быстрая']]},
@@ -46,7 +47,7 @@ export const PREFS = [
   {k: 'stats', ic: '📊', label: 'Статистика', hint: 'Анонимные числа о том, чем пользуются в игре. Без текстов и имён', opts: [[true, 'Вкл'], [false, 'Выкл']]},
 ];
 
-export const PREF_GROUPS = [['Звук', ['sound', 'music']], ['Игра', ['coach', 'view', 'botlvl', 'speed', 'alert', 'zones']], ['Экран', ['gfx']], ['Уведомления', ['notify']], ['Данные', ['stats']]];
+export const PREF_GROUPS = [['Звук', ['sound', 'music', 'vib']], ['Игра', ['coach', 'view', 'botlvl', 'speed', 'alert', 'zones']], ['Экран', ['gfx']], ['Уведомления', ['notify']], ['Данные', ['stats']]];
 
 export const STREAK_GOLD = [10, 15, 20, 25, 35, 50, 100];
 

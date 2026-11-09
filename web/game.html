@@ -2752,13 +2752,20 @@ document.addEventListener('visibilitychange', () => {
 // Synthesised effects and music live in src/audio/sound.js.
 function musicLevel() { return !wallet.music ? 0 : document.hidden ? 0 : gameVisible ? .045 : .075; }
 const sound = PG.audio.createSound({sfxOn: () => !!wallet.sound && !fast(), musicLevel});
-const {audio, beep, musicUpdate} = sound;
+const {audio, beep: beepSound, musicUpdate} = sound;
+// The phone answers the key moments of a game with a short buzz of its own (Settings → Vibration).
+const BUZZ = {place: 18, meeple: [12, 30, 12], score: [20, 40, 20], big: [30, 50, 30, 50, 60], win: [40, 60, 40, 60, 120], lose: 90};
+function beep(kind) {
+  beepSound(kind);
+  if (!wallet.vib || fast() || !BUZZ[kind]) return;
+  try { if (navigator.vibrate) navigator.vibrate(BUZZ[kind]); } catch (_) {}
+}
 // A quiet click on menu buttons.
 document.addEventListener('click', e => { if (e.target.closest('button') && !e.target.closest('#scr-game .board')) beep('tap'); });
 /* ---------------- settings ---------------- */
 // Phones with little memory start on the light graphics (no tile sides, shadows and trees).
 const weakDevice = (navigator.deviceMemory || 4) <= 2 || (navigator.hardwareConcurrency || 4) <= 2;
-Object.assign(wallet, Object.assign({music: true, notify: true, coach: 'tip', view: '3d', botlvl: 'normal', speed: 'normal', gfx: weakDevice ? 'low' : 'high', zones: true, alert: true}, wallet));
+Object.assign(wallet, Object.assign({music: true, notify: true, coach: 'tip', view: '3d', botlvl: 'normal', speed: 'normal', gfx: weakDevice ? 'low' : 'high', zones: true, alert: true, vib: true}, wallet));
 const applyGfx = () => document.documentElement.classList.toggle('lowgfx', wallet.gfx === 'low');
 applyGfx();
 function renderPrefs() {
