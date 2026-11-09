@@ -1,0 +1,29 @@
+name: Publish database rules
+
+# Publishes docs/firebase-rules.json to the Realtime Database (what the console's Rules tab shows).
+# The rules in force before are kept as the run's artifact «rules-before» for a rollback.
+on:
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: Опубликовать (иначе только сохранить текущие правила)
+        type: boolean
+        default: true
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: python3 scripts/publish-rules.py ${{ inputs.apply && '--apply' || '' }}
+      - uses: actions/upload-artifact@v4
+        if: always()
+        with:
+          name: rules-before
+          path: build/rules-before.json
+          if-no-files-found: ignore
