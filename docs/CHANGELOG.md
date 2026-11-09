@@ -1225,14 +1225,6 @@
 
 **В коде:**
 - Кошелёк: несовпадение подписи не сбрасывает золото
-- docs: record actual account regression and offline build results
-- fix(wallet): a checksum mismatch is reported, never resets the gold
-- Звук и кошелёк в модулях (TASK-008-3)
-- docs: record actual account regression and offline build results
-- refactor(state): wallet storage to src/state/wallet.js (TASK-008-3)
-- refactor(audio): synthesised effects and music to src/audio/sound.js (TASK-008-3)
-- Журнал версий: 1.0.216
-- docs(changelog): 1.0.216, clear release notes
 
 ## 1.0.218 — 2026-10-30
 
@@ -2059,15 +2051,15 @@
 ## 1.0.255 — 2026-11-03
 
 **Игрокам:**
-- Убран красный кружок у золота в магазине
+- Убрали красный кружок у золота в магазине
 - Если обновить приложение нельзя, показывается одна кнопка «Скачать новую версию вручную»
 
 **В коде:**
 - Merge pull request #241 from crownfall90-dot/dev/stage2-account-network-20261029
+- docs: record actual account regression and staging build results
 - fix(update): убран красный кружок у золота; одна кнопка ручной загрузки при невозможном обновлении
 - chore(firebase): google-services.json с Android OAuth-клиентами для app.crownfall.tiletopia
-- fix(update): старые версии распознают смену подписи/пакета через package и cert в latest.json и предлагают переустановку
-- docs: record actual account regression and staging build results
+- Merge pull request #240 from crownfall90-dot/dev/stage2-account-network-20261029
 - docs(release): журнал изменений 1.0.254
 
 ## 1.0.256 — 2026-11-03
@@ -2075,24 +2067,470 @@
 **Игрокам:**
 - Обязательное обновление: убрана кнопка «Позже», игра сразу предлагает актуальную версию
 - Раздел «Аккаунт и данные» в настройках перенесён в пункт «О приложении»
-- Защита от случайного удаления аккаунта: добавлены многократные подтверждения и ввод проверочного слова «УДАЛИТЬ»
+- Защита от случайного удаления аккаунта: добавлены многократные подтверждения и ввод проверочного слова
 
 **В коде:**
 - Merge pull request #242 from crownfall90-dot/dev/stage2-account-network-20261029
+- docs: record actual account regression and staging build results
 - feat(settings): перенос аккаунта в О приложении, подтверждение удаления словом УДАЛИТЬ, обязательное обновление
 - docs(release): журнал изменений 1.0.255
 
 ## 1.0.257 — 2026-11-03
 
 **Игрокам:**
-- Убрана кнопка «Позже» в окне переустановки для старых версий игры
-- Версии приложения, веб-версии и Telegram Mini App теперь строго совпадают в едином формате 1.0.X
+- Убрана кнопка «Позже» в окне переустановки для старых версий
+- Версии приложения, веб-версии и Telegram Mini App теперь строго синхронизированы в едином формате 1.0.X
 
 **В коде:**
 - Merge pull request #244 from crownfall90-dot/dev/stage2-account-network-20261029
-- fix(update): убрана кнопка позже в reinstallDialog; единая версия 1.0.X на всех платформах
+- docs: record actual account regression and staging build results
+- fix(version): единый формат версии 1.0.X для приложения, веб и Telegram Mini App с авто-синхронизацией
+- docs: record actual account regression and staging build results
+- fix(update): убрана кнопка позже в окне переустановки (reinstallDialog)
+- Merge pull request #243 from crownfall90-dot/dev/stage2-account-network-20261029
 - docs(release): журнал изменений 1.0.256
 
+## 1.0.258 — 2026-11-04
 
+**Игрокам:**
+- (без описания)
 
+**В коде:**
+- feat: direct room creation and telegram channel subscription with 500 gold reward (#248)
+- feat(friends): redesign friends screen and add clickable player profiles (#247)
+- Merge pull request #246 from crownfall90-dot/dev/stage2-account-network-20261029
+- docs: record actual account regression and staging build results
+- fix: match history cloud sync, resignation recording and profile entry
+- Merge pull request #245 from crownfall90-dot/dev/stage2-account-network-20261029
+- docs(release): журнал изменений 1.0.257
+
+## 1.0.259 — 2026-11-04
+
+**Игрокам:**
+- (без описания)
+
+**В коде:**
+- feat: display rating cups in menu profile pill and clean up profile screen (#249)
+
+## 1.0.260 — 2026-11-04
+
+**Игрокам:**
+- (без описания)
+
+**В коде:**
+- feat: show approximate last seen in friends and export 512x512 tile sprites (#250)
+
+## 1.0.261 — 2026-11-05
+
+**Игрокам:**
+- (без описания)
+
+**В коде:**
+- feat(ux): play boot animation to the very end before transitioning to game
+- refactor(positioning): remove medieval references, position strictly as tile strategy with distinct table locations
+- fix(web): move Telegram WebApp bootstrap into script tag to prevent raw text leak
+- feat(strategy, telegram): position as tile strategy, overhaul rules, eliminate draws, cap trophies to 10, add bot /start banner with play button, and eliminate web boot delay
+- ci: auto-deploy GitHub Pages on push to main
+- fix(admin, links): update obsolete /play/ URLs to /TileTopia/ across admin panel, invite links, bot setup, and docs; enable seamless admin auto-auth
+- fix(telegram, store, ui): fix null crash in Telegram WebApp, remove reward badge from screenshots, refresh top-20 league leaderboard and tile showcase assets
+- feat(ui, menu): unified top menu hub drawer, compact action row with quests tile left of play button
+- feat(game, ui, store): side-sliding tile notifications, fog relics and biomes, scout action, and pristine store screenshots
+- feat(ui, shop, fog, store): redesign shop daily rotation, village fog of war, mode sheet, leaderboard header button, and rich midgame banner
+- feat(ui): redesign main menu with compact play & mode drawer, tile icons and new store assets
+- chore(store): update all screenshots, icon, and feature graphic to current TileTopia UI
+- docs: rename repository to TileTopia, update links, enhance README and Google Play materials
+- feat: optional vs mandatory update system, admin controls, and static tiles gallery
+- fix(telegram): treat markdown headers as section dividers and drop internal section items
+- feat(telegram): new post styling with quotes, polls, 3 play methods and dev filter (#251)
+
+## 1.0.262 — 2026-11-06
+
+**Игрокам:**
+- ### 🎨 Визуальное обновление и новая система 3D-плиток Tiletopia
+- **3D Диорамы плиток (Классика 4 стороны и Гексы 6 сторон)**:
+- Высокодетализированные спрайты 512×512 px в стиле миниатюрных настольных 3D-диорам: реки, каменные мосты, озера, большой акведук, дороги, перекрёстки, средневековые деревни, замки-цитадели и горные монастыри.
+- Каждая плитка выверена по правилам стыковки: луга к лугам, реки к рекам, дороги к дорогам, крепостные стены к городам.
+- Готовые ZIP-архивы спрайтов для дизайнеров и разработчиков в `assets/tiles/`.
+- Интерактивный симулятор стыковки и галерея в `tools/export-tiles.html`.
+- **Колода реакций в партии (5 эмодзи + 5 фраз)**:
+- Ограничение до 5 быстрых эмоций и 5 тактических фраз в игре.
+- Настройка собственной колоды реакций перенесена во вкладку «Эмоции» в «Моих предметах».
+- **Центр уведомлений и наград (Вкладка уведомлений)**:
+- Новый экран с вкладками «Все», «Награды», «Промокоды», «Новости» и кнопкой колокольчика в главном меню с бейджем непрочитанных.
+- Мгновенное получение эксклюзивного статуса «Олд» (`ex:old`), приветственного золота (+500 🪙) и промокода `DIORAMA3D` (+300 🪙).
+- **Эксклюзивная анимированная косметика**:
+- Переливающиеся голографические рамки профиля: «Голография», «Призма», «Северное сияние», «Киберпанк», «Космос».
+- Новые детализированные фигурки в магазине: Архимаг, Теневой ниндзя, Паладин света.
+- Новые 3D-сундуки из дубовых досок с золотыми накладками и световыми лучами при открытии.
+- Рельефные 3D-монеты с чеканным золотым кантом и турнирные кубки.
+- **Игровая карта**:
+- Полное удаление тумана войны в пользу гармоничного космическо-полуночного фона с луговым ландшафтом.
+- **Тестовая сборка и автообновление**:
+- Автоматический инкремент versionCode для тестовой сборки (Staging APK), гарантирующий мгновенное предложение обновления при запуске игры.
+- ## 1.0.263-test — Задания, Дорога прогресса, Рейтинг на главной, Большая кнопка «Играть» и авто-обновления
+- **Авто-обновления без ручного скачивания:**
+- Настроен автоматический инкремент `versionCode` на каждую тестовую сборку.
+- Встроенный авто-апдейтер в приложении `Tiletopia Test` автоматически находит новую сборку при старте и предлагает обновиться в 1 клик.
+- **Главная страница:**
+- Кнопка «ИГРАТЬ» сделана доминантной, широкой (`flex: 1.7`) и высокой (`54px`) с крупным текстом и золотым 3D-свечением.
+- Карточка «🏆 Рейтинг игроков» перенесена на главную страницу с отображением кубков и сезона.
+- Кнопка быстрого перехода к Рейтингу `🏆` в верхней панели.
+- **Новый раздел «Задания и Прогресс» вместо Профиля в нижней панели:**
+- **Дорога прогресса:** интерактивная шкала вех кубков и уровней с наградами (золото, статус «Следопыт», рамка «Изумруд», фигурка «Магистр», «Золотой сундук», чемпионские кубки).
+- **Задания:** ежедневные задания, недельные цели с «Большим сундуком недели» (+100 золота), достижения и коллекции.
+- **Выделенный Профиль игрока:**
+- Открывается по клику на аватар в левом верхнем углу меню.
+- Очищен от квестов и рейтинга: строго персональная статистика, рамки, фигурки, мастерство по режимам, постройки и история партий.
+- **Уведомления:**
+- Плашка уведомлений смещена вниз (`top: 64px+`) и уменьшена в габаритах, исключая перекрытие кнопок шапки.
+- **Удалена кнопка «Сыграть с ботами» внизу экрана правил.**
+
+**В коде:**
+- ci(staging): add compute-staging-code.py for reliable auto-incrementing test APK version code
+- ci(staging): add compute-staging-code.py helper script for monotonic test versioning
+- chore(docs): record full implementation status, handoff guidelines for Claude, and auto-increment in-app updater
+- docs: add comprehensive state handoff documentation for Claude and update release notes
+- feat(ui): add notifications and rewards center with Old status claim, holographic frames, 3D chests, new figures and auto-increment staging version code
+- style(menu): make play button hero-sized and prominent over quest and mode buttons
+- feat(ui): relocate leaderboard to main menu, extract quests and progress road to bottom section, and compact notification toasts
+- fix(board): remove fog of war completely and polish harmonious game background
+- feat(tiles): 3D diorama playable tiles (classic 4-sided and hex 6-sided), interactive connection simulator, 5+5 reaction deck and UI polish
+- feat(profile): generate diverse multilingual nicknames across international gamertags, totems, and strategy handles
+- feat(admin): display active test build, list unreleased changes awaiting production, and one-click promote to production
+- ci(staging): auto-release test APK on every push to main and wire in-app staging updater
+- feat(gift): overhaul daily gift with interactive 3-chest mini-game, 7-day track, countdown timer, and main menu shortcut
+- fix(staging): register app.crownfall.tiletopia.test in google-services.json for staging builds
+- feat(android): configure isolated test APK (Tiletopia Test) with auto-incremented version
+
+## 1.0.263 — 2026-11-07
+
+**Игрокам:**
+- ### 🚀 Обновление Tiletopia: Выпуск в 1 клик, Политика обновлений, Задания и Дорога прогресса
+- **Выпуск из тестового APK и панели управления в 1 клик:**
+- В приложении тестовой сборки (панель основателя по 7 тапам в настройках) добавлена прямая кнопка выпуска на боевой сервер (`Promote to Production`) с онлайн-статусом сборки прямо в игре.
+- В панели основателя (`founder-admin.html`) выпуск переведён на прямой вызов GitHub Actions API по Personal Access Token с автоматическим запуском сборки и опросом статуса.
+- **Полноценная политика обновлений (Обязательные и Необязательные):**
+- Исправлен расчёт и применение обязательных обновлений: если установленная версия приложения ниже заданного минимального порога (`minRequiredCode`), обновление строго запрашивается при входе в игру.
+- Необязательные обновления (мелкие фиксы) не прерывают игрока всплывающими окнами при входе — кнопка обновления доступна в Настройках («Обновить по желанию»).
+- Нативный загрузчик Android (`Updater.java`) теперь считывает `mandatory` и `minRequiredCode` напрямую из `latest.json` надёжно и быстро.
+- При выпуске на боевой сервер в `latest.json` автоматически прописываются флаг `mandatory` и порог `minRequiredCode` на основе настроек из админки.
+- **Главная страница и навигация:**
+- Кнопка «ИГРАТЬ» сделана доминантной, широкой (`flex: 1.7`) и высокой (`54px`) с крупным текстом и золотым 3D-свечением.
+- Карточка «🏆 Рейтинг игроков» перенесена на главную страницу с отображением кубков и сезона.
+- Кнопка быстрого перехода к Рейтингу `🏆` в верхней панели главного меню.
+- **Новый раздел «Задания и Прогресс» вместо Профиля в нижней панели:**
+- **Дорога прогресса:** интерактивная шкала вех кубков и уровней с наградами (золото, статус «Следопыт», рамка «Изумруд», фигурка «Магистр», «Золотой сундук», чемпионские кубки).
+- **Задания:** ежедневные задания, недельные цели с «Большим сундуком недели» (+100 золота), достижения и коллекции.
+- **Выделенный Профиль игрока:**
+- Открывается по клику на аватар в левом верхнем углу меню.
+- Очищен от квестов и рейтинга: строго персональная статистика, рамки, фигурки, мастерство по режимам, постройки и история партий.
+- **Уведомления и интерфейс:**
+- Плашка уведомлений смещена вниз (`top: 64px+`) и уменьшена в габаритах, исключая перекрытие кнопок шапки.
+- Удалена кнопка «Сыграть с ботами» внизу экрана правил.
+- **3D Диорамы плиток:**
+- Высокодетализированные спрайты 512×512 px в стиле миниатюрных настольных 3D-диорам (Классика 4 стороны и Гексы 6 сторон).
+
+**В коде:**
+- feat(release): fix production promote from test APK and admin panel, and restore update policy
+
+## 1.0.264 — 2026-11-07
+
+**Игрокам:**
+- ### ✨ Что нового
+- Режим «Классика 2.0»: тактическая игра на шестигранных плитках (гексах) с шестью направлениями стыковки дорог, городов и рек
+- Интерактивная «Дорога прогресса»: карта уровней и наград с золотом, уникальными статусами, рамками и фигурками
+- Ежедневные задания и недельные цели с наградами и Большим сундуком золота
+- Новая официальная 3D-иконка игры и детализированные 3D-диорамы средневековых плиток
+- Витрина эмоций, фраз и реакций для общения и тактических сигналов во время партии
+- Награды за первую победу дня и серии побед в матчах
+- ### 🔧 Что изменилось
+- Главная кнопка «ИГРАТЬ» сделана крупной и заметной с ярким золотым акцентом
+- Рейтинг игроков и кубки сезона вынесены на главный экран для быстрого доступа
+- Персональный профиль игрока теперь открывается по клику на аватар в левом верхнем углу
+- Оптимизирована доставка обязательных обновлений и синхронизация версий для сетевых комнат
+- Улучшена плавность анимаций, стабильность сетевой игры и скорость загрузки
+- ### 🧹 Что убрано
+- Убран туман войны в пользу чистого живописного лугового фона
+- Убраны лишние всплывающие окна при входе, не мешая быстрому началу игры
+
+**В коде:**
+- feat(release): align production with tested features, enforce mandatory prod updates, and polish telegram announcements
+- Merge branch 'dev/tiles3d-blender' into main
+- revert(release): roll back latest update of test version to restore verified state
+- feat(mode): Classic 2.0 — the same game on six-sided tiles (own engine, art, bots, help); Classic untouched
+- feat(icon,banner): tiles now meet without a gap (hex rotation fixed), castle and banner moved; new Blender feature banner; shorter consent line on sign-up and sign-in
+- feat(icon): the new three-tile icon (Blender) everywhere: Android launcher, adaptive layers, web, PWA, Google Play 512
+- feat(consent): shorter, friendlier statistics question; the exact list of what is collected one tap away
+- feat(seo): About pages (ru, en), sitemap.xml, robots.txt, canonical and Open Graph tags; the test build is noindex
+- feat: remove the duel mode completely
+- feat(legal): privacy policy and terms in Russian and English, consent for statistics, third-party licenses, owner checklist
+- feat(analytics): what players use — counters per screen and button, report in the owner panel
+- feat(progress): «Прогресс» tab name, first-win and win-streak gold; ideas from top games
+- feat(ui): the progress road is a map — levels zigzag from the left edge to the right, cobbled road, rivers with bridges, villages, woods and a keep
+- feat(game): a running game comes back by itself, no «resume» button
+- feat(ui): new main header, menu popover with the rating, vertical progress road; fix the rating; no relics
+- feat(shop): daily showcase offers 4 statuses and 4 emoji too, only what the player does not own
+- feat(icon): candidate app icon — three joined hex tiles, one per player colour
+- chore(tiles3d): render all 37 tiles with keeps in every town and the new banners
+- Merge branch 'claude/session-checkpoint-9bc816' into feat/tiles3d-blender
+- feat(tiles): a keep in every town — on the square of two- and three-sided towns, deep in a small one
+- feat(progress, ui): more quests and tiered achievements, daily quest swap, full nickname, banners
+- feat(tiles, ui): towns and the monastery redrawn, all 37 tiles in 3D, minimal interface
+- feat(tiles3d): real game faces with winding rivers, lakes and waterfalls; remove stale exports
+- feat(shop): emoji and phrases are collected — 3 + 3 free, the rest bought or earned
+- feat(tiles3d): tile defs from TYPES, Blender generator, three pilot tiles and props
+- build(android): target SDK 36 for Google Play, predictive back and large-screen config changes
+
+## 1.0.265 — 2026-11-07
+
+**Игрокам:**
+- ### ✨ Что нового
+- Режим «Классика 2.0»: тактическая игра на шестигранных плитках (гексах) с шестью направлениями стыковки дорог, городов и рек
+- Интерактивная «Дорога прогресса»: карта уровней и наград с золотом, уникальными статусами, рамками и фигурками
+- Ежедневные задания и недельные цели с наградами и Большим сундуком золота
+- Детализированные 3D-диорамы средневековых плиток и любимая классическая иконка игры
+- Витрина эмоций, фраз и реакций для общения и тактических сигналов во время партии
+- Награды за первую победу дня и серии побед в матчах
+- ### 🔧 Что изменилось
+- Главная кнопка «ИГРАТЬ» сделана крупной и заметной с ярким золотым акцентом
+- Рейтинг игроков и кубки сезона вынесены на главный экран для быстрого доступа
+- Персональный профиль игрока теперь открывается по клику на аватар в левом верхнем углу
+- Оптимизирована доставка обязательных обновлений и синхронизация версий для сетевых комнат
+- Улучшена плавность анимаций, стабильность сетевой игры и скорость загрузки
+- ### 🧹 Что убрано
+- Убран туман войны в пользу чистого живописного лугового фона
+- Убраны лишние всплывающие окна при входе, не мешая быстрому началу игры
+
+**В коде:**
+- revert(icon): restore previous classic game icon across Android launcher, web, and store assets
+
+## 1.0.266 — 2026-11-07
+
+**Игрокам:**
+- ### ✨ Что нового
+- Интерактивные заявки в друзья: всплывающее окно с быстрым принятием дружбы и отображение входящих заявок в разделе уведомлений
+- Карточка игрока v2: подробная статистика (кубки, победы, процент побед, сыгранные матчи), предложение дружбы и мгновенное приглашение в комнату
+- Полноэкранная дорога прогресса: вехи каждые 5 уровней (с 5 по 50), боковая шторка с заданиями
+- Наглядный баланс 3 видов монет на главном экране (медь, серебро, золото)
+- Обновлённая витрина: 5 прилавков, отображение уже забранного сундука с понятной надписью
+- ### 🔧 Что изменилось
+- Устранена ошибка инициализации на старте игры (TDZ), приводившая к экрану сбоя
+- Улучшен сторожевой таймер запуска приложения и добавлена кнопка перезапуска
+- Из раздела «Друзья» убрана лишняя кнопка создания комнаты
+- Оптимизирована стабильность сетевых комнат и синхронизация уведомлений
+
+**В коде:**
+- docs(release): update release notes with startup fix and friends integration
+- fix: resolve startup crash, improve watchdog guard, add interactive friend request popup and notifications integration
+- feat: player card modal v2 with stats, friend & room actions, improved report dialog, remove create room from friends
+- refactor(copy): simplify wording across shop stalls, achievements and release notes
+- feat(telegram): format release post with blockquotes for all sections, concise play links, and clean headline
+- feat: 5 shop stalls, achievements hall in menu, aligned header buttons, copper coin currency
+
+## 1.0.267 — 2026-11-07
+
+**Игрокам:**
+- ### ✨ Что нового
+- Интерактивные заявки в друзья: всплывающее окно с быстрым принятием дружбы и отображение входящих заявок в разделе уведомлений
+- Карточка игрока v2: подробная статистика (кубки, победы, процент побед, сыгранные матчи), предложение дружбы и мгновенное приглашение в комнату
+- Полноэкранная дорога прогресса: вехи каждые 5 уровней (с 5 по 50), боковая шторка с заданиями
+- Наглядный баланс 3 видов монет на главном экране (медь, серебро, золото)
+- Обновлённая витрина: 5 прилавков, отображение уже забранного сундука с понятной надписью
+- ### 🔧 Что изменилось
+- Исправлено: после прошлого обновления игра не запускалась и зависала на загрузке
+- Если игра не может запуститься, она сразу предложит обновиться или попробовать снова
+- Устранена ошибка инициализации на старте игры (TDZ), приводившая к экрану сбоя
+- Улучшен сторожевой таймер запуска приложения и добавлена кнопка перезапуска
+- Из раздела «Друзья» убрана лишняя кнопка создания комнаты
+- Оптимизирована стабильность сетевых комнат и синхронизация уведомлений
+
+**В коде:**
+- fix(start): the game hung on loading after v266 (a removed #ptabs still got a click handler); the boot guard now works and can update a broken build
+
+## 1.0.268 — 2026-11-07
+
+**Игрокам:**
+- ### ✨ Что нового
+- Интерактивные заявки в друзья: всплывающее окно с быстрым принятием дружбы и отображение входящих заявок в разделе уведомлений
+- Карточка игрока v2: подробная статистика (кубки, победы, процент побед, сыгранные матчи), предложение дружбы и мгновенное приглашение в комнату
+- Полноэкранная дорога прогресса: вехи каждые 5 уровней (с 5 по 50), боковая шторка с заданиями
+- Наглядный баланс 3 видов монет на главном экране (медь, серебро, золото)
+- Обновлённая витрина: 5 прилавков, отображение уже забранного сундука с понятной надписью
+- ### 🔧 Что изменилось
+- Исправлено: после прошлого обновления игра не запускалась и зависала на загрузке
+- Если игра не может запуститься, она сразу предложит обновиться или попробовать снова
+- Устранена ошибка инициализации на старте игры (TDZ), приводившая к экрану сбоя
+- Улучшен сторожевой таймер запуска приложения и добавлена кнопка перезапуска
+- Из раздела «Друзья» убрана лишняя кнопка создания комнаты
+- Оптимизирована стабильность сетевых комнат и синхронизация уведомлений
+
+**В коде:**
+- feat(app): game updates over the air, signed, with automatic rollback; Telegram post only on request
+
+## 1.0.269 — 2026-11-07
+
+**Игрокам:**
+- ### ✨ Что нового
+- Интерактивные заявки в друзья: всплывающее окно с быстрым принятием дружбы и отображение входящих заявок в разделе уведомлений
+- Карточка игрока v2: подробная статистика (кубки, победы, процент побед, сыгранные матчи), предложение дружбы и мгновенное приглашение в комнату
+- Полноэкранная дорога прогресса: вехи каждые 5 уровней (с 5 по 50), боковая шторка с заданиями
+- Наглядный баланс 3 видов монет на главном экране (медь, серебро, золото)
+- Обновлённая витрина: 5 прилавков, отображение уже забранного сундука с понятной надписью
+- ### 🔧 Что изменилось
+- Исправлено: после прошлого обновления игра не запускалась и зависала на загрузке
+- Если игра не может запуститься, она сразу предложит обновиться или попробовать снова
+- Устранена ошибка инициализации на старте игры (TDZ), приводившая к экрану сбоя
+- Улучшен сторожевой таймер запуска приложения и добавлена кнопка перезапуска
+- Из раздела «Друзья» убрана лишняя кнопка создания комнаты
+- Оптимизирована стабильность сетевых комнат и синхронизация уведомлений
+
+**В коде:**
+- chore(deps): vite 6.4.5 (fixes the dev-server advisories; npm audit: 0)
+- fix: quests open again, the progress road scrolls, online figures are checked, tighter database rules
+
+## 1.0.270 — 2026-11-07
+
+**Игрокам:**
+- ### ✨ Что нового
+- Интерактивные заявки в друзья: всплывающее окно с быстрым принятием дружбы и отображение входящих заявок в разделе уведомлений
+- Карточка игрока v2: подробная статистика (кубки, победы, процент побед, сыгранные матчи), предложение дружбы и мгновенное приглашение в комнату
+- Полноэкранная дорога прогресса: вехи каждые 5 уровней (с 5 по 50), боковая шторка с заданиями
+- Наглядный баланс 3 видов монет на главном экране (медь, серебро, золото)
+- Обновлённая витрина: 5 прилавков, отображение уже забранного сундука с понятной надписью
+- ### 🔧 Что изменилось
+- Исправлено: после прошлого обновления игра не запускалась и зависала на загрузке
+- Если игра не может запуститься, она сразу предложит обновиться или попробовать снова
+- Устранена ошибка инициализации на старте игры (TDZ), приводившая к экрану сбоя
+- Улучшен сторожевой таймер запуска приложения и добавлена кнопка перезапуска
+- Из раздела «Друзья» убрана лишняя кнопка создания комнаты
+- Оптимизирована стабильность сетевых комнат и синхронизация уведомлений
+
+**В коде:**
+- feat(shop): three real coins with an exchange, market stalls come alive
+
+## 1.0.271 — 2026-11-07
+
+**Игрокам:**
+- ### ✨ Что нового
+- Интерактивные заявки в друзья: всплывающее окно с быстрым принятием дружбы и отображение входящих заявок в разделе уведомлений
+- Карточка игрока v2: подробная статистика (кубки, победы, процент побед, сыгранные матчи), предложение дружбы и мгновенное приглашение в комнату
+- Полноэкранная дорога прогресса: вехи каждые 5 уровней (с 5 по 50), боковая шторка с заданиями
+- Наглядный баланс 3 видов монет на главном экране (медь, серебро, золото)
+- Обновлённая витрина: 5 прилавков, отображение уже забранного сундука с понятной надписью
+- ### 🔧 Что изменилось
+- Исправлено: после прошлого обновления игра не запускалась и зависала на загрузке
+- Если игра не может запуститься, она сразу предложит обновиться или попробовать снова
+- Устранена ошибка инициализации на старте игры (TDZ), приводившая к экрану сбоя
+- Улучшен сторожевой таймер запуска приложения и добавлена кнопка перезапуска
+- Из раздела «Друзья» убрана лишняя кнопка создания комнаты
+- Оптимизирована стабильность сетевых комнат и синхронизация уведомлений
+
+**В коде:**
+- feat(coins): achievements pay silver and gold, rare goods for silver and gold
+
+## 1.0.272 — 2026-11-07
+
+**Игрокам:**
+- ### ✨ Что нового
+- Фигурки в витрине стали живыми персонажами: рыцарь, маг, королева, ниндзя и другие
+- Все три монеты видны в витрине, в профиле и на главной под профилем; кубки — под монетами
+- Задания в новом виде: кольца прогресса дня и недели, понятные награды, сундук недели
+- История партий: итоги сверху, у каждой партии медаль и таблица счёта
+- В профиле другого игрока видно его рамку, статус, уровень и число достижений
+- В «Как играть» новая вкладка «Награды»: режимы, монеты, задания, дорога прогресса и кубки
+- ### 🔧 Что изменилось
+- Текст на дороге прогресса больше не сливается с фоном
+- Убрана кнопка «Скопировать ID» в профиле игрока
+
+**В коде:**
+- feat: quests and history redesigned, three purses in the profile, richer player card, rewards tab in How to play
+- feat(shop): chibi characters for the figures, all coins in the shop header, coins plain under the profile
+
+## 1.0.273 — 2026-11-09
+
+**Игрокам:**
+- ### ✨ Что нового
+- Две валюты вместо трёх: **Тайлы** (главная) и **Звёзды** (редкая). Обменника больше нет, ваши монеты перенесены сами: серебро стало тайлами, золото стало звёздами
+- Новые монеты, нарисованные в Blender, в меню, витрине, профиле и наградах
+- Звёзды дают за золотые достижения и за вершины дороги прогресса (30, 40, 45 и 50 уровни)
+- Плитки «Классики 2.0» нарисованы заново: города, реки, дороги и монастыри на каждой карте
+- Дорога прогресса стала ровнее: каждый этап на 5 уровней и 250 кубков дальше
+- При создании профиля и входе появилась галочка согласия с Соглашением и Политикой конфиденциальности
+- ### 🔧 Что изменилось
+- Достижения снова можно забрать, кнопка на узких экранах встаёт под текстом
+- Профиль игрока из рейтинга открывается один раз и показывает настоящую карточку
+- Кнопки меню помещаются на узких телефонах, подписи не обрезаются
+- Кнопки больше не «залипают» после касания на телефоне
+- Убраны коллекции фигурок и рамок
+
+**В коде:**
+- Merge pull request #257 from crownfall90-dot/claude/sweet-mayer-xqbexq
+- test: Google sign-in waits for the consent tick-box
+- feat: consent tick-box, narrow-phone menu fixes, android-sim, release notes
+- feat(mobile): hover only where a mouse exists, dvh heights; feat(rewards): stars for the top stages of the progress road
+- test: texts after the move to tiles and stars; audit.mjs can run Chromium without a sandbox
+- wip(coins): coin pictures embedded in the page as data URIs (they must reach OTA and old APKs); old coin sources removed
+- wip(coins): two currencies, Tiles and Stars, instead of three coins; the exchange is removed for good
+- wip(coins): coin without studs and with matte tiles, a sharp non-cartoon star
+- wip(coins): refined yellow clay coin and blue faceted star (back to the styles the owner liked)
+- wip(coins): detailed matte dark pair (engraved coin with a stepped tile, star with two glowing lines)
+- wip(coins): dark minimal pair (charcoal coin with one gold tile, charcoal star with a thin glowing edge)
+- wip(coins): fully matte clay coin and a neon star (glow added after the render)
+- wip(coins): flat-icon and clay styles for the coin and the star
+- wip(coins): yellow coin with a violet outline, four rare star variants
+- wip(coins): glint-free pair, the main coin in the star's violet palette
+- wip(coins): improved pair (gold coin with a mosaic emblem, faceted rare star)
+- wip(coins): matching pair in a glossy outlined style (gold round coin with a mosaic tile, rare star-shaped token)
+- wip(coins): non-coin currencies (gold meeple, gold jigsaw piece, faceted gems)
+- wip(coins): engraving layouts after the store banner (mixed-case name with a short round underline)
+- wip(coins): more engraving layouts (arched name with a jigsaw piece, split arcs, slanted stamp)
+- wip(coins): gold coin with the name Tiletopia engraved (three layouts), jigsaw and faceted variants
+- wip(coins): realistic pair (gold stepped tile, obsidian and platinum faceted star), studio lighting
+- wip(coins): chunky glossy coin pair (b1_main, b1_rare) in a bold cartoon style
+- wip(coins): two more pairs (milled edge with rings, sunburst) with faceted stars
+- wip(coins): five variants of each coin (round, hexagon, rounded square) for the owner to pick from
+- wip(coins): coins «Тайлы» (gold, mosaic tile) and «Звёзды» (rare, gold star) in the Blender generator
+- wip(coins): Blender generator for the two game coins (main gold coin with a mosaic tile, rare coin with a crescent)
+- docs(release): notes for the next release
+- fix: achievements layout on narrow phones, rating opens the real player card; remove collections; progress road +5 levels/+250 cups per stage
+- Merge pull request #256 from crownfall90-dot/claude/sweet-mayer-xqbexq
+- chore: allow syncing dev/test-features to main without a prompt
+- Merge pull request #254 from crownfall90-dot/claude/sweet-mayer-xqbexq
+- docs: master prompt and action plan (brought from claude/bold-tesla-c6256a, brought up to date)
+- test: bring four browser tests up to date with the current UI
+- merge dev/tiles3d-blender (Classic 2.0 Blender tiles); fix: achievements can be claimed again
+- docs: hand-off for the next agent (what was done on 7 Nov, how to release, what is next)
+- merge origin/main (startup fix, over-the-air updates) into the Classic 2.0 renders
+- feat(hex): Classic 2.0 cards rendered in Blender — towns, rivers, roads, monastery and life on every card, shown on the board, in hand, help and setup
+- wip(hex): Blender render pipeline for Classic 2.0 cards (unfinished: water and roads modules missing, life.py incomplete)
+
+## 1.0.274 — 2026-11-09
+
+**Игрокам:**
+- ### ✨ Что нового
+- Вибрация в партии: отклик при ходе, посадке фишки, очках, победе и поражении. Отключается в настройках
+- В итогах партии строка «Лучший ход»: кто и за какой объект получил больше всего очков разом
+- ### 🔧 Что изменилось
+- Настройки: нарисованные иконки вместо эмодзи
+- Достижения: подпись на кнопке «В процессе» теперь по центру
+
+**В коде:**
+- Merge pull request #258 from crownfall90-dot/dev/stage2-account-network-20261029
+- docs(release): заметки к выпуску — только новое с v273
+- Merge remote-tracking branch 'origin/dev/stage2-account-network-20261029' into dev/stage2-account-network-20261029
+- build: скрипты локальной сборки тестового APK (Linux и Windows)
+- docs: record actual account regression and staging build results
+- Merge remote-tracking branch 'origin/dev/stage2-account-network-20261029' into dev/stage2-account-network-20261029
+- feat(ui): нарисованные линейные иконки в настройках вместо эмодзи
+- docs: record actual account regression and staging build results
+- Merge remote-tracking branch 'origin/dev/stage2-account-network-20261029' into dev/stage2-account-network-20261029
+- feat(results): строка «Лучший ход» в итогах партии
+- docs: record actual account regression and staging build results
+- feat(game): вибрация на ключевые действия партии и выключатель в настройках
+- Merge branch 'dev/stage2-account-network-20261029' of https://github.com/crownfall90-dot/play into dev/stage2-account-network-20261029
+- fix(ui): подпись на кнопке достижения по центру на узких экранах
+- docs: record actual account regression and staging build results
+- docs: версия и число тестов приведены к фактическим (v273, 299 тестов)
+- Merge main into dev/stage2
+- docs: record actual account regression and staging build results
 
