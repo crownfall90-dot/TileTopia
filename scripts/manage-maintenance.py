@@ -81,22 +81,26 @@ def main():
     daem_uids = set()
     
     # Check leaders
+    target_names = {'daem', 'daed', 'deym'}
     for uid, v in leaders.items():
-        if isinstance(v, dict) and ('daem' in (v.get('n') or '').lower() or 'daem' in (v.get('name') or '').lower()):
+        n = ((v.get('n') or v.get('name') if isinstance(v, dict) else str(v)) or '').lower()
+        if any(t in n for t in target_names):
             daem_uids.add(uid)
-            print(f'Found Daem in leaders: uid={uid}, data={v}')
+            print(f'Found Daem/daED in leaders: uid={uid}, data={v}')
             
     # Check leaders_hex
     for uid, v in leaders_hex.items():
-        if isinstance(v, dict) and ('daem' in (v.get('n') or '').lower() or 'daem' in (v.get('name') or '').lower()):
+        n = ((v.get('n') or v.get('name') if isinstance(v, dict) else str(v)) or '').lower()
+        if any(t in n for t in target_names):
             daem_uids.add(uid)
-            print(f'Found Daem in leaders_hex: uid={uid}, data={v}')
+            print(f'Found Daem/daED in leaders_hex: uid={uid}, data={v}')
             
     # Check presence
     for uid, v in presence.items():
-        if isinstance(v, dict) and ('daem' in (v.get('n') or '').lower() or 'daem' in (v.get('name') or '').lower()):
+        n = ((v.get('n') or v.get('name') if isinstance(v, dict) else str(v)) or '').lower()
+        if any(t in n for t in target_names):
             daem_uids.add(uid)
-            print(f'Found Daem in presence: uid={uid}, data={v}')
+            print(f'Found Daem/daED in presence: uid={uid}, data={v}')
 
     # Check profiles
     for uid, v in profiles.items():
@@ -111,9 +115,11 @@ def main():
                 s = json.loads(s_str) if isinstance(s_str, str) else s_str
             except Exception:
                 s = {}
-            if 'daem' in (w.get('name') or '').lower() or 'daem' in (s.get('name') or '').lower():
+            wn = (w.get('name') or '').lower()
+            sn = (s.get('name') or '').lower()
+            if any(t in wn or t in sn for t in target_names):
                 daem_uids.add(uid)
-                print(f'Found Daem in profiles: uid={uid}, wallet.name={w.get("name")}, seat.name={s.get("name")}')
+                print(f'Found Daem/daED in profiles: uid={uid}, wallet.name={w.get("name")}, seat.name={s.get("name")}')
 
     if daem_uids:
         print(f'Total Daem accounts found: {len(daem_uids)}')
@@ -202,8 +208,8 @@ def main():
     # TASK 3: Export Agent Telemetry, Errors, and Analytics
     # ----------------------------------------------------
     print('\n[TASK 3] Gathering Telemetry & Agent Analytics Data...')
-    errors_raw = fb_req('GET', 'errors?orderBy="$key"&limitToLast=200') or {}
-    feedback_raw = fb_req('GET', 'feedback?orderBy="$key"&limitToLast=100') or {}
+    errors_raw = fb_req('GET', 'errors') or {}
+    feedback_raw = fb_req('GET', 'feedback') or {}
     usage_raw = fb_req('GET', 'usage') or {}
 
     out_dir = os.path.join(os.path.dirname(__file__), '..', 'agent_data')

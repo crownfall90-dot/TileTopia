@@ -38,6 +38,10 @@ jobs:
           git config user.name "TileTopia Agent Bot"
           git config user.email "bot@tiletopia.app"
           
+          # Move agent data to temporary location
+          mkdir -p /tmp/agent_data_export
+          cp -r agent_data/* /tmp/agent_data_export/
+          
           # Check out or create orphan branch telemetry/agent-hub
           if git show-ref --quiet refs/remotes/origin/telemetry/agent-hub; then
             git checkout -B telemetry/agent-hub origin/telemetry/agent-hub
@@ -46,10 +50,10 @@ jobs:
             git rm -rf . || true
           fi
           
-          # Copy agent data
+          # Copy agent data back
           mkdir -p agent_data
-          cp -r ../TileTopia/agent_data/* agent_data/ 2>/dev/null || cp -r agent_data/* . 2>/dev/null || true
+          cp -r /tmp/agent_data_export/* agent_data/
           
-          git add agent_data/ || git add .
+          git add agent_data/
           git commit -m "chore(telemetry): update errors, player feedback, and analytics data [skip ci]" || echo "No changes to commit"
           git push -u origin telemetry/agent-hub --force
