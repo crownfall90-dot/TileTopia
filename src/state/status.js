@@ -55,7 +55,7 @@ export const EXCLUSIVE_STATUSES = [
   {id: 'allach', text: 'Коллекционер', how: 'Получите все достижения', ic: '🏆'},
   {id: 'legend', text: 'Легенда', how: 'Достигните 30 уровня', ic: '👑'},
   {id: 'old', text: 'Олд', how: 'Играли в Tiletopia до 2027 года', ic: '🗿'},
-  {id: 'champion', text: 'Чемпион', how: 'Скоро: первое место в рейтинге недели', ic: '🥇', soon: true},
+  {id: 'champion', text: 'Чемпион', how: 'Первое место в рейтинге по итогам двух недель', ic: '🥇'},
 ];
 
 const BAD_STEMS = ['хуй', 'хуе', 'хуя', 'хуи', 'пизд', 'бляд', 'блят', 'ебан', 'ебат', 'ебл', 'ебу', 'еба', 'сука', 'суки', 'мудак', 'мудил', 'пидор', 'пидар', 'гондон', 'залуп', 'шлюх', 'долбо', 'уебок', 'уёбок', 'педик', 'нацист', 'гитлер', 'фашист', 'негр', 'чурк', 'убей', 'убью', 'fuck', 'shit', 'bitch', 'cunt', 'nigg', 'faggot', 'whore', 'dick', 'cock', 'rape', 'nazi', 'hitler', 'porn', 'порн', 'секс', 'sex'];
@@ -86,6 +86,7 @@ const all = () => [...SHOP_STATUSES.map(x => ({...x, key: 'sh:' + x.id})), ...EX
 export function statusText(key) {
   if (typeof key !== 'string') return '';
   if (key.startsWith('cu:')) return shownStatus(key.slice(3));
+  if (key.startsWith('ti:')) return titleText(key);
   const f = all().find(x => x.key === key);
   return f ? f.text : '';
 }
@@ -150,4 +151,33 @@ export function grantEarned(wallet, prog, achCount, today) {
   const qd = prog && prog.qdays;
   if (qd && flawlessMonth(qd, prevMonth(today))) give('ex:flawless');
   return got;
+}
+
+/* Season titles (scripts/champions.py, every two weeks; the rating itself is never reset): /titles/{uid} holds how many
+   times the player came first in the classic rating (c), in the Classic 2.0 one (h) and in the top three (p). They turn
+   into statuses to wear: 'ex:champion' for the first win, then 'ti:c2', 'ti:c3'… «Чемпион ×2»; 'ti:h1' «Чемпион 2.0»; 'ti:p1' «Призёр». */
+const TITLE = {c: 'Чемпион', h: 'Чемпион 2.0', p: 'Призёр'};
+export function titleText(key) {
+  const m = /^ti:([chp])(\d{1,3})$/.exec(key);
+  if (!m) return '';
+  const k = +m[2];
+  return k > 1 ? `${TITLE[m[1]]} ×${k}` : TITLE[m[1]];
+}
+/** Adds the statuses the titles give (only the highest count of each kind is kept). Returns the new keys. */
+export function grantTitles(wallet, t) {
+  wallet.statuses = Array.isArray(wallet.statuses) ? wallet.statuses : [];
+  const added = [];
+  for (const kind of ['c', 'h', 'p']) {
+    const k = Math.min(999, Math.floor(+(t && t[kind]) || 0));
+    if (!k) continue;
+    if (kind === 'c' && !wallet.statuses.includes('ex:champion')) { wallet.statuses.push('ex:champion'); added.push('ex:champion'); }
+    if (kind === 'c' && k === 1) continue;
+    const key = `ti:${kind}${k}`;
+    if (wallet.statuses.includes(key)) continue;
+    const old = wallet.statuses.filter(x => x.startsWith('ti:' + kind));
+    wallet.statuses = wallet.statuses.filter(x => !old.includes(x)).concat(key);
+    if (old.includes(wallet.statusKey)) wallet.statusKey = key;
+    added.push(key);
+  }
+  return added;
 }

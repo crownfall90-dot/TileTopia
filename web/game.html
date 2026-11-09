@@ -243,12 +243,10 @@
         <div class="lb">
           <div class="ltop">
             <button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button>
-            <b>Уведомления и награды</b>
+            <b>Уведомления</b>
           </div>
           <div class="seg ntabs" id="ntabs">
-            <button data-nt="all" aria-pressed="true">Все</button>
-            <button data-nt="rewards" aria-pressed="false">Награды</button>
-            <button data-nt="promo" aria-pressed="false">Промокоды</button>
+            <button data-nt="rewards" aria-pressed="true">Награды</button>
             <button data-nt="news" aria-pressed="false">Новости</button>
           </div>
           <div class="col notif-list" id="notifList"></div>
@@ -1108,28 +1106,31 @@ function ownSvg(t, list) {
   }
   return 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">${out}</svg>`);
 }
-// The owner colours on a six-sided tile, drawn in the tile type's own frame (the picture turns with the face), on the
-// shapes the tile renders are built from (src/engine/hex.js shapes): its roads, the town's wall curves, the monastery.
+// Who holds what on a card (classic and Classic 2.0 alike), drawn in the card type's own frame on the shapes the renders
+// are built from (src/engine/hex.js, src/engine/square.js): the road and the town keep their own colours. A road gets a thin
+// dashed line in its holder's colour down the middle, a town a dashed line along the inside of its wall and a pennant on
+// every wall tower, a monastery a dashed ring. Several holders: the dashes take their colours in turn.
 function hexOwnSvg(t, list, M) {
   const R = M.GEO.R, S = M.shapes(t.type), NS = M.N, P = p => p[0].toFixed(4) + ' ' + p[1].toFixed(4);
   const line = path => path.length === 4 ? `M${P(path[0])}C${P(path[1])} ${P(path[2])} ${P(path[3])}` : `M${P(path[0])}L${P(path[1])}`;
-  const strokes = (d, cols, w) => cols.map((c, i) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${w}" stroke-linecap="${cols.length > 1 ? 'butt' : 'round'}"${cols.length > 1 ? ` stroke-dasharray=".07 ${.07 * (cols.length - 1)}" stroke-dashoffset="${-.07 * i}"` : ''}/>`).join('');
+  const D = .055, G = .035, W = .03;
+  const dashes = (d, cols) => `<path d="${d}" fill="none" stroke="rgba(20,16,10,.45)" stroke-width="${W + .014}" stroke-dasharray="${D + .01} ${G - .01}" stroke-dashoffset=".005"/>`
+    + cols.map((c, i) => `<path d="${d}" fill="none" stroke="${c}" stroke-width="${W}" stroke-dasharray="${D} ${(D + G) * cols.length - D}" stroke-dashoffset="${-(D + G) * i}"/>`).join('');
+  const pennant = (p, c) => `<path d="M${P(p)}v-.13" stroke="#3b2a18" stroke-width=".016" stroke-linecap="round"/><path d="M${p[0].toFixed(4)} ${(p[1] - .13).toFixed(4)}l.08 .03l-.08 .03Z" fill="${c}" stroke="rgba(0,0,0,.35)" stroke-width=".006"/>`;
   let out = '';
   for (const it of list) {
     const base = it.edges.map(d => (d - t.r + NS) % NS).sort();
     if (it.kind === 'r') {
       const road = S.roads.find(x => x.edges.slice().sort().join() === base.join());
-      if (!road) continue;
-      const d = line(road.path);
-      out += `<path d="${d}" fill="none" stroke="#fff" stroke-opacity=".55" stroke-width=".1" stroke-linecap="round"/>` + strokes(d, it.cols, .065);
+      if (road) out += dashes(line(road.path), it.cols);
     } else if (it.kind === 'c' && S.town) {
-      const T6 = S.town, fill = `M${P(T6.from)}${T6.segs.map(s => s.c ? `Q${P(s.c)} ${P(s.to)}` : `L${P(s.to)}`).join('')}Z`;
-      const wall = T6.walls.map(([a, c, b]) => `M${P(a)}Q${P(c)} ${P(b)}`).join('');
-      out += `<path d="${fill}" fill="${it.cols[0]}" fill-opacity="${it.cols.length > 1 ? .12 : .22}"/>`;
-      out += wall ? `<path d="${wall}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width=".07" stroke-linecap="round"/>` + strokes(wall, it.cols, .045) : strokes(fill, it.cols, .045);
+      const T6 = S.town, k = T6.keep, inw = (p, f = .07) => { const dx = k[0] - p[0], dy = k[1] - p[1], L = Math.hypot(dx, dy) || 1; return [p[0] + dx / L * f, p[1] + dy / L * f]; };
+      if (T6.walls.length) {
+        out += dashes(T6.walls.map(([a, c, b]) => `M${P(inw(a, .1))}Q${P(inw(c))} ${P(inw(b, .1))}`).join(''), it.cols);
+        T6.towers.forEach((p, i) => { out += pennant(inw(p, .04), it.cols[i % it.cols.length]); });
+      } else out += pennant(k, it.cols[0]);
     } else if (it.kind === 'f') {
-      const d = 'M0 -.26A.26 .26 0 1 1 -.001 -.26Z';
-      out += `<path d="${d}" fill="none" stroke="#fff" stroke-opacity=".5" stroke-width=".07"/>` + strokes(d, it.cols, .045);
+      out += dashes('M0 -.27A.27 .27 0 1 1 -.001 -.27Z', it.cols);
     }
   }
   return 'data:image/svg+xml,' + encodeURIComponent(`<svg xmlns="http://www.w3.org/2000/svg" viewBox="${-R} -.5 ${2 * R} 1" preserveAspectRatio="none">${out}</svg>`);
@@ -3152,11 +3153,26 @@ const TRANSPORT = FB ? FIRE : NTFY;
 // Players online: every open game marks itself in /presence once a minute (and removes the mark
 // when it goes to the background); the menu counts marks from the last 2.5 minutes.
 // Rules for /presence are in docs/firebase-rules.json.
+// Season titles (scripts/champions.py): every two weeks the best of each rating get a title in /titles/{uid}; the game
+// turns it into a status to wear («Чемпион», «Чемпион ×2», «Призёр»…) and says so once. Checked with the presence mark.
+let titlesAt = 0;
+async function checkTitles() {
+  if (!FB || !fbAuth.uid || Date.now() - titlesAt < 30 * 60000) return;
+  titlesAt = Date.now();
+  const t = await fbGet('titles/' + fbAuth.uid).catch(() => null);
+  if (!t) return;
+  const added = PG.state.status.grantTitles(wallet, t);
+  if (!added.length) return;
+  saveWallet();
+  const txt = PG.state.status.statusText(added[added.length - 1]);
+  toastAny(`🏆 Итоги сезона: вам присвоено звание «${txt}». Наденьте его в профиле!`);
+}
 async function presenceMark(on) {
   if (!FB) return;
   try {
     const tok = await fbToken();
     if (!fbAuth.uid) return;
+    if (on) checkTitles();
     const url = `${FB.dbUrl}/presence/${fbAuth.uid}.json?auth=${tok}`;
     const vs = versionSeen(), di = devInfo(), dev = {p: installKind(), v: vs.v, u: vs.t, ...(di.m ? {m: di.m, i: di.i} : {})};
     const ret = {fr: FRAMES[wallet.frame] ? wallet.frame : '', a: ACH.filter(x => PROG.ach[x.id] === 'got').length, lv: PROG.lvl || 1, w: (PROG.st && PROG.st.wins) || 0, g: (PROG.st && PROG.st.games) || 0, c: validCol(wallet.color) ? wallet.color : '', st: myStatus(), fs: wallet.firstSeen || today(), d1: (wallet.rd && wallet.rd[1]) ? 1 : 0, d7: (wallet.rd && wallet.rd[7]) ? 1 : 0};
@@ -4745,6 +4761,8 @@ function openReportDialog(uid, name) {
   }
 }
 
+// The last card data of each player, so opening a card again is instant (a fresh copy is still fetched).
+const plCache = new Map();
 async function openPlayer(uid, name, col, meta = {}) {
   if (!uid || !FB) return;
   const old = document.getElementById('plBox'); if (old) old.remove();
@@ -4845,7 +4863,10 @@ async function openPlayer(uid, name, col, meta = {}) {
     }
   };
 
-  renderCard();
+  // A card seen before opens with what was known; a new one waits for its numbers instead of showing zeros.
+  const cached = plCache.get(uid);
+  renderCard(cached || {});
+  if (!cached) box.classList.add('plload');
   document.body.append(box);
   box.onclick = e => { if (e.target === box) box.remove(); };
 
@@ -4865,16 +4886,12 @@ async function openPlayer(uid, name, col, meta = {}) {
     statusText = PG.state.status.shownStatus((pres && pres.st) || (lead && lead.st) || statusText);
     frame = (lead && lead.fr) || (pres && pres.fr) || frame;
 
-    renderCard({
-      cups,
-      wins,
-      games,
-      statusText,
-      frame, ach, level,
-      isOnline: details.isOnline,
-      seenText: details.seenText
-    });
+    const data = {cups, wins, games, statusText, frame, ach, level, isOnline: details.isOnline, seenText: details.seenText};
+    plCache.set(uid, data);
+    if (!box.isConnected) return;
+    renderCard(data);
   } catch (_) {}
+  box.classList.remove('plload');
 }
 document.addEventListener('click', e => { const b = e.target.closest('[data-pl]'); if (b && !e.target.closest('button.chip')) openPlayer(b.dataset.pl, b.dataset.n, b.dataset.c, b.dataset); });
 // Edit the profile: colour (free, any time) and nickname (the usual rename).
@@ -6791,9 +6808,15 @@ async function attachPendingGoogle() {
   try { const j = await googleIdp(g.token, fbAuth.idToken); keepAuth(j, fbAuth.email); toastAny('Google подключён — теперь можно входить в один тап'); }
   catch (e) { authErr(e, true); }
 }
+// After a registration the status «Олд» waits in Notifications → Rewards: the red dot lights up and a toast says so.
+function oldStatusNote() {
+  updateNotifBadge();
+  const claimed = (wallet.inbox && wallet.inbox.claimed) || [];
+  if (!claimed.includes('notif_old_status') && !(wallet.statuses || []).includes('ex:old')) setTimeout(() => toastAny('🗿 В уведомлениях вас ждёт статус «Олд» — заберите его!'), 1500);
+}
 // The last step of a registration: a nickname rivals and the rating will see. One made up before is kept.
 function finishSignup() {
-  if (wallet.name) { toastAny(`Профиль сохранён, ${profileName()}!`); return; }
+  if (wallet.name) { toastAny(`Профиль сохранён, ${profileName()}!`); oldStatusNote(); return; }
   if (document.getElementById('signupBox')) return;
   const box = document.createElement('div'); box.className = 'over'; box.id = 'signupBox'; box.style.position = 'fixed';
   box.innerHTML = `<div class="ocard prof"><div class="pav" id="suAv" style="--c:${wallet.color}">?</div><h3>Завершите регистрацию</h3><p>Придумайте никнейм — его увидят соперники и рейтинг</p>
@@ -6805,7 +6828,7 @@ function finishSignup() {
   inp.onkeydown = e => { if (e.key === 'Enter' && !ok.disabled) ok.click(); };
   ok.onclick = async () => {
     if (!setProfileName(inp.value)) return;
-    box.remove(); toastAny(`Профиль создан. Привет, ${profileName()}!`);
+    box.remove(); toastAny(`Профиль создан. Привет, ${profileName()}!`); oldStatusNote();
     renderAccount(); renderSetup(); presenceMark(true);
     try { await cloudSave(); syncRating(); } catch (_) {}
   };
@@ -7251,7 +7274,7 @@ async function signOut() {
 
 
 /* ---------------- Inbox & Rewards Controller ---------------- */
-let ntab = 'all';
+let ntab = 'rewards';
 function renderInbox() {
   wallet.inbox = wallet.inbox || { claimed: [], read: [] };
   const claimed = Array.isArray(wallet.inbox.claimed) ? wallet.inbox.claimed : [];
@@ -7262,7 +7285,8 @@ function renderInbox() {
       items: PG.ui.inbox.INBOX_ITEMS,
       claimed: claimed,
       filter: ntab,
-      friendRequests: friendRequests
+      friendRequests: friendRequests,
+      registered: registered()
     });
   }
   document.querySelectorAll('#ntabs button').forEach(b => b.setAttribute('aria-pressed', b.dataset.nt === ntab));
@@ -7275,7 +7299,7 @@ function updateNotifBadge() {
   const read = Array.isArray(wallet.inbox.read) ? wallet.inbox.read : [];
   const friendRequests = Object.entries(inbox || {}).filter(([, v]) => v && v.k === 'f');
   const count = (typeof PG !== 'undefined' && PG.ui && PG.ui.inbox && PG.ui.inbox.unreadInboxCount)
-    ? PG.ui.inbox.unreadInboxCount(claimed, read, friendRequests)
+    ? PG.ui.inbox.unreadInboxCount(claimed, read, friendRequests, registered())
     : 0;
   const dot = $('#notifDot');
   if (dot) {
@@ -7584,13 +7608,29 @@ function firstInstallHint() {
   wallet.installHinted = true; saveWallet(); installDialog();
 }
 // After an update (from Google Play or GitHub) show what changed, once per version.
+// Release notes (Markdown in release-notes.md) as a tidy list: headings, bold, underline, italics and bullets, with the
+// marks themselves (#, *, -, _) gone. Everything is escaped first, so the notes cannot carry markup of their own.
+function notesHtml(md) {
+  const esc = t => String(t).replace(/[&<>"]/g, c => ({'&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;'})[c]);
+  const inline = t => esc(t).replace(/\*\*(.+?)\*\*/g, '<b>$1</b>').replace(/__(.+?)__/g, '<u>$1</u>').replace(/(^|[\s(])[*_](\S(?:.*?\S)?)[*_](?=[\s).,!?:;]|$)/g, '$1<i>$2</i>').replace(/`([^`]+)`/g, '<code>$1</code>');
+  let out = '', list = false;
+  for (const raw of String(md || '').split(/\r?\n/)) {
+    const line = raw.trim();
+    const li = /^[-*•]\s+(.*)$/.exec(line), h = /^#{1,6}\s*(.*)$/.exec(line);
+    if (li) { if (!list) { out += '<ul class="nl-list">'; list = true; } out += `<li>${inline(li[1])}</li>`; continue; }
+    if (list) { out += '</ul>'; list = false; }
+    if (!line) continue;
+    out += h ? `<div class="nl-h">${inline(h[1])}</div>` : `<p class="nl-p">${inline(line)}</p>`;
+  }
+  return out + (list ? '</ul>' : '');
+}
 function showWhatsNew(ver) {
   let last = null;
   try { last = localStorage.getItem('seenVersion'); localStorage.setItem('seenVersion', ver); } catch (_) { return; }
   if (!last || last === ver || !window.RELEASE_NOTES) return;
   const box = document.createElement('div'); box.className = 'over'; box.style.position = 'fixed';
   box.innerHTML = `<div class="ocard"><h3>Что нового в версии ${ver}</h3><div class="notes-list"></div><button class="cta wide">Играть</button></div>`;
-  box.querySelector('.notes-list').textContent = window.RELEASE_NOTES;
+  box.querySelector('.notes-list').innerHTML = notesHtml(window.RELEASE_NOTES);
   box.querySelector('.cta').onclick = () => box.remove();
   document.body.append(box);
 }
@@ -7670,10 +7710,10 @@ window.onUpdateAvailable = (info, manual) => {
   if (updBox && document.body.contains(updBox)) return;
   boot.checked = true;
   const box = updBox = document.createElement('div'); box.className = 'over'; box.style.position = 'fixed';
-  const titleText = isMandatory ? `Вышло обязательное обновление ${info.version}` : `Вышло обновление ${info.version}`;
-  const subText = isMandatory ? 'Для продолжения сетевой игры требуется обновление. Что нового:' : (info && info.mandatory === false ? 'Необязательный патч (мелкие фиксы). Что нового:' : 'Что нового:');
+  const titleText = isMandatory ? `Вышло обновление ${info.version}` : `Вышло обновление ${info.version}`;
+  const subText = isMandatory ? 'Для продолжения сетевой игры требуется обновление. Что нового:' : 'Что нового:';
   box.innerHTML = `<div class="ocard"><h3>${titleText}</h3><p>${subText}</p><div class="notes-list"></div><div class="prog" hidden><i></i></div><button class="cta wide" id="upd">Обновить</button>${!isMandatory ? '<button class="ghostbtn" id="updLater" style="margin-top:6px">Позже</button>' : ''}<a class="ghostbtn manual" id="manual" hidden href="https://github.com/crownfall90-dot/TileTopia/releases/latest">Скачать вручную</a></div>`;
-  box.querySelector('.notes-list').textContent = info.notes || 'Исправления и улучшения';
+  box.querySelector('.notes-list').innerHTML = notesHtml(info.notes || 'Исправления и улучшения');
   if (players.length && phase !== 'end' && phase !== 'idle') box.querySelector('p').textContent = (net ? 'Партия на паузе: после обновления вернитесь в комнату — игра продолжится, когда обновятся все. ' : 'Партия сохранится. ') + 'Что нового:';
   document.body.append(box);
   if (!isMandatory) {

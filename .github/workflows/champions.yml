@@ -1,0 +1,29 @@
+name: Season results
+
+# Every two weeks the best of each rating get a title (scripts/champions.py). The job runs every Monday at 00:05 Moscow
+# time and acts on even weeks only; run it by hand with force to close a season now.
+on:
+  schedule:
+    - cron: '5 21 * * 0'
+  workflow_dispatch:
+    inputs:
+      apply:
+        description: Записать итоги (иначе только показать)
+        type: boolean
+        default: true
+      force:
+        description: Подвести итоги сейчас, не дожидаясь чётной недели
+        type: boolean
+        default: false
+
+permissions:
+  contents: read
+
+jobs:
+  season:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - env:
+          FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
+        run: python3 scripts/champions.py ${{ (github.event_name == 'schedule' || inputs.apply) && '--apply' || '' }} ${{ inputs.force && '--force' || '' }}

@@ -7087,3 +7087,22 @@ html.calm .shop-stall.stall-emotes .stall-emote-icon{animation:none}
 .shop-stall.stall-avatars .av-pedestal{display:grid;place-items:center;height:62px}
 .shop-stall.stall-avatars .av{width:52px;height:52px;box-shadow:0 6px 12px -4px rgba(0,0,0,.7)}
 .shop-stall.stall-avatars .av.sh-rect{height:40px}
+
+/* Player card while its numbers load: the stats shimmer instead of showing zeros */
+#plBox.plload .pl-v2-stat-val,#plBox.plload .pl-v2-badge span{color:transparent!important;background:linear-gradient(90deg,rgba(255,255,255,.06),rgba(255,255,255,.16),rgba(255,255,255,.06)) 0 0/200% 100%;border-radius:6px;animation:plShim 1s linear infinite}
+@keyframes plShim{to{background-position:-200% 0}}
+
+/* Release notes (notesHtml): a heading and bullets with gold dots, no Markdown marks */
+.notes-list{white-space:normal!important;text-align:left}
+.notes-list .nl-h{font:800 15px var(--f-display);color:var(--brass);margin:2px 0 8px}
+.notes-list .nl-list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}
+.notes-list .nl-list li{position:relative;padding-left:16px;font-size:13.5px;line-height:1.4;color:#e7ecf8}
+.notes-list .nl-list li::before{content:"";position:absolute;left:2px;top:.5em;width:7px;height:7px;border-radius:50%;background:linear-gradient(135deg,#ffd877,#f2b84b);box-shadow:0 0 6px rgba(242,184,75,.6)}
+.notes-list .nl-p{margin:0 0 6px;font-size:13.5px;line-height:1.4}
+.notes-list b{color:#fff;font-weight:800}.notes-list u{text-decoration-color:var(--brass);text-underline-offset:2px}
+.notes-list code{font-size:12px;padding:1px 5px;border-radius:5px;background:rgba(255,255,255,.08)}
+
+/* Main menu: the «Режим» button takes the width of its word (the «Играть» button gives way), never cut to «Реж…» */
+html body .tile-btn.tile-mode{flex:0 0 auto;min-width:max-content;padding-left:12px;padding-right:12px}
+html body .tile-btn.tile-mode .t-title{overflow:visible;text-overflow:clip}
+@media (max-width:400px){html body .tile-btn.tile-mode .t-arrow{display:none}html body .tile-btn.tile-mode{padding-left:10px;padding-right:10px}}

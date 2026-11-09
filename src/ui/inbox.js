@@ -1,76 +1,36 @@
-// Renders the Notifications & Rewards screen (inbox): developer rewards, promo codes, patch notes.
+// Renders the Notifications screen (inbox): two sections, rewards (with friend requests on top) and news.
 
 export const INBOX_ITEMS = [
   {
-    id: 'notif_old_status',
-    category: 'rewards',
-    icon: '🗿',
-    badge: 'Эксклюзив',
-    badgeClass: 'b-gold',
-    title: 'Эксклюзивный статус ветерана: «Олд»',
-    date: 'Сегодня',
-    desc: 'Награда первопроходца TileTopia! Заберите легендарный эксклюзивный статус ветерана «Олд» для отображения в профиле, лобби и онлайн-партиях.',
-    rewardType: 'status',
-    rewardKey: 'ex:old',
-    rewardTitle: 'Статус «Олд» 🗿',
-    actionLabel: 'Забрать статус'
+    id: 'notif_old_status', category: 'rewards', icon: '🗿', badge: 'Эксклюзив', badgeClass: 'b-gold', requires: 'registered',
+    title: 'Статус «Олд» — за регистрацию', date: 'Награда',
+    desc: 'Спасибо, что вы с нами с самого начала! Статус «Олд» получают только игроки, которые завели профиль до 2027 года. Его видят соперники в партиях и в рейтинге.',
+    rewardType: 'status', rewardKey: 'ex:old', rewardTitle: 'Статус «Олд»', actionLabel: 'Забрать статус'
   },
   {
-    id: 'notif_welcome_gold',
-    category: 'rewards',
-    icon: '🪙',
-    badge: 'Подарок',
-    badgeClass: 'b-gold',
-    title: 'Приветственный дар: +500 тайлов',
-    date: 'Сегодня',
-    desc: 'В честь масштабного визуального обновления дарим вам 500 тайлов на покупку новых анимированных голографических рамок и фигурок!',
-    rewardType: 'gold',
-    rewardAmount: 500,
-    rewardTitle: '+500 🪙',
-    actionLabel: 'Забрать +500 🪙'
+    id: 'notif_welcome_gold', category: 'rewards', icon: '🪙', badge: 'Подарок', badgeClass: 'b-gold',
+    title: 'Подарок: +500 тайлов', date: 'Награда',
+    desc: 'Тайлы на витрину: фигурки, рамки, картинки профиля и статусы.',
+    rewardType: 'gold', rewardAmount: 500, rewardTitle: '+500 тайлов', actionLabel: 'Забрать 500 тайлов'
   },
   {
-    id: 'notif_promo_diorama',
-    category: 'promo',
-    icon: '🎟️',
-    badge: 'Промокод',
-    badgeClass: 'b-blue',
-    title: 'Секретный промокод: DIORAMA3D',
-    date: 'Вчера',
-    desc: 'Промокод разработчиков на +300 тайлов в честь релиза 3D-плиток и 6-сторонних гексов. Нажмите кнопку для мгновенной активации!',
-    rewardType: 'promo',
-    promoCode: 'DIORAMA3D',
-    rewardTitle: '+300 🪙',
-    actionLabel: 'Активировать DIORAMA3D'
+    id: 'notif_news_seasons', category: 'news', icon: '🏆', badge: 'Сезоны', badgeClass: 'b-gold',
+    title: 'Чемпионы каждые две недели', date: '10.11.2026',
+    desc: 'Раз в две недели лучшие игроки рейтинга получают звания: «Чемпион», «Чемпион ×2» и дальше, а места со второго по третье — «Призёр». Рейтинг при этом не сбрасывается.',
+    actionLabel: 'Открыть рейтинг', actionLink: 'rating'
   },
   {
-    id: 'notif_news_diorama',
-    category: 'news',
-    icon: '🏰',
-    badge: 'Обновление',
-    badgeClass: 'b-purple',
-    title: '3D-мир Tiletopia: Диорамы и Гексы',
-    date: '06.11.2026',
-    desc: 'В игру добавлены детализированные настольные 3D-диорамы: реки, каменные мосты, озера, большой акведук, деревни, цитадели и монастыри! Доступны классический режим (4 стороны) и гексагональный (6 сторон), а также настраиваемая колода реакций (5 эмодзи + 5 фраз).',
-    actionLabel: 'В «Мои предметы»',
-    actionLink: 'items'
-  },
-  {
-    id: 'notif_news_cups',
-    category: 'news',
-    icon: '🏆',
-    badge: 'Сезон',
-    badgeClass: 'b-gold',
-    title: 'Сезонный турнир: играйте за кубки',
-    date: '04.11.2026',
-    desc: 'Участвуйте в онлайн-партиях, сражайтесь за кубки рейтинга и поднимайтесь на вершину Зала Славы в профиле!',
-    actionLabel: 'Открыть Зал Славы',
-    actionLink: 'rating'
+    id: 'notif_news_tiles', category: 'news', icon: '🏰', badge: 'Обновление', badgeClass: 'b-purple',
+    title: 'Новые плитки и картинки профиля', date: '10.11.2026',
+    desc: 'Плитки «Классики» перерисованы так же подробно, как в «Классике 2.0». В витрине появились аватарки и баннеры, а у аватара — квадратная форма и форма-баннер.',
+    actionLabel: 'В витрину', actionLink: 'shop'
   }
 ];
 
-export function unreadInboxCount(claimed = [], read = [], friendRequests = []) {
-  const baseCount = INBOX_ITEMS.filter(it => {
+const visible = (items, registered) => items.filter(it => it.requires !== 'registered' || registered);
+
+export function unreadInboxCount(claimed = [], read = [], friendRequests = [], registered = false) {
+  const baseCount = visible(INBOX_ITEMS, registered).filter(it => {
     if (it.rewardType && !claimed.includes(it.id)) return true;
     if (!it.rewardType && !read.includes(it.id)) return true;
     return false;
@@ -82,11 +42,12 @@ export function unreadInboxCount(claimed = [], read = [], friendRequests = []) {
 export function renderInboxHtml({
   items = INBOX_ITEMS,
   claimed = [],
-  filter = 'all',
-  friendRequests = []
+  filter = 'rewards',
+  friendRequests = [],
+  registered = false
 }) {
-  const filtered = items.filter(it => filter === 'all' || it.category === filter);
-  const showFriends = (filter === 'all' || filter === 'friends') && Array.isArray(friendRequests) && friendRequests.length > 0;
+  const filtered = visible(items, registered).filter(it => filter === 'all' || it.category === filter);
+  const showFriends = (filter === 'all' || filter === 'rewards') && Array.isArray(friendRequests) && friendRequests.length > 0;
 
   let friendCardsHtml = '';
   if (showFriends) {
@@ -133,7 +94,7 @@ export function renderInboxHtml({
       <div class="notif-empty">
         <span class="ne-icon">📭</span>
         <b>В этой категории пока пусто</b>
-        <small>Новые награды, промокоды и заявки появятся здесь</small>
+        <small>${filter === 'news' ? 'Новости игры появятся здесь' : 'Награды и заявки в друзья появятся здесь'}</small>
       </div>
     `;
   }

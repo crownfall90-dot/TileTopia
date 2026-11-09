@@ -41,11 +41,13 @@ test('ui/inbox: items definition, unread count and rendering', async () => {
   const html = inbox.renderInboxHtml({
     items: inbox.INBOX_ITEMS,
     claimed: [],
-    friendRequests: [['u123_f', { n: 'Алексей', k: 'f' }]]
+    friendRequests: [['u123_f', { n: 'Алексей', k: 'f' }]],
+    registered: true
   });
   assert.ok(html.includes('notif-card'), 'Renders notif-card');
   assert.ok(html.includes('data-claim-notif="notif_old_status"'), 'Renders claim button for old status');
   assert.ok(html.includes('data-facc="u123"'), 'Renders accept button for friend request');
   assert.ok(html.includes('data-fdrop="u123_f"'), 'Renders decline button for friend request');
   assert.ok(html.includes('Алексей'), 'Renders friend request sender name');
+  assert.ok(!inbox.renderInboxHtml({claimed: []}).includes('notif_old_status'), 'Old status waits for a registration');
 });
