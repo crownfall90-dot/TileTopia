@@ -30,10 +30,10 @@ export const BANNERS = {
   abbey: P('Монастырь', 'tiles/fort.webp', 1000, '50% 50%'),
   watercity: P('Водный замок', 'tiles/wCity.webp', 1100, '50% 50%'),
   abbeyriver: P('Обитель у реки', 'tiles/fortR.webp', 1300, '50% 50%'),
-  rocks: P('Скалистый утёс', 'tiles/rocks.webp', 1500, '50% 50%'),
-  citadel: P('Цитадель', 'tiles/c4.webp', 2000, '50% 50%'),
-  dragons: P('Пик Дракона', 'tiles/banner_dragons.webp', 2500, '50% 45%'),
-  harbor: P('Королевская гавань', 'tiles/banner_harbor.webp', 3000, '50% 50%'),
+  rocks: P('Скалистый утёс', 'tiles/rocks.webp', 2000, '50% 50%'),
+  citadel: P('Цитадель', 'tiles/c4.webp', 3000, '50% 50%'),
+  dragons: P('Пик Дракона', 'tiles/banner_dragons.webp', 5000, '50% 45%'),
+  harbor: P('Королевская гавань', 'tiles/banner_harbor.webp', 8000, '50% 50%'),
 };
 const POOL = {pic: [PICS, 'avatars', 'avatar'], banner: [BANNERS, 'banners', 'banner']};
 

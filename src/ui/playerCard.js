@@ -138,24 +138,26 @@ export function renderPlayerCardHtml({
     actionsHtml = inviteBtn + friendAction + secondaryActions;
   }
 
-  const bannerCls = (hasBanner && bannerSrc) ? ' has-banner' : '';
-  const bannerStyle = (hasBanner && bannerSrc) ? ` style="--banner-bg:url(${bannerSrc});--banner-pos:${bannerPos}"` : '';
-
   return `
-    <div class="ocard prof pcard pl-dialog-v2${bannerCls}"${bannerStyle}>
+    <div class="ocard prof pcard pl-dialog-v2">
       <button class="pl-v2-close" id="plCloseBtn" aria-label="Закрыть">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
       </button>
 
-      <!-- Player Identity Header -->
-      <div class="pl-v2-header">
-        <div class="pl-v2-av-box" style="--pl-c:${safeCol}">
-          <span class="pl-v2-av${frameRing ? ' fr' : ''}" style="--c:${safeCol}${frameRing ? ';--fr:' + String(frameRing).replace(/[;"<>]/g, '') : ''}">${initial}</span>${level != null ? `<span class="pl-v2-lvl">${+level || 1}</span>` : ''}
-        </div>
-        <div class="pl-v2-identity">
-          <h3 class="pl-v2-name">${cleanName}</h3>
-          ${statusBadge}
-          <div class="pl-v2-presence-row">${onlinePill}</div>
+      <!-- Minimalist Cinematic Banner Hero -->
+      <div class="pl-hero-banner${hasBanner && bannerSrc ? ' with-art' : ''}"${hasBanner && bannerSrc ? ` style="--banner-bg:url(${bannerSrc});--banner-pos:${bannerPos}"` : ''}>
+        <div class="pl-hero-shade"></div>
+        <div class="pl-hero-row">
+          <div class="pl-v2-av-box" style="--pl-c:${safeCol}">
+            <span class="pl-v2-av${hasBanner ? ' crest' : ''}${frameRing ? ' fr' : ''}" style="--c:${safeCol}${frameRing ? ';--fr:' + String(frameRing).replace(/[;"<>]/g, '') : ''}">${initial}</span>${level != null ? `<span class="pl-v2-lvl">${+level || 1}</span>` : ''}
+          </div>
+          <div class="pl-v2-identity">
+            <div class="pl-v2-name-row">
+              <h3 class="pl-v2-name">${cleanName}</h3>
+              ${statusBadge}
+            </div>
+            <div class="pl-v2-presence-row">${onlinePill}</div>
+          </div>
         </div>
       </div>
 

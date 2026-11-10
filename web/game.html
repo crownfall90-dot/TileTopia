@@ -69,6 +69,16 @@
         <div class="mbody">
           <h2 class="logo">Tile<span>topia</span></h2>
           <p class="tag">Стройте города, дороги и монастыри</p>
+          <button class="menu-resume-game-btn" id="btnMenuResumeGame" aria-label="Вернуться в партию" hidden>
+            <span class="mrg-ic">
+              <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><polygon points="6 4 20 12 6 20 6 4"/></svg>
+            </span>
+            <span class="mrg-tx">
+              <b>Вернуться в партию</b>
+              <small id="mrgSub">Партия продолжается</small>
+            </span>
+            <i class="mrg-arr">›</i>
+          </button>
           <button class="menu-gift-pill" id="menuGiftPill" aria-label="Открыть ежедневный подарок" hidden>
             <span class="mgp-ic"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M12 8v13M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7"/><path d="M7.5 8a2.5 2.5 0 010-5C11 3 12 8 12 8s1-5 4.5-5a2.5 2.5 0 010 5"/></svg></span>
             <span class="mgp-tx"><b>Подарок готов!</b><small>Три сундука удачи</small></span>
@@ -2612,6 +2622,38 @@ function lastOnline() {
    background after the phone dropped the player out) puts the player straight into it — the saved game of this phone,
    or the online room they were in. Leaving by «Выйти в главное меню» on purpose pauses that until the next start. */
 let resumeHold = false;
+function getActiveResumableGame() {
+  if (phase !== 'end' && players && players.length) {
+    return {
+      kind: net ? 'online' : 'live',
+      sub: net ? `Комната ${net.code} · ход ${turn + 1}` : 'Игра не завершена'
+    };
+  }
+  const p = pendingGame();
+  if (p) {
+    if (p.kind === 'saved') {
+      return { kind: 'saved', sub: 'Сохранённая партия' };
+    }
+    if (p.kind === 'online' && p.lg && p.lg.code) {
+      return { kind: 'online_rejoin', sub: `Комната ${p.lg.code}`, code: p.lg.code };
+    }
+  }
+  return null;
+}
+
+function updateMenuResumeBtn() {
+  const b = $('#btnMenuResumeGame');
+  if (!b) return;
+  const active = getActiveResumableGame();
+  if (active) {
+    b.hidden = false;
+    const sub = b.querySelector('#mrgSub');
+    if (sub) sub.textContent = active.sub;
+  } else {
+    b.hidden = true;
+  }
+}
+
 function pendingGame() {
   const sv = loadSave(), lg = lastOnline() && (!net || !gameVisible); // also when a dead room object is left behind after a drop
   if (sv && sv.moves && sv.cfg) return {kind: 'saved', sv};
@@ -4781,9 +4823,11 @@ function renderProfile() {
 
     const pct = Math.max(0, Math.min(100, 100 * PROG.xp / need));
     const achGot = ACH.filter(a => PROG.ach[a.id] === 'got').length;
+    const hasBanner = isBannerShape && !!curBanner;
+    const bannerHeroStyle = hasBanner ? `style="--banner-bg:url(${bannerSrc});--banner-pos:${bannerPos}"` : '';
 
     profEl.innerHTML = `
-      <div class="pctop">
+      <div class="pctop${hasBanner ? ' with-banner' : ''}" ${bannerHeroStyle}>
         <div class="prof-banner-shade"></div>
         <div class="prof-hero-row">
           <span class="${avCls}" style="${avStyle}">${(name[0] || '?').toUpperCase()}</span>
@@ -4791,12 +4835,6 @@ function renderProfile() {
             <div class="pnick-row">
               <b class="pnick">${name}</b>
               ${myStatus() ? `<em class="fst">${myStatus()}</em>` : ''}
-            </div>
-            <div class="pmail-row">
-              ${isGuest
-                ? `<span class="pmail guest"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg> ${mail}</span>`
-                : `<span class="pmail signed"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> ${mail}</span>`
-              }
             </div>
           </div>
           <button class="iconbtn prof-banner-btn" id="profBannerTry" aria-label="Примерить баннер" title="Примерить баннер">
@@ -5183,8 +5221,15 @@ async function openPlayer(uid, name, col, meta = {}) {
 document.addEventListener('click', e => { const b = e.target.closest('[data-pl]'); if (b && !e.target.closest('button.chip')) openPlayer(b.dataset.pl, b.dataset.n, b.dataset.c, b.dataset); });
 // Edit the profile: colour (free, any time) and nickname (the usual rename).
 
-function openBannerFitting(initialId) {
-  let curId = (initialId && AV.BANNERS[initialId]) ? initialId : (wallet.banner || 'meadow');
+function openBannerFitting(initialId, initialKind = 'banner') {
+  let curKind = initialKind || 'banner';
+  let curId = initialId || '';
+  if (!curId) {
+    if (curKind === 'banner') curId = wallet.banner || 'meadow';
+    else if (curKind === 'pic') curId = wallet.avatar || 'peasant';
+    else if (curKind === 'shape') curId = wallet.avShape || 'round';
+    else if (curKind === 'frame') curId = wallet.frame || 'wood';
+  }
   let curView = 'profile'; // 'profile' | 'rival'
   const old = $('#bannerFittingModal');
   if (old) old.remove();
@@ -5197,38 +5242,81 @@ function openBannerFitting(initialId) {
   modal.setAttribute('aria-modal', 'true');
 
   const render = () => {
-    const curB = AV.BANNERS[curId] || AV.BANNERS.meadow;
-    const isOwned = AV.owns(wallet, 'banner', curId);
-    const hasShape = AV.owns(wallet, 'shape', 'rect');
-    const isEquipped = (wallet.banner === curId && wallet.avShape === 'rect');
-    const canAfford = hasShape && COINS.canPay(wallet, curB.price);
+    // Resolve active banner for preview
+    const previewBannerId = (curKind === 'banner' && curId) ? curId : (wallet.banner || 'meadow');
+    const curB = AV.BANNERS[previewBannerId] || AV.BANNERS.meadow;
 
+    // Resolve active avatar, shape, and frame for preview
+    const previewPicId = (curKind === 'pic') ? curId : wallet.avatar;
+    const previewShape = (curKind === 'shape') ? curId : (curKind === 'banner' ? 'rect' : (wallet.avShape || 'round'));
+    const previewFrame = (curKind === 'frame') ? curId : wallet.frame;
+
+    const ring = previewFrame && FRAMES[previewFrame] ? FRAMES[previewFrame].ring : myRing();
+    const frameStyle = ring ? `--fr:${ring};` : '';
+    const col = wallet.color || '#3a7bd5';
     const name = profileName();
+    const initial = (name[0] || '?').toUpperCase();
     const need = xpNeed(PROG.lvl);
     const pct = Math.max(0, Math.min(100, 100 * PROG.xp / need));
     const st = PROG.st = normalizeStats(PROG.st);
     const rate = st.games ? Math.round(100 * st.wins / st.games) : 0;
-    const initial = (name[0] || '?').toUpperCase();
-    const col = wallet.color || '#3a7bd5';
-    const ring = myRing();
-    const frameStyle = ring ? `--fr:${ring};` : '';
+    const achGot = ACH.filter(a => PROG.ach[a.id] === 'got').length;
 
+    // Check ownership and equipped status for the currently selected item
+    let isOwned = false, isEquipped = false, itemPrice = 0, itemName = '';
+    if (curKind === 'banner') {
+      const bObj = AV.BANNERS[curId] || AV.BANNERS.meadow;
+      itemName = bObj.name;
+      itemPrice = bObj.price;
+      isOwned = AV.owns(wallet, 'banner', curId);
+      isEquipped = (wallet.banner === curId && wallet.avShape === 'rect');
+    } else if (curKind === 'pic') {
+      const pObj = AV.PICS[curId] || AV.PICS.peasant;
+      itemName = pObj.name;
+      itemPrice = pObj.price;
+      isOwned = AV.owns(wallet, 'pic', curId);
+      isEquipped = (wallet.avatar === curId);
+    } else if (curKind === 'shape') {
+      const sObj = AV.SHAPES[curId] || AV.SHAPES.round;
+      itemName = sObj.name;
+      itemPrice = sObj.price;
+      isOwned = (curId === 'round' || AV.owns(wallet, 'shape', curId));
+      isEquipped = ((wallet.avShape || 'round') === curId);
+    } else if (curKind === 'frame') {
+      const fObj = FRAMES[curId] || FRAMES.wood;
+      itemName = fObj.name;
+      itemPrice = fObj.price || 0;
+      isOwned = (curId === 'none' || (wallet.frames || []).includes(curId) || (!fObj.price && !fObj.earn));
+      isEquipped = ((wallet.frame || 'none') === curId);
+    }
+
+    const canAfford = COINS.canPay(wallet, itemPrice);
+
+    // Build stage previews
     let stageHtml = '';
+    const picObj = previewPicId ? AV.PICS[previewPicId] : null;
+    const picStyle = picObj ? `--pic:url(${picObj.src});--pp:${picObj.pos || 'center'};` : '';
+    const avPreviewCls = `av big${previewShape === 'rect' ? ' banner-crest' : (previewShape === 'square' ? ' sh-square' : '')}${ring ? ' fr' : ''}${picObj ? ' pic' : ''}`;
+    const avPreviewStyle = `--c:${col};${frameStyle}${picStyle}`;
+
     if (curView === 'profile') {
       stageHtml = `
-        <div class="bf-profile-card" style="--banner-bg:url(${curB.src});--banner-pos:${curB.pos || 'center'}">
-          <div class="bf-shade"></div>
-          <div class="bf-badge">✨ ${curB.name}</div>
-          <div class="prof-hero-row">
-            <span class="av big" style="--c:${col};${frameStyle}">${initial}</span>
-            <div class="pwho">
-              <div class="pnick-row">
-                <b class="pnick">${name}</b>
-                ${myStatus() ? `<em class="fst">${myStatus()}</em>` : ''}
+        <div class="bf-profile-card">
+          <!-- Minimalist Banner Hero: ONLY Avatar, Nickname & Status -->
+          <div class="pctop with-banner" style="--banner-bg:url(${curB.src});--banner-pos:${curB.pos || 'center'}">
+            <div class="prof-banner-shade"></div>
+            <div class="prof-hero-row">
+              <span class="${avPreviewCls}" style="${avPreviewStyle}">${initial}</span>
+              <div class="pwho">
+                <div class="pnick-row">
+                  <b class="pnick">${name}</b>
+                  ${myStatus() ? `<em class="fst">${myStatus()}</em>` : ''}
+                </div>
               </div>
-              <small class="pmail guest">В вашем профиле</small>
             </div>
           </div>
+
+          <!-- Below Banner: Clean Stats Podium -->
           <div class="pclvl">
             <div class="lvl-badge"><b>${PROG.lvl}</b><small>УР.</small></div>
             <div class="pi">
@@ -5238,60 +5326,116 @@ function openBannerFitting(initialId) {
           </div>
           <div class="pchips">
             <div class="pchip-item cups-item"><b>${PROG.cups || 0}</b> <small>Кубков</small></div>
-            <div class="pchip-item ach-item"><b>${ACH.filter(a => PROG.ach[a.id] === 'got').length}</b> <small>Наград</small></div>
+            <div class="pchip-item ach-item"><b>${achGot}</b> <small>Наград</small></div>
           </div>
         </div>
       `;
     } else {
       stageHtml = `
-        <div class="bf-rival-card" style="--banner-bg:url(${curB.src});--banner-pos:${curB.pos || 'center'}">
-          <div class="bf-shade"></div>
-          <div class="bf-badge">👁️ Вид для соперников</div>
-          <div class="pl-v2-header">
-            <div class="pl-v2-av-box" style="--pl-c:${col}">
-              <span class="pl-v2-av${ring ? ' fr' : ''}" style="--c:${col};${frameStyle}">${initial}</span>
-              <span class="pl-v2-lvl">${PROG.lvl || 1}</span>
-            </div>
-            <div class="pl-v2-identity">
-              <h3 class="pl-v2-name">${name}</h3>
-              ${myStatus() ? `<span class="pl-v2-status-pill"><em class="fst">${myStatus()}</em></span>` : ''}
-              <div class="pl-v2-presence-row">
-                <span class="pl-v2-badge on"><i class="pl-v2-dot"></i> <span>В сети</span></span>
+        <div class="bf-rival-card pl-dialog-v2">
+          <!-- Minimalist Regal Banner Hero for Rivals -->
+          <div class="pl-hero-banner with-art" style="--banner-bg:url(${curB.src});--banner-pos:${curB.pos || 'center'}">
+            <div class="pl-hero-shade"></div>
+            <div class="pl-hero-row">
+              <div class="pl-v2-av-box" style="--pl-c:${col}">
+                <span class="${avPreviewCls}" style="${avPreviewStyle}">${initial}</span>
+                <span class="pl-v2-lvl">${PROG.lvl || 1}</span>
+              </div>
+              <div class="pl-v2-identity">
+                <div class="pl-v2-name-row">
+                  <h3 class="pl-v2-name">${name}</h3>
+                  ${myStatus() ? `<span class="pl-v2-status-pill"><em class="fst">${myStatus()}</em></span>` : ''}
+                </div>
+                <div class="pl-v2-presence-row">
+                  <span class="pl-v2-badge on"><i class="pl-v2-dot"></i> <span>В сети</span></span>
+                </div>
               </div>
             </div>
           </div>
+
+          <!-- 4-Stat Podium for Rivals -->
           <div class="pl-v2-stats">
-            <div class="pl-v2-stat"><b class="pl-v2-stat-num">${PROG.cups || 0}</b><small>Кубков</small></div>
-            <div class="pl-v2-stat"><b class="pl-v2-stat-num">${st.wins}</b><small>Побед</small></div>
-            <div class="pl-v2-stat"><b class="pl-v2-stat-num">${rate}%</b><small>Винрейт</small></div>
+            <div class="pl-v2-stat"><b class="pl-v2-stat-val">${PROG.cups || 0}</b><small class="pl-v2-stat-lbl">Кубки</small></div>
+            <div class="pl-v2-stat"><b class="pl-v2-stat-val">${st.wins}</b><small class="pl-v2-stat-lbl">Победы</small></div>
+            <div class="pl-v2-stat"><b class="pl-v2-stat-val">${rate}%</b><small class="pl-v2-stat-lbl">Винрейт</small></div>
+            <div class="pl-v2-stat"><b class="pl-v2-stat-val">${achGot}</b><small class="pl-v2-stat-lbl">Награды</small></div>
           </div>
         </div>
       `;
     }
 
-    const carouselHtml = Object.entries(AV.BANNERS).map(([bId, b]) => {
-      const owned = AV.owns(wallet, 'banner', bId);
-      const equipped = (wallet.banner === bId && wallet.avShape === 'rect');
-      const sel = (bId === curId);
-      return `
-        <button class="bf-card${sel ? ' sel' : ''}${equipped ? ' on' : ''}" data-bid="${bId}" type="button">
-          <div class="bf-thumb" style="background-image:url(${b.src});background-position:${b.pos || 'center'}">
-            ${equipped ? '<span class="bf-tag eq">Надет</span>' : (owned ? '<span class="bf-tag ow">Куплен</span>' : `<span class="bf-tag pr">${b.price} 🪙</span>`)}
-          </div>
-          <span class="bf-name">${b.name}</span>
-        </button>
-      `;
-    }).join('');
+    // Build carousel for the active category
+    let carouselHtml = '';
+    if (curKind === 'banner') {
+      carouselHtml = Object.entries(AV.BANNERS).map(([bId, b]) => {
+        const owned = AV.owns(wallet, 'banner', bId);
+        const equipped = (wallet.banner === bId && wallet.avShape === 'rect');
+        const sel = (bId === curId);
+        return `
+          <button class="bf-card${sel ? ' sel' : ''}${equipped ? ' on' : ''}" data-bid="${bId}" type="button">
+            <div class="bf-thumb" style="background-image:url(${b.src});background-position:${b.pos || 'center'}">
+              ${equipped ? '<span class="bf-tag eq">Надет</span>' : (owned ? '<span class="bf-tag ow">Куплен</span>' : `<span class="bf-tag pr">${COINS.priceTag(b.price)}</span>`)}
+            </div>
+            <span class="bf-name">${b.name}</span>
+          </button>
+        `;
+      }).join('');
+    } else if (curKind === 'pic') {
+      carouselHtml = Object.entries(AV.PICS).map(([pId, p]) => {
+        const owned = AV.owns(wallet, 'pic', pId);
+        const equipped = (wallet.avatar === pId);
+        const sel = (pId === curId);
+        return `
+          <button class="bf-card${sel ? ' sel' : ''}${equipped ? ' on' : ''}" data-pid="${pId}" type="button">
+            <div class="bf-thumb" style="background-image:url(${p.src});background-position:${p.pos || 'center'};background-size:cover">
+              ${equipped ? '<span class="bf-tag eq">Надет</span>' : (owned ? '<span class="bf-tag ow">Куплен</span>' : `<span class="bf-tag pr">${COINS.priceTag(p.price)}</span>`)}
+            </div>
+            <span class="bf-name">${p.name}</span>
+          </button>
+        `;
+      }).join('');
+    } else if (curKind === 'shape') {
+      carouselHtml = Object.entries(AV.SHAPES).map(([sId, s]) => {
+        const owned = (sId === 'round' || AV.owns(wallet, 'shape', sId));
+        const equipped = ((wallet.avShape || 'round') === sId);
+        const sel = (sId === curId);
+        return `
+          <button class="bf-card${sel ? ' sel' : ''}${equipped ? ' on' : ''}" data-sid="${sId}" type="button">
+            <div class="bf-thumb" style="display:grid;place-items:center;background:rgba(255,255,255,0.06)">
+              <span class="av big${sId === 'rect' ? ' sh-rect' : (sId === 'square' ? ' sh-square' : '')}" style="--c:${col};width:42px;height:42px">${initial}</span>
+              ${equipped ? '<span class="bf-tag eq">Надета</span>' : (owned ? '<span class="bf-tag ow">Куплена</span>' : `<span class="bf-tag pr">${COINS.priceTag(s.price)}</span>`)}
+            </div>
+            <span class="bf-name">${s.name}</span>
+          </button>
+        `;
+      }).join('');
+    } else if (curKind === 'frame') {
+      carouselHtml = Object.entries(FRAMES).filter(([fId]) => fId !== 'none').map(([fId, f]) => {
+        const owned = (wallet.frames || []).includes(fId) || (!f.price && !f.earn);
+        const equipped = ((wallet.frame || 'none') === fId);
+        const sel = (fId === curId);
+        return `
+          <button class="bf-card${sel ? ' sel' : ''}${equipped ? ' on' : ''}" data-fid="${fId}" type="button">
+            <div class="bf-thumb" style="display:grid;place-items:center;background:rgba(255,255,255,0.06)">
+              <span class="av big fr" style="--c:${col};--fr:${f.ring || ''};width:42px;height:42px">${initial}</span>
+              ${equipped ? '<span class="bf-tag eq">Надета</span>' : (owned ? '<span class="bf-tag ow">Куплена</span>' : `<span class="bf-tag pr">${f.earn ? '🔒' : COINS.priceTag(f.price || 0)}</span>`)}
+            </div>
+            <span class="bf-name">${f.name}</span>
+          </button>
+        `;
+      }).join('');
+    }
 
+    // Action button
     let actionBtnHtml = '';
     if (isEquipped) {
-      actionBtnHtml = `<button class="ghostbtn bf-action-btn" id="bfUnequipBtn">Снять баннер</button>`;
+      actionBtnHtml = `<button class="ghostbtn bf-action-btn" id="bfUnequipBtn">Снять</button>`;
     } else if (isOwned) {
-      actionBtnHtml = `<button class="cta wide bf-action-btn" id="bfEquipBtn">Надеть этот баннер</button>`;
-    } else if (!hasShape) {
+      actionBtnHtml = `<button class="cta wide bf-action-btn" id="bfEquipBtn">Надеть «${itemName}»</button>`;
+    } else if (curKind === 'banner' && !AV.owns(wallet, 'shape', 'rect')) {
       actionBtnHtml = `<button class="cta wide bf-action-btn lock" id="bfNeedShapeBtn">Открыть форму баннера (2500 🪙)</button>`;
     } else {
-      actionBtnHtml = `<button class="cta wide bf-action-btn${!canAfford ? ' poor' : ''}" id="bfBuyBtn" ${!canAfford ? 'disabled' : ''}>Купить за ${COINS.priceTag(curB.price)} и надеть</button>`;
+      actionBtnHtml = `<button class="cta wide bf-action-btn${!canAfford ? ' poor' : ''}" id="bfBuyBtn" ${!canAfford ? 'disabled' : ''}>Купить за ${COINS.priceTag(itemPrice)} и надеть</button>`;
     }
 
     modal.innerHTML = `
@@ -5299,13 +5443,14 @@ function openBannerFitting(initialId) {
         <div class="bf-top">
           <div class="bf-title-row">
             <div class="bf-title-wrap">
-              <h3 class="bf-title">Примерка баннера</h3>
-              <p class="bf-sub">Посмотрите, как фон преображает профиль и как его видят другие</p>
+              <h3 class="bf-title">Примерка: ${itemName || 'Предмет'}</h3>
+              <p class="bf-sub">Посмотрите, как фон и образ преображают профиль и как его видят другие</p>
             </div>
             <button class="iconbtn bf-close" id="bfCloseBtn" aria-label="Закрыть">
               <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6L6 18M6 6l12 12"/></svg>
             </button>
           </div>
+
           <div class="bf-tabs">
             <button class="bf-tab${curView === 'profile' ? ' active' : ''}" data-view="profile">
               <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
@@ -5321,7 +5466,12 @@ function openBannerFitting(initialId) {
         <div class="bf-stage">${stageHtml}</div>
 
         <div class="bf-carousel-wrap">
-          <span class="bf-carousel-label">Выберите баннер для примерки:</span>
+          <div class="bf-cat-tabs" style="display:flex;gap:6px;margin-bottom:8px;overflow-x:auto">
+            <button class="chip${curKind === 'banner' ? ' pri' : ''}" data-cat="banner">Баннеры</button>
+            <button class="chip${curKind === 'pic' ? ' pri' : ''}" data-cat="pic">Аватарки</button>
+            <button class="chip${curKind === 'shape' ? ' pri' : ''}" data-cat="shape">Формы</button>
+            <button class="chip${curKind === 'frame' ? ' pri' : ''}" data-cat="frame">Рамки</button>
+          </div>
           <div class="bf-carousel" id="bfCarousel">${carouselHtml}</div>
         </div>
 
@@ -5341,9 +5491,23 @@ function openBannerFitting(initialId) {
       };
     });
 
+    modal.querySelectorAll('[data-cat]').forEach(b => {
+      b.onclick = () => {
+        curKind = b.dataset.cat;
+        if (curKind === 'banner') curId = wallet.banner || 'meadow';
+        else if (curKind === 'pic') curId = wallet.avatar || 'peasant';
+        else if (curKind === 'shape') curId = wallet.avShape || 'round';
+        else if (curKind === 'frame') curId = wallet.frame || 'wood';
+        render();
+      };
+    });
+
     modal.querySelectorAll('.bf-card').forEach(c => {
       c.onclick = () => {
-        curId = c.dataset.bid;
+        if (c.dataset.bid) curId = c.dataset.bid;
+        else if (c.dataset.pid) curId = c.dataset.pid;
+        else if (c.dataset.sid) curId = c.dataset.sid;
+        else if (c.dataset.fid) curId = c.dataset.fid;
         render();
       };
     });
@@ -5351,14 +5515,23 @@ function openBannerFitting(initialId) {
     const equipBtn = modal.querySelector('#bfEquipBtn');
     if (equipBtn) {
       equipBtn.onclick = () => {
-        wallet.avShape = 'rect';
-        wallet.banner = curId;
+        if (curKind === 'banner') {
+          wallet.avShape = 'rect';
+          wallet.banner = curId;
+        } else if (curKind === 'pic') {
+          wallet.avatar = curId;
+        } else if (curKind === 'shape') {
+          wallet.avShape = curId;
+        } else if (curKind === 'frame') {
+          wallet.frame = curId;
+        }
         beep('coin');
         saveWallet();
         renderProfile();
         renderMenuProfile();
         if (typeof renderShop === 'function') renderShop();
-        toastAny(`Баннер «${curB.name}» надет!`);
+        if (typeof renderItems === 'function') renderItems();
+        toastAny(`«${itemName}» надето!`);
         render();
       };
     }
@@ -5366,12 +5539,16 @@ function openBannerFitting(initialId) {
     const unequipBtn = modal.querySelector('#bfUnequipBtn');
     if (unequipBtn) {
       unequipBtn.onclick = () => {
-        wallet.banner = '';
+        if (curKind === 'banner') wallet.banner = '';
+        else if (curKind === 'pic') wallet.avatar = '';
+        else if (curKind === 'shape') wallet.avShape = 'round';
+        else if (curKind === 'frame') wallet.frame = 'none';
         saveWallet();
         renderProfile();
         renderMenuProfile();
         if (typeof renderShop === 'function') renderShop();
-        toastAny('Баннер снят');
+        if (typeof renderItems === 'function') renderItems();
+        toastAny('Предмет снят');
         render();
       };
     }
@@ -5379,17 +5556,32 @@ function openBannerFitting(initialId) {
     const buyBtn = modal.querySelector('#bfBuyBtn');
     if (buyBtn) {
       buyBtn.onclick = () => {
-        if (!COINS.canPay(wallet, curB.price)) return;
-        COINS.pay(wallet, curB.price);
-        wallet.banners = [...(wallet.banners || []), curId];
-        wallet.avShape = 'rect';
-        wallet.banner = curId;
+        if (!COINS.canPay(wallet, itemPrice)) return toastAny(COINS.lackText(wallet, itemPrice));
+        if (curKind === 'banner') {
+          const res = AV.buy(wallet, 'banner', curId);
+          if (!res.ok) return;
+          wallet.avShape = 'rect';
+          wallet.banner = curId;
+        } else if (curKind === 'pic') {
+          const res = AV.buy(wallet, 'pic', curId);
+          if (!res.ok) return;
+          wallet.avatar = curId;
+        } else if (curKind === 'shape') {
+          const res = AV.buy(wallet, 'shape', curId);
+          if (!res.ok) return;
+          wallet.avShape = curId;
+        } else if (curKind === 'frame') {
+          COINS.pay(wallet, itemPrice);
+          wallet.frames = [...(wallet.frames || []), curId];
+          wallet.frame = curId;
+        }
         beep('coin');
         saveWallet();
         renderProfile();
         renderMenuProfile();
         if (typeof renderShop === 'function') renderShop();
-        toastAny(`Баннер «${curB.name}» куплен и надет!`);
+        if (typeof renderItems === 'function') renderItems();
+        toastAny(`Куплено и надето: ${itemName}`);
         render();
       };
     }
@@ -5397,10 +5589,7 @@ function openBannerFitting(initialId) {
     const needShapeBtn = modal.querySelector('#bfNeedShapeBtn');
     if (needShapeBtn) {
       needShapeBtn.onclick = () => {
-        if (!COINS.canPay(wallet, 2500)) {
-          toastAny('Форма баннера стоит 2500 тайлов');
-          return;
-        }
+        if (!COINS.canPay(wallet, 2500)) return toastAny(COINS.lackText(wallet, 2500));
         COINS.pay(wallet, 2500);
         wallet.avShapes = [...(wallet.avShapes || []), 'rect'];
         wallet.avShape = 'rect';
@@ -6180,8 +6369,8 @@ function renderPlayerShowcaseHtml() {
 function avPickerHtml() {
   const ini = (profileName()[0] || '?').toUpperCase(), ring = myRing(), base = `--c:${wallet.color};${ring ? `--fr:${ring};` : ''}`;
   const av = (cls, style) => `<span class="av${ring ? ' fr' : ''}${cls}" style="${base}${style}">${ini}</span>`;
-  const shapeBtn = k => { const o = AV.owns(wallet, 'shape', k), x = AV.SHAPES[k]; return `<button class="${(wallet.avShape || 'round') === k ? 'sel' : ''}" ${o ? `data-avwear="shape|${k}"` : `data-avbuy="shape|${k}"`}>${av(k === 'round' ? '' : ' sh-' + k, '')}<span>${x.name}</span>${o ? '' : `<small>${COINS.priceTag(x.price)}</small>`}</button>`; };
-  const picBtn = (kind, k, it, shape) => `<button class="${(kind === 'pic' ? wallet.avatar : wallet.banner) === k ? 'sel' : ''}" data-avwear="${kind}|${k}">${av(` pic${shape}`, `--pic:url(${it.src});--pp:${it.pos};`)}<span>${it.name}</span></button>`;
+  const shapeBtn = k => { const o = AV.owns(wallet, 'shape', k), x = AV.SHAPES[k]; return `<button class="${(wallet.avShape || 'round') === k ? 'sel' : ''}" data-avfit="shape|${k}">${av(k === 'round' ? '' : ' sh-' + k, '')}<span>${x.name}</span>${o ? '' : `<small>${COINS.priceTag(x.price)}</small>`}</button>`; };
+  const picBtn = (kind, k, it, shape) => `<button class="${(kind === 'pic' ? wallet.avatar : wallet.banner) === k ? 'sel' : ''}" data-avfit="${kind}|${k}">${av(` pic${shape}`, `--pic:url(${it.src});--pp:${it.pos};`)}<span>${it.name}</span></button>`;
   const mine = (kind, P, shape) => Object.entries(P).filter(([k]) => AV.owns(wallet, kind, k)).map(([k, it]) => picBtn(kind, k, it, shape)).join('');
   const none = kind => `<button class="${(kind === 'pic' ? wallet.avatar : wallet.banner) ? '' : 'sel'}" data-avwear="${kind}|">${av(kind === 'banner' ? ' sh-rect' : '', '')}<span>Без картинки</span></button>`;
   return `<div class="avpick"><div class="h3 sec">Форма</div><div class="avsh">${['round', 'square', 'rect'].map(shapeBtn).join('')}</div>`
@@ -6202,7 +6391,12 @@ function buyAvatarItem(kind, id) {
   });
 }
 document.addEventListener('click', e => {
-  const b = e.target.closest('[data-avbuy],[data-avwear]'); if (!b) return;
+  const b = e.target.closest('[data-avfit],[data-avbuy],[data-avwear]'); if (!b) return;
+  if (b.dataset.avfit) {
+    const [k, id] = b.dataset.avfit.split('|');
+    openBannerFitting(id, k);
+    return;
+  }
   if (b.dataset.avbuy) { const [k, id] = b.dataset.avbuy.split('|'); return buyAvatarItem(k, id); }
   const [k, id] = b.dataset.avwear.split('|'); AV.wear(wallet, k, id); if (k === 'banner' && id) AV.wear(wallet, 'shape', 'rect');
   saveWallet(); renderMenuProfile(); renderItems();
@@ -7950,9 +8144,24 @@ function renameDialog() {
 function renderAccount() {
   const el = $('#acct'); if (!el) return;
   const linked = fbAuth && fbAuth.email, lvl = typeof PROG !== 'undefined' && PROG.lvl ? `<small class="plvl">Уровень ${PROG.lvl}</small>` : '';
-  const mail = linked ? String(fbAuth.email).replace(/[<>&"]/g, '') : '';
-  el.innerHTML = `<div class="prow"><span class="av big" style="--c:${wallet.color}">${profileName()[0]}</span><span class="pwho"><b>${profileName()}</b><small class="pmail">${linked ? mail : 'Профиль не сохранён'}</small>${lvl}</span><button class="chip" id="rnBtn">Сменить <i class="coin" style="display:inline-block;width:11px;height:11px"></i> ${RENAME_PRICE}</button></div>` +
-    (FB ? `<div class="pact">${linked ? '<button class="chip" id="acLogout">Выйти из аккаунта</button>' : '<button class="chip pri" id="acLogin">Войти или создать профиль</button>'}</div>` : '');
+  const mail = linked ? String(fbAuth.email).replace(/[<>&"]/g, '') : 'Гостевой профиль (почта не привязана)';
+  el.innerHTML = `
+    <div class="saccount-card">
+      <div class="prow">
+        <span class="av big" style="--c:${wallet.color}">${profileName()[0]}</span>
+        <div class="pwho">
+          <b class="sacct-name">${profileName()}</b>
+          <div class="sacct-mail-row ${linked ? 'signed' : 'guest'}">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"/><polyline points="22,6 12,13 2,6"/></svg>
+            <span class="sacct-email-txt">${mail}</span>
+          </div>
+          ${lvl}
+        </div>
+        <button class="chip" id="rnBtn">Сменить <i class="coin" style="display:inline-block;width:11px;height:11px"></i> ${RENAME_PRICE}</button>
+      </div>
+      ${FB ? `<div class="pact">${linked ? '<button class="chip" id="acLogout">Выйти из аккаунта</button>' : '<button class="chip pri" id="acLogin">Войти или создать профиль</button>'}</div>` : ''}
+    </div>
+  `;
   $('#rnBtn').onclick = renameDialog;
   if ($('#acLogin')) $('#acLogin').onclick = () => accountDialog('login');
   if ($('#acLogout')) $('#acLogout').onclick = () => confirmBox('Выйти из аккаунта?<br><small style="font-weight:500;color:var(--muted)">Прогресс сохранится в аккаунте. На этом устройстве начнётся новая игра, а войти можно будет в любой аккаунт</small>', 'Выйти', signOut);
@@ -8364,7 +8573,7 @@ function show(name, instant = false) {
   if (name === 'shop') renderShop();
   if (name === 'settings') renderPrefs();
   if (name === 'menu') {
-    saveWallet(); presenceCount(); progressDot(); renderMenuProfile(); updateNotifBadge();
+    saveWallet(); presenceCount(); progressDot(); renderMenuProfile(); updateNotifBadge(); updateMenuResumeBtn();
     if (pendingUpdate && (!updBox || !document.body.contains(updBox))) {
       const pendingInfo = pendingUpdate;
       pendingUpdate = null;
@@ -8860,6 +9069,27 @@ try { checkUpdatePolicy(); } catch (_) {}
 try { applyStatsConsent(); } catch (_) {}
 // the start: once the splash is gone, a game that was going comes back by itself
 bootReady.then(() => setTimeout(() => { try { if (wallet.name) askStats(); } catch (_) {} }, 2500));
+const _mrg = $('#btnMenuResumeGame');
+if (_mrg) {
+  _mrg.onclick = () => {
+    const active = getActiveResumableGame();
+    if (!active) return;
+    resumeHold = false;
+    if (active.kind === 'live') {
+      show('game');
+    } else if (active.kind === 'saved') {
+      if (net) leaveRoom();
+      startGame(active.sv.cfg, active.sv.moves);
+      show('game');
+    } else if (active.kind === 'online' || active.kind === 'online_rejoin') {
+      const code = active.code || (net && net.code) || (lastOnline() && lastOnline().code);
+      if (code) {
+        connect(code, false);
+        show('lobby');
+      }
+    }
+  };
+}
 bootReady.then(() => setTimeout(() => { try { autoResume(); } catch (e) { plog('error', 'autoResume ' + e.message); } }, 450));
 devVerify();
 // First open and the days people come back (D1, D3, D7), each reported once.
@@ -9182,7 +9412,17 @@ function showShopItemModal(kind, key, name, price) {
         </div>
       </div>
       <div class="stall-modal-foot">
-        ${(kind === 'av' && (key || '').startsWith('banner:')) ? `<button class="ghostbtn stall-modal-try-btn" id="stallModalTryBtn" style="width:100%;margin-bottom:8px;border-color:rgba(242,184,75,0.6);color:#ffd875"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="display:inline-block;vertical-align:-3px;margin-right:6px"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Примерить баннер</button>` : ''}
+        ${(() => {
+          let lbl = '';
+          if (kind === 'frame') lbl = 'Примерить рамку';
+          else if (kind === 'av') {
+            const pk = (key || '').split(':')[0];
+            if (pk === 'banner') lbl = 'Примерить баннер';
+            else if (pk === 'shape') lbl = 'Примерить форму';
+            else if (pk === 'pic') lbl = 'Примерить аватарку';
+          }
+          return lbl ? `<button class="ghostbtn stall-modal-try-btn" id="stallModalTryBtn" style="width:100%;margin-bottom:8px;border-color:rgba(242,184,75,0.6);color:#ffd875"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="display:inline-block;vertical-align:-3px;margin-right:6px"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>${lbl}</button>` : '';
+        })()}
         <button class="cta wide stall-modal-buy-btn${!canAfford ? ' poor' : ''}" id="stallModalBuyBtn">
           <span class="stall-modal-buy-text">Купить</span><span class="stall-modal-buy-sep">·</span><span class="stall-modal-buy-price">${COINS.priceTag(price)}</span>
         </button>
@@ -9208,8 +9448,12 @@ function showShopItemModal(kind, key, name, price) {
     const tryBtn = e.target.closest('#stallModalTryBtn');
     if (tryBtn) {
       close();
-      const parts = (key || '').split(':');
-      openBannerFitting(parts[1] || 'meadow');
+      if (kind === 'frame') {
+        openBannerFitting(key, 'frame');
+      } else if (kind === 'av') {
+        const parts = (key || '').split(':');
+        openBannerFitting(parts[1] || 'meadow', parts[0] || 'banner');
+      }
       return;
     }
     const buyBtn = e.target.closest('#stallModalBuyBtn');
