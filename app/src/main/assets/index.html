@@ -2419,7 +2419,7 @@ html.lowgfx .tile.ghost,html.lowgfx .gm{animation:none}
 
 .ground{position:absolute;left:-1800px;top:-1800px;width:3600px;height:3600px;transform:translateZ(-15px);background:radial-gradient(closest-side,rgba(64,98,66,.5),rgba(30,48,44,.22) 55%,transparent 100%);pointer-events:none}
 
-.tile{position:absolute;width:88px;height:88px;transform-style:preserve-3d;filter:drop-shadow(0 4px 8px rgba(0,0,0,.32))}
+.tile{position:absolute;width:88px;height:88px;transform-style:preserve-3d}
 
 .face{position:absolute;inset:0;background-size:100% 100%;border-radius:2px;transform:rotate(var(--r,0deg));transition:transform .28s cubic-bezier(.3,1.4,.5,1),filter .4s,box-shadow .4s}
 
@@ -2442,6 +2442,7 @@ html.lowgfx .tile.ghost,html.lowgfx .gm{animation:none}
 /* 2D (top-down) view: plain flat cards, no walls or rims. */
 
 html.flat #world .tile .sd{display:none}
+html.flat #world .tile{filter:drop-shadow(0 3px 6px rgba(0,0,0,.45))}
 
 /* Hint frames sit at the foot of the pieces in 3D, so the walls show; flat in 2D. */
 
@@ -6027,16 +6028,18 @@ html body .menu-gift-pill *,html body .menu-rating-card *{text-shadow:none}
 html body .mtop-rank-btn,html body .menu-hub-btn,html body #mprof{background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none}
 html body .mhub-tilt{transform:none}
 html body .logo{text-shadow:none;filter:none}
-html body .bnav{filter:none;gap:2px;padding:5px;border-radius:20px;background:rgba(12,17,32,.9);border:1px solid var(--m-line);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-html body .bnav button{transform:none;background:transparent;border:0;box-shadow:none;border-radius:15px;color:var(--muted)}
-html body .bnav button svg,html body .bnav button span{transform:none}
+html body .bnav{filter:none;gap:3px;padding:5px;border-radius:20px;background:rgba(12,17,32,.92);border:1px solid var(--m-line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 -4px 20px rgba(0,0,0,.4)}
+html body .bnav button{transform:none;background:transparent;border:1px solid transparent;box-shadow:none;border-radius:15px;color:var(--muted);transition:background .22s cubic-bezier(.2,.9,.3,1),color .22s cubic-bezier(.2,.9,.3,1),border-color .22s cubic-bezier(.2,.9,.3,1),box-shadow .22s cubic-bezier(.2,.9,.3,1)}
+html body .bnav button svg{transition:transform .24s cubic-bezier(.34,1.56,.64,1),color .22s ease,filter .22s ease}
+html body .bnav button span{transform:none}
 @media (hover: hover){
 html body .bnav button:hover{transform:none;box-shadow:none;background:var(--m-surface);color:var(--ink)}
 
 }
-html body .bnav button:active{transform:scale(.96);box-shadow:none}
-html body .bnav button.on{background:rgba(242,184,75,.14);border:0;box-shadow:none;color:var(--m-gold)}
-html body .bnav button.on svg{color:var(--m-gold)}
+html body .bnav button:active{transform:scale(.95);box-shadow:none}
+html body .bnav button.on{background:rgba(242,184,75,.16);border:1px solid rgba(242,184,75,.38);box-shadow:0 0 16px rgba(242,184,75,.2),inset 0 1px 0 rgba(255,255,255,.12);color:var(--m-gold)}
+@keyframes bnavPop{0%{transform:scale(.9)}50%{transform:scale(1.22)}75%{transform:scale(1.08)}100%{transform:scale(1.14)}}
+html body .bnav button.on svg{color:var(--m-gold);transform:scale(1.14);filter:drop-shadow(0 2px 8px rgba(242,184,75,.5));animation:bnavPop .28s cubic-bezier(.34,1.56,.64,1)}
 
 /* cards and headers on the other screens */
 html body .ocard{box-shadow:0 18px 48px rgba(0,0,0,.5)}
@@ -8438,6 +8441,51 @@ button:disabled:active,
 }
 
 /* 3. Screen Swipe Slide Animations (Dual screens visible during transition) */
+
+/* 3.1 Clash Royale Ribbon Transitions (Between main bottom nav tabs) */
+.screen.tab-enter-from-right {
+  animation: tabEnterFromRight 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform;
+  z-index: 2;
+  box-shadow: -10px 0 28px rgba(0, 0, 0, 0.45);
+}
+.screen.tab-exit-to-left {
+  animation: tabExitToLeft 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform;
+  pointer-events: none;
+  z-index: 1;
+}
+.screen.tab-enter-from-left {
+  animation: tabEnterFromLeft 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform;
+  z-index: 2;
+  box-shadow: 10px 0 28px rgba(0, 0, 0, 0.45);
+}
+.screen.tab-exit-to-right {
+  animation: tabExitToRight 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes tabEnterFromRight {
+  0% { transform: translate3d(100%, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+@keyframes tabExitToLeft {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-100%, 0, 0); }
+}
+@keyframes tabEnterFromLeft {
+  0% { transform: translate3d(-100%, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+@keyframes tabExitToRight {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(100%, 0, 0); }
+}
+
+/* 3.2 Hierarchical Screen Push/Pop (Sub-screens & Modals) */
 .screen.screen-enter-from-right {
   animation: screenEnterFromRight 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
   will-change: transform;
@@ -8464,43 +8512,27 @@ button:disabled:active,
 }
 
 @keyframes screenEnterFromRight {
-  0% {
-    transform: translate3d(100%, 0, 0);
-  }
-  100% {
-    transform: translate3d(0, 0, 0);
-  }
+  0% { transform: translate3d(100%, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
 }
 @keyframes screenExitToLeft {
-  0% {
-    transform: translate3d(0, 0, 0) scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: translate3d(-26%, 0, 0) scale(0.98);
-    opacity: 0.25;
-  }
+  0% { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
+  100% { transform: translate3d(-26%, 0, 0) scale(0.98); opacity: 0.25; }
 }
 @keyframes screenEnterFromLeft {
-  0% {
-    transform: translate3d(-26%, 0, 0) scale(0.98);
-    opacity: 0.25;
-  }
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
-    opacity: 1;
-  }
+  0% { transform: translate3d(-26%, 0, 0) scale(0.98); opacity: 0.25; }
+  100% { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
 }
 @keyframes screenExitToRight {
-  0% {
-    transform: translate3d(0, 0, 0);
-  }
-  100% {
-    transform: translate3d(100%, 0, 0);
-  }
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(100%, 0, 0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .screen.tab-enter-from-right,
+  .screen.tab-exit-to-left,
+  .screen.tab-enter-from-left,
+  .screen.tab-exit-to-right,
   .screen.screen-enter-from-right,
   .screen.screen-exit-to-left,
   .screen.screen-enter-from-left,
@@ -15875,22 +15907,185 @@ $('#bnav').onclick = e => { const b = e.target.closest('[data-nav]'); if (!b) re
 // scroll sideways themselves (the progress road, tabs, stalls), not in dialogs, and only for a clearly sideways move.
 (function navSwipe() {
   const ORDER = ['menu', 'progress', 'friends', 'shop'];
-  let x0 = 0, y0 = 0, t0 = 0, on = false;
-  const sideScroller = el => { for (; el && el !== document.body; el = el.parentElement) { if (el.scrollWidth > el.clientWidth + 4 && /auto|scroll/.test(getComputedStyle(el).overflowX)) return true; } return false; };
+  let x0 = 0, y0 = 0, t0 = 0, curX = 0;
+  let active = false, isDragging = false, axisLocked = null;
+  let curScr = null, curName = '', targetScr = null, targetName = '';
+  let animating = false;
+
+  const sideScroller = el => {
+    for (; el && el !== document.body; el = el.parentElement) {
+      if (el.scrollWidth > el.clientWidth + 4 && /auto|scroll/.test(getComputedStyle(el).overflowX)) return true;
+    }
+    return false;
+  };
+
+  const cleanupStyles = el => {
+    if (!el) return;
+    el.style.removeProperty('transform');
+    el.style.removeProperty('transition');
+    el.style.removeProperty('will-change');
+    el.style.removeProperty('pointer-events');
+    el.style.removeProperty('z-index');
+  };
+
   document.addEventListener('touchstart', e => {
-    const nav = $('#bnav'); on = false;
-    if (!nav || nav.hidden || e.touches.length !== 1 || e.target.closest('.over,input,textarea,.board') || sideScroller(e.target)) return;
-    on = true; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; t0 = Date.now();
+    if (animating || e.touches.length !== 1) return;
+    const nav = $('#bnav');
+    if (!nav || nav.hidden || e.target.closest('.over,input,textarea,.board,#boot,.modal-overlay') || sideScroller(e.target)) return;
+    curScr = document.querySelector('.screen:not([hidden])');
+    if (!curScr) return;
+    curName = curScr.id.replace('scr-', '');
+    if (!ORDER.includes(curName)) return;
+
+    active = true;
+    isDragging = false;
+    axisLocked = null;
+    targetScr = null;
+    targetName = '';
+    x0 = e.touches[0].clientX;
+    y0 = e.touches[0].clientY;
+    curX = x0;
+    t0 = Date.now();
   }, {passive: true});
-  document.addEventListener('touchend', e => {
-    if (!on) return; on = false;
-    const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
-    if (Date.now() - t0 > 700 || Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.8) return;
-    const cur = ORDER.find(n => !$('#scr-' + n).hidden); if (!cur) return;
-    const next = ORDER[ORDER.indexOf(cur) + (dx < 0 ? 1 : -1)]; if (!next) return;
-    if (next === 'friends') friendsBack = 'menu';
-    show(next);
-  }, {passive: true});
+
+  document.addEventListener('touchmove', e => {
+    if (!active || animating || e.touches.length !== 1) return;
+    curX = e.touches[0].clientX;
+    const curY = e.touches[0].clientY;
+    const dx = curX - x0;
+    const dy = curY - y0;
+
+    if (axisLocked === null) {
+      if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
+        if (Math.abs(dy) >= Math.abs(dx) * 0.85) {
+          axisLocked = 'vertical';
+          active = false;
+          return;
+        } else {
+          axisLocked = 'horizontal';
+          isDragging = true;
+        }
+      } else {
+        return;
+      }
+    }
+
+    if (axisLocked !== 'horizontal') return;
+    if (e.cancelable) e.preventDefault();
+
+    const curIdx = ORDER.indexOf(curName);
+    const screenW = window.innerWidth || 360;
+    let dragDx = dx;
+
+    let newTargetName = '';
+    if (dx < 0) {
+      if (curIdx < ORDER.length - 1) {
+        newTargetName = ORDER[curIdx + 1];
+      } else {
+        dragDx = dx * 0.28;
+      }
+    } else if (dx > 0) {
+      if (curIdx > 0) {
+        newTargetName = ORDER[curIdx - 1];
+      } else {
+        dragDx = dx * 0.28;
+      }
+    }
+
+    if (newTargetName !== targetName) {
+      if (targetScr && targetScr !== curScr) {
+        cleanupStyles(targetScr);
+        targetScr.hidden = true;
+      }
+      targetName = newTargetName;
+      targetScr = targetName ? $('#scr-' + targetName) : null;
+      if (targetScr) {
+        targetScr.hidden = false;
+        targetScr.style.pointerEvents = 'none';
+        targetScr.style.willChange = 'transform';
+        targetScr.style.transition = 'none';
+        targetScr.style.zIndex = '2';
+      }
+    }
+
+    curScr.style.pointerEvents = 'none';
+    curScr.style.willChange = 'transform';
+    curScr.style.transition = 'none';
+    curScr.style.zIndex = '3';
+    curScr.style.transform = `translate3d(${dragDx}px, 0, 0)`;
+
+    if (targetScr) {
+      const targetOffset = dx < 0 ? (screenW + dragDx) : (-screenW + dragDx);
+      targetScr.style.transform = `translate3d(${targetOffset}px, 0, 0)`;
+    }
+  }, {passive: false});
+
+  const onTouchEnd = () => {
+    if (!active || !isDragging) {
+      active = false;
+      isDragging = false;
+      return;
+    }
+    active = false;
+    isDragging = false;
+
+    const dx = curX - x0;
+    const dt = Math.max(1, Date.now() - t0);
+    const vx = dx / dt;
+    const screenW = window.innerWidth || 360;
+
+    const sameDirection = (dx < 0 && vx <= 0.08) || (dx > 0 && vx >= -0.08);
+    const fastFlick = sameDirection && Math.abs(vx) > 0.32 && Math.abs(dx) > 24;
+    const draggedFarEnough = sameDirection && Math.abs(dx) > screenW * 0.26;
+    const shouldCommit = Boolean(targetScr && (draggedFarEnough || fastFlick));
+
+    animating = true;
+    const animDuration = 240;
+    const ease = 'cubic-bezier(0.22, 1, 0.36, 1)';
+
+    curScr.style.transition = `transform ${animDuration}ms ${ease}`;
+    if (targetScr) {
+      targetScr.style.transition = `transform ${animDuration}ms ${ease}`;
+    }
+
+    if (shouldCommit) {
+      const nav = $('#bnav');
+      if (nav && !nav.hidden) {
+        nav.querySelectorAll('[data-nav]').forEach(b => {
+          b.classList.toggle('on', b.dataset.nav === targetName);
+        });
+      }
+      try { if (typeof telegramHaptic === 'function') telegramHaptic('selection'); } catch (_) {}
+
+      curScr.style.transform = `translate3d(${dx < 0 ? -screenW : screenW}px, 0, 0)`;
+      targetScr.style.transform = 'translate3d(0, 0, 0)';
+
+      setTimeout(() => {
+        cleanupStyles(curScr);
+        cleanupStyles(targetScr);
+        animating = false;
+        if (targetName === 'friends') friendsBack = 'menu';
+        show(targetName, true);
+      }, animDuration + 15);
+    } else {
+      curScr.style.transform = 'translate3d(0, 0, 0)';
+      if (targetScr) {
+        targetScr.style.transform = `translate3d(${dx < 0 ? screenW : -screenW}px, 0, 0)`;
+      }
+
+      setTimeout(() => {
+        cleanupStyles(curScr);
+        if (targetScr) {
+          cleanupStyles(targetScr);
+          targetScr.hidden = true;
+        }
+        animating = false;
+      }, animDuration + 15);
+    }
+  };
+
+  document.addEventListener('touchend', onTouchEnd, {passive: true});
+  document.addEventListener('touchcancel', onTouchEnd, {passive: true});
 })();
 
 /* ---------------- account: keep the profile across reinstalls ----------------
@@ -16747,29 +16942,36 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) usage
 let _screenAnimTimer = null;
 let _outgoingScr = null;
 
+const ALL_TRANS_CLASSES = [
+  'screen-exit-to-left', 'screen-exit-to-right', 'screen-enter-from-left', 'screen-enter-from-right',
+  'tab-exit-to-left', 'tab-exit-to-right', 'tab-enter-from-left', 'tab-enter-from-right'
+];
+
 function clearScreenTransitions() {
   if (_screenAnimTimer) { clearTimeout(_screenAnimTimer); _screenAnimTimer = null; }
   if (_outgoingScr) {
     _outgoingScr.hidden = true;
-    _outgoingScr.classList.remove('screen-exit-to-left', 'screen-exit-to-right', 'screen-enter-from-left', 'screen-enter-from-right');
+    _outgoingScr.classList.remove(...ALL_TRANS_CLASSES);
     _outgoingScr = null;
   }
   document.querySelectorAll('.screen').forEach(s => {
-    s.classList.remove('screen-exit-to-left', 'screen-exit-to-right', 'screen-enter-from-left', 'screen-enter-from-right');
+    s.classList.remove(...ALL_TRANS_CLASSES);
   });
 }
 
-function show(name) {
+function show(name, instant = false) {
   useCount('screen:' + name);
   if (typeof recordAction === 'function') recordAction('show:' + name);
-  const curScr = document.querySelector('.screen:not([hidden]):not(.screen-exit-to-left):not(.screen-exit-to-right)');
+  const curScr = document.querySelector('.screen:not([hidden]):not(.screen-exit-to-left):not(.screen-exit-to-right):not(.tab-exit-to-left):not(.tab-exit-to-right)');
   const curName = curScr ? curScr.id.replace('scr-', '') : '';
   const ORDER = ['menu', 'progress', 'friends', 'shop'];
   const SUB_SCREENS = ['rules', 'rating', 'settings', 'items', 'inbox', 'history', 'achievements', 'mastery', 'setup', 'lobby', 'profile'];
   let animDir = '';
-  if (curName && curName !== name && curScr) {
+  let isTab = false;
+  if (!instant && curName && curName !== name && curScr) {
     if (ORDER.includes(curName) && ORDER.includes(name)) {
       animDir = ORDER.indexOf(name) > ORDER.indexOf(curName) ? 'left' : 'right';
+      isTab = true;
     } else if (ORDER.includes(curName) && SUB_SCREENS.includes(name)) {
       animDir = 'left';
     } else if (SUB_SCREENS.includes(curName) && ORDER.includes(name)) {
@@ -16786,12 +16988,22 @@ function show(name) {
     curScr.hidden = false;
     targetScr.hidden = false;
 
-    if (animDir === 'left') {
-      curScr.classList.add('screen-exit-to-left');
-      targetScr.classList.add('screen-enter-from-right');
+    if (isTab) {
+      if (animDir === 'left') {
+        curScr.classList.add('tab-exit-to-left');
+        targetScr.classList.add('tab-enter-from-right');
+      } else {
+        curScr.classList.add('tab-exit-to-right');
+        targetScr.classList.add('tab-enter-from-left');
+      }
     } else {
-      curScr.classList.add('screen-exit-to-right');
-      targetScr.classList.add('screen-enter-from-left');
+      if (animDir === 'left') {
+        curScr.classList.add('screen-exit-to-left');
+        targetScr.classList.add('screen-enter-from-right');
+      } else {
+        curScr.classList.add('screen-exit-to-right');
+        targetScr.classList.add('screen-enter-from-left');
+      }
     }
 
     document.querySelectorAll('.screen').forEach(s => {
@@ -16801,7 +17013,7 @@ function show(name) {
     _screenAnimTimer = setTimeout(() => {
       clearScreenTransitions();
       if (targetScr) targetScr.hidden = false;
-    }, 280);
+    }, isTab ? 260 : 280);
   } else {
     clearScreenTransitions();
     document.querySelectorAll('.screen').forEach(s => {

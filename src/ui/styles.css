@@ -1803,7 +1803,7 @@ html.lowgfx .tile.ghost,html.lowgfx .gm{animation:none}
 
 .ground{position:absolute;left:-1800px;top:-1800px;width:3600px;height:3600px;transform:translateZ(-15px);background:radial-gradient(closest-side,rgba(64,98,66,.5),rgba(30,48,44,.22) 55%,transparent 100%);pointer-events:none}
 
-.tile{position:absolute;width:88px;height:88px;transform-style:preserve-3d;filter:drop-shadow(0 4px 8px rgba(0,0,0,.32))}
+.tile{position:absolute;width:88px;height:88px;transform-style:preserve-3d}
 
 .face{position:absolute;inset:0;background-size:100% 100%;border-radius:2px;transform:rotate(var(--r,0deg));transition:transform .28s cubic-bezier(.3,1.4,.5,1),filter .4s,box-shadow .4s}
 
@@ -1826,6 +1826,7 @@ html.lowgfx .tile.ghost,html.lowgfx .gm{animation:none}
 /* 2D (top-down) view: plain flat cards, no walls or rims. */
 
 html.flat #world .tile .sd{display:none}
+html.flat #world .tile{filter:drop-shadow(0 3px 6px rgba(0,0,0,.45))}
 
 /* Hint frames sit at the foot of the pieces in 3D, so the walls show; flat in 2D. */
 
@@ -5411,16 +5412,18 @@ html body .menu-gift-pill *,html body .menu-rating-card *{text-shadow:none}
 html body .mtop-rank-btn,html body .menu-hub-btn,html body #mprof{background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none}
 html body .mhub-tilt{transform:none}
 html body .logo{text-shadow:none;filter:none}
-html body .bnav{filter:none;gap:2px;padding:5px;border-radius:20px;background:rgba(12,17,32,.9);border:1px solid var(--m-line);backdrop-filter:blur(12px);-webkit-backdrop-filter:blur(12px)}
-html body .bnav button{transform:none;background:transparent;border:0;box-shadow:none;border-radius:15px;color:var(--muted)}
-html body .bnav button svg,html body .bnav button span{transform:none}
+html body .bnav{filter:none;gap:3px;padding:5px;border-radius:20px;background:rgba(12,17,32,.92);border:1px solid var(--m-line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 -4px 20px rgba(0,0,0,.4)}
+html body .bnav button{transform:none;background:transparent;border:1px solid transparent;box-shadow:none;border-radius:15px;color:var(--muted);transition:background .22s cubic-bezier(.2,.9,.3,1),color .22s cubic-bezier(.2,.9,.3,1),border-color .22s cubic-bezier(.2,.9,.3,1),box-shadow .22s cubic-bezier(.2,.9,.3,1)}
+html body .bnav button svg{transition:transform .24s cubic-bezier(.34,1.56,.64,1),color .22s ease,filter .22s ease}
+html body .bnav button span{transform:none}
 @media (hover: hover){
 html body .bnav button:hover{transform:none;box-shadow:none;background:var(--m-surface);color:var(--ink)}
 
 }
-html body .bnav button:active{transform:scale(.96);box-shadow:none}
-html body .bnav button.on{background:rgba(242,184,75,.14);border:0;box-shadow:none;color:var(--m-gold)}
-html body .bnav button.on svg{color:var(--m-gold)}
+html body .bnav button:active{transform:scale(.95);box-shadow:none}
+html body .bnav button.on{background:rgba(242,184,75,.16);border:1px solid rgba(242,184,75,.38);box-shadow:0 0 16px rgba(242,184,75,.2),inset 0 1px 0 rgba(255,255,255,.12);color:var(--m-gold)}
+@keyframes bnavPop{0%{transform:scale(.9)}50%{transform:scale(1.22)}75%{transform:scale(1.08)}100%{transform:scale(1.14)}}
+html body .bnav button.on svg{color:var(--m-gold);transform:scale(1.14);filter:drop-shadow(0 2px 8px rgba(242,184,75,.5));animation:bnavPop .28s cubic-bezier(.34,1.56,.64,1)}
 
 /* cards and headers on the other screens */
 html body .ocard{box-shadow:0 18px 48px rgba(0,0,0,.5)}
@@ -7822,6 +7825,51 @@ button:disabled:active,
 }
 
 /* 3. Screen Swipe Slide Animations (Dual screens visible during transition) */
+
+/* 3.1 Clash Royale Ribbon Transitions (Between main bottom nav tabs) */
+.screen.tab-enter-from-right {
+  animation: tabEnterFromRight 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform;
+  z-index: 2;
+  box-shadow: -10px 0 28px rgba(0, 0, 0, 0.45);
+}
+.screen.tab-exit-to-left {
+  animation: tabExitToLeft 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform;
+  pointer-events: none;
+  z-index: 1;
+}
+.screen.tab-enter-from-left {
+  animation: tabEnterFromLeft 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform;
+  z-index: 2;
+  box-shadow: 10px 0 28px rgba(0, 0, 0, 0.45);
+}
+.screen.tab-exit-to-right {
+  animation: tabExitToRight 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes tabEnterFromRight {
+  0% { transform: translate3d(100%, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+@keyframes tabExitToLeft {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-100%, 0, 0); }
+}
+@keyframes tabEnterFromLeft {
+  0% { transform: translate3d(-100%, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+@keyframes tabExitToRight {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(100%, 0, 0); }
+}
+
+/* 3.2 Hierarchical Screen Push/Pop (Sub-screens & Modals) */
 .screen.screen-enter-from-right {
   animation: screenEnterFromRight 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
   will-change: transform;
@@ -7848,43 +7896,27 @@ button:disabled:active,
 }
 
 @keyframes screenEnterFromRight {
-  0% {
-    transform: translate3d(100%, 0, 0);
-  }
-  100% {
-    transform: translate3d(0, 0, 0);
-  }
+  0% { transform: translate3d(100%, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
 }
 @keyframes screenExitToLeft {
-  0% {
-    transform: translate3d(0, 0, 0) scale(1);
-    opacity: 1;
-  }
-  100% {
-    transform: translate3d(-26%, 0, 0) scale(0.98);
-    opacity: 0.25;
-  }
+  0% { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
+  100% { transform: translate3d(-26%, 0, 0) scale(0.98); opacity: 0.25; }
 }
 @keyframes screenEnterFromLeft {
-  0% {
-    transform: translate3d(-26%, 0, 0) scale(0.98);
-    opacity: 0.25;
-  }
-  100% {
-    transform: translate3d(0, 0, 0) scale(1);
-    opacity: 1;
-  }
+  0% { transform: translate3d(-26%, 0, 0) scale(0.98); opacity: 0.25; }
+  100% { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
 }
 @keyframes screenExitToRight {
-  0% {
-    transform: translate3d(0, 0, 0);
-  }
-  100% {
-    transform: translate3d(100%, 0, 0);
-  }
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(100%, 0, 0); }
 }
 
 @media (prefers-reduced-motion: reduce) {
+  .screen.tab-enter-from-right,
+  .screen.tab-exit-to-left,
+  .screen.tab-enter-from-left,
+  .screen.tab-exit-to-right,
   .screen.screen-enter-from-right,
   .screen.screen-exit-to-left,
   .screen.screen-enter-from-left,

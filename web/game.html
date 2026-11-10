@@ -6868,22 +6868,185 @@ $('#bnav').onclick = e => { const b = e.target.closest('[data-nav]'); if (!b) re
 // scroll sideways themselves (the progress road, tabs, stalls), not in dialogs, and only for a clearly sideways move.
 (function navSwipe() {
   const ORDER = ['menu', 'progress', 'friends', 'shop'];
-  let x0 = 0, y0 = 0, t0 = 0, on = false;
-  const sideScroller = el => { for (; el && el !== document.body; el = el.parentElement) { if (el.scrollWidth > el.clientWidth + 4 && /auto|scroll/.test(getComputedStyle(el).overflowX)) return true; } return false; };
+  let x0 = 0, y0 = 0, t0 = 0, curX = 0;
+  let active = false, isDragging = false, axisLocked = null;
+  let curScr = null, curName = '', targetScr = null, targetName = '';
+  let animating = false;
+
+  const sideScroller = el => {
+    for (; el && el !== document.body; el = el.parentElement) {
+      if (el.scrollWidth > el.clientWidth + 4 && /auto|scroll/.test(getComputedStyle(el).overflowX)) return true;
+    }
+    return false;
+  };
+
+  const cleanupStyles = el => {
+    if (!el) return;
+    el.style.removeProperty('transform');
+    el.style.removeProperty('transition');
+    el.style.removeProperty('will-change');
+    el.style.removeProperty('pointer-events');
+    el.style.removeProperty('z-index');
+  };
+
   document.addEventListener('touchstart', e => {
-    const nav = $('#bnav'); on = false;
-    if (!nav || nav.hidden || e.touches.length !== 1 || e.target.closest('.over,input,textarea,.board') || sideScroller(e.target)) return;
-    on = true; x0 = e.touches[0].clientX; y0 = e.touches[0].clientY; t0 = Date.now();
+    if (animating || e.touches.length !== 1) return;
+    const nav = $('#bnav');
+    if (!nav || nav.hidden || e.target.closest('.over,input,textarea,.board,#boot,.modal-overlay') || sideScroller(e.target)) return;
+    curScr = document.querySelector('.screen:not([hidden])');
+    if (!curScr) return;
+    curName = curScr.id.replace('scr-', '');
+    if (!ORDER.includes(curName)) return;
+
+    active = true;
+    isDragging = false;
+    axisLocked = null;
+    targetScr = null;
+    targetName = '';
+    x0 = e.touches[0].clientX;
+    y0 = e.touches[0].clientY;
+    curX = x0;
+    t0 = Date.now();
   }, {passive: true});
-  document.addEventListener('touchend', e => {
-    if (!on) return; on = false;
-    const t = e.changedTouches[0], dx = t.clientX - x0, dy = t.clientY - y0;
-    if (Date.now() - t0 > 700 || Math.abs(dx) < 70 || Math.abs(dx) < Math.abs(dy) * 1.8) return;
-    const cur = ORDER.find(n => !$('#scr-' + n).hidden); if (!cur) return;
-    const next = ORDER[ORDER.indexOf(cur) + (dx < 0 ? 1 : -1)]; if (!next) return;
-    if (next === 'friends') friendsBack = 'menu';
-    show(next);
-  }, {passive: true});
+
+  document.addEventListener('touchmove', e => {
+    if (!active || animating || e.touches.length !== 1) return;
+    curX = e.touches[0].clientX;
+    const curY = e.touches[0].clientY;
+    const dx = curX - x0;
+    const dy = curY - y0;
+
+    if (axisLocked === null) {
+      if (Math.abs(dx) > 8 || Math.abs(dy) > 8) {
+        if (Math.abs(dy) >= Math.abs(dx) * 0.85) {
+          axisLocked = 'vertical';
+          active = false;
+          return;
+        } else {
+          axisLocked = 'horizontal';
+          isDragging = true;
+        }
+      } else {
+        return;
+      }
+    }
+
+    if (axisLocked !== 'horizontal') return;
+    if (e.cancelable) e.preventDefault();
+
+    const curIdx = ORDER.indexOf(curName);
+    const screenW = window.innerWidth || 360;
+    let dragDx = dx;
+
+    let newTargetName = '';
+    if (dx < 0) {
+      if (curIdx < ORDER.length - 1) {
+        newTargetName = ORDER[curIdx + 1];
+      } else {
+        dragDx = dx * 0.28;
+      }
+    } else if (dx > 0) {
+      if (curIdx > 0) {
+        newTargetName = ORDER[curIdx - 1];
+      } else {
+        dragDx = dx * 0.28;
+      }
+    }
+
+    if (newTargetName !== targetName) {
+      if (targetScr && targetScr !== curScr) {
+        cleanupStyles(targetScr);
+        targetScr.hidden = true;
+      }
+      targetName = newTargetName;
+      targetScr = targetName ? $('#scr-' + targetName) : null;
+      if (targetScr) {
+        targetScr.hidden = false;
+        targetScr.style.pointerEvents = 'none';
+        targetScr.style.willChange = 'transform';
+        targetScr.style.transition = 'none';
+        targetScr.style.zIndex = '2';
+      }
+    }
+
+    curScr.style.pointerEvents = 'none';
+    curScr.style.willChange = 'transform';
+    curScr.style.transition = 'none';
+    curScr.style.zIndex = '3';
+    curScr.style.transform = `translate3d(${dragDx}px, 0, 0)`;
+
+    if (targetScr) {
+      const targetOffset = dx < 0 ? (screenW + dragDx) : (-screenW + dragDx);
+      targetScr.style.transform = `translate3d(${targetOffset}px, 0, 0)`;
+    }
+  }, {passive: false});
+
+  const onTouchEnd = () => {
+    if (!active || !isDragging) {
+      active = false;
+      isDragging = false;
+      return;
+    }
+    active = false;
+    isDragging = false;
+
+    const dx = curX - x0;
+    const dt = Math.max(1, Date.now() - t0);
+    const vx = dx / dt;
+    const screenW = window.innerWidth || 360;
+
+    const sameDirection = (dx < 0 && vx <= 0.08) || (dx > 0 && vx >= -0.08);
+    const fastFlick = sameDirection && Math.abs(vx) > 0.32 && Math.abs(dx) > 24;
+    const draggedFarEnough = sameDirection && Math.abs(dx) > screenW * 0.26;
+    const shouldCommit = Boolean(targetScr && (draggedFarEnough || fastFlick));
+
+    animating = true;
+    const animDuration = 240;
+    const ease = 'cubic-bezier(0.22, 1, 0.36, 1)';
+
+    curScr.style.transition = `transform ${animDuration}ms ${ease}`;
+    if (targetScr) {
+      targetScr.style.transition = `transform ${animDuration}ms ${ease}`;
+    }
+
+    if (shouldCommit) {
+      const nav = $('#bnav');
+      if (nav && !nav.hidden) {
+        nav.querySelectorAll('[data-nav]').forEach(b => {
+          b.classList.toggle('on', b.dataset.nav === targetName);
+        });
+      }
+      try { if (typeof telegramHaptic === 'function') telegramHaptic('selection'); } catch (_) {}
+
+      curScr.style.transform = `translate3d(${dx < 0 ? -screenW : screenW}px, 0, 0)`;
+      targetScr.style.transform = 'translate3d(0, 0, 0)';
+
+      setTimeout(() => {
+        cleanupStyles(curScr);
+        cleanupStyles(targetScr);
+        animating = false;
+        if (targetName === 'friends') friendsBack = 'menu';
+        show(targetName, true);
+      }, animDuration + 15);
+    } else {
+      curScr.style.transform = 'translate3d(0, 0, 0)';
+      if (targetScr) {
+        targetScr.style.transform = `translate3d(${dx < 0 ? screenW : -screenW}px, 0, 0)`;
+      }
+
+      setTimeout(() => {
+        cleanupStyles(curScr);
+        if (targetScr) {
+          cleanupStyles(targetScr);
+          targetScr.hidden = true;
+        }
+        animating = false;
+      }, animDuration + 15);
+    }
+  };
+
+  document.addEventListener('touchend', onTouchEnd, {passive: true});
+  document.addEventListener('touchcancel', onTouchEnd, {passive: true});
 })();
 
 /* ---------------- account: keep the profile across reinstalls ----------------
@@ -7740,29 +7903,36 @@ document.addEventListener('visibilitychange', () => { if (document.hidden) usage
 let _screenAnimTimer = null;
 let _outgoingScr = null;
 
+const ALL_TRANS_CLASSES = [
+  'screen-exit-to-left', 'screen-exit-to-right', 'screen-enter-from-left', 'screen-enter-from-right',
+  'tab-exit-to-left', 'tab-exit-to-right', 'tab-enter-from-left', 'tab-enter-from-right'
+];
+
 function clearScreenTransitions() {
   if (_screenAnimTimer) { clearTimeout(_screenAnimTimer); _screenAnimTimer = null; }
   if (_outgoingScr) {
     _outgoingScr.hidden = true;
-    _outgoingScr.classList.remove('screen-exit-to-left', 'screen-exit-to-right', 'screen-enter-from-left', 'screen-enter-from-right');
+    _outgoingScr.classList.remove(...ALL_TRANS_CLASSES);
     _outgoingScr = null;
   }
   document.querySelectorAll('.screen').forEach(s => {
-    s.classList.remove('screen-exit-to-left', 'screen-exit-to-right', 'screen-enter-from-left', 'screen-enter-from-right');
+    s.classList.remove(...ALL_TRANS_CLASSES);
   });
 }
 
-function show(name) {
+function show(name, instant = false) {
   useCount('screen:' + name);
   if (typeof recordAction === 'function') recordAction('show:' + name);
-  const curScr = document.querySelector('.screen:not([hidden]):not(.screen-exit-to-left):not(.screen-exit-to-right)');
+  const curScr = document.querySelector('.screen:not([hidden]):not(.screen-exit-to-left):not(.screen-exit-to-right):not(.tab-exit-to-left):not(.tab-exit-to-right)');
   const curName = curScr ? curScr.id.replace('scr-', '') : '';
   const ORDER = ['menu', 'progress', 'friends', 'shop'];
   const SUB_SCREENS = ['rules', 'rating', 'settings', 'items', 'inbox', 'history', 'achievements', 'mastery', 'setup', 'lobby', 'profile'];
   let animDir = '';
-  if (curName && curName !== name && curScr) {
+  let isTab = false;
+  if (!instant && curName && curName !== name && curScr) {
     if (ORDER.includes(curName) && ORDER.includes(name)) {
       animDir = ORDER.indexOf(name) > ORDER.indexOf(curName) ? 'left' : 'right';
+      isTab = true;
     } else if (ORDER.includes(curName) && SUB_SCREENS.includes(name)) {
       animDir = 'left';
     } else if (SUB_SCREENS.includes(curName) && ORDER.includes(name)) {
@@ -7779,12 +7949,22 @@ function show(name) {
     curScr.hidden = false;
     targetScr.hidden = false;
 
-    if (animDir === 'left') {
-      curScr.classList.add('screen-exit-to-left');
-      targetScr.classList.add('screen-enter-from-right');
+    if (isTab) {
+      if (animDir === 'left') {
+        curScr.classList.add('tab-exit-to-left');
+        targetScr.classList.add('tab-enter-from-right');
+      } else {
+        curScr.classList.add('tab-exit-to-right');
+        targetScr.classList.add('tab-enter-from-left');
+      }
     } else {
-      curScr.classList.add('screen-exit-to-right');
-      targetScr.classList.add('screen-enter-from-left');
+      if (animDir === 'left') {
+        curScr.classList.add('screen-exit-to-left');
+        targetScr.classList.add('screen-enter-from-right');
+      } else {
+        curScr.classList.add('screen-exit-to-right');
+        targetScr.classList.add('screen-enter-from-left');
+      }
     }
 
     document.querySelectorAll('.screen').forEach(s => {
@@ -7794,7 +7974,7 @@ function show(name) {
     _screenAnimTimer = setTimeout(() => {
       clearScreenTransitions();
       if (targetScr) targetScr.hidden = false;
-    }, 280);
+    }, isTab ? 260 : 280);
   } else {
     clearScreenTransitions();
     document.querySelectorAll('.screen').forEach(s => {
