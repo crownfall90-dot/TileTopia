@@ -275,7 +275,7 @@
             <ol class="rsteps">
               <li><i>1</i><span class="ric">🧩</span><div><b>Возьмите плитку</b><p>Плитка из запаса показана внизу экрана. Её можно поворачивать кнопкой «Повернуть».</p></div></li>
               <li><i>2</i><span class="ric">🗺️</span><div><b>Приложите к полю</b><p>Все края обязаны совпасть с соседями: город к городу, дорога к дороге, река к реке. Доступные места подсвечены.</p></div></li>
-              <li><i>3</i><span class="ric">🧍</span><div><b>Выставьте мипла (подданного)</b><p>По желанию отправьте мипла на объект только что выставленной плитки (рыцарь в город, разбойник на дорогу, монах в монастырь). Затем — «Поставить».</p></div></li>
+              <li><i>3</i><span class="ric">🧍</span><div><b>Выставьте мипла (подданного)</b><p>По желанию отправьте мипла на объект только что выставленной плитки либо на свой свободный достроенный или недостроенный объект (например, на ранее поставленный монастырь). Затем — «Поставить».</p></div></li>
             </ol>
             <div class="h3">Умные подсказки</div>
             <div class="hitem"><span class="hic">💡</span><div><b>Подсказка лучшего хода</b><p>Игра анализирует поле и может подсказать самое выгодное место для плитки с расчётом будущих очков. Лампочка справа от стола ставит плитку на оптимальную позицию.</p><em>В настройках: «Всегда», «По кнопке» или «Выкл»</em></div></div>
@@ -303,7 +303,8 @@
 
           <div class="rpane" data-rp="meeple" hidden>
             <div class="h3">Стратегия управления миплами</div>
-            <div class="hitem"><span class="hic">♟️</span><div><b>Один мипл за ход</b><p>Мипл выставляется строго на только что выложенную плитку — на город, дорогу или монастырь.</p></div></div>
+            <div class="hitem"><span class="hic">♟️</span><div><b>Один мипл за ход</b><p>За ход можно выставить одного мипла — на только что выложенную плитку либо на свой свободный объект, начатый ранее.</p></div></div>
+            <div class="hitem" style="border:1.5px solid rgba(242,184,75,.45);background:rgba(242,184,75,.09)"><span class="hic">⛪</span><div><b>Позднее заселение своих объектов (достроенных и недостроенных)</b><p>Если вы поставили плитку во время игры, но не выставили на неё фишку тем же ходом, вы можете <b>любым следующим ходом</b> поставить фишку на свой достроенный или ещё недостроенный объект. Например, если вы поставили монастырь без фишки и вокруг него ещё осталась свободная плитка, то при выкладывании соседней плитки вы можете отправить мипла на этот монастырь!</p></div></div>
             <div class="hitem"><span class="hic">🔒</span><div><b>Правило занятого объекта</b><p>Нельзя поставить мипла на объект, где уже есть чей-то подданный. Захват чужого объекта возможен только через хитрое объединение!</p></div></div>
             <div class="hitem"><span class="hic">⚔️</span><div><b>Битва за объект: большинство миплов</b><p>Если две части объекта слились воедино, очки за него получает игрок с перевесом по миплам. Если миплов поровну — побеждает тот, кто выложил больше плиток этого объекта!</p></div></div>
             <div class="hitem"><span class="hic">↩️</span><div><b>Возврат миплов в резерв</b><p>Как только объект достроен и очки начислены, миплы немедленно возвращаются в ваш запас для новых завоеваний.</p></div></div>
@@ -1458,15 +1459,19 @@ async function afterPlace(t, p, forced) {
   t.by = p;
   const meeplesBefore = players[p].meeples;
   const mine = players[p].meeples > 0 ? doneMine(t, p) : [];
+  const touching = (players[p].meeples > 0 && typeof SC.touchingMine === 'function') ? SC.touchingMine(tiles, meeples, t, p) : [];
   await scoreAfter(t, p, new Set(mine.flatMap(m => [...m.c.ids])));
   if (my !== token) return;
   const meepleReturned = players[p].meeples > meeplesBefore;
 
-  // opts: {t, g} pairs — anywhere on board if a meeple returned, otherwise only placed tile.
+  // opts: {t, g} pairs — anywhere on board if a meeple returned, otherwise placed tile + touching owned features
   const anyMode = meepleReturned && players[p].meeples > 0;
-  const opts = (players[p].meeples > 0
+  const baseOpts = players[p].meeples > 0
     ? (anyMode ? claimableAll(p) : claimable(t, p).map(g => ({t, g})))
-    : []).concat(players[p].meeples > 0 ? mine.map(m => ({t: m.t, g: m.g, done: true})) : []);
+    : [];
+  const mineOpts = players[p].meeples > 0 ? mine.map(m => ({t: m.t, g: m.g, done: true})) : [];
+  const touchingOpts = players[p].meeples > 0 ? touching.filter(tc => !mineOpts.some(mo => gid(mo.t, mo.g) === gid(tc.t, tc.g)) && !baseOpts.some(bo => gid(bo.t, bo.g) === gid(tc.t, tc.g))).map(tc => ({t: tc.t, g: tc.g, done: tc.done})) : [];
+  const opts = baseOpts.concat(mineOpts).concat(touchingOpts);
   let choice = null; // {t, g} or null
   if (forced !== undefined) {
     // a move from the network or the history: its figure counts only where the rules allow one (a changed client could

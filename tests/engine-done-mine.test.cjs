@@ -20,3 +20,17 @@ test('engine/scoring: doneMine counts the starting card as neutral', async () =>
   const shared = build(1);
   assert.equal(doneMine(shared, [], shared.get(key(0, 1)), 0).length, 0, 'a card of another player makes the road shared: no free figure');
 });
+test('engine/scoring: touchingMine allows claiming an uncompleted monastery placed earlier', async () => {
+  const {key} = await import('../src/engine/board.js');
+  const {touchingMine} = await import('../src/engine/scoring.js');
+  const mk = (x, y, type, r, by) => ({x, y, type, r, seed: 1, ...(by === undefined ? {} : {by})});
+  const tiles = new Map();
+  const fort = mk(0, 0, 'fort', 0, 0); // player 0's monastery without meeple
+  const adj = mk(1, 0, 'rS', 0, 0);   // player 0 places an adjacent tile
+  tiles.set(key(0, 0), fort);
+  tiles.set(key(1, 0), adj);
+  const got = touchingMine(tiles, [], adj, 0);
+  assert.equal(got.length, 1, 'finds uncompleted adjacent monastery');
+  assert.equal(got[0].t.type, 'fort');
+  assert.equal(got[0].done, false, 'monastery is not yet completed');
+});

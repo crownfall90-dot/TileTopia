@@ -60,3 +60,25 @@ export function doneMine(tiles, meeples, t, p) {
   for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) { const n = at(tiles, t.x + dx, t.y + dy); const g = n && TYPES[n.type].fort && groupsOf(n).find(x => x.kind === 'f'); if (g) consider(n, g); }
   return out;
 }
+/** Uncompleted or completed features touched by card t that player p placed/built and nobody holds.
+ *  Allows a player to put a meeple on an uncompleted object they placed previously (e.g. an uncompleted monastery). */
+export function touchingMine(tiles, meeples, t, p) {
+  const out = [], seen = new Set();
+  const consider = (tt, g) => {
+    if (seen.has(gid(tt, g))) return;
+    const c = component(tiles, meeples, tt, g); c.ids.forEach(i => seen.add(i));
+    if (!c.meeples.length && (tt.by === p || c.tiles.some(x => x.by === p))) {
+      out.push({t: tt, g, c, done: c.complete});
+    }
+  };
+  // 1. Adjacent monasteries placed by player p or contributed to
+  for (let dy = -1; dy <= 1; dy++) {
+    for (let dx = -1; dx <= 1; dx++) {
+      if (dx === 0 && dy === 0) continue;
+      const n = at(tiles, t.x + dx, t.y + dy);
+      const g = n && TYPES[n.type] && TYPES[n.type].fort && groupsOf(n).find(x => x.kind === 'f');
+      if (g) consider(n, g);
+    }
+  }
+  return out;
+}
