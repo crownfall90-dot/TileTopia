@@ -21,9 +21,19 @@ export const PICS = {
 };
 /** Banners: wide scenes of the kingdom, only for the banner shape. */
 export const BANNERS = {
-  meadow: P('Луга', 'tiles/rC.webp', 500, '50% 40%'), river: P('Река', 'tiles/wS.webp', 600, '50% 50%'),
-  bridge: P('Мост', 'tiles/wBr.webp', 800, '50% 50%'), town: P('Город', 'tiles/band.webp', 900, '50% 50%'),
-  abbey: P('Монастырь', 'tiles/fort.webp', 1000, '50% 50%'), citadel: P('Цитадель', 'tiles/c4.webp', 2000, '50% 50%'),
+  meadow: P('Луга', 'tiles/rC.webp', 500, '50% 40%'),
+  river: P('Река', 'tiles/wS.webp', 600, '50% 50%'),
+  lake: P('Озёрный край', 'tiles/wLake.webp', 750, '50% 50%'),
+  bridge: P('Мост', 'tiles/wBr.webp', 800, '50% 50%'),
+  mine: P('Древняя шахта', 'tiles/rMine.webp', 850, '50% 50%'),
+  town: P('Город', 'tiles/band.webp', 900, '50% 50%'),
+  abbey: P('Монастырь', 'tiles/fort.webp', 1000, '50% 50%'),
+  watercity: P('Водный замок', 'tiles/wCity.webp', 1100, '50% 50%'),
+  abbeyriver: P('Обитель у реки', 'tiles/fortR.webp', 1300, '50% 50%'),
+  rocks: P('Скалистый утёс', 'tiles/rocks.webp', 1500, '50% 50%'),
+  citadel: P('Цитадель', 'tiles/c4.webp', 2000, '50% 50%'),
+  dragons: P('Пик Дракона', 'tiles/banner_dragons.webp', 2500, '50% 45%'),
+  harbor: P('Королевская гавань', 'tiles/banner_harbor.webp', 3000, '50% 50%'),
 };
 const POOL = {pic: [PICS, 'avatars', 'avatar'], banner: [BANNERS, 'banners', 'banner']};
 

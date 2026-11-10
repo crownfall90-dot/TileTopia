@@ -1803,7 +1803,7 @@ html.lowgfx .tile.ghost,html.lowgfx .gm{animation:none}
 
 .ground{position:absolute;left:-1800px;top:-1800px;width:3600px;height:3600px;transform:translateZ(-15px);background:radial-gradient(closest-side,rgba(64,98,66,.5),rgba(30,48,44,.22) 55%,transparent 100%);pointer-events:none}
 
-.tile{position:absolute;width:88px;height:88px;transform-style:preserve-3d}
+.tile{position:absolute;width:88px;height:88px;transform-style:preserve-3d;filter:drop-shadow(0 4px 8px rgba(0,0,0,.32))}
 
 .face{position:absolute;inset:0;background-size:100% 100%;border-radius:2px;transform:rotate(var(--r,0deg));transition:transform .28s cubic-bezier(.3,1.4,.5,1),filter .4s,box-shadow .4s}
 
@@ -1847,11 +1847,11 @@ html.flat .ct .face{border-radius:4px;box-shadow:none}
 
 .tile .sd.e.fall::before,.tile .sd.w.fall::before{top:calc(50% - 6.5px);height:13px;left:0;right:0;background:repeating-linear-gradient(90deg,#9fd8ff 0 3px,#4ea2e4 3px 7px,#3b88cf 7px 10px);background-size:10px 100%;animation-name:fallX}
 
-.face.t-wLake::after,.face.t-wTee::after{content:"";position:absolute;inset:8%;border-radius:34%;background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.3) 50%,transparent 62%) 0 0/260% 100%;pointer-events:none;animation:lakeFlow 3.6s steps(36) infinite}
+.face[class*="t-w"]::after,.face.t-fortR::after{content:"";position:absolute;inset:6%;border-radius:24%;background:linear-gradient(115deg,transparent 36%,rgba(255,255,255,.32) 50%,transparent 64%) 0 0/260% 100%;pointer-events:none;animation:lakeFlow 3.6s steps(36) infinite}
 
 @keyframes lakeFlow{from{background-position:130% 0}to{background-position:-30% 0}}
 
-html.lowgfx .face.t-wLake::after,html.lowgfx .face.t-wTee::after{display:none}
+html.lowgfx .face[class*="t-w"]::after,html.lowgfx .face.t-fortR::after{display:none}
 
 .tile .sd.fall::after{content:"";position:absolute;border-radius:50%;background:radial-gradient(rgba(255,255,255,.95),rgba(190,230,255,.5) 55%,transparent 72%);animation:foam .9s steps(5) infinite alternate}
 
@@ -1911,7 +1911,9 @@ html.lowgfx .tile .sd.s{display:block}
 
 @keyframes shk{25%{transform:translateZ(18px) translateX(-5px)}75%{transform:translateZ(18px) translateX(5px)}}
 
-.tile.glow .face{filter:brightness(1.3) saturate(1.15);box-shadow:0 0 0 2px #ffe08a,0 0 22px rgba(255,214,120,.85)}
+.tile.glow .face{filter:brightness(1.3) saturate(1.18);box-shadow:0 0 0 2.5px #ffe08a,0 0 24px rgba(255,214,120,.9),0 0 42px rgba(246,197,101,.45);animation:tileGlowPulse 1.1s cubic-bezier(.25,1,.5,1) forwards}
+
+@keyframes tileGlowPulse{0%{transform:rotate(var(--r,0deg)) translateZ(0);filter:brightness(1.1) saturate(1)}35%{transform:rotate(var(--r,0deg)) translateZ(7px);filter:brightness(1.38) saturate(1.28);box-shadow:0 0 0 3px #fff1a8,0 0 30px rgba(255,214,120,1),0 0 55px rgba(246,197,101,.6)}100%{transform:rotate(var(--r,0deg)) translateZ(0);filter:brightness(1.3) saturate(1.18)}}
 
 .slot{position:absolute;width:88px;height:88px;box-sizing:border-box;border-radius:12px;transform:translateZ(-14px);border:2.5px dashed var(--pc,#f2b84b);background:rgba(0,0,0,.18);cursor:pointer}
 
@@ -1925,7 +1927,7 @@ html.lowgfx .tile .sd.s{display:block}
 
 .slot.tip{border:3px solid #ffd75e;background:rgba(255,215,94,.22);box-shadow:0 0 0 3px rgba(255,215,94,.25),0 0 26px rgba(255,215,94,.55)}.slot.tip::after{background:linear-gradient(#ffd75e,#ffd75e) center/100% 3px no-repeat,linear-gradient(#ffd75e,#ffd75e) center/3px 100% no-repeat}
 
-.bb{position:absolute;background-size:100% 100%;transform-origin:50% 100%;transform:translate(-50%,-100%) rotateZ(calc(var(--rot,0deg) * -1)) rotateX(calc(var(--tilt) * -1));pointer-events:none}
+.bb{position:absolute;background-size:100% 100%;transform-origin:50% 100%;transform:translate(-50%,-100%) rotateZ(calc(var(--rot,0deg) * -1)) rotateX(calc(var(--tilt) * -1));filter:drop-shadow(0 3px 4px rgba(0,0,0,.45));pointer-events:none}
 
 .bb.pop{animation:bbpop .45s cubic-bezier(.3,1.6,.5,1) both;animation-delay:var(--d,0s)}
 
@@ -1951,7 +1953,9 @@ html.lowgfx .tile .sd.s{display:block}
 
 .fab{width:38px;height:38px;border-radius:12px;background:var(--glass);border:1px solid var(--line);display:grid;place-items:center;cursor:pointer;font:700 11px var(--f-display);}
 
-.fab[hidden]{display:none}.fab.tipb{color:#ffd75e;border-color:rgba(255,215,94,.45);box-shadow:0 0 14px rgba(255,215,94,.18)}
+.fab[hidden]{display:none}.fab.tipb{color:#ffd75e;border-color:rgba(255,215,94,.65);background:radial-gradient(circle at 50% 40%,rgba(255,215,94,.22),rgba(20,28,48,.85));box-shadow:0 0 16px rgba(255,215,94,.35);animation:tipLampBreathe 2s ease-in-out infinite}
+
+@keyframes tipLampBreathe{0%,100%{transform:scale(1);box-shadow:0 0 14px rgba(255,215,94,.3)}50%{transform:scale(1.08);box-shadow:0 0 24px rgba(255,215,94,.65),0 0 36px rgba(246,197,101,.35);border-color:#ffe08a}}
 
 .toast{position:absolute;top:60px;left:50%;transform:translate(-50%,-8px);opacity:0;transition:.25s;z-index:5;background:var(--glass);border:1px solid var(--line);padding:5px 11px;border-radius:10px;font-size:11.5px;white-space:nowrap;max-width:min(300px,calc(100% - 32px));overflow:hidden;text-overflow:ellipsis;pointer-events:none;}
 
@@ -2495,9 +2499,9 @@ html.tutoring #helpBtn{display:none}
 
 /* water at rest: nothing repaints while the player is not doing anything (see wake() in the game) */
 
-html.calm .tile .sd.fall::before,html.calm .tile .sd.fall::after,html.calm .face.t-wLake::after,html.calm .face.t-wTee::after{animation-play-state:paused}
+html.calm .tile .sd.fall::before,html.calm .tile .sd.fall::after,html.calm .face[class*="t-w"]::after,html.calm .face.t-fortR::after{animation-play-state:paused}
 
-.board.dragging .tile .sd.fall::before,.board.dragging .tile .sd.fall::after,.board.dragging .face.t-wLake::after,.board.dragging .face.t-wTee::after{animation-play-state:paused}/* the finger moves the whole scene: no water repainting on top of that */
+.board.dragging .tile .sd.fall::before,.board.dragging .tile .sd.fall::after,.board.dragging .face[class*="t-w"]::after,.board.dragging .face.t-fortR::after{animation-play-state:paused}/* the finger moves the whole scene: no water repainting on top of that */
 
 
 

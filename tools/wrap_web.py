@@ -142,6 +142,7 @@ if os.path.exists("tools/export-tiles.html"):
     shutil.copy2("tools/export-tiles.html", f"{site}/tiles/index.html")
 if os.path.exists("assets/tiles"):
     shutil.copytree("assets/tiles", f"{site}/tiles", dirs_exist_ok=True)
+    shutil.copytree("assets/tiles", f"{site}/staging/tiles", dirs_exist_ok=True)
 if os.path.exists("store"):
     shutil.copytree("store", f"{site}/store", dirs_exist_ok=True)
     shutil.copytree("store", f"{site}/staging/store", dirs_exist_ok=True)
