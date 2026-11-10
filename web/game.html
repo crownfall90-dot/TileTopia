@@ -4799,6 +4799,11 @@ function renderProfile() {
               }
             </div>
           </div>
+          <button class="iconbtn prof-banner-btn" id="profBannerTry" aria-label="Примерить баннер" title="Примерить баннер">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round">
+              <rect x="3" y="5" width="18" height="14" rx="3"/><path d="M3 10h18"/><circle cx="7" cy="15" r="1.5"/>
+            </svg>
+          </button>
           <button class="iconbtn prof-edit-btn" id="profEdit" aria-label="Редактировать профиль" title="Настроить профиль">
             <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
               <path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>
@@ -4867,7 +4872,17 @@ function renderProfile() {
     `;
     const pe = $('#profEdit');
     if (pe) pe.onclick = editProfile;
-    profEl.querySelectorAll('[data-hacct]').forEach(b => { b.onclick = () => { const t = $(b.dataset.hacct === 'out' ? '#acLogout' : '#acLogin'); if (t) t.click(); }; });
+    const pbt = $('#profBannerTry');
+    if (pbt) pbt.onclick = () => openBannerFitting(wallet.banner || 'meadow');
+    profEl.querySelectorAll('[data-hacct]').forEach(b => {
+      b.onclick = () => {
+        if (b.dataset.hacct === 'out') {
+          confirmBox('Выйти из аккаунта?<br><small style="font-weight:500;color:var(--muted)">Прогресс сохранится в аккаунте. На этом устройстве начнётся новая игра, а войти можно будет в любой аккаунт</small>', 'Выйти', signOut);
+        } else {
+          accountDialog('login');
+        }
+      };
+    });
   }
 
   const st = PROG.st = normalizeStats(PROG.st);
@@ -5068,7 +5083,10 @@ async function openPlayer(uid, name, col, meta = {}) {
         pendingInvite: Boolean(invited && invited.uids && invited.uids.has(uid)),
         incomingRequest: Boolean(inbox && inbox[uid + '_f']),
         hasActiveRoom: Boolean(room),
-        roomCode: room || ''
+        roomCode: room || '',
+        hasBanner: Boolean((pData.banner && AV.BANNERS[pData.banner]) || (me && wallet.avShape === 'rect' && wallet.banner && AV.BANNERS[wallet.banner])),
+        bannerSrc: ((pData.banner && AV.BANNERS[pData.banner]) || (me && wallet.avShape === 'rect' && wallet.banner && AV.BANNERS[wallet.banner])) ? ((pData.banner && AV.BANNERS[pData.banner]) || AV.BANNERS[wallet.banner]).src : '',
+        bannerPos: ((pData.banner && AV.BANNERS[pData.banner]) || (me && wallet.avShape === 'rect' && wallet.banner && AV.BANNERS[wallet.banner])) ? ((pData.banner && AV.BANNERS[pData.banner]) || AV.BANNERS[wallet.banner]).pos : 'center'
       });
       wireCardEvents();
     } else {
@@ -5164,6 +5182,240 @@ async function openPlayer(uid, name, col, meta = {}) {
 }
 document.addEventListener('click', e => { const b = e.target.closest('[data-pl]'); if (b && !e.target.closest('button.chip')) openPlayer(b.dataset.pl, b.dataset.n, b.dataset.c, b.dataset); });
 // Edit the profile: colour (free, any time) and nickname (the usual rename).
+
+function openBannerFitting(initialId) {
+  let curId = (initialId && AV.BANNERS[initialId]) ? initialId : (wallet.banner || 'meadow');
+  let curView = 'profile'; // 'profile' | 'rival'
+  const old = $('#bannerFittingModal');
+  if (old) old.remove();
+
+  const modal = document.createElement('div');
+  modal.id = 'bannerFittingModal';
+  modal.className = 'over banner-fitting-modal';
+  modal.style.position = 'fixed';
+  modal.setAttribute('role', 'dialog');
+  modal.setAttribute('aria-modal', 'true');
+
+  const render = () => {
+    const curB = AV.BANNERS[curId] || AV.BANNERS.meadow;
+    const isOwned = AV.owns(wallet, 'banner', curId);
+    const hasShape = AV.owns(wallet, 'shape', 'rect');
+    const isEquipped = (wallet.banner === curId && wallet.avShape === 'rect');
+    const canAfford = hasShape && COINS.canPay(wallet, curB.price);
+
+    const name = profileName();
+    const need = xpNeed(PROG.lvl);
+    const pct = Math.max(0, Math.min(100, 100 * PROG.xp / need));
+    const st = PROG.st = normalizeStats(PROG.st);
+    const rate = st.games ? Math.round(100 * st.wins / st.games) : 0;
+    const initial = (name[0] || '?').toUpperCase();
+    const col = wallet.color || '#3a7bd5';
+    const ring = myRing();
+    const frameStyle = ring ? `--fr:${ring};` : '';
+
+    let stageHtml = '';
+    if (curView === 'profile') {
+      stageHtml = `
+        <div class="bf-profile-card" style="--banner-bg:url(${curB.src});--banner-pos:${curB.pos || 'center'}">
+          <div class="bf-shade"></div>
+          <div class="bf-badge">✨ ${curB.name}</div>
+          <div class="prof-hero-row">
+            <span class="av big" style="--c:${col};${frameStyle}">${initial}</span>
+            <div class="pwho">
+              <div class="pnick-row">
+                <b class="pnick">${name}</b>
+                ${myStatus() ? `<em class="fst">${myStatus()}</em>` : ''}
+              </div>
+              <small class="pmail guest">В вашем профиле</small>
+            </div>
+          </div>
+          <div class="pclvl">
+            <div class="lvl-badge"><b>${PROG.lvl}</b><small>УР.</small></div>
+            <div class="pi">
+              <div class="xp-meta"><b class="pl1">Уровень ${PROG.lvl}</b><span class="xp-count">${PROG.xp} / ${need} XP</span></div>
+              <div class="xpbar"><i style="width:${pct.toFixed(1)}%"></i></div>
+            </div>
+          </div>
+          <div class="pchips">
+            <div class="pchip-item cups-item"><b>${PROG.cups || 0}</b> <small>Кубков</small></div>
+            <div class="pchip-item ach-item"><b>${ACH.filter(a => PROG.ach[a.id] === 'got').length}</b> <small>Наград</small></div>
+          </div>
+        </div>
+      `;
+    } else {
+      stageHtml = `
+        <div class="bf-rival-card" style="--banner-bg:url(${curB.src});--banner-pos:${curB.pos || 'center'}">
+          <div class="bf-shade"></div>
+          <div class="bf-badge">👁️ Вид для соперников</div>
+          <div class="pl-v2-header">
+            <div class="pl-v2-av-box" style="--pl-c:${col}">
+              <span class="pl-v2-av${ring ? ' fr' : ''}" style="--c:${col};${frameStyle}">${initial}</span>
+              <span class="pl-v2-lvl">${PROG.lvl || 1}</span>
+            </div>
+            <div class="pl-v2-identity">
+              <h3 class="pl-v2-name">${name}</h3>
+              ${myStatus() ? `<span class="pl-v2-status-pill"><em class="fst">${myStatus()}</em></span>` : ''}
+              <div class="pl-v2-presence-row">
+                <span class="pl-v2-badge on"><i class="pl-v2-dot"></i> <span>В сети</span></span>
+              </div>
+            </div>
+          </div>
+          <div class="pl-v2-stats">
+            <div class="pl-v2-stat"><b class="pl-v2-stat-num">${PROG.cups || 0}</b><small>Кубков</small></div>
+            <div class="pl-v2-stat"><b class="pl-v2-stat-num">${st.wins}</b><small>Побед</small></div>
+            <div class="pl-v2-stat"><b class="pl-v2-stat-num">${rate}%</b><small>Винрейт</small></div>
+          </div>
+        </div>
+      `;
+    }
+
+    const carouselHtml = Object.entries(AV.BANNERS).map(([bId, b]) => {
+      const owned = AV.owns(wallet, 'banner', bId);
+      const equipped = (wallet.banner === bId && wallet.avShape === 'rect');
+      const sel = (bId === curId);
+      return `
+        <button class="bf-card${sel ? ' sel' : ''}${equipped ? ' on' : ''}" data-bid="${bId}" type="button">
+          <div class="bf-thumb" style="background-image:url(${b.src});background-position:${b.pos || 'center'}">
+            ${equipped ? '<span class="bf-tag eq">Надет</span>' : (owned ? '<span class="bf-tag ow">Куплен</span>' : `<span class="bf-tag pr">${b.price} 🪙</span>`)}
+          </div>
+          <span class="bf-name">${b.name}</span>
+        </button>
+      `;
+    }).join('');
+
+    let actionBtnHtml = '';
+    if (isEquipped) {
+      actionBtnHtml = `<button class="ghostbtn bf-action-btn" id="bfUnequipBtn">Снять баннер</button>`;
+    } else if (isOwned) {
+      actionBtnHtml = `<button class="cta wide bf-action-btn" id="bfEquipBtn">Надеть этот баннер</button>`;
+    } else if (!hasShape) {
+      actionBtnHtml = `<button class="cta wide bf-action-btn lock" id="bfNeedShapeBtn">Открыть форму баннера (2500 🪙)</button>`;
+    } else {
+      actionBtnHtml = `<button class="cta wide bf-action-btn${!canAfford ? ' poor' : ''}" id="bfBuyBtn" ${!canAfford ? 'disabled' : ''}>Купить за ${COINS.priceTag(curB.price)} и надеть</button>`;
+    }
+
+    modal.innerHTML = `
+      <div class="ocard bf-modal-card">
+        <div class="bf-top">
+          <div class="bf-title-row">
+            <div class="bf-title-wrap">
+              <h3 class="bf-title">Примерка баннера</h3>
+              <p class="bf-sub">Посмотрите, как фон преображает профиль и как его видят другие</p>
+            </div>
+            <button class="iconbtn bf-close" id="bfCloseBtn" aria-label="Закрыть">
+              <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4"><path d="M18 6L6 18M6 6l12 12"/></svg>
+            </button>
+          </div>
+          <div class="bf-tabs">
+            <button class="bf-tab${curView === 'profile' ? ' active' : ''}" data-view="profile">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+              <span>В моем профиле</span>
+            </button>
+            <button class="bf-tab${curView === 'rival' ? ' active' : ''}" data-view="rival">
+              <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+              <span>В карточке соперника</span>
+            </button>
+          </div>
+        </div>
+
+        <div class="bf-stage">${stageHtml}</div>
+
+        <div class="bf-carousel-wrap">
+          <span class="bf-carousel-label">Выберите баннер для примерки:</span>
+          <div class="bf-carousel" id="bfCarousel">${carouselHtml}</div>
+        </div>
+
+        <div class="bf-foot">
+          ${actionBtnHtml}
+        </div>
+      </div>
+    `;
+
+    const closeBtn = modal.querySelector('#bfCloseBtn');
+    if (closeBtn) closeBtn.onclick = () => modal.remove();
+
+    modal.querySelectorAll('.bf-tab').forEach(t => {
+      t.onclick = () => {
+        curView = t.dataset.view;
+        render();
+      };
+    });
+
+    modal.querySelectorAll('.bf-card').forEach(c => {
+      c.onclick = () => {
+        curId = c.dataset.bid;
+        render();
+      };
+    });
+
+    const equipBtn = modal.querySelector('#bfEquipBtn');
+    if (equipBtn) {
+      equipBtn.onclick = () => {
+        wallet.avShape = 'rect';
+        wallet.banner = curId;
+        beep('coin');
+        saveWallet();
+        renderProfile();
+        renderMenuProfile();
+        if (typeof renderShop === 'function') renderShop();
+        toastAny(`Баннер «${curB.name}» надет!`);
+        render();
+      };
+    }
+
+    const unequipBtn = modal.querySelector('#bfUnequipBtn');
+    if (unequipBtn) {
+      unequipBtn.onclick = () => {
+        wallet.banner = '';
+        saveWallet();
+        renderProfile();
+        renderMenuProfile();
+        if (typeof renderShop === 'function') renderShop();
+        toastAny('Баннер снят');
+        render();
+      };
+    }
+
+    const buyBtn = modal.querySelector('#bfBuyBtn');
+    if (buyBtn) {
+      buyBtn.onclick = () => {
+        if (!COINS.canPay(wallet, curB.price)) return;
+        COINS.pay(wallet, curB.price);
+        wallet.banners = [...(wallet.banners || []), curId];
+        wallet.avShape = 'rect';
+        wallet.banner = curId;
+        beep('coin');
+        saveWallet();
+        renderProfile();
+        renderMenuProfile();
+        if (typeof renderShop === 'function') renderShop();
+        toastAny(`Баннер «${curB.name}» куплен и надет!`);
+        render();
+      };
+    }
+
+    const needShapeBtn = modal.querySelector('#bfNeedShapeBtn');
+    if (needShapeBtn) {
+      needShapeBtn.onclick = () => {
+        if (!COINS.canPay(wallet, 2500)) {
+          toastAny('Форма баннера стоит 2500 тайлов');
+          return;
+        }
+        COINS.pay(wallet, 2500);
+        wallet.avShapes = [...(wallet.avShapes || []), 'rect'];
+        wallet.avShape = 'rect';
+        beep('coin');
+        saveWallet();
+        toastAny('Форма баннера открыта!');
+        render();
+      };
+    }
+  };
+
+  render();
+  document.body.append(modal);
+}
+
 function editProfile() {
   const box = document.createElement('div'); box.className = 'over'; box.style.position = 'fixed';
   box.innerHTML = `<div class="ocard prof"><div class="pav" id="epAv" style="--c:${wallet.color}">${(profileName()[0] || '?').toUpperCase()}</div><h3>Редактировать профиль</h3><p>Цвет игрока — в профиле и по умолчанию в партиях</p><span id="epAnchor"></span>
@@ -7629,13 +7881,32 @@ function accountDialog(mode, prefill) {
       let j = null, created = false;
       try { j = await idt('signInWithPassword', {email: mail(), password: pass(), returnSecureToken: true}); }
       catch (e) {
-        if (!(e && e.error && /^(EMAIL_NOT_FOUND|INVALID_LOGIN_CREDENTIALS)/.test(e.error.message))) throw e;
+        const msg = String((e && e.error && e.error.message) || (e && e.message) || '');
+        if (!/^(EMAIL_NOT_FOUND|INVALID_LOGIN_CREDENTIALS)/.test(msg)) throw e;
         if (pass().length < 6) throw {error: {message: 'SHORT_OR_WRONG'}};
         try {
-          if (fbAuth && fbAuth.email) j = await idt('signUp', {email: mail(), password: pass(), returnSecureToken: true}); // signed in elsewhere: a new account
-          else { await fbToken(); j = await idt('update', {idToken: fbAuth.idToken, email: mail(), password: pass(), returnSecureToken: true}); }
+          if (fbAuth && fbAuth.email) j = await idt('signUp', {email: mail(), password: pass(), returnSecureToken: true});
+          else {
+            let tok = null;
+            try { tok = await fbToken(); } catch (_) {}
+            if (tok) {
+              try {
+                j = await idt('update', {idToken: tok, email: mail(), password: pass(), returnSecureToken: true});
+              } catch (updErr) {
+                const uMsg = String((updErr && updErr.error && updErr.error.message) || (updErr && updErr.message) || '');
+                if (/^EMAIL_EXISTS/.test(uMsg)) throw {error: {message: 'INVALID_PASSWORD'}};
+                j = await idt('signUp', {email: mail(), password: pass(), returnSecureToken: true});
+              }
+            } else {
+              j = await idt('signUp', {email: mail(), password: pass(), returnSecureToken: true});
+            }
+          }
           created = true;
-        } catch (e2) { throw e2 && e2.error && /^EMAIL_EXISTS/.test(e2.error.message) ? {error: {message: 'INVALID_PASSWORD'}} : e2; }
+        } catch (e2) {
+          const e2Msg = String((e2 && e2.error && e2.error.message) || (e2 && e2.message) || '');
+          if (/^EMAIL_EXISTS/.test(e2Msg)) throw {error: {message: 'INVALID_PASSWORD'}};
+          throw e2;
+        }
       }
       keepAuth(j, mail());
       if (created) {
@@ -8911,6 +9182,7 @@ function showShopItemModal(kind, key, name, price) {
         </div>
       </div>
       <div class="stall-modal-foot">
+        ${(kind === 'av' && (key || '').startsWith('banner:')) ? `<button class="ghostbtn stall-modal-try-btn" id="stallModalTryBtn" style="width:100%;margin-bottom:8px;border-color:rgba(242,184,75,0.6);color:#ffd875"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" style="display:inline-block;vertical-align:-3px;margin-right:6px"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>Примерить баннер</button>` : ''}
         <button class="cta wide stall-modal-buy-btn${!canAfford ? ' poor' : ''}" id="stallModalBuyBtn">
           <span class="stall-modal-buy-text">Купить</span><span class="stall-modal-buy-sep">·</span><span class="stall-modal-buy-price">${COINS.priceTag(price)}</span>
         </button>
@@ -8931,6 +9203,13 @@ function showShopItemModal(kind, key, name, price) {
   modal.addEventListener('click', e => {
     if (e.target.closest('[data-close-modal]') || e.target === modal) {
       close();
+      return;
+    }
+    const tryBtn = e.target.closest('#stallModalTryBtn');
+    if (tryBtn) {
+      close();
+      const parts = (key || '').split(':');
+      openBannerFitting(parts[1] || 'meadow');
       return;
     }
     const buyBtn = e.target.closest('#stallModalBuyBtn');

@@ -135,10 +135,16 @@ export const MAIL_FIX = {
 };
 
 export function classifyAuthError(j, link) {
-  if (!j || !j.error) return ['Нет связи с сервером — проверьте интернет', ''];
-  const c = String(j.error.message || '').split(' ')[0];
+  if (!j) return ['Нет связи с сервером — проверьте интернет', ''];
+  const msg = (j.error && j.error.message) || j.message || (typeof j === 'string' ? j : '');
+  if (!msg) return ['Нет связи с сервером — проверьте интернет', ''];
+  const c = String(msg).split(' ')[0].replace(/[:;,]$/, '');
   if (AUTH_ERR[c]) return AUTH_ERR[c];
-  return [link ? 'Не удалось сохранить профиль. Попробуйте позже — золото и прогресс никуда не денутся' : 'Не удалось войти. Попробуйте чуть позже', ''];
+  if (c === 'INVALID_IDP_RESPONSE') return ['Не удалось подтвердить вход Google. Попробуйте войти по почте', ''];
+  if (c === 'CONFIGURATION_NOT_FOUND') return ['Вход пока не настроен для тестовой версии. Войдите по почте', ''];
+  if (c === 'OPERATION_NOT_ALLOWED') return ['Этот способ входа отключён на сервере', ''];
+  if (c === 'NETWORK_ERROR' || c === 'Failed') return ['Нет связи с сервером — проверьте интернет', ''];
+  return [link ? `Не удалось сохранить профиль (${c}). Попробуйте позже` : `Не удалось войти (${c}). Попробуйте чуть позже`, ''];
 }
 
 export function checkAuthInput(mail, pass, link) {

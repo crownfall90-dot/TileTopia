@@ -48,6 +48,9 @@ export function renderPlayerCardHtml({
   achievements = null,
   achTotal = 0,
   level = null,
+  hasBanner = false,
+  bannerSrc = '',
+  bannerPos = 'center',
 }) {
   const cleanName = String(name || 'Игрок').replace(/[<>&"']/g, '').slice(0, 20);
   const initial = (cleanName[0] || '?').toUpperCase();
@@ -135,8 +138,11 @@ export function renderPlayerCardHtml({
     actionsHtml = inviteBtn + friendAction + secondaryActions;
   }
 
+  const bannerCls = (hasBanner && bannerSrc) ? ' has-banner' : '';
+  const bannerStyle = (hasBanner && bannerSrc) ? ` style="--banner-bg:url(${bannerSrc});--banner-pos:${bannerPos}"` : '';
+
   return `
-    <div class="ocard prof pcard pl-dialog-v2">
+    <div class="ocard prof pcard pl-dialog-v2${bannerCls}"${bannerStyle}>
       <button class="pl-v2-close" id="plCloseBtn" aria-label="Закрыть">
         <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
       </button>
