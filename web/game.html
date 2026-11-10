@@ -4753,7 +4753,8 @@ function renderMenuProfile() {
 }
 function renderProfile() {
   const need = xpNeed(PROG.lvl), name = profileName();
-  const mail = fbAuth && fbAuth.email ? String(fbAuth.email).replace(/[<>&"]/g, '') : 'Профиль не сохранён';
+  const isGuest = !(fbAuth && fbAuth.email);
+  const mail = !isGuest ? String(fbAuth.email).replace(/[<>&"]/g, '') : 'Гостевой профиль';
   const profEl = $('#profile');
   if (profEl) {
     const isBannerShape = (wallet.avShape === 'rect');
@@ -4761,8 +4762,8 @@ function renderProfile() {
     const bannerSrc = curBanner ? curBanner.src : (isBannerShape ? 'tiles/rC.webp' : '');
     const bannerPos = curBanner ? (curBanner.pos || 'center') : 'center';
 
-    profEl.classList.toggle('has-banner', isBannerShape);
-    if (isBannerShape) {
+    profEl.classList.toggle('has-banner', isBannerShape && !!curBanner);
+    if (isBannerShape && curBanner) {
       profEl.style.setProperty('--banner-bg', `url(${bannerSrc})`);
       profEl.style.setProperty('--banner-pos', bannerPos);
     } else {
@@ -4778,20 +4779,115 @@ function renderProfile() {
       ? `--c:${wallet.color};${myRing() ? `--fr:${myRing()};` : ''}`
       : `--c:${wallet.color};${myRing() ? `--fr:${myRing()};` : ''}${lk.style}`;
 
-    profEl.innerHTML = `<div class="pctop"><div class="prof-banner-shade"></div><div class="prof-hero-row"><span class="${avCls}" style="${avStyle}">${(name[0] || '?').toUpperCase()}</span><span class="pwho"><b class="pnick">${name}</b>${myStatus() ? `<em class="fst">${myStatus()}</em>` : ''}<small class="pmail">${mail}</small></span><button class="iconbtn" id="profEdit" aria-label="Редактировать профиль"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/></svg></button></div></div><div class="pclvl"><div class="lvl">${ring(PROG.xp / need)}<b>${PROG.lvl}</b></div><div class="pi"><b class="pl1">Уровень ${PROG.lvl}</b><div class="xpbar"><i style="width:${(100 * PROG.xp / need).toFixed(1)}%"></i></div><small>${PROG.xp} / ${need} опыта до ${PROG.lvl + 1} уровня</small></div></div><div class="pchips"><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><path d="M8 21h8M12 17v4M5 4h14v4a7 7 0 01-14 0V4z"/><path d="M5 6H3a2 2 0 00-2 2v1a4 4 0 004 4h0M19 6h2a2 2 0 012 2v1a4 4 0 01-4 4h0"/></svg><b>${PROG.cups}</b> <small>кубков</small></span><span><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg"><circle cx="12" cy="14" r="6"/><path d="M8.5 8.5L7 3l5 3 5-3-1.5 5.5"/></svg><b>${ACH.filter(a => PROG.ach[a.id] === 'got').length}</b>/${ACH.length} <small>наград</small></span></div><div class="pcoins"><span class="cu"><i class="coin c-tile"></i><b>${COINS.balance(wallet, 'tile')}</b><small>тайлы</small></span><span class="au"><i class="coin c-star"></i><b>${COINS.balance(wallet, 'star')}</b><small>звёзды</small></span></div>${FB ? `<div class="pacts">${fbAuth && fbAuth.email ? '<button class="chip" data-hacct="out">Выйти из аккаунта</button>' : '<button class="chip pri" data-hacct="in">Войти или создать профиль</button>'}</div>` : ''}`;
+    const pct = Math.max(0, Math.min(100, 100 * PROG.xp / need));
+    const achGot = ACH.filter(a => PROG.ach[a.id] === 'got').length;
+
+    profEl.innerHTML = `
+      <div class="pctop">
+        <div class="prof-banner-shade"></div>
+        <div class="prof-hero-row">
+          <span class="${avCls}" style="${avStyle}">${(name[0] || '?').toUpperCase()}</span>
+          <div class="pwho">
+            <div class="pnick-row">
+              <b class="pnick">${name}</b>
+              ${myStatus() ? `<em class="fst">${myStatus()}</em>` : ''}
+            </div>
+            <div class="pmail-row">
+              ${isGuest
+                ? `<span class="pmail guest"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><circle cx="12" cy="12" r="10"/><path d="M12 8v4M12 16h.01"/></svg> ${mail}</span>`
+                : `<span class="pmail signed"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5"><path d="M20 6L9 17l-5-5"/></svg> ${mail}</span>`
+              }
+            </div>
+          </div>
+          <button class="iconbtn prof-edit-btn" id="profEdit" aria-label="Редактировать профиль" title="Настроить профиль">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round">
+              <path d="M4 20h4L19 9l-4-4L4 16z"/><path d="M13.5 6.5l4 4"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+
+      <div class="pclvl">
+        <div class="lvl-badge">
+          <b>${PROG.lvl}</b>
+          <small>УР.</small>
+        </div>
+        <div class="pi">
+          <div class="xp-meta">
+            <b class="pl1">Уровень ${PROG.lvl}</b>
+            <span class="xp-count">${PROG.xp} / ${need} XP</span>
+          </div>
+          <div class="xpbar"><i style="width:${pct.toFixed(1)}%"></i></div>
+          <small class="xp-sub">До ${PROG.lvl + 1} уровня осталось ${Math.max(0, need - PROG.xp)} опыта</small>
+        </div>
+      </div>
+
+      <div class="pchips">
+        <div class="pchip-item cups-item">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg cup-svg">
+            <path d="M6 9H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2"/><path d="M18 9h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2"/><path d="M6 3h12v7a6 6 0 0 1-12 0V3z"/><path d="M12 16v4"/><path d="M8 20h8"/>
+          </svg>
+          <div class="pchip-text">
+            <b>${PROG.cups || 0}</b>
+            <small>Кубков</small>
+          </div>
+        </div>
+        <div class="pchip-item ach-item">
+          <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg ach-svg">
+            <circle cx="12" cy="14" r="6"/><path d="M8.5 8.5L7 3l5 3 5-3-1.5 5.5"/>
+          </svg>
+          <div class="pchip-text">
+            <b>${achGot} <span class="tot">/ ${ACH.length}</span></b>
+            <small>Наград</small>
+          </div>
+        </div>
+      </div>
+
+      <div class="pcoins" data-go="shop" title="Открыть Витрину">
+        <div class="pcoin-card cu">
+          <i class="coin c-tile"></i>
+          <div class="pcoin-info">
+            <b>${COINS.balance(wallet, 'tile')}</b>
+            <small>Тайлы</small>
+          </div>
+        </div>
+        <div class="pcoin-card au">
+          <i class="coin c-star"></i>
+          <div class="pcoin-info">
+            <b>${COINS.balance(wallet, 'star')}</b>
+            <small>Звёзды</small>
+          </div>
+        </div>
+      </div>
+
+      ${FB ? `<div class="pacts">${isGuest
+        ? '<button class="pact-btn guest-btn" data-hacct="in"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Войти или создать профиль</span><i class="pact-arr">›</i></button>'
+        : '<button class="pact-btn logout-btn" data-hacct="out"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg><span>Выйти из аккаунта</span></button>'
+      }</div>` : ''}
+    `;
     const pe = $('#profEdit');
     if (pe) pe.onclick = editProfile;
     profEl.querySelectorAll('[data-hacct]').forEach(b => { b.onclick = () => { const t = $(b.dataset.hacct === 'out' ? '#acLogout' : '#acLogin'); if (t) t.click(); }; });
   }
+
   const st = PROG.st = normalizeStats(PROG.st);
   const rate = st.games ? Math.round(100 * st.wins / st.games) : 0;
   const bm = st.byMode || {};
-  const bRate = bm.bots && bm.bots.games ? Math.round(100 * bm.bots.wins / bm.bots.games) : 0;
-  const fRate = bm.friends && bm.friends.games ? Math.round(100 * bm.friends.wins / bm.friends.games) : 0;
-  const oRate = bm.online && bm.online.games ? Math.round(100 * bm.online.wins / bm.online.games) : 0;
   const statsEl = $('#stats');
   if (statsEl) {
-    statsEl.innerHTML = `<div class="sbig">${[[st.games, 'партий'], [st.wins, 'побед'], [rate + '%', '% побед'], [st.best, 'рекорд очков']].map(([v, l]) => `<div><b>${v}</b><small>${l}</small></div>`).join('')}</div><div class="smastery"><div class="h3 sec">Мастерство по режимам</div>${PG.ui.progress.renderMasteryGrid(bm)}</div>${PG.ui.progress.renderBuildingStats(st)}`;
+    statsEl.innerHTML = `
+      <div class="sbig">
+        <div class="sbig-card"><b>${st.games}</b><small>партий</small></div>
+        <div class="sbig-card highlight"><b>${st.wins}</b><small>побед</small></div>
+        <div class="sbig-card"><b>${rate}%</b><small>винрейт</small></div>
+        <div class="sbig-card"><b>${st.best}</b><small>рекорд</small></div>
+      </div>
+      <div class="smastery">
+        <div class="sec-title"><svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M12 2l3.09 6.26L22 9.27l-5 4.87 1.18 6.88L12 17.77l-6.18 3.25L7 14.14 2 9.27l6.91-1.01L12 2z"/></svg> <span>Мастерство по режимам</span></div>
+        ${PG.ui.progress.renderMasteryGrid(bm)}
+      </div>
+      ${PG.ui.progress.renderBuildingStats(st)}
+    `;
   }
 }
 
@@ -7996,7 +8092,16 @@ function show(name, instant = false) {
   if (name === 'lobby') { renderLobby(); if (FB && registered()) loadFriends().then(renderLobbyFriends).catch(() => {}); }
   if (name === 'shop') renderShop();
   if (name === 'settings') renderPrefs();
-  if (name === 'menu') { saveWallet(); presenceCount(); progressDot(); renderMenuProfile(); updateNotifBadge(); }
+  if (name === 'menu') {
+    saveWallet(); presenceCount(); progressDot(); renderMenuProfile(); updateNotifBadge();
+    if (pendingUpdate && (!updBox || !document.body.contains(updBox))) {
+      const pendingInfo = pendingUpdate;
+      pendingUpdate = null;
+      setTimeout(() => {
+        window.onUpdateAvailable(pendingInfo, false);
+      }, 450);
+    }
+  }
   if (name === 'progress') { roadScroll = true; renderTasks(); }
   if (name === 'achievements') { renderAchievements(); }
   if (name === 'profile') { renderProfile(); renderAccount(); }
@@ -8241,6 +8346,7 @@ function reinstallDialog(info) {
   document.body.append(box);
   track('reinstall_offer');
 }
+let pendingUpdate = null;
 window.onUpdateAvailable = (info, manual) => {
   if (info && info.reinstall) return reinstallDialog(info);
   lastUpd = info;
@@ -8261,8 +8367,18 @@ window.onUpdateAvailable = (info, manual) => {
     return;
   }
 
-  // In an online game the whole table waits for the update (see "update pause").
-  if (net && net.gameId && phase !== 'end' && info.code > appCode() && !(net.upd && net.upd.c >= info.code) && players.some(p => p.owner === myId)) { netSend({t: 'upd', g: net.gameId, c: info.code}); updOpen(info.code); }
+  // During an active game, DO NOT interrupt players mid-match!
+  // Wait until they finish the game to the end and return to the main menu.
+  const isGameActive = Boolean(
+    (gameVisible || (document.querySelector('#scr-game') && !$('#scr-game').hidden)) &&
+    players && players.length &&
+    phase !== 'end' && phase !== 'idle'
+  );
+  if (!manual && isGameActive) {
+    pendingUpdate = info;
+    return;
+  }
+
   if (updBox && document.body.contains(updBox)) return;
   boot.checked = true;
   const box = updBox = document.createElement('div'); box.className = 'over'; box.style.position = 'fixed';
