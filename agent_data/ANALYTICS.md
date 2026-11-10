@@ -1,44 +1,44 @@
 # 📊 TileTopia Feature & Gameplay Analytics for Developer Agents
 
-Updated: 2026-11-09 22:48:18 UTC
+Updated: 2026-11-10 14:24:07 UTC
 
 ## Overview of Player Activity & Preferences
 - **Total Registered / Active Profiles:** 21
-- **Classic Mode Leaderboard Players:** 18
-- **Classic 2.0 (Hex) Leaderboard Players:** 0
-- **Presence Device Records:** 25
+- **Classic Mode Leaderboard Players:** 19
+- **Classic 2.0 (Hex) Leaderboard Players:** 2
+- **Presence Device Records:** 34
 
 ### Most Tapped Features & Screens
 
 | Feature ID | Total Taps |
 |---|---|
-| `btn:ok` | 886 |
-| `screen:menu` | 575 |
-| `claim:achievement` | 262 |
-| `screen:progress` | 204 |
-| `nav:progress` | 161 |
-| `go:menu` | 118 |
-| `btn:rot` | 111 |
-| `screen:friends` | 106 |
-| `screen:game` | 100 |
-| `screen:shop` | 92 |
-| `btn:btnMenuHub` | 88 |
-| `nav:menu` | 86 |
-| `nav:friends` | 84 |
-| `nav:shop` | 66 |
-| `btn:lobbyReady` | 64 |
-| `screen:setup` | 60 |
-| `btn:btnRoadQuests` | 57 |
-| `screen:profile` | 53 |
-| `screen:rating` | 53 |
-| `btn:btnCloseRoadQuests` | 52 |
-| `btn:btnMenuNotif` | 52 |
-| `screen:inbox` | 52 |
-| `btn:view` | 50 |
-| `btn:mprof` | 44 |
-| `btn:start` | 40 |
-| `btn:btnOpenModes` | 40 |
-| `go:results` | 39 |
-| `screen:results` | 39 |
-| `btn:btnMainPlay` | 37 |
-| `screen:lobby` | 37 |
+| `btn:ok` | 1330 |
+| `screen:menu` | 853 |
+| `screen:progress` | 321 |
+| `claim:achievement` | 264 |
+| `screen:friends` | 223 |
+| `nav:progress` | 204 |
+| `btn:rot` | 179 |
+| `screen:game` | 170 |
+| `go:menu` | 167 |
+| `screen:shop` | 149 |
+| `btn:btnMenuHub` | 130 |
+| `nav:friends` | 128 |
+| `nav:menu` | 119 |
+| `screen:setup` | 93 |
+| `nav:shop` | 92 |
+| `btn:zout` | 81 |
+| `screen:profile` | 80 |
+| `screen:rating` | 75 |
+| `btn:view` | 73 |
+| `btn:btnRoadQuests` | 72 |
+| `btn:mprof` | 71 |
+| `btn:btnMenuNotif` | 70 |
+| `screen:inbox` | 70 |
+| `btn:btnOpenModes` | 66 |
+| `btn:lobbyReady` | 65 |
+| `screen:lobby` | 62 |
+| `btn:btnCloseRoadQuests` | 61 |
+| `btn:upd` | 61 |
+| `go:results` | 59 |
+| `screen:results` | 59 |
