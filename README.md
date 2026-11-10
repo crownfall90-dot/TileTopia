@@ -88,5 +88,6 @@ TileTopia объединяет лёгкость освоения, свободу
 - **Архитектура:** `web/game.html` + `src/` (модули собираются через Vite в `build/bundle/pg.js`), `app/` — нативная Android-оболочка (Gradle / Java), `scripts/` — пайплайн сборки, `tests/` — модульные тесты (`node --test tests/*.test.cjs`).
 - **Сборка веб-модулей:** `npm run build`.
 - **Запуск тестов:** `npm test`.
+- **Гибридное ядро Rust + WebAssembly (Промпт и план миграции):** [docs/HYBRID-RUST-MIGRATION-PROMPT.md](docs/HYBRID-RUST-MIGRATION-PROMPT.md).
 - **Ключи и подпись:** [docs/SIGNING-KEY-ROTATION.md](docs/SIGNING-KEY-ROTATION.md); регламент безопасности репозитория — [docs/REPO-SECURITY.md](docs/REPO-SECURITY.md).
 </details>
