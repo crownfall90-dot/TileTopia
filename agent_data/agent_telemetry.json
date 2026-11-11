@@ -1,5 +1,5 @@
 {
-  "updated": 1794351123580,
+  "updated": 1794404276141,
   "errors": [
     {
       "dev": "Android 16 · 362x782 (vp: 361x781, dpr: 3.50) · 4g",
@@ -1827,19 +1827,19 @@
     "go:results": 59,
     "hub:achievements": 39,
     "hub:settings": 23,
-    "nav:friends": 128,
+    "nav:friends": 129,
     "nav:menu": 119,
     "nav:progress": 204,
     "nav:shop": 92,
     "say:emote": 22,
     "screen:achievements": 39,
-    "screen:friends": 223,
+    "screen:friends": 224,
     "screen:game": 170,
     "screen:history": 11,
     "screen:inbox": 71,
     "screen:items": 40,
-    "screen:lobby": 62,
-    "screen:menu": 856,
+    "screen:lobby": 63,
+    "screen:menu": 857,
     "screen:profile": 80,
     "screen:progress": 321,
     "screen:rating": 76,
@@ -1936,6 +1936,6 @@
     "profiles": 21,
     "leadersClassic": 19,
     "leadersHex": 2,
-    "presence": 34
+    "presence": 4
   }
 }
