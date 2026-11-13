@@ -1,12 +1,12 @@
 # 📊 TileTopia Feature & Gameplay Analytics for Developer Agents
 
-Updated: 2026-11-12 23:14:58 UTC
+Updated: 2026-11-13 13:58:11 UTC
 
 ## Overview of Player Activity & Preferences
 - **Total Registered / Active Profiles:** 21
 - **Classic Mode Leaderboard Players:** 19
 - **Classic 2.0 (Hex) Leaderboard Players:** 3
-- **Presence Device Records:** 6
+- **Presence Device Records:** 3
 
 ### Most Tapped Features & Screens
 
