@@ -1,5 +1,5 @@
 {
-  "updated": 1794879442782,
+  "updated": 1794929538319,
   "errors": [
     {
       "dev": "Android 16 · 362x782 (vp: 361x781, dpr: 3.50) · 4g",
@@ -1839,7 +1839,7 @@
     "screen:inbox": 76,
     "screen:items": 41,
     "screen:lobby": 78,
-    "screen:menu": 1009,
+    "screen:menu": 1010,
     "screen:profile": 87,
     "screen:progress": 384,
     "screen:rating": 95,
