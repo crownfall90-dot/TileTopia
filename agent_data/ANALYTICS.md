@@ -1,6 +1,6 @@
 # 📊 TileTopia Feature & Gameplay Analytics for Developer Agents
 
-Updated: 2026-11-18 00:35:04 UTC
+Updated: 2026-11-18 15:10:23 UTC
 
 ## Overview of Player Activity & Preferences
 - **Total Registered / Active Profiles:** 21
@@ -12,33 +12,33 @@ Updated: 2026-11-18 00:35:04 UTC
 
 | Feature ID | Total Taps |
 |---|---|
-| `btn:ok` | 2186 |
-| `screen:menu` | 1010 |
-| `btn:rot` | 388 |
-| `screen:progress` | 384 |
-| `claim:achievement` | 264 |
-| `nav:progress` | 253 |
+| `btn:ok` | 2381 |
+| `screen:menu` | 1021 |
+| `btn:rot` | 426 |
+| `screen:progress` | 386 |
+| `claim:achievement` | 269 |
+| `nav:progress` | 255 |
 | `screen:friends` | 252 |
-| `screen:game` | 226 |
-| `go:menu` | 201 |
-| `screen:shop` | 169 |
-| `btn:btnMenuHub` | 149 |
+| `screen:game` | 233 |
+| `go:menu` | 206 |
+| `screen:shop` | 170 |
+| `btn:btnMenuHub` | 151 |
 | `nav:menu` | 142 |
 | `nav:friends` | 141 |
-| `screen:setup` | 118 |
+| `screen:setup` | 123 |
 | `btn:zout` | 103 |
 | `nav:shop` | 100 |
-| `screen:rating` | 95 |
+| `screen:rating` | 96 |
+| `btn:btnRoadQuests` | 93 |
 | `btn:view` | 93 |
-| `btn:btnRoadQuests` | 92 |
+| `btn:btnOpenModes` | 88 |
 | `screen:profile` | 87 |
-| `btn:btnOpenModes` | 87 |
-| `go:results` | 84 |
-| `screen:results` | 84 |
+| `go:results` | 86 |
+| `screen:results` | 86 |
+| `btn:start` | 80 |
 | `btn:btnCloseRoadQuests` | 79 |
 | `btn:mprof` | 78 |
 | `screen:lobby` | 78 |
-| `btn:btnMenuNotif` | 76 |
-| `screen:inbox` | 76 |
-| `btn:start` | 75 |
-| `go:rating` | 70 |
+| `btn:btnMenuNotif` | 77 |
+| `screen:inbox` | 77 |
+| `go:rating` | 71 |
