@@ -1,5 +1,5 @@
 {
-  "updated": 1794929538319,
+  "updated": 1794962100630,
   "errors": [
     {
       "dev": "Android 16 · 362x782 (vp: 361x781, dpr: 3.50) · 4g",
@@ -1942,6 +1942,6 @@
     "profiles": 21,
     "leadersClassic": 19,
     "leadersHex": 3,
-    "presence": 1
+    "presence": 2
   }
 }
