@@ -1,5 +1,5 @@
 {
-  "updated": 1795134018181,
+  "updated": 1795186538197,
   "errors": [
     {
       "dev": "Android 16 · 362x782 (vp: 361x781, dpr: 3.50) · 4g",
@@ -1803,7 +1803,7 @@
   "featureUsage": {
     "btn:again2": 64,
     "btn:btnCloseRoadQuests": 79,
-    "btn:btnMainPlay": 67,
+    "btn:btnMainPlay": 68,
     "btn:btnMenuHub": 151,
     "btn:btnMenuNotif": 77,
     "btn:btnRoadQuests": 93,
@@ -1827,26 +1827,26 @@
     "go:results": 86,
     "hub:achievements": 43,
     "hub:settings": 26,
-    "nav:friends": 141,
-    "nav:menu": 142,
-    "nav:progress": 255,
-    "nav:shop": 100,
+    "nav:friends": 143,
+    "nav:menu": 143,
+    "nav:progress": 256,
+    "nav:shop": 103,
     "say:emote": 23,
     "screen:achievements": 43,
-    "screen:friends": 252,
+    "screen:friends": 256,
     "screen:game": 233,
     "screen:history": 13,
     "screen:inbox": 77,
     "screen:items": 41,
     "screen:lobby": 78,
-    "screen:menu": 1021,
+    "screen:menu": 1025,
     "screen:profile": 87,
-    "screen:progress": 386,
+    "screen:progress": 388,
     "screen:rating": 96,
     "screen:results": 86,
     "screen:settings": 30,
-    "screen:setup": 123,
-    "screen:shop": 170,
+    "screen:setup": 124,
+    "screen:shop": 174,
     "btn:btnOpenModes": 88,
     "btn:gameMenu": 31,
     "btn:invNo": 21,
@@ -1942,6 +1942,6 @@
     "profiles": 21,
     "leadersClassic": 19,
     "leadersHex": 3,
-    "presence": 0
+    "presence": 1
   }
 }

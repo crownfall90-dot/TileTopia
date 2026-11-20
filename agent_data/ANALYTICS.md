@@ -1,33 +1,33 @@
 # 📊 TileTopia Feature & Gameplay Analytics for Developer Agents
 
-Updated: 2026-11-20 00:20:24 UTC
+Updated: 2026-11-20 14:55:42 UTC
 
 ## Overview of Player Activity & Preferences
 - **Total Registered / Active Profiles:** 21
 - **Classic Mode Leaderboard Players:** 19
 - **Classic 2.0 (Hex) Leaderboard Players:** 3
-- **Presence Device Records:** 0
+- **Presence Device Records:** 1
 
 ### Most Tapped Features & Screens
 
 | Feature ID | Total Taps |
 |---|---|
 | `btn:ok` | 2381 |
-| `screen:menu` | 1021 |
+| `screen:menu` | 1025 |
 | `btn:rot` | 426 |
-| `screen:progress` | 386 |
+| `screen:progress` | 388 |
 | `claim:achievement` | 269 |
-| `nav:progress` | 255 |
-| `screen:friends` | 252 |
+| `nav:progress` | 256 |
+| `screen:friends` | 256 |
 | `screen:game` | 233 |
 | `go:menu` | 206 |
-| `screen:shop` | 170 |
+| `screen:shop` | 174 |
 | `btn:btnMenuHub` | 151 |
-| `nav:menu` | 142 |
-| `nav:friends` | 141 |
-| `screen:setup` | 123 |
+| `nav:friends` | 143 |
+| `nav:menu` | 143 |
+| `screen:setup` | 124 |
+| `nav:shop` | 103 |
 | `btn:zout` | 103 |
-| `nav:shop` | 100 |
 | `screen:rating` | 96 |
 | `btn:btnRoadQuests` | 93 |
 | `btn:view` | 93 |
