@@ -88,7 +88,9 @@ class Updater {
             // "package": the app id of the release. Phones that still have the old id cannot be updated in place
             // (older copies of this app see only "cert", which therefore differs on purpose in latest.json).
             String pkg = f.optString("package", "");
-            info.put("reinstall", !pkg.isEmpty() ? !pkg.equals(ctx.getPackageName()) : (!cert.isEmpty() && !mine.isEmpty() && !cert.equals(mine)));
+            boolean differentApp = !pkg.isEmpty() && !pkg.equals(ctx.getPackageName());
+            boolean differentSigner = !cert.isEmpty() && !mine.isEmpty() && !cert.equals(mine);
+            info.put("reinstall", differentApp || differentSigner);
             return info;
         } catch (Exception ignored) {
             // An older release without latest.json, or the download failed: ask the API.

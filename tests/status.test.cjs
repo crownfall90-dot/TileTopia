@@ -60,21 +60,49 @@ test('screens: shop statuses and "my items" open without errors', {skip: !pw && 
   } finally { await browser.close(); }
 });
 
-test('profile DOM: sign-out / auth action is inside profile card; rating scope buttons exist', {skip: !pw && 'playwright is not installed (npm ci)', timeout: 120000}, async () => {
+test('profile: the account action opens sign-out confirmation and rating scopes can be switched', {skip: !pw && 'playwright is not installed (npm ci)', timeout: 120000}, async () => {
   const browser = await pw.chromium.launch();
   try {
-    const {page, errors} = await openGame(browser, instrumentedCopy(), null);
-    const res = await page.evaluate(() => {
-      const P = window.__pg;
-      P.show('progress');
-      // offline there is no Firebase, so the sign-in / sign-out button is not drawn: the markup is checked in the source below
-      const authActionInsideCard = true;
-      const topTabActive = !document.querySelector('#scr-progress').hidden && document.querySelector('#ptab').children.length > 0;
-      return {authActionInsideCard, topTabActive};
+    const {page, errors} = await openGame(browser, instrumentedCopy(), null, () => {
+      window.FIREBASE = {apiKey: 'test', dbUrl: 'https://tiletopia.test'};
+      localStorage.setItem('fbAuth', JSON.stringify({
+        uid: 'test-player', email: 'a.long.tiletopia.player.address@example.invalid', idToken: 'test-token', exp: Date.now() + 3600000,
+      }));
     });
-    assert.ok(res.authActionInsideCard);
-    assert.match(require('node:fs').readFileSync(__dirname + '/../web/game.html', 'utf8'), /data-hacct="out">Выйти из аккаунта/, 'sign-out button is in the profile card markup');
-    assert.equal(res.topTabActive, true, 'the progress road is shown');
+    await page.setViewportSize({width: 320, height: 568});
+    await page.locator('#boot').waitFor({state: 'detached'});
+    await page.evaluate(() => window.__pg.show('profile'));
+    const signOut = page.locator('#profile').getByRole('button', {name: 'Выйти из аккаунта'});
+    await signOut.click();
+    await page.locator('#confirmBox').getByText('Выйти из аккаунта?', {exact: true}).waitFor();
+    await page.locator('#confirmBox [data-a=n]').click();
+    await signOut.waitFor();
+
+    await page.evaluate(() => window.__pg.show('settings', true));
+    const email = page.locator('#scr-settings #acct .sacct-email-txt');
+    await email.waitFor();
+    assert.equal(await email.textContent(), 'a.long.tiletopia.player.address@example.invalid');
+    assert.ok(await email.evaluate(el => el.scrollWidth <= el.clientWidth + 1), 'the full email fits in the account card');
+    await page.locator('#scr-settings #acLogout').waitFor();
+
+    for (const [screen, tabs] of [['items', '#itabs'], ['rules', '#rtabs']]) {
+      await page.evaluate(name => window.__pg.show(name, true), screen);
+      const buttons = page.locator(`${tabs} button`);
+      await buttons.first().waitFor();
+      assert.deepEqual(await buttons.evaluateAll(nodes => nodes.filter(el => el.scrollWidth > el.clientWidth + 1).map(el => el.textContent)), [], `${screen} labels fit on a narrow screen`);
+    }
+
+    await page.evaluate(() => window.__pg.show('progress'));
+    await page.locator('#scr-progress #ptab .rd-map').waitFor();
+    await page.evaluate(() => window.__pg.show('rating'));
+    const all = page.locator('#scr-rating #topScopeAll');
+    const friends = page.locator('#scr-rating #topScopeFriends');
+    const selected = page.locator('.pri');
+    await all.and(selected).waitFor();
+    await friends.click();
+    await friends.and(selected).waitFor();
+    await all.click();
+    await all.and(selected).waitFor();
     assert.deepEqual(errors, []);
   } finally { await browser.close(); }
 });

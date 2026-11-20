@@ -72,7 +72,7 @@ def circle(img):
 
 big = compose(1024, .90)                      # full bleed: the stores and launchers cut their own corners
 big.convert('RGB').save('store/src/icon-3tiles-composed-1024.png', optimize=True)
-big.convert('RGB').resize((512, 512), Image.LANCZOS).save('store/icon-512.png', optimize=True)   # Google Play: 512x512, no alpha
+big.resize((512, 512), Image.LANCZOS).save('store/icon-512.png', optimize=True)   # Google Play: 512x512, 32-bit PNG
 
 # web app and PWA
 for name, n in (('icon-512.png', 512), ('icon-192.png', 192), ('apple-touch-icon.png', 180), ('favicon-32.png', 32)):

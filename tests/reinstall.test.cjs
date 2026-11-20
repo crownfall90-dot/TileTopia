@@ -12,20 +12,28 @@ test('reinstall: a release signed with another key opens the step-by-step reinst
   try {
     const {page, errors} = await openGame(browser, instrumentedCopy(), null);
     // the app's bridge, only the call this flow uses (set after start: the page decides at start whether it is the app)
-    await page.evaluate(() => { document.querySelectorAll('body > .over,#boot').forEach(e => e.remove()); window.__settings = 0; window.AndroidApp = {openAppSettings() { window.__settings++; }}; });
-    await page.evaluate(() => window.onUpdateAvailable({code: 999, version: '1.0.999', notes: 'x', url: 'https://example.invalid/Tiletopia.apk', reinstall: true}, false));
+    await page.evaluate(() => {
+      document.querySelectorAll('body > .over,#boot').forEach(e => e.remove());
+      window.__pg.show('menu', true);
+      window.__settings = 0;
+      window.AndroidApp = {openAppSettings() { window.__settings++; }};
+    });
+    const url = 'https://example.invalid/Tiletopia.apk';
+    await page.route(url, r => r.fulfill({status: 204}));
+    await page.evaluate(url => window.onUpdateAvailable({code: 999, version: '1.0.999', notes: 'x', url, reinstall: true}, false), url);
     const box = await page.waitForSelector('#reinst');
     const t = await box.textContent();
-    for (const want of ['Новое приложение Tiletopia', 'Сохраните прогресс', 'Скачайте новую версию', 'Удалите эту версию', 'Установите скачанный файл']) assert.ok(t.includes(want), want);
+    for (const want of ['Новое приложение Tiletopia', 'Сохраните прогресс', 'Скачайте новую версию', 'Удалите старую версию', 'Установите скачанный файл']) assert.ok(t.includes(want), want);
     assert.equal(await page.evaluate(() => !!document.querySelector('#upd')), false, 'no in-place update button');
-    // without a profile the first tap on "remove" only warns; the second opens the system page
+    assert.equal(await page.locator('#reinst li.ok').count(), 0, 'a guest is never shown as saved');
+    assert.equal(await page.locator('#rsDel').isDisabled(), true, 'start the download first');
+    await Promise.all([page.waitForRequest(url), page.click('#rsGet')]);
     await page.click('#rsDel');
     assert.equal(await page.evaluate(() => window.__settings), 0);
-    await page.click('#rsDel');
+    await page.locator('#confirmBox [data-a=y]').click();
     assert.equal(await page.evaluate(() => window.__settings), 1);
-    assert.equal(await page.evaluate(() => !!document.querySelector('#rsLater')), false, 'no later button in reinstall dialog');
-    await page.evaluate(() => document.getElementById('reinst')?.remove());
-    assert.equal(await page.evaluate(() => !!document.getElementById('reinst')), false);
+    await page.click('#rsLater');
+    await page.locator('#reinst').waitFor({state: 'detached'});
     // the same key: the usual update dialog
     await page.evaluate(() => window.onUpdateAvailable({code: 999, version: '1.0.999', notes: 'x', url: 'u', reinstall: false}, true));
     await page.waitForSelector('#upd');

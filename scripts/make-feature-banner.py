@@ -1,7 +1,7 @@
 """Google Play feature graphic (1024x500) from the Blender render of the three tiles (store/src/icon-3tiles-1024.png):
 the same indigo backdrop and warm light as the icon, the diorama on the right, the name and a line on the left.
     python scripts/make-feature-banner.py [font-dir]
-font-dir holds Unbounded / Onest as .ttf (the game ships woff2; convert with fontTools). Writes store/feature-1024x500.png."""
+font-dir holds Unbounded and the Cyrillic and Latin Onest .ttf files (the game ships woff2; convert with fontTools)."""
 import math
 import os
 import sys
@@ -66,9 +66,6 @@ d.text((x0 + 3 * S, 150 * S + 4 * S), 'Tiletopia', font=title, fill=(6, 8, 36, 1
 d.text((x0, 150 * S), 'Tiletopia', font=title, fill=(255, 255, 255, 255))
 bar_y = 262 * S
 d.rounded_rectangle((x0, bar_y, x0 + 92 * S, bar_y + 7 * S), radius=3 * S, fill=(242, 184, 75, 255))
-tag = font('onest-600-cyrillic.ttf', 29, 600)
-d.text((x0, 286 * S), 'Стройте города и дороги', font=tag, fill=(232, 238, 255, 255))
-d.text((x0, 326 * S), 'из плиток вместе с друзьями', font=tag, fill=(232, 238, 255, 255))
 
 
 def meeple(cx_, cy_, s, col):
@@ -88,6 +85,15 @@ def meeple(cx_, cy_, s, col):
 for k, col in enumerate(((214, 40, 32, 255), (24, 84, 232, 255), (255, 170, 20, 255))):
     meeple(x0 + (24 + k * 62) * S, 440 * S, 40 * S, col)
 
-out = bg.convert('RGB').resize((W, H), Image.LANCZOS)
-out.save('store/feature-1024x500.png', optimize=True)
-print('store/feature-1024x500.png', out.size)
+for filename, script, lines in (
+    ('feature-1024x500.png', 'cyrillic', ('Стройте города и дороги', 'из плиток вместе с друзьями')),
+    ('feature-1024x500-en.png', 'latin', ('Build towns and roads', 'tile by tile with friends')),
+):
+    poster = bg.copy()
+    draw = ImageDraw.Draw(poster)
+    tagline = font(f'onest-600-{script}.ttf', 29, 600)
+    for line, y in zip(lines, (286, 326)):
+        draw.text((x0, y * S), line, font=tagline, fill=(232, 238, 255, 255))
+    out = poster.convert('RGB').resize((W, H), Image.LANCZOS)
+    out.save(os.path.join('store', filename), optimize=True)
+    print(filename, out.size)

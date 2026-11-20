@@ -77,7 +77,7 @@ jobs:
           VERSION: ${{ steps.ver.outputs.version }}
           OTA_SIGNING_KEY: ${{ secrets.OTA_SIGNING_KEY }}
         run: |
-          python3 -c 'import json,os; c=int(os.environ["CODE"]); v=os.environ["VERSION"]; r=os.environ["GITHUB_REPOSITORY"]; json.dump({"code": c, "version": v, "mandatory": False, "notes": "Тестовая сборка " + v, "url": "https://github.com/%s/releases/download/staging-latest/Tiletopia-Test-%s.apk" % (r, v), "package": "app.crownfall.tiletopia.test"}, open("latest-staging.json", "w", encoding="utf-8"), ensure_ascii=False)'
+          python3 -c 'import json,os; c=int(os.environ["CODE"]); v=os.environ["VERSION"]; r=os.environ["GITHUB_REPOSITORY"]; json.dump({"code": c, "version": v, "mandatory": False, "notes": "Тестовая сборка " + v, "url": "https://github.com/%s/releases/download/staging-latest/Tiletopia-Test-%s.apk" % (r, v), "cert": os.environ["SIGNING_CERT_SHA256"]}, open("latest-staging.json", "w", encoding="utf-8"), ensure_ascii=False)'
           python3 scripts/ci/make-web-ota.py "$CODE" staging-latest web-staging
           gh release delete staging-latest --yes || true
           gh release create staging-latest \

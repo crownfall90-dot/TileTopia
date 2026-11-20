@@ -138,6 +138,8 @@
           <div class="ltop"><button class="iconbtn" id="settingsBack" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Настройки</b></div>
           <button class="instcard" id="installBtn" hidden><span class="iic"><img src="icons/icon-192.png" alt=""></span><span class="itx"><b>Установите игру</b><small>Полноэкранный режим и офлайн-доступ</small></span><span class="igo">Как?</span></button>
           <div id="prefs"></div>
+          <div class="h3">Профиль</div>
+          <div id="acct"></div>
           <div class="h3">Поддержка и сообщество</div>
           <div class="sgroup">
             <button class="srow btn" id="tgChannelBtn"><span class="sic">📢</span><span class="stx"><b>Телеграм-канал</b><small id="tgChannelSub">Новости и обновления · +500 тайлов</small></span><span class="chip pri" id="tgChannelBadge">+500 🪙</span></button>
@@ -180,7 +182,6 @@
         <div class="lb">
           <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b>Профиль</b></div>
           <div class="profile" id="profile"></div>
-          <div class="sgroup prof" id="acct"></div>
           <div class="pstats" id="stats"></div>
         </div>
       </section>
@@ -529,7 +530,7 @@
         <div class="players" id="players"></div>
         <div class="saybox" id="sayBox" hidden></div>
         <div class="coach" id="coach" hidden></div>
-        <div class="board" id="board">
+        <div class="board" id="board" tabindex="0" aria-label="Игровое поле" aria-keyshortcuts="ArrowLeft ArrowRight R Enter" title="Стрелки — выбрать место, R — повернуть плитку, Enter — поставить">
           <!-- Thematic Village Location Backdrop -->
           <div class="village-backdrop" aria-hidden="true">
             <div class="vb-sky"></div>
@@ -1329,10 +1330,29 @@ function rotate() {
   beep('rotate'); tutEvent('rotate');
   if (!sel) return setRot((current.r + 1) % NDIR());
   const rots = legalRots(current.type, sel.x, sel.y);
-  if (rots.length < 2) { toast('Другие повороты не сходятся с соседями'); if (ghost) { ghost.classList.remove('shake'); void ghost.offsetWidth; ghost.classList.add('shake'); setTimeout(() => ghost && ghost.classList.remove('shake'), 360); } return; }
+  if (rots.length < 2) { useCount('turn:rotate_locked'); toast('Другие повороты не сходятся с соседями'); if (ghost) { ghost.classList.remove('shake'); void ghost.offsetWidth; ghost.classList.add('shake'); setTimeout(() => ghost && ghost.classList.remove('shake'), 360); } return; }
   setRot(rots[(rots.indexOf(current.r) + 1) % rots.length]);
 }
 rotBtn.onclick = rotate;
+board.addEventListener('keydown', e => {
+  if (e.target !== board || !gameVisible || phase !== 'place' || paused || e.altKey || e.ctrlKey || e.metaKey) return;
+  if (document.querySelector('.over:not(#over):not([hidden])')) return;
+  if (e.code === 'KeyR') {
+    rotate();
+  } else if (e.key === 'Enter') {
+    if (!e.repeat) okBtn.click();
+  } else if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && slotEls.length) {
+    const step = e.key === 'ArrowRight' ? 1 : -1;
+    let index = slotEls.findIndex(s => s.classList.contains('sel'));
+    if (index < 0 && step < 0) index = 0;
+    const slot = slotEls[(slotEls.length + index + step) % slotEls.length];
+    const x = +slot.dataset.x, y = +slot.dataset.y;
+    useCount('turn:slot');
+    selectSlot(x, y);
+    ensureVisible(x, y);
+  } else return;
+  e.preventDefault();
+});
 /* "Points and rules" window, from the button in the game header: what each object is worth and what has to be done to
    get it, plus the rules, in any game (also online; the turn clock keeps running there). Not a placement hint. */
 function helpWindow(tab = 'pts') {
@@ -1384,6 +1404,7 @@ tipBtn.onclick = () => {
   const m = tipFor();
   if (!m) return;
   selectSlot(m.x, m.y); setRot(m.r); ensureVisible(m.x, m.y);
+  useCount('turn:hint');
   setStatus(`💡 ${m.why} · <b>«Поставить»</b>`);
   track('hint_used');
 };
@@ -1392,6 +1413,7 @@ okBtn.onclick = async () => {
   // the turn the coach asks for, and in the right rotation (the next step builds on it)
   if (tut && (tutStep().wait !== 'placed' || (tutStep().r != null && current.r !== tutStep().r))) { const h = $('#rot'); h.classList.remove('tutpulse'); void h.offsetWidth; h.classList.add('tutpulse'); return; }
   phase = 'busy'; okBtn.disabled = rotBtn.disabled = true; clearSlots(); showTip();
+  if (!autoMove) useCount('turn:placed');
   tutEvent('placed');
   const t = {x: sel.x, y: sel.y, type: current.type, r: current.r, seed: (Math.random() * 1e9) | 0};
   if (meCounted() && isMe(players[turn]) && !tut) progress({tiles: 1});
@@ -1402,7 +1424,8 @@ function tap(x, y) {
   const gm = el.closest('.gm'); if (gm && meepleResolve) { meepleActed = true; meepleResolve(meepleOpts[+gm.dataset.i]); return; }
   if (phase !== 'place') return;
   if (el.closest('.tile.ghost')) return rotate();
-  const s = el.closest('.slot'); if (s) selectSlot(+s.dataset.x, +s.dataset.y);
+  const s = el.closest('.slot');
+  if (s) { useCount('turn:slot'); selectSlot(+s.dataset.x, +s.dataset.y); }
 }
 async function dropAt(t) {
   peekClear();
@@ -1668,6 +1691,7 @@ function startTimer() {
       : (wallet.alert && left > 0 && left <= 10 && isLocal(who) && ['place', 'meeple'].includes(phase) && now - lastAct > 2500);
     if (shouldWarn) idleWarn(left); else idleWarn();
     if (left > 0) return;
+    if (isLocal(who)) useCount('turn:timeout');
     stopTimer(); if (away) toast('За вас сходил бот');
     if (phase === 'meeple' && meepleResolve) return meepleResolve(null);
     const m = helperPick(current.type, who);
@@ -7894,13 +7918,13 @@ function refreshProfileUI() {
 }
 let syncing = null, syncAgain = false, cloudTimer = 0;
 function cloudSync(push) {
-  if (!linkedNow()) return Promise.resolve();
+  if (!linkedNow()) return Promise.resolve(false);
   if (syncing) { syncAgain = syncAgain || push || 'pull'; return syncing; }
   syncing = (async () => {
     try {
       const tok = await fbToken(), url = `${FB.dbUrl}/profiles/${fbAuth.uid}.json?auth=${tok}`;
       for (let attempt = 0; attempt < 4; attempt++) {
-        const r = await fetch(url, {headers: {'X-Firebase-ETag': 'true'}}); if (!r.ok) return;
+        const r = await fetch(url, {headers: {'X-Firebase-ETag': 'true'}}); if (!r.ok) return false;
         const etag = r.headers.get('ETag'), d = await r.json();
         let base = loadBase(); if (base && base.uid !== fbAuth.uid) base = null;
         const mine = syncable(wallet);
@@ -7927,19 +7951,20 @@ function cloudSync(push) {
           } catch (_) {}
         }
         const currentHist = jsonRead(GAME_HISTORY_KEY, []);
-        if (d && d.w && same(next, syncable(JSON.parse(d.w))) && (!Array.isArray(currentHist) || !currentHist.length || (d.h && d.h === JSON.stringify(currentHist.slice(0, 30))))) { saveBase(wallet, d.t); return; }
-        if (!push && d && d.w && base && base.t === d.t && same(next, base.w)) return; // nothing new anywhere
+        if (d && d.w && same(next, syncable(JSON.parse(d.w))) && (!Array.isArray(currentHist) || !currentHist.length || (d.h && d.h === JSON.stringify(currentHist.slice(0, 30))))) { saveBase(wallet, d.t); return true; }
+        if (!push && d && d.w && base && base.t === d.t && same(next, base.w)) return true; // nothing new anywhere
         const bodyPayload = {w: JSON.stringify(wallet), s: JSON.stringify(setup.seats[0]), t: {'.sv': 'timestamp'}, by: {c: myId, v: appCode(), p: installKind()}};
         if (Array.isArray(currentHist) && currentHist.length) bodyPayload.h = JSON.stringify(currentHist.slice(0, 30));
         const w = await fetch(url, {method: 'PUT', headers: etag ? {'if-match': etag} : {}, body: JSON.stringify(bodyPayload)});
         if (w.status === 412) continue; // another device saved in between: merge again
         if (w.ok) { const saved = await w.json().catch(() => null); saveBase(wallet, saved && saved.t); }
-        return;
+        return w.ok;
       }
     } catch (_) {} finally {
       syncing = null;
       if (syncAgain) { const p = syncAgain === true; syncAgain = false; cloudSync(p); }
     }
+    return false;
   })();
   return syncing;
 }
@@ -8237,8 +8262,10 @@ async function signOut() {
   try { await Promise.race([cloudSync(true), new Promise(r => setTimeout(r, 5000))]); } catch (_) {}
   try { await presenceMark(false); } catch (_) {}
   clearTimeout(cloudTimer);
-  ['wallet', 'walletBase', 'fbAuth', 'setup', 'lastGame', 'savedGame', 'verSeen'].forEach(k => { try { localStorage.removeItem(k); } catch (_) {} });
   track('logout');
+  FBC?.clear();
+  usageState = null;
+  ['wallet', 'walletBase', 'setup', 'lastGame', 'savedGame', 'verSeen', 'usage'].forEach(k => { try { localStorage.removeItem(k); } catch (_) {} });
   location.reload();
 }
 
@@ -8446,7 +8473,7 @@ document.addEventListener('click', e => {
 /* ---------------- screens ---------------- */
 /* What players use: a counter per screen and per button (src/state/usage.js), kept per day, sent to /usage/{day}/{uid}
    every few minutes and when the game is closed, and to Firebase Analytics as «feature_use». Counts only, no texts. */
-let usageState = null, usageTimer = 0;
+let usageState = null, usageTimer = 0, usageSending = false;
 try { usageState = JSON.parse(localStorage.getItem('usage')); } catch (_) {}
 /* Consent for statistics: asked once, plainly, default off. Anything that is not an error report waits for «Разрешить». */
 let statsAskTries = 0;
@@ -8454,7 +8481,7 @@ function askStats() {
   if (wallet.statsAsked || tut || document.getElementById('statsBox')) return;
   if (document.querySelector('.over:not(#over):not([hidden])') || document.hidden) { if (++statsAskTries < 6) setTimeout(askStats, 3000); return; }
   const b = document.createElement('div'); b.className = 'over'; b.id = 'statsBox'; b.style.position = 'fixed';
-  b.innerHTML = `<div class="ocard"><div style="font-size:40px">📊</div><h3>Помочь улучшить игру?</h3><p>Мы смотрим, какими экранами и кнопками пользуются, чтобы убрать лишнее и сделать игру удобнее. Только числа, без имён и текстов.</p><details class="more"><summary>Что именно собирается</summary><p>Какие экраны открыты и какие кнопки нажаты (счётчиками по дням), события вроде «сыграна партия», модель устройства и версия игры, сбои. Не собираем имя, почту, переписку и местоположение. Хранится до 12 месяцев. Выключить можно в «Настройки» → «Статистика». Подробнее — в <a href="https://crownfall90-dot.github.io/TileTopia/privacy.html" target="_blank" rel="noopener">Политике конфиденциальности</a>.</p></details><button class="cta wide" id="statsYes">Разрешить</button><button class="ghostbtn" id="statsNo">Не сейчас</button></div>`;
+  b.innerHTML = `<div class="ocard"><div style="font-size:40px">📊</div><h3>Помочь улучшить игру?</h3><p>Мы смотрим, какими экранами и кнопками пользуются, чтобы убрать лишнее и сделать игру удобнее. Только числа, без имён и текстов.</p><details class="more"><summary>Что именно собирается</summary><p>Какие экраны открыты и какие кнопки нажаты. По дням считаем выбор места, ручные ходы, подсказки и истечение времени хода. Также учитываются модель устройства, версия игры и сбои. Не собираем имя, почту, переписку и местоположение. Хранится до 12 месяцев. Выключить можно в «Настройки» → «Статистика». Подробнее — в <a href="https://crownfall90-dot.github.io/TileTopia/privacy.html" target="_blank" rel="noopener">Политике конфиденциальности</a>.</p></details><button class="cta wide" id="statsYes">Разрешить</button><button class="ghostbtn" id="statsNo">Не сейчас</button></div>`;
   document.body.append(b);
   const done = on => { wallet.stats = on; wallet.statsAsked = true; saveWallet(); applyStatsConsent(); b.remove(); };
   b.querySelector('#statsYes').onclick = () => done(true);
@@ -8470,14 +8497,26 @@ function useCount(id) {
   } catch (_) {}
 }
 async function usageFlush(keepalive) {
+  if (usageSending) return;
   clearTimeout(usageTimer); usageTimer = 0;
+  const state = usageState;
+  const body = PG.state.usage.payload(state);
+  if (wallet.stats !== true || !body || !FBC) return;
+  usageSending = true;
   try {
-    const body = PG.state.usage.payload(usageState); if (!body) return;
-    if (typeof FBC === 'undefined' || !FBC) return;
     const tok = await FBC.token(), uid = FBC.session() && FBC.session().uid; if (!uid) return;
-    const r = await fetch(`${FB.dbUrl}/usage/${usageState.d}/${uid}.json?auth=${tok}`, {method: 'PUT', body: JSON.stringify(body), keepalive: !!keepalive});
-    if (r.ok) { usageState.dirty = false; localStorage.setItem('usage', JSON.stringify(usageState)); }
-  } catch (_) { /* the rules may not be published yet, or no network: it is tried again with the next change */ }
+    if (wallet.stats !== true || usageState !== state) return;
+    const payload = JSON.stringify(body);
+    const r = await fetch(`${FB.dbUrl}/usage/${state.d}/${uid}.json?auth=${tok}`, {method: 'PUT', body: payload, keepalive: !!keepalive});
+    if (r.ok && usageState === state && JSON.stringify(state.c) === payload) {
+      state.dirty = false;
+      localStorage.setItem('usage', JSON.stringify(state));
+    }
+  } catch (_) { /* Tried again with the next change. */ }
+  finally {
+    usageSending = false;
+    if (wallet.stats === true && usageState?.dirty && !usageTimer) usageTimer = setTimeout(usageFlush, 180000);
+  }
 }
 document.addEventListener('click', e => { const f = PG.state.usage.featureOf(e.target); if (f) useCount(f); }, true);
 document.addEventListener('visibilitychange', () => { if (document.hidden) usageFlush(true); });
@@ -8738,7 +8777,7 @@ function openLink() {
   // In an Android browser: first offer to open the game app, the browser stays an option.
   if (/Android/i.test(navigator.userAgent) && !standalone() && !(window.Telegram && window.Telegram.WebApp && window.Telegram.WebApp.initData)) {
     const qs = l.friend ? 'friend=' + l.friend : 'room=' + l.room, what = l.friend ? 'Приглашение в друзья' : 'Приглашение в комнату';
-    const intent = `intent://${location.host}${location.pathname}?${qs}#Intent;scheme=https;package=com.crownfall.mosaic;S.browser_fallback_url=${encodeURIComponent(APK_URL)};end`;
+    const intent = `intent://${location.host}${location.pathname}?${qs}#Intent;scheme=https;package=app.crownfall.tiletopia;S.browser_fallback_url=${encodeURIComponent(APK_URL)};end`;
     const box = document.createElement('div'); box.className = 'over'; box.style.position = 'fixed';
     box.innerHTML = `<div class="ocard"><div style="font-size:44px">${l.friend ? '🤝' : '🎲'}</div><h3>${what}</h3><p>Откройте игру в приложении или продолжите прямо в браузере</p><a class="cta wide" id="lkApp" href="${intent}" style="text-decoration:none;display:grid;place-items:center">Открыть в приложении</a><button class="ghostbtn" id="lkWeb">Продолжить в браузере</button><a class="linkbtn" href="${APK_URL}" target="_blank" rel="noopener">Нет приложения? Скачать для Android</a></div>`;
     document.body.append(box);
@@ -8803,37 +8842,43 @@ function reinstallDialog(info) {
   boot.checked = true; bootHide();
   const old = document.getElementById('reinst'); if (old) old.remove();
   const box = document.createElement('div'); box.className = 'over'; box.id = 'reinst'; box.style.position = 'fixed';
+  let savedUid = null, downloadOpened = false;
   const draw = () => {
-    const linked = linkedNow(), mail = linked ? String(fbAuth.email).replace(/[<>&"]/g, '') : '';
+    const linked = linkedNow(), saved = linked && savedUid === fbAuth.uid;
     box.innerHTML = `<div class="ocard reinst"><div class="rbig">🔐</div><h3>Новое приложение Tiletopia</h3>
-      <p>Мы сменили цифровую подпись приложения — это защита от подделок. Поверх старого новое не встанет: нужно один раз переустановить. Это 1 минута.</p>
+      <p>У Tiletopia новый ключ подписи. Сначала сохраните профиль и скачайте APK, затем подтвердите удаление старой версии в Android.</p>
       <ol class="rsteps2">
-        <li class="${linked ? 'ok' : ''}"><i>1</i><div><b>${linked ? 'Прогресс сохранён в профиле' : 'Сохраните прогресс'}</b><small>${linked ? mail : 'Войдите или создайте профиль — иначе тайлы и уровень пропадут'}</small></div>${linked ? '<em>✓</em>' : '<button class="chip pri" id="rsSave">Сохранить</button>'}</li>
-        <li><i>2</i><div><b>Скачайте новую версию</b><small>Файл Tiletopia.apk сохранится в «Загрузки»</small></div><button class="chip pri" id="rsGet">Скачать</button></li>
-        <li><i>3</i><div><b>Удалите эту версию</b><small>Откроются настройки приложения — нажмите «Удалить»</small></div><button class="chip" id="rsDel">Удалить</button></li>
-        <li><i>4</i><div><b>Установите скачанный файл</b><small>Откройте Tiletopia.apk из «Загрузок», запустите игру и войдите в тот же профиль</small></div></li>
-      </ol></div>`;
+        <li class="${saved ? 'ok' : ''}"><i>1</i><div><b>${saved ? 'Профиль сохранён' : 'Сохраните прогресс в профиле'}</b><small>Перед переустановкой завершите начатую партию на устройстве.</small></div>${saved ? '<em>✓</em>' : '<button class="chip pri" id="rsSave">Сохранить</button>'}</li>
+        <li><i>2</i><div><b>Скачайте новую версию</b><small>Дождитесь появления APK в папке «Загрузки».</small></div><button class="chip pri" id="rsGet">Скачать</button></li>
+        <li><i>3</i><div><b>Удалите старую версию</b><small>В системных настройках нажмите «Удалить».</small></div><button class="chip" id="rsDel" ${downloadOpened ? '' : 'disabled'}>Открыть</button></li>
+        <li><i>4</i><div><b>Установите скачанный файл</b><small>Откройте APK из «Загрузок» и войдите в тот же профиль.</small></div></li>
+      </ol><button class="ghostbtn wide" id="rsLater">Позже</button></div>`;
     const q = sel => box.querySelector(sel);
-    if (q('#rsSave')) q('#rsSave').onclick = () => accountDialog('link');
-    q('#rsGet').onclick = () => { track('reinstall_download'); location.href = info.url; };
-    q('#rsDel').onclick = e => {
-      if (!linkedNow() && !e.currentTarget.dataset.sure) { e.currentTarget.dataset.sure = 1; e.currentTarget.textContent = 'Без профиля?'; return toastAny('Без профиля прогресс не сохранится. Нажмите ещё раз, если всё равно удалить'); }
-      track('reinstall_remove');
-      if (window.AndroidApp && AndroidApp.openAppSettings) AndroidApp.openAppSettings();
+    if (q('#rsSave')) q('#rsSave').onclick = async e => {
+      if (!linkedNow()) return accountDialog('link');
+      const uid = fbAuth.uid;
+      e.currentTarget.disabled = true;
+      if (await cloudSave() && linkedNow() && fbAuth.uid === uid) savedUid = uid;
+      else toastAny('Не удалось подтвердить сохранение. Проверьте подключение и повторите.');
+      if (box.isConnected) draw();
     };
+    q('#rsGet').onclick = () => { downloadOpened = true; draw(); track('reinstall_download'); location.href = info.url; };
+    q('#rsDel').onclick = () => {
+      const openSettings = () => {
+        track('reinstall_remove');
+        window.AndroidApp?.openAppSettings?.();
+      };
+      if (linkedNow() && savedUid === fbAuth.uid) openSettings();
+      else confirmBox('Профиль не сохранён. Прогресс на этом устройстве может пропасть.', 'Всё равно продолжить', openSettings);
+    };
+    q('#rsLater').onclick = () => box.remove();
   };
   draw();
-  if (linkedNow()) cloudSave().catch(() => {});
-  // back from the sign-in dialog: show the saved state
-  const again = () => { if (!document.body.contains(box)) return document.removeEventListener('visibilitychange', again); if (!document.hidden) draw(); };
-  document.addEventListener('visibilitychange', again);
-  box.addEventListener('click', () => setTimeout(() => { if (document.body.contains(box) && linkedNow() && !box.querySelector('li.ok')) { cloudSave().catch(() => {}); draw(); } }, 1500));
   document.body.append(box);
   track('reinstall_offer');
 }
 let pendingUpdate = null;
 window.onUpdateAvailable = (info, manual) => {
-  if (info && info.reinstall) return reinstallDialog(info);
   lastUpd = info;
   if (typeof updateSettingsUpdateBtn === 'function') updateSettingsUpdateBtn(info);
 
@@ -8846,7 +8891,7 @@ window.onUpdateAvailable = (info, manual) => {
   const isMandatory = (typeof PG !== 'undefined' && PG.app && PG.app.update && PG.app.update.isUpdateMandatory)
     ? PG.app.update.isUpdateMandatory(info, minCode, curCode)
     : (isTestBuild ? Boolean(info && info.force === true) : Boolean(!info || info.mandatory !== false));
-  if (!manual && !isMandatory && !isTestBuild) {
+  if (!manual && !isMandatory && !isTestBuild && !info?.reinstall) {
     boot.checked = true;
     bootHide();
     return;
@@ -8863,6 +8908,8 @@ window.onUpdateAvailable = (info, manual) => {
     pendingUpdate = info;
     return;
   }
+
+  if (info?.reinstall) return reinstallDialog(info);
 
   if (updBox && document.body.contains(updBox)) return;
   boot.checked = true;
