@@ -15,7 +15,7 @@ The data controller is the game's developer, an individual acting under the name
 - **Game progress.** Level, experience, cups, virtual gold, unlocked items, quests, statistics and match history, friends and invitations. Gold is virtual and is not sold for money.
 - **In-game messages.** Moves and short quick phrases in online rooms (kept up to 7 days), and the text of feedback or suggestions you send.
 - **Technical data.** App version and platform (Android, web, iOS, Telegram), device model and screen size, crash and frame-rate reports, a push notification token (Firebase Cloud Messaging).
-- **Usage statistics (only with your consent).** Usage events (Firebase Analytics) and daily counters of opened screens and pressed buttons: numbers only, no texts or names. We use them to understand which features of the game are used. You can give or withdraw consent in Settings → Statistics.
+- **Usage statistics (only with your consent).** Usage events (Firebase Analytics) and daily counters of screens opened, buttons pressed, and outcomes such as choosing a tile slot, using a hint, or running out of turn time. The counters do not contain touch coordinates, names, or typed text. They help us understand how features are used and where controls can improve. You can give or withdraw consent in Settings → Statistics.
 - **What we do not collect:** precise or approximate location, contacts, photos, files, microphone or camera, payment data, advertising ID.
 
 ## 3. Why, and on what basis

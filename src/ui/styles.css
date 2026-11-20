@@ -2152,10 +2152,6 @@ table.bd{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric
 
 .devlink{display:grid;place-items:center;text-decoration:none}
 
-/* in the profile the level card already shows the avatar, name and level: the account card keeps only its status and buttons */
-
-#scr-progress #acct .prow{display:none}
-
 /* a dropped connection in an online game: a quiet line over the board, not a dialog */
 
 .netbad{position:absolute;top:34px;left:50%;transform:translateX(-50%);z-index:6;display:flex;align-items:center;gap:8px;padding:7px 13px;border-radius:12px;background:rgba(60,22,22,.9);border:1px solid rgba(255,120,110,.45);font-size:12.5px;white-space:nowrap;pointer-events:none}
@@ -2347,7 +2343,6 @@ table.bd{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric
 
 #scr-progress #profile{display:flex;flex-direction:column;align-items:stretch;gap:12px;text-align:left}
 
-#scr-progress #acct:empty{display:none}
 
 .pctop{display:flex;align-items:center;justify-content:flex-start;gap:12px}.pctop .pwho{display:flex;flex-direction:column;align-items:flex-start}.pctop .av.big{width:56px;height:56px;font-size:23px;flex:0 0 auto}.pctop .pwho{flex:1;min-width:0}.pctop .pwho b{font:800 18px var(--f-display)}
 
@@ -3191,7 +3186,7 @@ html.app .screen.scroll{--sp:var(--it,0px);padding-top:0}/* the status-bar gap i
 
 .stcustom{display:flex;gap:8px;margin-bottom:16px}.stcustom .field{flex:1;min-width:0}.stcustom .cta{flex:0 0 auto;display:flex;gap:5px;align-items:center;padding:0 14px}
 
-.itabs{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:5px;margin-bottom:14px;padding:3px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:15px}
+.itabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-bottom:14px;padding:3px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:15px}
 .itabs button{padding:9px 2px;font-size:12px;font-weight:600;border-radius:12px;transition:all .2s cubic-bezier(.2,.8,.2,1);border:1px solid transparent;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .itabs button[aria-pressed="true"]{background:linear-gradient(135deg,rgba(242,184,75,.32),rgba(242,184,75,.12));border-color:rgba(242,184,75,.65);color:#fff;box-shadow:0 4px 14px rgba(242,184,75,.22)}
 
@@ -3219,10 +3214,6 @@ html.app .screen.scroll{--sp:var(--it,0px);padding-top:0}/* the status-bar gap i
 
 .itemsentry small{color:var(--muted)!important}.itemsentry b{color:var(--ink)}
 
-/* sign-in / sign-out buttons sit inside the profile card (the account block itself stays hidden: it keeps the handlers) */
-
-#acct{display:none}
-
 .profile .pacts{display:flex;width:100%}.profile .pacts .chip{flex:1;justify-content:center;padding:10px 8px}
 
 /* room: invited friends who have not come yet */
@@ -3234,8 +3225,6 @@ html.app .screen.scroll{--sp:var(--it,0px);padding-top:0}/* the status-bar gap i
 .who .fst{display:block;width:fit-content}
 
 .fbcard #fbHero .mhero{background:linear-gradient(135deg,#5a86e8,#3a62c4);border:1px solid rgba(255,255,255,.22);box-shadow:0 6px 16px rgba(0,0,0,.35);width:100%;box-sizing:border-box}
-
-#scr-progress #acct{display:none}
 
 
 
@@ -5442,6 +5431,9 @@ html body .fabs .fab:hover{background:var(--m-surface-2);color:var(--ink)}
 
 }
 html body .fabs .fab:active{transform:scale(.94)}
+.board:focus-visible{outline:2px solid var(--brass);outline-offset:-2px}
+@media (pointer:coarse) and (min-height:560px){html body .fabs .fab{width:44px;height:44px}}
+@media (prefers-reduced-motion:no-preference){.board .slot{transition:background-color .14s ease,border-color .14s ease,box-shadow .14s ease}}
 html body .pl{background:var(--m-surface);border:1px solid transparent;box-shadow:none}
 html body .pl.active{background:rgba(242,184,75,.1);border:1.5px solid var(--m-gold);box-shadow:none}
 html body .deck{background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none}
@@ -7120,7 +7112,7 @@ html body .tile-btn.tile-mode .t-title{overflow:visible;text-overflow:clip}
 
 /* Rules 4 tabs: equal width across screen without sideways scrolling */
 #rtabs{display:grid;grid-template-columns:repeat(4,1fr);width:100%;gap:4px;overflow:visible}
-#rtabs button{flex:1 1 0;min-width:0;padding:0 2px;white-space:nowrap;text-align:center;font-size:12.5px}
+#rtabs button{flex:1 1 0;min-width:0;padding:0 2px;white-space:nowrap;text-align:center;font:700 12.5px var(--f-body)}
 .shop-stall .stall-rar-tag{display:block;max-width:100%;font-size:9.5px;letter-spacing:.02em;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;text-align:center}
 .shop-stall.stall-phrases .stall-rar-tag{text-align:left}
 /* Toasts: top right under the screen's header (toastTop sets top), above dialogs */
@@ -9699,4 +9691,12 @@ html body #scr-profile #profile .prof-banner-btn:active {
   color: #9aa6c8;
   background: rgba(255, 255, 255, 0.06);
   border: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.sacct-mail-row svg, .saccount-card .av { flex-shrink: 0; }
+.sacct-email-txt { min-width: 0; overflow-wrap: anywhere; }
+
+@media (max-width: 380px) {
+  .saccount-card .prow { display: grid; grid-template-columns: auto minmax(0, 1fr); }
+  .saccount-card #rnBtn { grid-column: 2; justify-self: start; }
 }

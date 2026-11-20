@@ -1,93 +1,56 @@
-<p align="center">
-  <img src="store/icon-512.png" width="120" alt="TileTopia Icon">
-</p>
-
-<h1 align="center">TileTopia</h1>
+<p align="center"><img src="store/icon-512.png" width="112" alt="Иконка Tiletopia"></p>
+<h1 align="center">Tiletopia</h1>
+<p align="center">Настольная стратегия, где города, дороги и реки растут из плиток.</p>
 
 <p align="center">
-  <b>Создавайте живые миры из плиток: открывайте новые локации и играйте вместе!</b>
-</p>
-
-<p align="center">
-  <a href="https://github.com/crownfall90-dot/TileTopia/actions"><img src="https://img.shields.io/github/actions/workflow/status/crownfall90-dot/TileTopia/ci.yml?branch=main&label=CI%20Build&logo=github" alt="CI Status"></a>
-  <a href="https://github.com/crownfall90-dot/TileTopia/releases/latest"><img src="https://img.shields.io/github/v/release/crownfall90-dot/TileTopia?color=success&label=Release" alt="Latest Release"></a>
-  <img src="https://img.shields.io/badge/Platform-Android%20%7C%20Web%20%7C%20PWA-blue" alt="Platform">
-  <img src="https://img.shields.io/badge/Style-Tile%20Strategy-gold" alt="Tile Strategy">
+  <a href="https://crownfall90-dot.github.io/TileTopia/"><b>Играть в браузере</b></a> ·
+  <a href="https://github.com/crownfall90-dot/TileTopia/releases/latest/download/Tiletopia.apk"><b>Скачать APK</b></a> ·
+  <a href="https://github.com/crownfall90-dot/TileTopia/releases/latest"><b>Последний релиз</b></a>
 </p>
 
 <p align="center">
-  <a href="https://crownfall90-dot.github.io/TileTopia/"><b>▶ Играть в браузере</b></a> ·
-  <a href="https://github.com/crownfall90-dot/TileTopia/releases/latest/download/Tiletopia.apk"><b>⬇ Скачать для Android (APK)</b></a> ·
-  <a href="docs/privacy-policy.md">Политика конфиденциальности</a>
+  <a href="https://github.com/crownfall90-dot/TileTopia/actions/workflows/android-compile.yml"><img src="https://github.com/crownfall90-dot/TileTopia/actions/workflows/android-compile.yml/badge.svg?branch=main" alt="Проверка Android-сборки"></a>
+  <a href="https://github.com/crownfall90-dot/TileTopia/releases/latest"><img src="https://img.shields.io/github/v/release/crownfall90-dot/TileTopia?color=success&label=Release" alt="Версия Tiletopia"></a>
 </p>
 
 <p align="center">
   <img src="store/screenshots/1-menu.png" width="190" alt="Главное меню">
   <img src="store/screenshots/2-game.png" width="190" alt="Игровое поле">
-  <img src="store/screenshots/4-setup.png" width="190" alt="Выбор режима">
+  <img src="store/screenshots/4-setup.png" width="190" alt="Настройка партии">
   <img src="store/screenshots/5-results.png" width="190" alt="Итоги партии">
 </p>
 
----
+## Как играть
 
-## 🗺️ О стратегии
+Выбирайте плитку, продолжайте дороги и реки, достраивайте города и решайте, какие объекты занять фишками. Квадратное поле «Классики» и шестиугольные плитки «Классики 2.0» дают разные варианты хода.
 
-Добро пожаловать в **TileTopia** — развивающуюся настольную стратегию о созидании миров, где каждая выложенная плитка формирует живой и неповторимый ландшафт!
+- Тренируйтесь с ботами трёх уровней сложности или играйте по очереди на одном устройстве.
+- Приглашайте друзей по коду комнаты или ищите соперников в рейтинговой игре.
+- Выполняйте задания, открывайте фигурки, рамки и баннеры профиля.
+- Продолжайте сохранённую локальную партию после перерыва.
 
-TileTopia объединяет лёгкость освоения, свободу творчества и глубину тактической игры. Шаг за шагом соединяйте дороги, реки, поселения и природные просторы, создавая цветущие земли и открывая новые стратегические возможности.
+## Где играть
 
-### 🌟 Что вас ждет в TileTopia:
+- **Android** — скачайте APK из [последнего релиза](https://github.com/crownfall90-dot/TileTopia/releases/latest).
+- **Телефоны, планшеты и компьютеры** — откройте [веб-версию](https://crownfall90-dot.github.io/TileTopia/). На совместимых браузерах её можно добавить на домашний экран.
+- За правилами игры и вопросами об установке обращайтесь к [справке Tiletopia](https://crownfall90-dot.github.io/TileTopia/about.html). Идею или ошибку можно отправить из меню «Настройки → Написать разработчику».
 
-* **Сезонные локации и развивающийся мир**  
-  Игра растет и меняется вместе с вами! В финале каждого рейтингового сезона мир TileTopia пополняется крупным обновлением с новой тематической локацией, своими правилами застройки и уникальной архитектурой:
-  * **«Деревня» (активна уже сейчас)** — классические цветущие равнины, извилистые реки, старинные тракты и неприступные крепости.
-  * **«Мегаполис» (в разработке)** — современная сетка широких проспектов, деловые кварталы, линии метро и сияющие небоскрёбы.
-  * **«Сибирь» (в разработке)** — суровые северные зимники, деревянные остроги, густая тайга и замерзшие русла рек.
-  * **«Джунгли» (в разработке)** — затерянные тропы сквозь непроходимые заросли, древние каменные руины и величественные пирамиды.
+[Политика конфиденциальности](https://crownfall90-dot.github.io/TileTopia/privacy.html) · [Удаление аккаунта и данных](https://crownfall90-dot.github.io/TileTopia/delete-account.html) · [English](https://crownfall90-dot.github.io/TileTopia/about-en.html)
 
-* **Разнообразие игровых форматов**  
-  Выбирайте темп, который подходит именно вам:
-  * **Дзен-режим**: спокойное строительство и созидание в свое удовольствие без таймеров, спешки и давления.
-  * **Тактические сценарии**: увлекательные миссии с ограниченным запасом плиток и особыми условиями победы.
-  * **Онлайн-противостояние**: динамичные дуэли и соревновательные матчи, где каждый ход меняет расстановку сил на общей карте.
+© 2026 Crownfall. Все права защищены. Подробные условия приведены в [LICENSE](LICENSE). Об уязвимостях сообщайте через [приватный канал](SECURITY.md).
 
-* **Играйте в одиночку или с друзьями**  
-  Создавайте закрытые комнаты для уютных вечеров в компании друзей, участвуйте в открытых лигах и поднимайтесь на вершину сезонного рейтинга. Доступна игра с ботами трёх уровней сложности и хот-сит на одном устройстве.
-
-* **Приятная атмосфера и чистый геймплей**  
-  Красочный визуальный стиль, плавные анимации и удобное управление. Никакой навязчивой рекламы — наслаждайтесь честным игровым процессом в своем ритме.
-
-*Постройте свой идеальный край, найдите победную тактику и открывайте новые эпохи TileTopia с каждым сезоном!*
-
----
-
-## 📲 Установка и запуск
-
-* **Android:** скачайте актуальный [Tiletopia.apk](https://github.com/crownfall90-dot/TileTopia/releases/latest/download/Tiletopia.apk) и установите на смартфон. Встроенный апдейтер автоматически предложит новые версии по мере их выхода.
-* **iPhone, планшеты и ПК:** запустите [веб-версию игры](https://crownfall90-dot.github.io/TileTopia/) в браузере и добавьте ярлык на домашний экран (полная поддержка PWA и офлайн-режима).
-
----
-
-## 🛡️ Безопасность и поддержка
-
-* Если вы обнаружили ошибку или хотите предложить идею: используйте меню «Настройки → Написать разработчику» прямо в игре.
-* Уязвимости безопасности обрабатываются приватно согласно регламенту в [SECURITY.md](SECURITY.md).
-
-## 📄 Авторские права
-
-© 2026 Crownfall. Все права защищены. Код, графика, звуковое оформление и тексты игры — собственность автора; копирование, распространение и использование в коммерческих и сторонних проектах без письменного согласия правообладателя запрещены. Подробные условия — в файле [LICENSE](LICENSE).
-
----
 
 <details>
 <summary><b>Раздел для разработчиков и участников команды</b></summary>
 
-Рабочий репозиторий проекта **TileTopia**.  
+Рабочий репозиторий проекта **Tiletopia**.
+
 Перед началом работы ознакомьтесь с [docs/product/README.md](docs/product/README.md) (видение, механики, сезонные локации, аудит) и [docs/coordination/HANDOFF.md](docs/coordination/HANDOFF.md).
 
 - **Архитектура:** `web/game.html` + `src/` (модули собираются через Vite в `build/bundle/pg.js`), `app/` — нативная Android-оболочка (Gradle / Java), `scripts/` — пайплайн сборки, `tests/` — модульные тесты (`node --test tests/*.test.cjs`).
 - **Сборка веб-модулей:** `npm run build`.
 - **Запуск тестов:** `npm test`.
-- **Гибридное ядро Rust + WebAssembly (Промпт и план миграции):** [docs/HYBRID-RUST-MIGRATION-PROMPT.md](docs/HYBRID-RUST-MIGRATION-PROMPT.md).
+- **Развитие движка:** [архитектура и решение по Rust/WebAssembly](docs/ENGINEERING-ROADMAP.md).
+- **Google Play:** [материалы и подготовка рынков](docs/product/PLAY-RELEASE.md).
 - **Ключи и подпись:** [docs/SIGNING-KEY-ROTATION.md](docs/SIGNING-KEY-ROTATION.md); регламент безопасности репозитория — [docs/REPO-SECURITY.md](docs/REPO-SECURITY.md).
 </details>

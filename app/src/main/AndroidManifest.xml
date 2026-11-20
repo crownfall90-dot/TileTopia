@@ -33,12 +33,14 @@
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
-            <!-- Invite links (friend / room) of the web version open the game: https://…/play/?friend=CODE.
+            <!-- Invite links (friend / room) of the web version open the game: https://…/TileTopia/?friend=CODE.
                  Not verified yet (no assetlinks.json), so the web page offers an "Open in the app" button. -->
             <intent-filter>
                 <action android:name="android.intent.action.VIEW" />
                 <category android:name="android.intent.category.DEFAULT" />
                 <category android:name="android.intent.category.BROWSABLE" />
+                <data android:scheme="https" android:host="crownfall90-dot.github.io" android:path="/TileTopia" />
+                <data android:scheme="https" android:host="crownfall90-dot.github.io" android:pathPrefix="/TileTopia/" />
                 <data android:scheme="https" android:host="crownfall90-dot.github.io" android:pathPrefix="/play" />
             </intent-filter>
             <intent-filter>

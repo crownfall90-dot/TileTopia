@@ -1,39 +1,26 @@
-# Google Play Store Listing (English)
+# Google Play listing · English
 
-## App Name
-**Tiletopia: Board Tile Game** *(26 / 30 characters)*
+## App name
 
-## Short Description
-**Tactical medieval tile-laying board game: build towns, roads, and mighty forts!** *(79 / 80 characters)*
+Tiletopia
 
-## Full Description
+## Short description
 
-Welcome to **Tiletopia** — a cozy and strategic medieval tile-placement board game for solo tacticians and groups of friends!
+Build towns and roads with tiles. Play with friends or against bots.
 
-Draw and place landscape tiles onto a growing board, connect winding roads, fortify mighty castles, enclose monasteries, and assign your loyal meeples wisely. Every turn presents a rewarding tactical puzzle where clever positioning and point calculation reign supreme.
+## Full description
 
-### 🌟 Game Features:
+Tiletopia is a tabletop strategy game played on a shared board. Connect roads and rivers, complete towns, and decide which features to claim with your figures. One well-placed tile can change the course of a match.
 
-• **Timeless Tabletop Mechanics**: Match tile edges, complete castle districts, and build trade roads. Score points for every finished structure.
-• **Party Multiplayer (2–5 Players)**:
-  - Create private lobbies with easy-to-share room invite codes.
-  - Choose table sizes from 2 to 5 players with an adaptive deck.
-  - "Online Matchmaking": team up with a friend to play against random challengers.
-  - Missing an opponent? Fill empty seats with smart AI bots in a single click!
-• **Unified Cross-Platform Play**: Enjoy seamless crossplay with friends across Android devices, desktop web browsers, and Telegram.
-• **Intelligent AI Bots**: Three balanced difficulty tiers (Easy, Normal, Hard). Bots play fairly, anticipate your moves, and provide great practice anytime.
-• **Engaging Game Modes**:
-  - **Quick Match**: 30 cards, ~8 minutes — ideal for quick breaks.
-  - **Classic**: 50 cards, ~15 minutes — the golden standard of tactical depth.
-  - **Grand Epic**: 100 cards with rare tiles and monumental constructions.
-• **100% Offline Capable**: Full offline gameplay supported — play on flights, commutes, or off the grid without internet.
-• **Profile Showcase & Customization**:
-  - Collect exclusive sets of wooden meeples (Royal Court, Elements, and more).
-  - Try on prestigious avatar frames (Bronze, Silver, Gold, Sapphire, Emerald, Obsidian).
-  - Earn custom titles and honorary statuses for online matches.
-  - Roll the medieval dice 🎲 in the atmospheric nickname generator!
-• **Daily Quests & Weekly Chests**: Complete daily challenges, earn gold coins, unlock weekly treasure chests, and maintain your win streaks with streak protection.
-• **Haptic & Tactile Comfort**: Satisfying vibration feedback, smooth animations, automatic resume upon minimize, and secure cloud save via Google Sign-In.
-• **Clean & Respectful**: No intrusive ads and zero pay-to-win mechanics. Pure tabletop gaming joy.
+Choose square tiles in Classic or hexagonal tiles in Classic 2.0. Play a short match or build a larger realm. Practise against bots at three difficulty levels or take turns with friends on one device. These modes work offline.
 
-Build your legendary medieval kingdom tile by tile in Tiletopia!
+Go online to share a private room code with friends or find opponents in ranked matchmaking. Complete quests and collect figures, frames, and banners for your profile.
+
+Leave a local game and pick up where you left off. Tiletopia has no ads or real-money purchases.
+
+The in-game interface is currently in Russian.
+
+## Store assets
+
+- [512 × 512 app icon](icon-512.png) and [1024 × 500 feature graphic](feature-1024x500-en.png).
+- [Privacy policy](https://crownfall90-dot.github.io/TileTopia/privacy-en.html) and [account deletion](https://crownfall90-dot.github.io/TileTopia/delete-account.html).

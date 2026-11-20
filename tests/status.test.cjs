@@ -66,9 +66,10 @@ test('profile: the account action opens sign-out confirmation and rating scopes 
     const {page, errors} = await openGame(browser, instrumentedCopy(), null, () => {
       window.FIREBASE = {apiKey: 'test', dbUrl: 'https://tiletopia.test'};
       localStorage.setItem('fbAuth', JSON.stringify({
-        uid: 'test-player', email: 'test@example.invalid', idToken: 'test-token', exp: Date.now() + 3600000,
+        uid: 'test-player', email: 'a.long.tiletopia.player.address@example.invalid', idToken: 'test-token', exp: Date.now() + 3600000,
       }));
     });
+    await page.setViewportSize({width: 320, height: 568});
     await page.locator('#boot').waitFor({state: 'detached'});
     await page.evaluate(() => window.__pg.show('profile'));
     const signOut = page.locator('#profile').getByRole('button', {name: 'Выйти из аккаунта'});
@@ -76,6 +77,20 @@ test('profile: the account action opens sign-out confirmation and rating scopes 
     await page.locator('#confirmBox').getByText('Выйти из аккаунта?', {exact: true}).waitFor();
     await page.locator('#confirmBox [data-a=n]').click();
     await signOut.waitFor();
+
+    await page.evaluate(() => window.__pg.show('settings', true));
+    const email = page.locator('#scr-settings #acct .sacct-email-txt');
+    await email.waitFor();
+    assert.equal(await email.textContent(), 'a.long.tiletopia.player.address@example.invalid');
+    assert.ok(await email.evaluate(el => el.scrollWidth <= el.clientWidth + 1), 'the full email fits in the account card');
+    await page.locator('#scr-settings #acLogout').waitFor();
+
+    for (const [screen, tabs] of [['items', '#itabs'], ['rules', '#rtabs']]) {
+      await page.evaluate(name => window.__pg.show(name, true), screen);
+      const buttons = page.locator(`${tabs} button`);
+      await buttons.first().waitFor();
+      assert.deepEqual(await buttons.evaluateAll(nodes => nodes.filter(el => el.scrollWidth > el.clientWidth + 1).map(el => el.textContent)), [], `${screen} labels fit on a narrow screen`);
+    }
 
     await page.evaluate(() => window.__pg.show('progress'));
     await page.locator('#scr-progress #ptab .rd-map').waitFor();

@@ -3,7 +3,7 @@
 ## Scope
 
 Tiletopia Test is the staging test application with full online capabilities and feature parity with the public release.
-Its application ID is com.crownfall.mosaic.test, allowing it to be installed alongside the production app (com.crownfall.mosaic) on the same device without conflicts.
+Its application ID is app.crownfall.tiletopia.test, allowing it to be installed alongside the production app (app.crownfall.tiletopia) on the same device without conflicts.
 It has INTERNET permission enabled, Firebase connectivity, online rooms, matchmaking, cloud sync, Google sign-in, push notifications and updater.
 Production release workflows and main are not changed by this setup.
 

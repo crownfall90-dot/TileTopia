@@ -58,12 +58,12 @@ android {
 
     signingConfigs {
         release {
-            // Same key for every build, otherwise Android refuses to install updates over the old app.
-            // For Google Play this is the upload key; Google re-signs with the app signing key.
-            storeFile file(System.getenv('KEYSTORE_FILE') ?: 'release.keystore')
-            storePassword System.getenv('KEYSTORE_PASSWORD') ?: 'mosaic-kingdom'
-            keyAlias System.getenv('KEY_ALIAS') ?: 'mosaic'
-            keyPassword System.getenv('KEY_PASSWORD') ?: 'mosaic-kingdom'
+            // CI provides the protected key. Google Play uses this build's signature to verify the upload.
+            def releaseKeyFile = System.getenv('KEYSTORE_FILE')
+            if (releaseKeyFile) storeFile file(releaseKeyFile)
+            storePassword System.getenv('KEYSTORE_PASSWORD')
+            keyAlias System.getenv('KEY_ALIAS')
+            keyPassword System.getenv('KEY_PASSWORD')
         }
     }
     buildTypes {
