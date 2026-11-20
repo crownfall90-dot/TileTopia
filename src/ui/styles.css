@@ -2501,6 +2501,7 @@ html.tutoring #helpBtn{display:none}
 /* water at rest: nothing repaints while the player is not doing anything (see wake() in the game) */
 
 html.calm .tile .sd.fall::before,html.calm .tile .sd.fall::after,html.calm .face[class*="t-w"]::after,html.calm .face.t-fortR::after{animation-play-state:paused}
+html.calm .fab.tipb{animation-play-state:paused}
 
 .board.dragging .tile .sd.fall::before,.board.dragging .tile .sd.fall::after,.board.dragging .face[class*="t-w"]::after,.board.dragging .face.t-fortR::after{animation-play-state:paused}/* the finger moves the whole scene: no water repainting on top of that */
 
