@@ -1,4 +1,3 @@
-import base64
 import hashlib
 import os
 from pathlib import Path
@@ -6,6 +5,7 @@ import re
 import subprocess
 import sys
 import tempfile
+from ci.apk_cert import signer_digest
 
 report = {'status': 'verification_error', 'expected': 'unavailable', 'actual': 'unavailable'}
 
@@ -14,16 +14,6 @@ def run(args):
     if result.returncode:
         raise RuntimeError('Tool failed: ' + Path(args[0]).name + ' - ' + result.stderr)
     return result.stdout
-
-def signer_digest(text):
-    blocks = re.findall(r'-----BEGIN CERTIFICATE-----\s*([A-Za-z0-9+/=\s]+?)\s*-----END CERTIFICATE-----', text)
-    certificates = {base64.b64decode(re.sub(r'\s+', '', block), validate=True) for block in blocks}
-    if len(certificates) != 1:
-        raise ValueError('Expected exactly one distinct signing certificate')
-    certificate = next(iter(certificates))
-    if not certificate:
-        raise ValueError('Empty signing certificate')
-    return hashlib.sha256(certificate).hexdigest()
 
 def verify():
     apk = Path('app/build/outputs/apk/staging/release/app-staging-release.apk')
