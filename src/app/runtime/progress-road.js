@@ -32,6 +32,7 @@ function roadBridges() {
 }
 addEventListener('resize', roadBridges);
 function roadMapHtml(ms, unlockedFn, claimed) {
+  injectSceneryArt();
   const W = 360, ROW = 186, TOP = 130, n = ms.length, H = TOP + (n - 1) * ROW + 280;
   const P = ms.map((m, i) => ({x: i % 2 ? 284 : 76, y: TOP + i * ROW}));
   const cub = (p0, c1, c2, p1, t) => { const u = 1 - t; return [u * u * u * p0[0] + 3 * u * u * t * c1[0] + 3 * u * t * t * c2[0] + t * t * t * p1[0], u * u * u * p0[1] + 3 * u * u * t * c1[1] + 3 * u * t * t * c2[1] + t * t * t * p1[1]]; };

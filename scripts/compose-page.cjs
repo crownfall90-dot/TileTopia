@@ -40,7 +40,7 @@ function packagedMarkup() {
   if (!game.includes(start) || !game.includes(end)) throw new Error('Missing game script boundaries');
   const runtime = game.replace(start, () => `<script>\nwindow.__afterSplash(() => {\n${bundle}\nwindow.PG = PG;\n(() => {\n`)
     .replace(end, () => '\n})();\n});\n</script>');
-  return `<style>\n${splashCss}</style>\n${splash}\n${runtime}`;
+  return `<style>\n${splashCss}</style>\n${splash}\n<script>window.__showWebLaunch();</script>\n${runtime}`;
 }
 
 module.exports = { gameSource, stylesSource, gameMarkup, packagedMarkup };

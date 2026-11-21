@@ -162,5 +162,6 @@ if [ "$target" = web ]; then
   build_page "$out" "false" "$webver"
   build_page "$site/staging/index.html" "true" "$webver"
 else
+  cp web/splash-landscape.webp app/src/main/assets/launch-cover.webp
   build_page "$out" "false" "$webver"
 fi

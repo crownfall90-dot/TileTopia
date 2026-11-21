@@ -1,6 +1,6 @@
 /* ---------------- art ---------------- */
 // Tile and sprite art live in src/render/art.js.
-const {cv, SPR, sprite, TILE_URL, DRAWN, injectArt, injectHexArt} = PG.render.createArt({S, V, PL0, MEEPLE_D});
+const {cv, SPR, sprite, TILE_URL, DRAWN, injectArt, injectHexArt, injectSceneryArt} = PG.render.createArt({S, V, PL0, MEEPLE_D});
 /* ---------------- rules ---------------- */
 const G = (PG.game && PG.game.createGameState) ? PG.game.createGameState() : {
   tiles: new Map(), deck: [], meeples: [], players: [], turn: 0, phase: 'idle', current: null, sel: null

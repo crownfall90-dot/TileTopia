@@ -41,7 +41,9 @@ public class MainActivity extends Activity {
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable recheck = () -> checkSoon();
     private FrameLayout root;
+    private LaunchCover launchCover;
     private WebView web;
+    private long webNavigation;
     private Updater updater;
     private boolean pageReady;
     /** An invite link the game was opened with; handed to the page once it has loaded. */
@@ -92,11 +94,16 @@ public class MainActivity extends Activity {
             sendInsets(insets);
             return insets;
         });
+        launchCover = new LaunchCover(this);
+        root.addView(launchCover, new FrameLayout.LayoutParams(-1, -1));
         setContentView(root);
         hideSystemBars();
-        createWebView();
         grabLink(getIntent());
         registerBack();
+        // Allow Android to draw the cover before constructing the WebView on the UI thread.
+        root.postOnAnimation(() -> root.postOnAnimation(() -> {
+            if (!isDestroyed() && !isFinishing()) createWebView();
+        }));
     }
 
     @Override
@@ -217,6 +224,7 @@ public class MainActivity extends Activity {
         } catch (Exception e) {
             // No working Android System WebView on this phone (it is being updated or was disabled).
             report(e);
+            removeLaunchCover();
             TextView t = new TextView(this);
             t.setText("Не удалось запустить игру.\n\nОбновите или включите «Android System WebView» в Google Play и откройте игру снова.");
             t.setTextColor(0xFFEEF1F8);
@@ -233,15 +241,27 @@ public class MainActivity extends Activity {
         s.setDomStorageEnabled(true);
         s.setAllowFileAccess(true);
         s.setTextZoom(100); // large system fonts must not break the game layout
-        web.addJavascriptInterface(new Bridge(), "AndroidApp");
+        web.addJavascriptInterface(new Bridge(web), "AndroidApp");
         web.setWebChromeClient(new WebChromeClient());
         web.setWebViewClient(new WebViewClient() {
+            @Override
+            public void onPageStarted(WebView view, String url, android.graphics.Bitmap favicon) {
+                webNavigation++;
+            }
+
             @Override
             public void onPageFinished(WebView view, String url) {
                 pageReady = true;
                 if (!insetsJs.isEmpty()) view.evaluateJavascript(insetsJs, null);
                 deliverLink();
                 checkSoon();
+                // Older downloaded pages lack the early handoff hook.
+                if (launchCover != null) {
+                    long navigation = webNavigation;
+                    view.evaluateJavascript("typeof window.__showWebLaunch === 'function'", value -> {
+                        if ("false".equals(value) && navigation == webNavigation) revealWebView(view);
+                    });
+                }
             }
 
             @Override
@@ -267,7 +287,7 @@ public class MainActivity extends Activity {
                 return true;
             }
         });
-        root.addView(web, new FrameLayout.LayoutParams(-1, -1));
+        root.addView(web, 0, new FrameLayout.LayoutParams(-1, -1));
         // the newest good game page downloaded over the air, else the APK's own (same address: same saves and storage)
         contentStarted = false;
         handler.removeCallbacks(otaWatch);
@@ -281,6 +301,22 @@ public class MainActivity extends Activity {
             web.loadDataWithBaseURL(ContentUpdater.BUNDLED, page, "text/html", "utf-8", null);
             handler.postDelayed(otaWatch, ContentUpdater.READY_MS);
         } else web.loadUrl(ContentUpdater.BUNDLED);
+    }
+
+    private void revealWebView(WebView view) {
+        if (launchCover == null || web != view || isDestroyed()) return;
+        long navigation = webNavigation;
+        view.postVisualStateCallback(navigation, new WebView.VisualStateCallback() {
+            @Override public void onComplete(long requestId) {
+                if (web == view && requestId == webNavigation) removeLaunchCover();
+            }
+        });
+    }
+
+    private void removeLaunchCover() {
+        if (launchCover == null) return;
+        root.removeView(launchCover);
+        launchCover = null;
     }
 
     @Override
@@ -374,10 +410,21 @@ public class MainActivity extends Activity {
     }
 
     private class Bridge {
+        private final WebView source;
+
+        Bridge(WebView source) { this.source = source; }
+
+        @JavascriptInterface
+        public void launchArtReady() {
+            runOnUiThread(() -> revealWebView(source));
+        }
+
         /** The game has started (end of its start-up): a page downloaded over the air is good. */
         @JavascriptInterface
         public void contentReady() {
             runOnUiThread(() -> {
+                if (web != source) return;
+                revealWebView(source);
                 contentStarted = true;
                 handler.removeCallbacks(otaWatch);
                 if (ota != null) ota.ready();

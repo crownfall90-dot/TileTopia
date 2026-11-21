@@ -11,6 +11,16 @@
   window.__pageParsed = new Promise(function (resolve) {
     document.addEventListener('DOMContentLoaded', resolve, {once: true});
   });
+  function reveal() {
+    if (window.AndroidApp && AndroidApp.launchArtReady) AndroidApp.launchArtReady();
+  }
+  window.__showWebLaunch = function () {
+    if (!window.AndroidApp || !AndroidApp.launchArtReady) return;
+    var art = document.querySelector('#boot .boot-art');
+    if (!art || art.complete) return reveal();
+    art.addEventListener('load', reveal, {once: true});
+    art.addEventListener('error', reveal, {once: true});
+  };
   window.__afterSplash = function (start) {
     if (matchMedia('(prefers-reduced-motion: reduce)').matches || document.hidden) return start();
     var started = false, frameDelay;
@@ -47,6 +57,7 @@
     if (b) b.onclick = function () { b.disabled = true; b.textContent = 'Загружаем обновление…'; try { a.startUpdate(u.url); } catch (e) {} };
     if (c) c.onclick = function () { c.textContent = 'Проверяем…'; try { a.checkUpdates(); } catch (e) {} setTimeout(function () { if (!window.__upd) c.textContent = 'Обновлений нет · проверить снова'; }, 6000); };
     document.getElementById('bootRetry').onclick = function () { location.reload(); };
+    reveal();
   }
   // an error while the game sets itself up means it will not start: say so at once (after a moment for the page to settle)
   window.addEventListener('error', function () { if (!window.__ready) setTimeout(fail, 1500); });

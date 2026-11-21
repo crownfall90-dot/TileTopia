@@ -8,6 +8,25 @@ const fs = require('node:fs');
 
 const html = gameSource();
 
+test('Android hands off its launch cover once the embedded illustration can paint', () => {
+  const vm = require('node:vm');
+  const listeners = {};
+  let ready = 0;
+  const AndroidApp = {launchArtReady() { ready++; }};
+  const window = {AndroidApp, addEventListener() {}};
+  const art = {complete: false, addEventListener(name, fn) { listeners[name] = fn; }};
+  const document = {addEventListener() {}, querySelector: () => art};
+  vm.runInNewContext(fs.readFileSync('web/boot-guard.js', 'utf8'), {window, AndroidApp, document, setTimeout() {}});
+  window.__showWebLaunch();
+  assert.equal(ready, 0);
+  listeners.load();
+  assert.equal(ready, 1);
+  art.complete = true;
+  window.__showWebLaunch();
+  assert.equal(ready, 2);
+  assert.deepEqual(fs.readFileSync('app/src/main/assets/launch-cover.webp'), fs.readFileSync('web/splash-landscape.webp'));
+});
+
 test('splash: every touching tile edge matches and the detailed art is embedded', async () => {
   const {edgeAt} = await import('../src/engine/board.js');
   const layout = require('../tools/splash/tiles.json');
