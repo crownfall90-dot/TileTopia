@@ -1,7 +1,11 @@
 /* Tiletopia web: works offline after the first visit. The page itself is always fetched fresh
    when there is a connection (so a new version shows at once); fonts and icons come from the cache. */
 const CACHE = 'puzzlegrad-__VERSION__';
-const CORE = ['./', 'index.html', 'manifest.webmanifest', 'fonts/fonts.css', 'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png'];
+const CORE = [
+  './', 'index.html', 'manifest.webmanifest', 'fonts/fonts.css',
+  'icons/icon-192.png', 'icons/icon-512.png', 'icons/apple-touch-icon.png',
+  'icons/favicon-32.png', 'icons/maskable-512.png',
+];
 self.addEventListener('install', e => {
   e.waitUntil(caches.open(CACHE).then(c => c.addAll(CORE)).then(() => self.skipWaiting()));
 });

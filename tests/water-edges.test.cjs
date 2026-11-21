@@ -50,3 +50,67 @@ test('water edges: every water side has the river mouth, every pair lines up in 
     assert.deepEqual(errors, []);
   } finally { await browser.close(); }
 });
+
+test('packaged art covers both decks and keeps both lakes, the big bridge and the cliff aligned', {
+  skip: !pw && 'playwright is not installed (npm ci)', timeout: 30000,
+}, async () => {
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const {TYPES: classic} = await import('../src/engine/tiles.js');
+  const {TYPES: hex} = await import('../src/engine/hex.js');
+  const assets = path.join(__dirname, '../app/src/main/assets');
+  const decks = [['tiles', classic, [512, 512]], ['hex', hex, [640, 554]]];
+  const files = decks.flatMap(([dir, types, size]) => Object.entries(types).map(([id, type]) => ({
+    id, size, edges: type.e, image: fs.readFileSync(path.join(assets, dir, id + '.webp'), 'base64'),
+  })));
+  const browser = await pw.chromium.launch();
+  try {
+    const page = await browser.newPage();
+    const results = await page.evaluate(async files => {
+      const canvas = document.createElement('canvas');
+      const context = canvas.getContext('2d', {willReadFrequently: true});
+      const special = new Set(['wLake', 'wTee', 'wS', 'brHalf', 'rEnd']);
+      const artefacts = {};
+      const wrongSize = [];
+      for (const file of files) {
+        const image = new Image();
+        image.src = 'data:image/webp;base64,' + file.image;
+        await image.decode();
+        if (image.naturalWidth !== file.size[0] || image.naturalHeight !== file.size[1]) wrongSize.push(file.id);
+        if (!special.has(file.id)) continue;
+        [canvas.width, canvas.height] = file.size;
+        context.drawImage(image, 0, 0);
+        const pixel = (x, y) => context.getImageData(x, y, 1, 1).data;
+        const water = ([r, g, b, a]) => a === 255 && b > r + 60 && b > g + 12;
+        const N = canvas.width;
+        const spans = [0, 1, 2, 3].map(side => {
+          const hit = [];
+          for (let i = 0; i < N; i++) {
+            const coords = [[i, 2], [N - 3, i], [i, N - 3], [2, i]];
+            if (water(pixel(...coords[side]))) hit.push(i);
+          }
+          return hit.length ? [hit[0], hit.at(-1)] : null;
+        });
+        const bridgeWater = file.id === 'brHalf' ? [150, 361, 255, 256].map(y => water(pixel(509, y))) : [];
+        const cliffAlpha = file.id === 'rEnd' ? [pixel(255, 254)[3], pixel(255, 256)[3], pixel(50, 460)[3]] : [];
+        artefacts[file.id] = {spans, edges: file.edges, bridgeWater, cliffAlpha};
+      }
+      return {wrongSize, artefacts};
+    }, files);
+    assert.deepEqual(results.wrongSize, []);
+    const {wS, wLake, wTee, brHalf, rEnd} = results.artefacts;
+    for (const {spans, edges} of [wLake, wTee]) {
+      for (let side = 0; side < 4; side++) {
+        const span = spans[side];
+        if (edges[side] !== 'w') { assert.equal(span, null); continue; }
+        assert.ok(span, `water missing on side ${side}`);
+        assert.ok(span.every((edge, n) => Math.abs(edge - wS.spans[0][n]) <= 4),
+          `lake side ${side} (${span}) misses the river mouth (${wS.spans[0]})`);
+      }
+    }
+    assert.deepEqual(brHalf.bridgeWater, [true, true, false, false], 'water sits on both sides of the joined deck');
+    assert.deepEqual(rEnd.cliffAlpha, [255, 0, 0], 'only the playable half is visible under the road');
+  } finally {
+    await browser.close();
+  }
+});

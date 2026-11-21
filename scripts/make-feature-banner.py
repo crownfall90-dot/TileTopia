@@ -1,5 +1,4 @@
-"""Google Play feature graphic (1024x500) from the Blender render of the three tiles (store/src/icon-3tiles-1024.png):
-the same indigo backdrop and warm light as the icon, the diorama on the right, the name and a line on the left.
+"""Google Play feature graphics (1024x500) with the classic Tiletopia icon and localized copy.
     python scripts/make-feature-banner.py [font-dir]
 font-dir holds Unbounded and the Cyrillic and Latin Onest .ttf files (the game ships woff2; convert with fontTools)."""
 import math
@@ -9,7 +8,7 @@ from PIL import Image, ImageDraw, ImageFilter, ImageFont
 
 W, H, S = 1024, 500, 2          # supersampled 2x, then reduced
 fonts = sys.argv[1] if len(sys.argv) > 1 else '.'
-inner, outer = (62, 72, 182), (12, 16, 58)
+inner, outer = (44, 62, 110), (10, 14, 30)
 
 
 def font(name, size, weight):
@@ -46,12 +45,14 @@ fade = Image.linear_gradient('L').rotate(90).resize(bg.size)       # 0..255 left
 grid.putalpha(Image.composite(grid.getchannel('A'), Image.new('L', bg.size, 0), fade.point(lambda v: min(255, int(v * 1.1)))))
 bg.alpha_composite(grid)
 
-# the diorama
-art = Image.open('store/src/icon-3tiles-1024.png').convert('RGBA')
-art = art.crop(art.getbbox())
-h = int(H * S * .88)
-art = art.resize((int(art.width * h / art.height), h), Image.LANCZOS)
-ax, ay = int(W * S * .985 - art.width), int((H * S - h) / 2 + H * S * .015)
+# the classic tile and its dark grid
+h = 442 * S
+with Image.open('store/icon-512.png') as icon:
+    art = icon.convert('RGBA').resize((h, h), Image.Resampling.LANCZOS)
+mask = Image.new('L', (h, h), 0)
+ImageDraw.Draw(mask).rounded_rectangle((0, 0, h - 1, h - 1), radius=92 * S, fill=255)
+art.putalpha(mask)
+ax, ay = 550 * S, 29 * S
 shadow = Image.new('L', bg.size, 0)
 shadow.paste(art.getchannel('A').point(lambda v: int(v * .6)), (ax + 14 * S, ay + 22 * S))
 shadow = shadow.filter(ImageFilter.GaussianBlur(14 * S))

@@ -364,7 +364,7 @@ GREENS = [(.28, '#2a7a1f'), (.4, '#389525'), (.5, '#48aa2b'), (.6, '#5dba31'), (
 
 
 def grass_material(ctx):
-    m = bpy.data.materials.new('terrain_grass')
+    m = core.node_material('terrain_grass')
     g = Nodes(m)
     bsdf = next(n for n in g.N if n.type == 'BSDF_PRINCIPLED')
     bsdf.inputs['Roughness'].default_value = .9
@@ -452,7 +452,7 @@ def curb(ctx):
         solid(bm, poly, -.01, CORNER_H * rnd.uniform(.94, 1.04))
         mask.take_circle(A, CORNER_A)
     for d in range(NS):
-        if e[d] == 'c':
+        if e[d] in 'cbx':
             continue
         P, L = frame(ctx, d)
         a = CORNER_A + JOINT if corner[d] else 0.0

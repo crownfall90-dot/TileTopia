@@ -20,7 +20,7 @@ import time
 HERE = os.path.dirname(os.path.abspath(__file__))
 sys.path.insert(0, HERE)
 ROOT = os.path.abspath(os.path.join(HERE, '..', '..'))
-ORDER = ['terrain', 'water', 'roads', 'town', 'monastery', 'life']
+ORDER = ['terrain', 'water', 'roads', 'town', 'monastery', 'special', 'life']
 
 
 def arg(argv, name, default=None):
@@ -48,6 +48,8 @@ def main(argv):
         mats = core.Mats()
         mats.stock()
         ctx = core.Ctx(tid, mats)
+        if 'special' in loaded:
+            loaded['special'].reserve(ctx)
         if 'terrain' not in loaded:
             core.base_card(ctx)
         core.plain_features(ctx, [m for m in ('water', 'roads', 'town', 'monastery') if m not in loaded])

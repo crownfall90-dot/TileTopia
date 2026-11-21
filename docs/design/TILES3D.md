@@ -1,5 +1,20 @@
 # 3D-плитки и 2D-спрайты из одного источника
 
+## Иллюстрации игрового поля
+
+В игре используются 37 квадратных и 26 шестиугольных рисунков с видом сверху. Для «Классики» набор готов целиком, в том числе большие озёра, половина моста, шахта и обрыв. Источник их геометрии — `src/engine/square.js`, а детали этих пяти сцен строит `tools/blender_generators/hexgen/special.py`. Стороны, правила и формат сохранений задаёт прежний каталог карт.
+
+Пересборка пяти сцен из корня проекта. На Windows задайте `$env:TILE_SHAPES='square_shapes.json'`. При необходимости укажите полный путь к `blender.exe`.
+
+```bash
+node scripts/gen-square-defs.mjs
+TILE_SHAPES=square_shapes.json blender -b --python-exit-code 1 -P tools/blender_generators/generate_hex_tiles.py -- --only brHalf,rEnd,rMine,wLake,wTee --res 896 --samples 48 --out build/square-render
+python scripts/square-pack.py build/square-render
+node --test tests/water-edges.test.cjs
+```
+
+Файлы WebP попадают в APK и веб-сборку из `app/src/main/assets/tiles/`. В тесте проверяются размеры всех 63 рисунков, стыки озёр, проход по центру большого моста и прозрачность обрыва.
+
 ## Источник правды
 `assets/tiles3d/tiles.json` строится из `TYPES` (`src/engine/tiles.js`) командой `node scripts/gen-tile-defs.mjs`
 (`--check` — проверка, что файл не устарел). Движок не трогаем. 37 плиток: 29 обычных + 8 редких `x*`.

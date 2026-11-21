@@ -131,7 +131,7 @@ def _nm(ctx, name):
     """A new node material in the card's palette, or (None, None) if the card already has it."""
     if name in ctx.mats.m:
         return None, None
-    m = bpy.data.materials.new(name)
+    m = core.node_material(name)
     ctx.mats.m[name] = m
     nt = m.node_tree
     return nt, next(n for n in nt.nodes if n.type == 'BSDF_PRINCIPLED')

@@ -47,7 +47,7 @@ def _mat_tiles(ctx, name, c1, c2, mortar, bw, rh, rough=.55, bump=.5):
     each row raised toward its lower edge so the rows overlap like real tiles."""
     if name in ctx.mats.m:
         return ctx.mats.m[name]
-    m = bpy.data.materials.new(name)
+    m = core.node_material(name)
     nt = m.node_tree
     b = next(n for n in nt.nodes if n.type == 'BSDF_PRINCIPLED')
     b.inputs['Roughness'].default_value = rough
