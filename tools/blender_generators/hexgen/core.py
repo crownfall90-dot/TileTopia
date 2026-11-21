@@ -98,6 +98,13 @@ def hex_inset(p):
 
 
 # ------------------------------------------------------------------ materials
+def node_material(name):
+    material = bpy.data.materials.new(name)
+    if material.node_tree is None:
+        material.use_nodes = True
+    return material
+
+
 class Mats:
     def __init__(self):
         self.m = {}
@@ -106,7 +113,7 @@ class Mats:
         """A material by name, made on first use: a colour, or two colours mixed by noise (with a matching bump)."""
         if name in self.m:
             return self.m[name]
-        m = bpy.data.materials.new(name)
+        m = node_material(name)
         nt = m.node_tree
         b = next(n for n in nt.nodes if n.type == 'BSDF_PRINCIPLED')
         b.inputs['Roughness'].default_value = rough
@@ -542,6 +549,8 @@ def scene(samples=96, res=1280, device='gpu'):
     sc.view_settings.exposure = -.05
     world = sc.world or bpy.data.worlds.new('World')
     sc.world = world
+    if world.node_tree is None:
+        world.use_nodes = True
     bg = next((n for n in world.node_tree.nodes if n.type == 'BACKGROUND'), None)
     if bg:
         bg.inputs['Color'].default_value = (0.62, 0.72, 0.92, 1)

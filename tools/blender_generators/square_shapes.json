@@ -1337,6 +1337,39 @@
     "boulders": null
    }
   },
+  "brHalf": {
+   "e": "fbfr",
+   "n": 2,
+   "bridge": true,
+   "name": "Половина большого моста",
+   "shapes": {
+    "roads": [
+     {
+      "edges": [
+       3
+      ],
+      "path": [
+       [
+        -0.5,
+        0
+       ],
+       [
+        -0.14,
+        0
+       ]
+      ]
+     }
+    ],
+    "rivers": [],
+    "town": null,
+    "fort": null,
+    "plaza": null,
+    "spring": null,
+    "bridge": null,
+    "boulders": null,
+    "bridgeHalf": 1
+   }
+  },
   "wCity": {
    "e": "wcwf",
    "n": 1,
@@ -1535,6 +1568,49 @@
     "boulders": null
    }
   },
+  "wLake": {
+   "e": "wwww",
+   "n": 2,
+   "lake": true,
+   "name": "Разлив реки",
+   "shapes": {
+    "roads": [],
+    "rivers": [],
+    "town": null,
+    "fort": null,
+    "plaza": null,
+    "spring": null,
+    "bridge": null,
+    "boulders": null,
+    "lake": [
+     0,
+     1,
+     2,
+     3
+    ]
+   }
+  },
+  "wTee": {
+   "e": "wwwf",
+   "n": 2,
+   "lake": true,
+   "name": "Заводь с протокой",
+   "shapes": {
+    "roads": [],
+    "rivers": [],
+    "town": null,
+    "fort": null,
+    "plaza": null,
+    "spring": null,
+    "bridge": null,
+    "boulders": null,
+    "lake": [
+     0,
+     1,
+     2
+    ]
+   }
+  },
   "rRock": {
    "e": "rfff",
    "n": 2,
@@ -1569,6 +1645,74 @@
      0,
      0
     ]
+   }
+  },
+  "rMine": {
+   "e": "rfff",
+   "n": 2,
+   "end": "mine",
+   "name": "Вход в шахту",
+   "shapes": {
+    "roads": [
+     {
+      "edges": [
+       0
+      ],
+      "path": [
+       [
+        0,
+        -0.5
+       ],
+       [
+        0,
+        -0.07
+       ]
+      ],
+      "end": "mine"
+     }
+    ],
+    "rivers": [],
+    "town": null,
+    "fort": null,
+    "plaza": null,
+    "spring": null,
+    "bridge": null,
+    "boulders": null,
+    "mine": 0
+   }
+  },
+  "rEnd": {
+   "e": "rfxf",
+   "n": 1,
+   "end": "cliff",
+   "name": "Дорога к обрыву",
+   "shapes": {
+    "roads": [
+     {
+      "edges": [
+       0
+      ],
+      "path": [
+       [
+        0,
+        -0.5
+       ],
+       [
+        0,
+        -0.026
+       ]
+      ],
+      "end": "cliff"
+     }
+    ],
+    "rivers": [],
+    "town": null,
+    "fort": null,
+    "plaza": null,
+    "spring": null,
+    "bridge": null,
+    "boulders": null,
+    "cliff": 0
    }
   },
   "rocks": {

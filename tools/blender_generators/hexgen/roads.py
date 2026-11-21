@@ -120,7 +120,7 @@ def build(ctx):
         pts = sample(rd['path'], 50)
         band(ctx, pts, end_cap=rd.get('end') in ('gate', 'fort'))
         pebbles(ctx, pts)
-        if not sh.get('bridge') and rd.get('end') not in ('plaza',):
+        if not sh.get('bridge') and 'bridgeHalf' not in sh and rd.get('end') not in ('plaza', 'mine', 'cliff'):
             traffic(ctx, pts)
     if sh.get('plaza'):
         plaza(ctx, sh['plaza'])

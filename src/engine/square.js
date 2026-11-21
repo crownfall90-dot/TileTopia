@@ -16,7 +16,7 @@ export const GEO = {
   wall: [0, .1, .16, .2],       // how far a town wall bulges toward the open sides, by the number of sides it closes
   plaza: .085, fort: [.22, .2], pond: .16,
 };
-/** Card types with a Blender render of their own; the others (lake, mine, cliff, big bridge) keep the older picture. */
+/** Cards with shared ownership-overlay geometry. Special cards keep the original overlay coordinates. */
 export const RENDERED = new Set(Object.keys(TYPES).filter(id => !/[bx]/.test(TYPES[id].e) && !TYPES[id].lake && !TYPES[id].bridge && !['rMine', 'rEnd'].includes(id)));
 const mid = d => [V[d][0] * .5, V[d][1] * .5];
 export const corner = k => [[-.5, -.5], [.5, -.5], [.5, .5], [-.5, .5]][k % 4];   // corner k starts side k
@@ -60,12 +60,22 @@ export function inTown(t, p) {
   for (let i = 0, j = pts.length - 1; i < pts.length; j = i++) { const [xi, yi] = pts[i], [xj, yj] = pts[j]; if ((yi > p[1]) !== (yj > p[1]) && p[0] < (xj - xi) * (p[1] - yi) / (yj - yi) + xi) inside = !inside; }
   return inside;
 }
-/** Everything drawn on card type id (its own frame), as in hex.js shapes; null for a card without a render. */
+/** Geometry for the classic cards in their own frame. The overlay only uses the regular RENDERED set. */
 export function shapes(id) {
   const t = TYPES[id];
-  if (!t || !RENDERED.has(id)) return null;
+  if (!t) return null;
   const e = t.e, side = k => [0, 1, 2, 3].filter(d => e[d] === k);
   const town = townShape(e), r = side('r'), w = side('w'), out = {roads: [], rivers: [], town, fort: t.fort ? [0, 0] : null, plaza: null, spring: null, bridge: null, boulders: null};
+  if (t.lake) {
+    out.lake = w;
+    return out;
+  }
+  if (t.bridge) {
+    out.bridgeHalf = side('b')[0];
+    out.roads.push({edges: r, path: [mid(r[0]), [-.14, 0]]});
+    return out;
+  }
+  if (t.end === 'mine' || t.end === 'cliff') out[t.end] = r[0];
   if (r.length === 2) out.roads.push({edges: r, path: sidePath(r[0], r[1])});
   else for (const d of r) {
     const a = mid(d);
@@ -76,6 +86,8 @@ export function shapes(id) {
       const tip = [town.keep[0] - a[0], town.keep[1] - a[1]];
       for (let k = 1; k <= 60; k++) { const p = [a[0] + tip[0] * k / 60, a[1] + tip[1] * k / 60]; end = p; if (inTown(town, p)) break; }
     }
+    if (kind === 'cliff') end = [V[d][0] * .026, V[d][1] * .026];
+    if (kind === 'mine') end = [V[d][0] * .07, V[d][1] * .07];
     out.roads.push({edges: [d], path: [a, end], end: kind});
   }
   if (r.length >= 3) out.plaza = [0, 0];
