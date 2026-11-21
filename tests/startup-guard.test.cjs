@@ -43,3 +43,34 @@ test('updates over the air: the page reports its start, the app checks a signatu
   }
   assert.match(fs.readFileSync('.github/workflows/promote-production.yml', 'utf8'), /if: inputs\.announce/, 'Telegram only on request');
 });
+
+test('splash: motion animates without image or animation callbacks, and reduced motion opens immediately', async () => {
+  const {startSplash} = await import('../src/app/splash.js');
+  for (const reducedMotion of [false, true]) {
+    const boot = {min: false, checked: true};
+    const pending = [];
+    let opened = false;
+    startSplash({boot, element: {}, reducedMotion, finish: () => { opened = boot.min && boot.checked; },
+      schedule: (fn, ms) => pending.push({fn, ms})});
+    assert.equal(opened, reducedMotion);
+    assert.equal(pending.length, reducedMotion ? 0 : 1);
+    if (pending.length) {
+      assert.ok(pending[0].ms <= 1000);
+      pending[0].fn();
+    }
+    assert.ok(opened);
+  }
+});
+
+test('splash: a silent native update check has a deadline even with reduced motion', async () => {
+  const {startSplash} = await import('../src/app/splash.js');
+  const boot = {min: false, checked: false};
+  let opened = false;
+  let deadline;
+  startSplash({boot, element: {}, reducedMotion: true, finish: () => { opened = boot.min && boot.checked; },
+    schedule: (fn, ms) => { assert.ok(ms <= 2000); deadline = fn; }});
+  assert.ok(boot.min);
+  assert.ok(!opened);
+  deadline();
+  assert.ok(opened);
+});

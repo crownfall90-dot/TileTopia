@@ -246,9 +246,8 @@ function beginHumanTurn() {
   phase = 'place'; renderSlots(); okBtn.disabled = true; rotBtn.disabled = false; startTimer(); showTip();
   if (players[turn].missed >= 1) return setStatus('За вас ходит бот <button class="chip" id="imHere">Вернуться</button>');
   if (!coachTurn()) {
-    setStatus((PG.game && PG.game.turns)
-      ? PG.game.turns.formatTurnStatusText({turnPlayerName: players[turn].name, isLocal: true, localHumansCount: localHumans()})
-      : (localHumans() > 1 ? `Ход: <b>${players[turn].name}</b>. Тапните по подсвеченному месту` : '<b>Ваш ход.</b> Тапните по подсвеченному месту'));
+    setStatus(PG.game.turns.formatTurnStatusText({turnPlayerName: players[turn].name, isLocal: true,
+      localHumansCount: localHumans(), showHints: Boolean(gameRules.hints)}));
   }
 }
 // Several people on one phone: the next player simply gets the turn (the status line and the player strip show whose it is);

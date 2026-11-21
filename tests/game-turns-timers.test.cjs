@@ -195,6 +195,6 @@ test('game/turns: formatMovePayload and turn status formatting', async () => {
   // formatTurnStatusText
   assert.equal(turns.formatTurnStatusText({isAway: true}), 'За вас ходит бот <button class="chip" id="imHere">Вернуться</button>');
   assert.equal(turns.formatTurnStatusText({turnPlayerName: 'Боб', isLocal: false}), 'Ходит <b>Боб</b>…');
-  assert.equal(turns.formatTurnStatusText({turnPlayerName: 'Алиса', isLocal: true, localHumansCount: 2}), 'Ход: <b>Алиса</b>. Тапните по подсвеченному месту');
-  assert.equal(turns.formatTurnStatusText({turnPlayerName: 'Алиса', isLocal: true, localHumansCount: 1}), '<b>Ваш ход.</b> Тапните по подсвеченному месту');
+  assert.equal(turns.formatTurnStatusText({turnPlayerName: 'Алиса', isLocal: true, localHumansCount: 2}), 'Ход: <b>Алиса</b>. Выберите клетку с «+»');
+  assert.equal(turns.formatTurnStatusText({turnPlayerName: 'Алиса', isLocal: true, showHints: false}), '<b>Ваш ход.</b> Выберите клетку рядом с плитками');
 });

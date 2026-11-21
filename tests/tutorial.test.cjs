@@ -20,8 +20,13 @@ test('tutorial: all steps, from the first card to the win', {skip: !pw && 'playw
     // a new player is offered the tutorial on the first start: press its button, as they would
     await page.locator('[data-t=go]').click({timeout: 15000});
     await waitCoach(/Тапните по рамке/);
+    const tableWidth = () => page.locator('#world').evaluate(el => parseFloat(getComputedStyle(el, '::before').width));
+    const initialWidth = await tableWidth();
+    assert.ok(initialWidth > 88, 'the opening tile and its adjacent cells sit on the table');
     await tap('#world .slot'); await waitCoach(/Нажмите «Поставить»/);
     await tap('#ok'); await waitCoach(/фишку на город/);
+    const table = await page.locator('#world').evaluate(el => getComputedStyle(el, '::before').pointerEvents);
+    assert.equal(table, 'none', 'the table does not intercept taps on the board');
     await tap('#mrow .chip:not(.skip)'); await waitCoach(/Проведите пальцем/, 15000);
     const bb = await page.locator('#board').boundingBox();
     await page.mouse.move(bb.x + bb.width / 2, bb.y + bb.height / 2); await page.mouse.down();

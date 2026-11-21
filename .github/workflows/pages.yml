@@ -10,6 +10,9 @@ on:
       - release-notes.md
       - CLAUDE.md
       - docs/coordination/HANDOFF.md
+      - docs/product/PLAY-RELEASE.md
+      - docs/product/PLAYER-USAGE.md
+      - .github/workflows/pages.yml
   # Releases are cut only on request (workflow_dispatch): changes accumulate in release-notes.md
   # and go out together when the owner says so. Merging to main does not release.
   # rollback: build an earlier version (a tag such as v170) again as a NEW release with a higher

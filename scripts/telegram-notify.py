@@ -288,11 +288,18 @@ def main() -> int:
     req = urllib.request.Request(f'https://api.telegram.org/bot{token}/sendMessage', body, {'Content-Type': 'application/json'})
     try:
         with urllib.request.urlopen(req, timeout=20) as r:
-            ok = json.load(r).get('ok')
+            response = json.load(r)
+            ok = response.get('ok')
     except Exception as e:
         print('Telegram send failed:', type(e).__name__); return 1
 
     print('Telegram: sent' if ok else 'Telegram: refused')
+    if ok:
+        message = response.get('result', {})
+        channel = message.get('chat', {}).get('username')
+        message_id = message.get('message_id')
+        if channel and message_id:
+            print(f'https://t.me/{channel}/{message_id}')
 
     # 2. If --poll or TELEGRAM_SEND_POLL is requested, send an official interactive poll
     send_poll_flag = '--poll' in flags or os.environ.get('TELEGRAM_SEND_POLL', '').lower() in ('1', 'true', 'yes')

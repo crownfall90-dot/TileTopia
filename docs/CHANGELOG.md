@@ -2858,3 +2858,14 @@
 - fix(brand): simplify the monogram and align the wordmark
 - fix(brand): restore and refine the classic Tiletopia icon
 
+## 1.0.298 — 2026-11-21
+
+**Игрокам:**
+- На главной крупнее кнопка игры. При незавершённой партии первым доступно «Вернуться в партию». Последний выбранный режим запоминается.
+- Настройки, комнаты, витрина и другие разделы стали компактнее. Кнопки и вкладки получили единый вид, а правила и история доступны через «Ещё».
+- В карточке игрока можно заблокировать нежелательные приглашения и реакции. Управление списком находится в разделе «Друзья».
+
+**В коде:**
+- Merge pull request #265 from crownfall90-dot/codex/compact-interface
+- feat(game): simplify the interface and split client responsibilities
+

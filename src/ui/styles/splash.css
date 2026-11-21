@@ -1,0 +1,74 @@
+#boot {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: calc(16px + var(--it, 0px)) calc(16px + var(--ir, 0px)) calc(16px + var(--ib, 0px)) calc(16px + var(--il, 0px));
+  overflow: hidden;
+  background: radial-gradient(ellipse at 50% 39%, #293d56 0%, #18263e 37%, #101729 74%);
+  color: #ffefce;
+  text-align: center;
+  transition: opacity .24s ease-out;
+}
+
+#boot.gone { opacity: 0; pointer-events: none; }
+.boot-art { display: block; flex: none; width: min(82vw, 340px); height: auto; }
+.boot-logo {
+  margin-top: -10px;
+  font: 800 clamp(32px, 10.5vw, 54px)/1.18 system-ui, sans-serif;
+  letter-spacing: -.045em;
+  text-shadow: 0 3px 18px #060b17a6;
+  animation: boot-title .46s .22s cubic-bezier(.2,.7,.24,1) both;
+}
+.boot-logo span { color: #f2bf70; }
+.boot-indicator {
+  width: 94px;
+  height: 3px;
+  margin-top: 18px;
+  overflow: hidden;
+  border-radius: 3px;
+  background: #a5bcd435;
+}
+.boot-indicator i {
+  display: block;
+  width: 100%;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, #b38958, #f2bf70);
+  transform-origin: left;
+  animation: boot-mark .62s .07s ease-out both;
+}
+.boot-label { margin-top: 10px; color: #c1cce0; font: 500 13px/1.4 system-ui, sans-serif; }
+
+.boot-east { --from-x: 27px; --from-y: -13px; animation: boot-place .49s .08s cubic-bezier(.19,.72,.3,1) both; }
+.boot-front { --from-x: -11px; --from-y: 32px; animation: boot-place .47s .18s cubic-bezier(.19,.72,.3,1) both; }
+.boot-glint { opacity: 0; animation: boot-glint .42s .31s ease-out both; }
+
+@keyframes boot-place {
+  from { opacity: 0; transform: translate(var(--from-x), var(--from-y)); }
+  35% { opacity: 1; }
+  to { opacity: 1; transform: translate(0, 0); }
+}
+@keyframes boot-title { from { opacity: .35; transform: translateY(6px); } to { opacity: 1; transform: translateY(0); } }
+@keyframes boot-mark { from { transform: scaleX(.22); } to { transform: scaleX(1); } }
+@keyframes boot-glint { 0%, 100% { opacity: 0; } 47% { opacity: .8; } }
+
+#boot.withupd { justify-content: flex-start; }
+#boot.withupd .boot-art { width: min(69vw, 34vh, 286px); }
+#boot.withupd .boot-logo { font-size: clamp(24px, 6.8vh, 44px); }
+#boot.withupd .boot-indicator { display: none; }
+
+@media (max-height: 480px) {
+  .boot-art { width: min(65vw, 46vh, 280px); }
+  .boot-logo { font-size: clamp(26px, 9.5vh, 46px); }
+  .boot-indicator { margin-top: 11px; }
+  .boot-label { margin-top: 7px; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #boot { transition: none; }
+  #boot * { animation: none; }
+}
