@@ -1,0 +1,447 @@
+/* ==============================================================================
+   Player Card Modal v2 & Report Dialog v2
+   ============================================================================== */
+.pl-dialog-v2 {
+  position: relative;
+  max-width: 380px;
+  width: 92vw;
+  box-sizing: border-box;
+  padding: 22px 20px 20px;
+  border-radius: 26px;
+  text-align: center;
+  background: radial-gradient(circle at 50% 0%, rgba(35, 48, 85, 0.96), rgba(16, 23, 42, 0.98));
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.55), 0 0 0 1px rgba(255, 255, 255, 0.05);
+}
+.pl-v2-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 34px;
+  height: 34px;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: var(--muted);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+.pl-v2-close:active {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--ink);
+  transform: scale(0.96);
+}
+@media (hover: hover){
+.pl-v2-close:hover {
+  background: rgba(255, 255, 255, 0.12);
+  color: var(--ink);
+  transform: scale(0.96);
+}
+
+}
+.pl-v2-header {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 14px;
+}
+.pl-v2-av-box {
+  width: 72px;
+  height: 72px;
+  border-radius: 50%;
+  padding: 3px;
+  background: linear-gradient(135deg, rgba(255, 255, 255, 0.2), rgba(255, 255, 255, 0.04));
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);
+  position: relative;
+}
+.pl-v2-av {
+  width: 100%;
+  height: 100%;
+  border-radius: 50%;
+  background: var(--pl-c, #5b6684);
+  color: #fff;
+  font: 900 30px var(--f-display);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+}
+.pl-v2-identity {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+}
+.pl-v2-name {
+  font: 800 22px var(--f-display);
+  margin: 0;
+  color: var(--ink);
+  letter-spacing: -0.01em;
+}
+.pl-v2-status-pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  font-size: 12px;
+  font-weight: 700;
+  color: #ffd875;
+  background: rgba(245, 158, 11, 0.14);
+  border: 1px solid rgba(245, 158, 11, 0.35);
+  padding: 2px 10px;
+  border-radius: 999px;
+}
+.pl-v2-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 3px 10px;
+  border-radius: 999px;
+  margin-top: 2px;
+}
+.pl-v2-badge.on {
+  background: rgba(52, 211, 153, 0.15);
+  color: #34d399;
+  border: 1px solid rgba(52, 211, 153, 0.35);
+}
+.pl-v2-badge.off {
+  background: rgba(255, 255, 255, 0.06);
+  color: var(--muted);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+}
+.pl-v2-dot {
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  display: inline-block;
+}
+.pl-v2-badge.on .pl-v2-dot {
+  background: #34d399;
+  box-shadow: 0 0 8px #34d399;
+}
+.pl-v2-badge.off .pl-v2-dot {
+  background: var(--muted);
+}
+.pl-v2-stats {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 8px;
+  width: 100%;
+  margin-bottom: 14px;
+}
+.pl-v2-stat {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  border-radius: 16px;
+  padding: 10px 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 2px;
+}
+.pl-v2-stat-icon {
+  width: 28px;
+  height: 28px;
+  border-radius: 8px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 2px;
+}
+.pl-v2-stat-icon.cup {
+  background: rgba(255, 216, 117, 0.14);
+}
+.pl-v2-stat-icon.win {
+  background: rgba(52, 211, 153, 0.14);
+}
+.pl-v2-stat-icon.game {
+  background: rgba(96, 165, 250, 0.14);
+}
+.pl-v2-stat-val {
+  font: 800 17px var(--f-display);
+  color: var(--ink);
+  font-variant-numeric: tabular-nums;
+}
+.pl-v2-stat-lbl {
+  font-size: 10.5px;
+  font-weight: 700;
+  color: var(--muted);
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+.pl-v2-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  width: 100%;
+}
+.pl-v2-act-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-weight: 800;
+  border-radius: 14px;
+  height: 46px;
+  font-size: 15px;
+  margin: 0;
+  position: relative;
+}
+.pl-v2-act-btn.invite-btn {
+  background: linear-gradient(135deg, #3b82f6, #1d4ed8);
+  border-color: rgba(96, 165, 250, 0.5);
+  box-shadow: 0 4px 14px rgba(37, 99, 235, 0.35);
+  color: #fff;
+}
+.pl-v2-act-btn.friend-btn {
+  background: linear-gradient(135deg, #10b981, #059669);
+  border-color: rgba(52, 211, 153, 0.5);
+  box-shadow: 0 4px 14px rgba(16, 185, 129, 0.35);
+  color: #fff;
+}
+.pl-v2-act-btn.accept-btn {
+  background: linear-gradient(135deg, #f59e0b, #d97706);
+  border-color: rgba(251, 191, 36, 0.5);
+  box-shadow: 0 4px 14px rgba(245, 158, 11, 0.35);
+  color: #fff;
+}
+.pl-btn-sub {
+  font-size: 11px;
+  opacity: 0.85;
+  font-weight: 600;
+  margin-left: 2px;
+}
+.pl-v2-friend-badge {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  background: rgba(52, 211, 153, 0.12);
+  border: 1px solid rgba(52, 211, 153, 0.3);
+  border-radius: 12px;
+  padding: 8px 14px;
+  font-size: 13px;
+  font-weight: 700;
+  color: #34d399;
+}
+.pl-v2-del-link {
+  background: none;
+  border: 0;
+  color: #f87171;
+  font-size: 12px;
+  font-weight: 700;
+  cursor: pointer;
+  padding: 2px 6px;
+  border-radius: 6px;
+}
+@media (hover: hover){
+.pl-v2-del-link:hover {
+  background: rgba(248, 113, 113, 0.15);
+}
+
+}
+.pl-v2-sub-row {
+  display: flex;
+  gap: 8px;
+  justify-content: center;
+  margin-top: 4px;
+}
+.pl-v2-chip {
+  flex: 1;
+  height: 34px;
+  font-size: 12px;
+  font-weight: 700;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  border-radius: 10px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--muted);
+  cursor: pointer;
+}
+.pl-v2-chip.danger-chip {
+  color: #f87171;
+  border-color: rgba(248, 113, 113, 0.25);
+}
+
+/* Report Dialog v2 */
+.report-dialog-v2 {
+  max-width: 390px;
+  width: 92vw;
+  box-sizing: border-box;
+  padding: 20px;
+  border-radius: 24px;
+  text-align: left;
+  background: radial-gradient(circle at 50% 0%, rgba(35, 30, 45, 0.98), rgba(16, 18, 28, 0.98));
+  border: 1px solid rgba(248, 113, 113, 0.2);
+  box-shadow: 0 24px 60px rgba(0, 0, 0, 0.6);
+}
+.rep-v2-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin-bottom: 12px;
+}
+.rep-v2-ic {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: rgba(248, 113, 113, 0.15);
+  border: 1px solid rgba(248, 113, 113, 0.3);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex: 0 0 auto;
+}
+.rep-v2-title {
+  font: 800 18px var(--f-display);
+  margin: 0;
+  color: #fff;
+  line-height: 1.2;
+}
+.rep-v2-name {
+  margin: 2px 0 0;
+  font-size: 13px;
+  color: var(--muted);
+}
+.rep-v2-prompt {
+  font-size: 13px;
+  color: var(--muted);
+  margin: 0 0 10px;
+}
+.rep-v2-reasons {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-bottom: 12px;
+  max-height: 230px;
+  overflow-y: auto;
+}
+.rep-v2-item {
+  display: flex;
+  align-items: flex-start;
+  gap: 10px;
+  padding: 8px 10px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.03);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  cursor: pointer;
+  transition: all 0.15s ease;
+}
+@media (hover: hover){
+.rep-v2-item:hover {
+  background: rgba(255, 255, 255, 0.06);
+  border-color: rgba(255, 255, 255, 0.15);
+}
+
+}
+.rep-v2-item input {
+  margin-top: 3px;
+  accent-color: #f87171;
+}
+.rep-v2-text {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+.rep-v2-text b {
+  font-size: 13px;
+  font-weight: 700;
+  color: var(--ink);
+}
+.rep-v2-text small {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.25;
+}
+.rep-v2-comment-box {
+  margin-bottom: 14px;
+}
+.rep-v2-textarea {
+  width: 100%;
+  box-sizing: border-box;
+  resize: none;
+  font-size: 13px;
+  padding: 8px 10px;
+  border-radius: 10px;
+  height: 60px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  color: var(--ink);
+}
+.rep-v2-actions {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.danger-cta {
+  background: linear-gradient(135deg, #ef4444, #b91c1c);
+  border-color: rgba(248, 113, 113, 0.5);
+  box-shadow: 0 4px 14px rgba(239, 68, 68, 0.35);
+  font-weight: 800;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  height: 44px;
+  color: #fff;
+}
+
+/* achievement icons: the emoji stays inside its 40 px tile */
+html body .ach-card .qi{overflow:hidden;font-size:20px;line-height:1}
+
+/* the exchange in the shop: balances of the three coins, two exchange rows */
+.exch .excard{border-radius:18px;padding:12px 12px 10px;background:linear-gradient(160deg,rgba(242,184,75,.14),rgba(255,255,255,.04) 60%);border:1px solid rgba(242,184,75,.32);box-shadow:inset 0 1px 0 rgba(255,255,255,.12),0 10px 22px -12px rgba(0,0,0,.6)}
+.exch .exbal{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;margin-bottom:8px}
+.exch .exbal span{display:flex;flex-direction:column;align-items:center;gap:2px;padding:8px 4px;border-radius:12px;background:rgba(0,0,0,.18);min-width:0}
+.exch .exbal b{font:800 16px var(--f-display);color:#fff;max-width:100%;overflow:hidden;text-overflow:ellipsis}
+.exch .exbal small{font-size:11px;color:var(--muted)}
+.exch .exbal .coin{width:22px;height:22px}
+.exch .exrow{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:8px 2px;border-top:1px solid rgba(255,255,255,.07);flex-wrap:wrap}
+.exch .exlot{display:flex;align-items:center;gap:5px;font:800 15px var(--f-display);color:#fff;white-space:nowrap}
+.exch .exlot em{font-style:normal;color:var(--brass);margin:0 4px}
+.exch .exbtns{display:flex;gap:6px;flex:0 0 auto}
+.exch .exbtns .chip[disabled]{opacity:.45;pointer-events:none}
+.exch .exnote{margin:6px 2px 0;font-size:12px;line-height:1.4;color:var(--muted)}
+
+/* ---- Shop stalls, the market look: a striped awning with a scalloped valance over each stall (its own colours),
+   wooden posts with a lantern, a plank counter; goods priced in silver and gold glow in their coin's colour,
+   gold goods get a slow shine (stopped with the rest of the motion in calm mode and on economy graphics). ---- */
+.shop-stall{--aw1:#d9433a;--aw2:#f6ead2;position:relative;overflow:hidden}
+.shop-stall.stall-frames{--aw1:#3f78c8}.shop-stall.stall-statuses{--aw1:#3fa060}.shop-stall.stall-emotes{--aw1:#e0a83a}.shop-stall.stall-phrases{--aw1:#9a5ad0}
+.shop-stall .stall-awning{position:relative;height:34px;margin:-1px -1px 0;background:repeating-linear-gradient(90deg,var(--aw1) 0 26px,var(--aw2) 26px 52px);box-shadow:inset 0 -6px 10px rgba(0,0,0,.18),inset 0 4px 0 rgba(255,255,255,.18)}
+.shop-stall .stall-awning-stripes{position:absolute;inset:0;background:linear-gradient(180deg,rgba(255,255,255,.22),transparent 45%,rgba(0,0,0,.12))}
+.shop-stall .stall-valance{position:absolute;left:0;right:0;bottom:-11px;height:12px;background:radial-gradient(circle at 13px 0,var(--aw1) 12px,transparent 12.5px) 0 0/52px 12px repeat-x,radial-gradient(circle at 39px 0,var(--aw2) 12px,transparent 12.5px) 0 0/52px 12px repeat-x;filter:drop-shadow(0 3px 2px rgba(0,0,0,.3));z-index:1}
+.shop-stall .stall-sign-wrap{position:relative;padding-top:14px}
+.shop-stall .stall-post-left,.shop-stall .stall-post-right{position:absolute;top:0;bottom:-6px;width:9px;background:linear-gradient(90deg,#5a3a1e,#9a6a3c 45%,#5a3a1e);border-radius:3px;z-index:0}
+.shop-stall .stall-post-left{left:8px}.shop-stall .stall-post-right{right:8px}
+.shop-stall .stall-post-left::after,.shop-stall .stall-post-right::after{content:"";position:absolute;top:18px;left:50%;width:12px;height:16px;transform:translateX(-50%);border-radius:5px 5px 7px 7px;background:radial-gradient(circle at 50% 60%,#fff6c8,#ffc94d 45%,#c2711e 80%);box-shadow:0 0 14px 4px rgba(255,200,80,.55)}
+.shop-stall .stall-signboard{position:relative;z-index:1;margin:0 26px;border-radius:12px;background:linear-gradient(180deg,#8a5a33,#6b4426);border:2px solid #4a2f17;box-shadow:inset 0 1px 0 rgba(255,230,190,.35),0 6px 12px -4px rgba(0,0,0,.5)}
+.shop-stall .stall-counter{background:repeating-linear-gradient(180deg,#4a2f1b 0 2px,transparent 2px 46px),linear-gradient(180deg,#6b4426,#56351c);border-top:3px solid #9a6a3c;box-shadow:inset 0 8px 14px -8px rgba(0,0,0,.6)}
+.shop-stall .stall-item{position:relative;background:linear-gradient(180deg,rgba(255,236,200,.1),rgba(0,0,0,.18));border:1px solid rgba(255,220,170,.18);box-shadow:inset 0 1px 0 rgba(255,240,210,.18),0 6px 10px -6px rgba(0,0,0,.6);transition:transform .15s}
+.shop-stall .stall-item:active{transform:scale(.97)}
+.shop-stall .stall-item:has(.coin.c-star){border-color:rgba(255,213,99,.75);box-shadow:inset 0 0 22px rgba(255,200,80,.18),0 0 14px rgba(255,190,60,.25),0 6px 12px -6px rgba(0,0,0,.6);overflow:hidden}
+.shop-stall .stall-item:has(.coin.c-star)::after{content:"";position:absolute;inset:-40% -60%;background:linear-gradient(115deg,transparent 42%,rgba(255,245,200,.32) 50%,transparent 58%);animation:stallShine 4.5s ease-in-out infinite;pointer-events:none}
+@keyframes stallShine{0%,55%{transform:translateX(-55%)}100%{transform:translateX(55%)}}
+html.calm .shop-stall .stall-item::after{animation-play-state:paused}html.lowgfx .shop-stall .stall-item::after{display:none}
+.shop-stall .fig-art{transition:transform .2s}@media (hover: hover){
+.shop-stall .stall-item:hover .fig-art{transform:translateY(-3px) rotate(-3deg)}
+
+}
+.shop-stall .stall-item-name{display:block;max-width:100%;font-size:clamp(10.5px,3.1vw,12.5px);letter-spacing:-.01em;line-height:1.15;word-break:normal;overflow-wrap:normal;hyphens:auto;-webkit-hyphens:auto}
+
+/* main menu: the three coins plain under the profile plate, the trophies (to the rating) under them */
+html body #mstat{display:flex;flex-direction:column;align-items:flex-start;gap:6px}
+html body #mstat .menu-cur-trio{background:none!important;border:0!important;box-shadow:none!important;padding:2px 4px!important;display:flex;gap:16px;backdrop-filter:none!important}
+html body #mstat .mcur-sep{display:none}
+html body #mstat .mcur-item{display:inline-flex;align-items:center;gap:6px}
+html body #mstat .mcur-item b{font:800 16px var(--f-display);color:#fff;text-shadow:0 1px 3px rgba(0,0,0,.55)}
+html body #mstat .mcur-item .coin{width:22px;height:22px;filter:drop-shadow(0 2px 3px rgba(0,0,0,.4))}
+html body #mstat .mpc{padding:5px 12px 5px 10px;border-radius:999px;background:linear-gradient(180deg,rgba(255,216,117,.16),rgba(255,216,117,.06));border:1px solid rgba(255,216,117,.35)}
+html body #mstat .mpc b{color:#ffd875}

@@ -47,7 +47,7 @@
 
 Перед началом работы ознакомьтесь с [docs/product/README.md](docs/product/README.md) (видение, механики, сезонные локации, аудит) и [docs/coordination/HANDOFF.md](docs/coordination/HANDOFF.md).
 
-- **Архитектура:** `web/game.html` + `src/` (модули собираются через Vite в `build/bundle/pg.js`), `app/` — нативная Android-оболочка (Gradle / Java), `scripts/` — пайплайн сборки, `tests/` — модульные тесты (`node --test tests/*.test.cjs`).
+- **Исходники.** Экраны в `web/views/`, поведение в `src/app/runtime/`, стили в `src/ui/styles/`, Android-оболочка в `app/`. Правила, сеть и аккаунт вынесены в самостоятельные модули. [Карта проекта](docs/ARCHITECTURE.md)
 - **Сборка веб-модулей:** `npm run build`.
 - **Запуск тестов:** `npm test`.
 - **Развитие движка:** [архитектура и решение по Rust/WebAssembly](docs/ENGINEERING-ROADMAP.md).

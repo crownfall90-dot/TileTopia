@@ -1,60 +1,47 @@
-name: Agent Telemetry & Analytics Hub
+name: Player usage report
 
 on:
   schedule:
-    # Run twice daily to sync latest telemetry & player feedback to developer agents
     - cron: '0 6,18 * * *'
   workflow_dispatch:
-    inputs:
-      action:
-        description: 'Action to run (all, delete_daem, reward_names, export_only)'
-        type: string
-        default: 'all'
 
 permissions:
   contents: write
 
+concurrency:
+  group: usage-report
+  cancel-in-progress: false
+
 jobs:
-  telemetry:
+  usage:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
-
       - uses: actions/setup-python@v5
         with:
           python-version: '3.11'
 
-      - name: Run maintenance and generate agent analytics
+      - name: Read opt-in usage
         env:
           FIREBASE_SERVICE_ACCOUNT: ${{ secrets.FIREBASE_SERVICE_ACCOUNT }}
-          FIREBASE_DB_URL: 'https://puzzlegrad-default-rtdb.europe-west1.firebasedatabase.app'
-        run: |
-          python3 scripts/manage-maintenance.py "${{ inputs.action || 'all' }}" --apply
+          FIREBASE_DB_URL: https://puzzlegrad-default-rtdb.europe-west1.firebasedatabase.app
+        run: python3 scripts/export-usage.py
 
-      - name: Commit and push telemetry data to branch telemetry/agent-hub
+      - name: Publish aggregate report
         run: |
-          git config user.name "TileTopia Agent Bot"
-          git config user.email "bot@tiletopia.app"
-          
-          # Move agent data to temporary location
-          mkdir -p /tmp/agent_data_export
-          cp -r agent_data/* /tmp/agent_data_export/
-          rm -rf agent_data
-          
-          # Check out or create orphan branch telemetry/agent-hub
-          if git show-ref --quiet refs/remotes/origin/telemetry/agent-hub; then
-            git checkout -B telemetry/agent-hub origin/telemetry/agent-hub
+          git config user.name 'Tiletopia Agent Bot'
+          git config user.email 'bot@tiletopia.app'
+          cp -r build/usage-report "$RUNNER_TEMP/tiletopia-usage-report"
+          if git fetch origin refs/heads/telemetry/agent-hub; then
+            git switch -c telemetry/agent-hub FETCH_HEAD
           else
-            git checkout --orphan telemetry/agent-hub
-            git rm -rf . || true
+            git switch --orphan telemetry/agent-hub
           fi
-          
-          # Copy agent data back
+          git rm --ignore-unmatch -- agent_data/ERRORS.md agent_data/FEEDBACK.md agent_data/agent_telemetry.json
           mkdir -p agent_data
-          cp -r /tmp/agent_data_export/* agent_data/
-          
-          git add agent_data/
-          git commit -m "chore(telemetry): update errors, player feedback, and analytics data [skip ci]" || echo "No changes to commit"
-          git push -u origin telemetry/agent-hub --force
+          cp "$RUNNER_TEMP"/tiletopia-usage-report/{ANALYTICS.md,usage.json} agent_data/
+          git add -- agent_data/ANALYTICS.md agent_data/usage.json
+          if ! git diff --cached --quiet; then
+            git commit -m 'chore(analytics): publish aggregated usage [skip ci]'
+            git push origin HEAD:telemetry/agent-hub
+          fi

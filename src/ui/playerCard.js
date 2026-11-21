@@ -40,6 +40,8 @@ export function renderPlayerCardHtml({
   seenText = 'Офлайн',
   isFriend = false,
   isMe = false,
+  isBlocked = false,
+  canContact = true,
   pendingInvite = false,
   incomingRequest = false,
   hasActiveRoom = false,
@@ -128,6 +130,7 @@ export function renderPlayerCardHtml({
     // 3. Secondary row action: report
     const secondaryActions = `
       <div class="pl-v2-sub-row">
+        <button class="chip pl-v2-chip" id="plBlock">${isBlocked ? 'Разблокировать' : 'Заблокировать'}</button>
         <button class="chip pl-v2-chip danger-chip" id="plReport" aria-label="Пожаловаться на игрока">
           <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#f87171" stroke-width="2.2" stroke-linecap="round"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></svg>
           <span>Пожаловаться</span>
@@ -135,7 +138,7 @@ export function renderPlayerCardHtml({
       </div>
     `;
 
-    actionsHtml = inviteBtn + friendAction + secondaryActions;
+    actionsHtml = (isBlocked ? '<p class="shint">Заявки, приглашения и реакции этого игрока скрыты на этом устройстве.</p>' : canContact ? inviteBtn + friendAction : '') + secondaryActions;
   }
 
   return `

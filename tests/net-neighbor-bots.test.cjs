@@ -4,16 +4,14 @@
 // 3. No cups are awarded for games with bots.
 // 4. Bots never leak into private friends' rooms.
 'use strict';
+const { gameSource, stylesSource } = require('../scripts/compose-page.cjs');
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
 const path = require('node:path');
 
-const GAME_PATH = path.join(__dirname, '..', 'web', 'game.html');
-const STYLES_PATH = path.join(__dirname, '..', 'src', 'ui', 'styles.css');
 
 test('neighbor bots (H-5, owner decision 01.11): stand-in joins after 84 seconds in quick match', () => {
-  const code = fs.readFileSync(GAME_PATH, 'utf8');
+  const code = gameSource();
 
   // Matchmaking tick logic checks for 10 seconds
   assert.ok(code.includes('sec >= FILL_SECS') && code.includes('const FILL_SECS = 84'), 'matchTick checks the 84 s (1:24) threshold');
@@ -26,8 +24,8 @@ test('neighbor bots (H-5, owner decision 01.11): stand-in joins after 84 seconds
 });
 
 test('bot mark (H-5): honest bot pill badge displayed in player cards, lobby, and results', () => {
-  const code = fs.readFileSync(GAME_PATH, 'utf8');
-  const styles = fs.readFileSync(STYLES_PATH, 'utf8');
+  const code = gameSource();
+  const styles = stylesSource();
 
   // Bot pill badge in CSS
   assert.ok(styles.includes('.botpill'), 'styles.css contains .botpill class definition');
@@ -43,7 +41,7 @@ test('bot mark (H-5): honest bot pill badge displayed in player cards, lobby, an
 });
 
 test('cups safety (H-5): no cups awarded for games containing bots', () => {
-  const code = fs.readFileSync(GAME_PATH, 'utf8');
+  const code = gameSource();
 
   // rewardCalc checks players.some(p => !p.human)
   assert.ok(code.includes('const hasBots = players.some(p => !p.human)'), 'rewardCalc identifies whether any bots participated');
@@ -57,7 +55,7 @@ test('cups safety (H-5): no cups awarded for games containing bots', () => {
 });
 
 test('no leakage (H-5): private friends rooms never auto-fill bots', () => {
-  const code = fs.readFileSync(GAME_PATH, 'utf8');
+  const code = gameSource();
 
   // Auto-fill is strictly confined inside matchTick where mm is active and net.quick is true
   assert.ok(code.includes('if (!net || !net.quick || net.gameId) return;'), 'matchTick immediately returns if not net.quick');

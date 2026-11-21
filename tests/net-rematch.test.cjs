@@ -1,15 +1,15 @@
 // N-5 Rematch contract: in an online game, "Реванш" appears on the results card and screen.
 // Host starting rematch invokes startOnline with the same seats; non-host sends a rematch offer.
 'use strict';
+const { gameSource } = require('../scripts/compose-page.cjs');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const GAME_PATH = path.join(__dirname, '..', 'web', 'game.html');
 
 test('rematch (N-5): game.html contains rematchClick, startRematch and handles rematch message', () => {
-  const code = fs.readFileSync(GAME_PATH, 'utf8');
+  const code = gameSource();
 
   // Verify functions exist
   assert.ok(code.includes('function rematchClick('), 'rematchClick function is defined');
@@ -31,7 +31,7 @@ test('rematch (N-5): game.html contains rematchClick, startRematch and handles r
 });
 
 test('lobby readiness: friends in room must press ready before host can start', () => {
-  const code = fs.readFileSync(GAME_PATH, 'utf8');
+  const code = gameSource();
 
   // Ready button exists for guest
   assert.ok(code.includes('id="lobbyReady"'), 'lobbyReady button in HTML');
@@ -52,7 +52,7 @@ test('lobby readiness: friends in room must press ready before host can start', 
 });
 
 test('room header: cups game with friends displays рейтинговая игра under room', () => {
-  const code = fs.readFileSync(GAME_PATH, 'utf8');
+  const code = gameSource();
 
   assert.ok(code.includes("isCups ? 'рейтинговая игра' : 'онлайн'"), 'header subtitle shows рейтинговая игра for cups');
 });

@@ -2846,3 +2846,15 @@
 - fix: restore v295 browser regression checks
 - docs: fixate complete project state checkpoint (v295), handoffs, and roadmap on github
 
+## 1.0.297 — 2026-11-21
+
+**Игрокам:**
+- Вернули классическую зелёную иконку Tiletopia. Плитка стала крупнее, а название читается отдельной строкой внизу.
+- Доработали пять плиток «Классики». У больших озёр появились мягкое мелководье и кувшинки, у шахты — рельсы и вагонетка. Обновили большой каменный мост и край обрыва.
+
+**В коде:**
+- Merge pull request #264 from crownfall90-dot/codex/v297-classic-icon
+- feat(tiles): finish the classic deck illustrations in Blender
+- fix(brand): simplify the monogram and align the wordmark
+- fix(brand): restore and refine the classic Tiletopia icon
+

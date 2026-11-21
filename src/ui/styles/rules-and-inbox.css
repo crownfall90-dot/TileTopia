@@ -1,0 +1,376 @@
+/* 7. Spacing Consistency & Rules Screen Polish */
+#scr-rules .lb {
+  padding-bottom: 36px;
+}
+#scr-rules .h3 {
+  margin: 16px 0 10px 4px !important;
+}
+.rpane {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.rpane > * {
+  margin: 0 !important;
+}
+.hitem {
+  display: grid;
+  grid-template-columns: 50px 1fr;
+  gap: 14px;
+  align-items: start;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: linear-gradient(175deg, rgba(30, 42, 80, 0.85) 0%, rgba(14, 20, 44, 0.92) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1.5px solid rgba(255, 255, 255, 0.22);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  box-sizing: border-box;
+}
+.hitem b {
+  font: 800 15px var(--f-display, sans-serif);
+  color: #fff;
+  display: block;
+  margin-bottom: 4px;
+  line-height: 1.35;
+}
+.hitem p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: rgba(220, 229, 245, 0.92);
+}
+.hitem em {
+  display: inline-block;
+  margin-top: 8px;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(242, 184, 75, 0.12);
+  border: 1px solid rgba(242, 184, 75, 0.3);
+  font: 700 12px var(--f-body, sans-serif);
+  font-style: normal;
+  color: #ffd877;
+}
+.rgoal {
+  display: flex;
+  gap: 16px;
+  align-items: flex-start;
+  padding: 16px;
+  border-radius: 20px;
+  background: linear-gradient(160deg, rgba(242, 184, 75, 0.18), rgba(255, 255, 255, 0.05));
+  border: 1.5px solid rgba(242, 184, 75, 0.4);
+  box-sizing: border-box;
+}
+.rgoal > span {
+  font-size: 38px;
+  line-height: 1;
+  flex: 0 0 auto;
+  margin-top: 2px;
+}
+.rgoal b {
+  font: 800 16px var(--f-display, sans-serif);
+  color: #fff;
+  display: block;
+  margin-bottom: 6px;
+}
+.rgoal p {
+  margin: 0;
+  font-size: 13.5px;
+  line-height: 1.5;
+  color: #dbe2f4;
+}
+.rsteps {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+.rsteps li {
+  position: relative;
+  display: grid;
+  grid-template-columns: 48px 1fr;
+  gap: 14px;
+  align-items: center;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: rgba(255, 255, 255, 0.055);
+  border: 1px solid var(--line);
+  box-sizing: border-box;
+}
+.rsteps li > i {
+  position: absolute;
+  left: -1px;
+  top: -1px;
+  width: 24px;
+  height: 24px;
+  border-radius: 18px 0 12px 0;
+  display: grid;
+  place-items: center;
+  font: 800 12px var(--f-display);
+  font-style: normal;
+  background: var(--brass);
+  color: var(--brass-ink);
+}
+.rsteps .ric {
+  width: 48px;
+  height: 48px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  font-size: 26px;
+  background: rgba(255, 255, 255, 0.07);
+}
+.rsteps b {
+  font: 700 14.5px var(--f-display, sans-serif);
+  color: #fff;
+  display: block;
+  margin-bottom: 3px;
+}
+.rsteps p {
+  margin: 0;
+  font-size: 13px;
+  line-height: 1.45;
+  color: #d5dcf0;
+}
+.goldrow {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 8px;
+}
+.goldrow span {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding: 10px 4px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid var(--line);
+  font-size: 16px;
+}
+.goldrow b {
+  font: 800 13px var(--f-display);
+  color: var(--brass);
+  margin-top: 4px;
+}
+.rnote {
+  margin: 0;
+  padding: 12px 14px;
+  border-radius: 14px;
+  background: rgba(255, 255, 255, 0.05);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  color: #cbd5e1;
+  font-size: 12.5px;
+  line-height: 1.5;
+}
+
+/* 8. News Reader Modal */
+.news-reader-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 140;
+  background: rgba(5, 8, 18, 0.85);
+  backdrop-filter: blur(14px);
+  -webkit-backdrop-filter: blur(14px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 18px;
+}
+.news-modal-card {
+  width: 100%;
+  max-width: 480px;
+  max-height: 85vh;
+  overflow-y: auto;
+  background: linear-gradient(175deg, #18233e 0%, #0c1322 100%);
+  border: 1.5px solid rgba(242, 184, 75, 0.5);
+  border-radius: 24px;
+  padding: 22px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.75), 0 0 40px rgba(242, 184, 75, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.nrm-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 12px;
+}
+.nrm-top {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.nrm-icon {
+  font-size: 28px;
+  width: 46px;
+  height: 46px;
+  border-radius: 14px;
+  background: rgba(242, 184, 75, 0.16);
+  border: 1px solid rgba(242, 184, 75, 0.35);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-shrink: 0;
+}
+.nrm-meta {
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+.nrm-title {
+  font: 800 18px var(--f-display, sans-serif);
+  color: #fff;
+  margin: 0;
+  line-height: 1.35;
+}
+.nrm-body {
+  font: 500 14px/1.6 var(--f-body, sans-serif);
+  color: rgba(255, 255, 255, 0.9);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.nrm-body p {
+  margin: 0;
+  line-height: 1.55;
+}
+.nrm-list {
+  list-style: none;
+  margin: 4px 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+.nrm-list li {
+  position: relative;
+  padding-left: 18px;
+  font-size: 13.5px;
+  line-height: 1.45;
+  color: #e2e8f0;
+}
+.nrm-list li::before {
+  content: "";
+  position: absolute;
+  left: 3px;
+  top: 0.55em;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--brass, #f2b84b);
+  box-shadow: 0 0 6px rgba(242, 184, 75, 0.6);
+}
+.nrm-close {
+  flex: 0 0 auto;
+}
+
+/* 9. My Items ("Мои предметы") Overhaul */
+#scr-items .icount {
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid rgba(255, 255, 255, 0.08);
+  padding: 10px 14px;
+  border-radius: 14px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+#scr-items .itnow {
+  background: rgba(242, 184, 75, 0.08);
+  border: 1px solid rgba(242, 184, 75, 0.25);
+  padding: 8px 12px;
+  border-radius: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 14px;
+}
+#scr-items .stgrid,
+#scr-items .frgrid,
+#scr-items .figgrid {
+  gap: 10px;
+  margin-bottom: 14px;
+}
+#scr-items .stb,
+#scr-items .frb,
+#scr-items .fig {
+  border-radius: 16px;
+  transition: all 0.18s ease;
+}
+#scr-items .stb:hover,
+#scr-items .frb:hover,
+#scr-items .fig:hover {
+  transform: translateY(-2px);
+  border-color: rgba(242, 184, 75, 0.5);
+}
+#scr-items .stb.sel,
+#scr-items .frb.sel,
+#scr-items .fig.sel {
+  border-color: var(--brass, #f2b84b);
+  background: linear-gradient(145deg, rgba(242, 184, 75, 0.2), rgba(242, 184, 75, 0.06));
+  box-shadow: 0 4px 16px rgba(242, 184, 75, 0.2);
+}
+
+
+/* ==================== Cup Distribution Table & Negative Cup Styling ==================== */
+.cup-rules-table {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  background: rgba(255, 255, 255, 0.04);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 10px 12px;
+  margin: 6px 0;
+}
+.crt-row {
+  display: grid;
+  grid-template-columns: 82px repeat(5, 1fr);
+  align-items: center;
+  text-align: center;
+  font-size: 12px;
+  padding: 6px 0;
+}
+.crt-row:not(:last-child) {
+  border-bottom: 1px solid rgba(255, 255, 255, 0.06);
+}
+.crt-head {
+  font-weight: 800;
+  color: var(--muted);
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.crt-row b {
+  text-align: left;
+  font: 700 12px var(--f-body);
+  color: #fff;
+}
+.crt-row .pos {
+  color: #4ade80;
+  font-weight: 800;
+}
+.crt-row .neg {
+  color: #f87171;
+  font-weight: 800;
+}
+.crt-row .neu {
+  color: #ffd875;
+  font-weight: 700;
+}
+.crt-row .nil {
+  color: rgba(255, 255, 255, 0.2);
+}
+
+.rchip.cup.neg {
+  background: linear-gradient(135deg, rgba(239, 83, 80, 0.22), rgba(239, 83, 80, 0.06));
+  border-color: rgba(239, 83, 80, 0.6);
+  box-shadow: 0 3px 10px rgba(239, 83, 80, 0.25);
+}
+.rchip.cup.neg b {
+  color: #ff8a80;
+}

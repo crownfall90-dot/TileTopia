@@ -1,5 +1,6 @@
+const { gameSource } = require('../scripts/compose-page.cjs');
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
-const html=fs.readFileSync('web/game.html','utf8');
+const html=gameSource();
 const script=[...html.matchAll(/<script(?:\s[^>]*)?>([\s\S]*?)<\/script>/g)].map(x=>x[1]).join('\n');
 const fn=name=>{const i=script.indexOf(`function ${name}(`);assert.notEqual(i,-1,`missing ${name}`);let b=script.indexOf('{',i),d=0;for(let j=b;j<script.length;j++){if(script[j]==='{')d++;else if(script[j]==='}'&&!--d)return script.slice(i,j+1)}throw Error(name)};
 const store=()=>{const m=new Map;return {getItem:k=>m.has(k)?m.get(k):null,setItem:(k,v)=>{m.set(k,String(v))},removeItem:k=>{m.delete(k)},m}};

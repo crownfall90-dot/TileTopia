@@ -1,9 +1,10 @@
+const { gameSource, stylesSource } = require('../scripts/compose-page.cjs');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const vm = require('node:vm');
 
-const html = fs.readFileSync('web/game.html', 'utf8');
+const html = gameSource();
 
 function fn(name) {
   let i = html.indexOf('async function ' + name + '(');
@@ -361,7 +362,7 @@ test('founder panel shows only the sign-in card until an admin has signed in', (
 });
 
 test('app text is not selectable by long press, typing fields and codes are', () => {
-  const css = fs.readFileSync('src/ui/styles.css', 'utf8');
+  const css = stylesSource();
   assert.ok(css.includes('html.app body{-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}'));
   assert.ok(/html\.app input,html\.app textarea,html\.app a,[^{]*html\.app \.code/.test(css), 'inputs, links and codes stay selectable');
   assert.ok(html.includes('<b>С&nbsp;друзьями</b>'), 'the menu label does not break after «С»');

@@ -101,6 +101,10 @@ test('app/update: isUpdateMandatory, shouldPromptUpdate, and formatUpdateSetting
 
   // shouldPromptUpdate: test builds always prompt testers with option to update or postpone
   assert.equal(U.shouldPromptUpdate({code: 275, version: '1.0.275-test', mandatory: false}, {manual: false}), true);
+  assert.equal(U.shouldPromptUpdate({code: 297, package: 'app.crownfall.tiletopia.test'}), true);
+  assert.equal(U.isUpdateMandatory({code: 297}, 0, 295, true), false);
+  assert.equal(U.shouldPromptUpdate({code: 297, mandatory: false, reinstall: true}), true);
+  assert.equal(U.shouldPromptUpdate({code: 297, mandatory: false, minRequiredCode: 296}, {currentCode: 295}), true);
 
   // shouldPromptUpdate: production build is mandatory by default, so it prompts
   assert.equal(U.shouldPromptUpdate({code: 264, version: '1.0.264'}, {manual: false}), true);

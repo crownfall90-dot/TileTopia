@@ -1,7 +1,7 @@
+const { gameSource, stylesSource } = require('../scripts/compose-page.cjs');
 // The consent tick-box: asked once per version of the texts, and the buttons of the sign-up dialogs wait for it.
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
 
 test('consent: markup has a real checkbox, both documents and a hint; the answer is stored per version', async () => {
   const C = await import('../src/ui/consent.js');
@@ -17,10 +17,10 @@ test('consent: markup has a real checkbox, both documents and a hint; the answer
 });
 
 test('consent: the profile and sign-in dialogs get the tick-box and lock their buttons', () => {
-  const html = fs.readFileSync(__dirname + '/../web/game.html', 'utf8');
+  const html = gameSource();
   assert.match(html, /addConsent\(box, '#profOk', \['#profOk'\]\)/);
   assert.match(html, /addConsent\(box, '#accGo', \['#accGo', '#accGoogle', '#accGSlot'\]\)/);
-  const css = fs.readFileSync(__dirname + '/../src/ui/styles.css', 'utf8');
+  const css = stylesSource();
   assert.match(css, /\.consent-lock\s*\{[^}]*pointer-events: none/);
   assert.match(css, /prefers-reduced-motion[^}]*consent/);
 });

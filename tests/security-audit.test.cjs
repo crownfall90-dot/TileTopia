@@ -1,12 +1,12 @@
 // Tests for Security Audit 2026-11-01: SEC-01 (XSS/sanitization), SEC-02 (PIN exposure & staging gate), SEC-03 (promo claims)
 'use strict';
+const { gameSource } = require('../scripts/compose-page.cjs');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 
-const GAME_PATH = path.join(__dirname, '..', 'web', 'game.html');
 const RULES_PATH = path.join(__dirname, '..', 'docs', 'firebase-rules.json');
 
 function extractFn(html, name) {
@@ -45,7 +45,7 @@ test('security audit: firebase rules contain promo_claims and secure testerPin',
 });
 
 test('security audit: game.html sanitizes remote seats, uid, and results board against XSS', () => {
-  const html = fs.readFileSync(GAME_PATH, 'utf8');
+  const html = gameSource();
 
   // SEC-01: remote seats in startGame use clean() and sanitized UID
   assert.match(html, /startGame\(\{seats:\s*m\.seats\.map\(\(x,\s*i\)\s*=>\s*\(\{name:\s*clean\(x\.name\)/);
@@ -60,7 +60,7 @@ test('security audit: game.html sanitizes remote seats, uid, and results board a
 });
 
 test('security audit: redeemPromo handles 401 on promo_claims gracefully without crediting gold', async () => {
-  const html = fs.readFileSync(GAME_PATH, 'utf8');
+  const html = gameSource();
   const code = extractFn(html, 'redeemPromo');
 
   const toasts = [];

@@ -125,6 +125,8 @@ export function renderRoomSeatsHtml({
   isHost = false,
   registered = false,
   isFriendFn = () => false,
+  isBlockedFn = () => false,
+  contactUid = seat => seat.uid,
   validColFn = () => false,
   cleanFn = s => s,
   stTagFn = () => '',
@@ -134,11 +136,11 @@ export function renderRoomSeatsHtml({
     const isMe = x.owner === myId;
     const isBot = !x.owner;
     const isRoomHost = x.owner === hostId;
-    const safeUid = String(x.uid || '').replace(/[^\w-]/g, '').slice(0, 64);
+    const safeUid = String(contactUid(x) || '').replace(/[^\w-]/g, '').slice(0, 64);
     const safeName = cleanFn(x.name);
     const initial = (safeName || '?')[0];
     const colVal = validColFn(x.col) ? x.col : (palette[i % palette.length] ? (palette[i % palette.length].col || palette[i % palette.length]) : '#3fc27a');
-    const dataAttrs = (x.uid && !isMe) ? ` data-pl="${safeUid}" data-n="${safeName}" data-c="${validColFn(x.col) ? x.col : ''}"` : '';
+    const dataAttrs = (safeUid && !isMe) ? ` data-pl="${safeUid}"${x.uid ? '' : ' data-guest="1"'} data-n="${safeName}" data-c="${validColFn(x.col) ? x.col : ''}"` : '';
 
     const botLvl = x.botlvl || 'normal';
     const botLvlName = BOT_LVL_LABELS[botLvl] || 'Обычный';
@@ -146,7 +148,7 @@ export function renderRoomSeatsHtml({
     const friendBadge = isFriend ? ' <span class="pill friend-pill" title="Ваш друг">🤝 Друг</span>' : '';
     const whoHtml = `<b>${safeName}${isMe ? ' (вы)' : ''}</b>${stTagFn(x.st)}${friendBadge}<small>${isBot ? `Бот · ${botLvlName.toLowerCase()}` : isRoomHost ? 'Создатель комнаты' : (x.ready ? '✓ Готов к игре' : 'Ждём готовности')}</small>`;
     
-    const canAddFriend = (!isMe && !isBot && x.uid && x.uid !== myUid && !isFriendFn(x.uid) && registered);
+    const canAddFriend = (!isMe && !isBot && x.uid && x.uid !== myUid && !isFriend && !isBlockedFn(safeUid) && registered);
     const addFriendBtn = canAddFriend ? `<button class="chip addf" data-addf="${safeUid}" data-n="${safeName}" aria-label="В друзья">＋</button>` : '';
 
     let actionOrPill;

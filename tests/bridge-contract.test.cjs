@@ -2,12 +2,13 @@
 // A handler renamed or lost while code moves out of game.html would fail silently on the phone (Java checks
 // `window.onX && ...`), so the two sides are checked against each other here.
 'use strict';
+const { gameSource } = require('../scripts/compose-page.cjs');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const html = fs.readFileSync('web/game.html', 'utf8');
+const html = gameSource();
 const javaFiles = [];
 (function walk(d) { for (const f of fs.readdirSync(d)) { const p = path.join(d, f); if (fs.statSync(p).isDirectory()) walk(p); else if (p.endsWith('.java')) javaFiles.push(p); } })('app/src');
 const java = javaFiles.map(f => fs.readFileSync(f, 'utf8')).join('\n');

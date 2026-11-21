@@ -1,11 +1,10 @@
 // Tests for G-3 (Adaptive difficulty), G-5 (Rare cards and events in Big mode), G-6 (the duel mode was removed)
 'use strict';
+const { gameSource } = require('../scripts/compose-page.cjs');
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
 const path = require('node:path');
 
-const GAME_PATH = path.join(__dirname, '..', 'web', 'game.html');
 
 test('G-3: checkAdaptiveDifficulty proposes hard after 3 wins and easy after 3 losses', async () => {
   const {checkAdaptiveDifficulty} = await import('../src/engine/bots.js');
@@ -46,7 +45,7 @@ test('G-3: checkAdaptiveDifficulty proposes hard after 3 wins and easy after 3 l
 
 test('G-5: Big game mode (epic) includes rare cards and triggers event celebrations', async () => {
   const {deckList, isRareTile, TYPES} = await import('../src/engine/tiles.js');
-  const html = fs.readFileSync(GAME_PATH, 'utf8');
+  const html = gameSource();
 
   // Check epic deck includes rare tiles
   const epicDeck = deckList({mode: 'epic', rivers: true});
@@ -65,7 +64,7 @@ test('G-5: Big game mode (epic) includes rare cards and triggers event celebrati
 test('G-6: the duel mode is gone — no setting, no card, no counters', async () => {
   const {MODES} = await import('../src/state/config.js');
   const {normalizeStats, recordGameMode, QUESTS, ACH} = await import('../src/state/progress.js');
-  const html = fs.readFileSync(GAME_PATH, 'utf8');
+  const html = gameSource();
   assert.deepEqual(Object.keys(MODES), ['fast', 'classic', 'epic', 'hex']);
   const st = normalizeStats({byMode: {duel: {games: 5, wins: 4, best: 55}}, duelwin: 3});
   assert.ok(!('duel' in st.byMode) && !('duelwin' in st), 'old duel numbers are dropped');

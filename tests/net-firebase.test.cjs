@@ -1,9 +1,9 @@
 // src/net/firebase.js: the Firebase session and REST paths moved out of game.html (TASK-008-5).
 // Same requests and the same saved session as before, so nobody is signed out by the update. No network: fetch is faked.
 'use strict';
+const { gameSource } = require('../scripts/compose-page.cjs');
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
 
 const load = () => import('../src/net/firebase.js');
 const mem = (init = {}) => { const m = {...init}; return {getItem: k => (k in m ? m[k] : null), setItem: (k, v) => { m[k] = String(v); }, removeItem: k => { delete m[k]; }, m}; };
@@ -138,7 +138,7 @@ test('net/firebase: errors keep their old meaning', async () => {
 });
 
 test('net/firebase: game.html takes the session from the module, with no second copy', () => {
-  const html = fs.readFileSync('web/game.html', 'utf8');
+  const html = gameSource();
   assert.ok(html.includes('PG.net.createFirebase('));
   assert.ok(!html.includes('securetoken.googleapis.com'), 'token refresh only in src/net/firebase.js');
   assert.ok(!html.includes('accounts:${method}'), 'Identity Toolkit calls only in src/net/firebase.js');

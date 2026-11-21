@@ -1,0 +1,30 @@
+      <section class="screen scroll" id="scr-setup" hidden>
+        <div class="lb">
+          <div class="ltop"><button class="iconbtn" data-go="menu" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button><b id="setupTitle">Новая партия</b></div>
+          <div class="jig shero" id="jigSetup"><div class="mhero" id="setupHero" data-jp data-jc="#3fc27a" data-je="r:tab"><span class="mhi" id="shIcon" aria-hidden="true">🤖</span><div><b id="shTitle">Против компьютера</b><p id="shTag">Тренировка без интернета</p></div></div></div>
+          <button class="quickbig" id="setupQuick" hidden><i>⚡</i><span><b>Быстрая игра</b><small>Подключение к открытой игре</small></span></button>
+          <div class="h3 orown" id="setupOwn" hidden>Или своя игра</div>
+          <div class="h3">Сколько игроков</div>
+          <div class="seg" id="seg"><button>2</button><button>3</button><button>4</button><button>5</button></div>
+          <p class="shint" id="segHint" hidden></p>
+          <div class="col" id="setupBotLvlBox" hidden>
+            <div class="h3">Сложность ботов</div>
+            <div class="seg" id="setupBotLvl"><button data-blvl="easy">Лёгкие</button><button data-blvl="normal">Обычные</button><button data-blvl="hard">Сложные</button></div>
+            <p class="shint" id="setupBotLvlHint">Обычные — взвешенные ходы и захват подходящих объектов.</p>
+          </div>
+          <div class="col" id="setupLocBox" hidden style="display:none !important;">
+            <div class="h3">Локация стола</div>
+            <div class="seg" id="setupLoc"><button data-loc="village" class="on">🌳 Деревня</button><button data-loc="city">🏙️ Мегаполис</button><button data-loc="siberia">❄️ Сибирь</button><button data-loc="jungle">🌴 Джунгли</button></div>
+          </div>
+          <div class="col" id="seatsBox"><div class="h3">Игроки</div>
+            <ul class="plist" id="slist"></ul></div>
+          <div class="col" id="meBox" hidden><div class="h3">Ваше имя</div>
+            <div class="profline" id="setupName"></div>
+            <div class="h3">Ваш цвет</div>
+            <div class="mycolor" id="setupColor"></div></div>
+          <div class="h3">Правила партии</div>
+          <div class="rulesbox" data-rules></div>
+          <p class="shint" id="setupHint">Передавайте устройство перед каждым ходом.</p>
+        </div>
+        <div class="sfoot"><button class="cta wide" id="start">Начать партию</button></div>
+      </section>

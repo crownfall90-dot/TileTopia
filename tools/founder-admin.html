@@ -1507,6 +1507,9 @@ const USAGE_NAMES = {
   'btn:zin': 'Приблизить поле', 'btn:zout': 'Отдалить поле', 'btn:ctr': 'К центру поля', 'btn:turnL': 'Повернуть поле', 'btn:view': 'Наклон камеры 2D/3D', 'btn:gameMenu': 'Меню партии',
   'turn:slot': 'Место для плитки выбрано', 'turn:placed': 'Плитка поставлена вручную',
   'turn:rotate_locked': 'У плитки нет другого допустимого поворота', 'turn:hint': 'Подсказка нашла ход', 'turn:timeout': 'Время хода игрока истекло',
+  'match:start': 'Начата партия', 'match:result': 'Дошли до итогов партии', 'match:deck_end': 'Партия закончилась после последней плитки',
+  'match:mode_online': 'Старт: поиск соперников', 'match:mode_friends': 'Старт: комната для друзей',
+  'match:mode_bots': 'Старт: с ботами', 'match:mode_local': 'Старт: на одном устройстве',
   'btn:openGift': 'Ежедневный подарок', 'btn:itemsBtn': 'Мои предметы', 'btn:installBtn': 'Установка игры',
   'say:emote': 'Реакция: эмодзи', 'say:phrase': 'Реакция: фраза',
   'claim:quest': 'Награда за задание', 'claim:achievement': 'Награда за достижение', 'claim:weekly': 'Награда за недельную цель', 'claim:chest': 'Сундук недели',
@@ -1536,8 +1539,10 @@ async function loadUsage() {
     const table = list => `<table style="width:100%;border-collapse:collapse;font-size:13px"><tr style="text-align:left;color:var(--muted)"><th>Что</th><th>Игроков</th><th>Доля</th><th>Нажатий</th></tr>${list.map(r => `<tr style="border-top:1px solid var(--border)"><td style="padding:5px 4px">${r.name}${USAGE_NAMES[r.id] ? '' : ' <small style="color:var(--muted)">(не в списке)</small>'}</td><td>${r.users}</td><td>${bar(r.users, total)} ${Math.round(100 * r.users / total)}%</td><td>${r.taps}</td></tr>`).join('')}</table>`;
     const screens = rows.filter(r => r.id.startsWith('screen:'));
     const turns = rows.filter(r => r.id.startsWith('turn:'));
-    const buttons = rows.filter(r => !r.id.startsWith('screen:') && !r.id.startsWith('turn:'));
+    const matches = rows.filter(r => r.id.startsWith('match:'));
+    const buttons = rows.filter(r => !/^(screen|turn|match):/.test(r.id));
     box.innerHTML = `<p style="margin-bottom:10px">Активных игроков за период: <b style="color:var(--fg)">${total}</b>. «Доля» — какая часть из них хоть раз этим пользовалась.</p>`
+      + `<h4 style="margin:10px 0 4px">Старт и итоги партий</h4>${matches.length ? table(matches) : '<p>Нет данных за выбранный период.</p>'}`
       + `<h4 style="margin:10px 0 4px">Экраны</h4>${table(screens)}`
       + `<h4 style="margin:14px 0 4px">Ходы в партии</h4>${turns.length ? table(turns) : '<p>Нет данных за выбранный период.</p>'}`
       + `<h4 style="margin:14px 0 4px">Кнопки и функции — от самых нужных</h4>${table(buttons.slice(0, 40))}`

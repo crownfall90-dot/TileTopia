@@ -1,0 +1,228 @@
+/* ==================== Daily Shop Showcase ==================== */
+.daily-shop-card {
+  margin: 12px 0 16px;
+  background: linear-gradient(175deg, rgba(28, 38, 70, 0.95) 0%, rgba(13, 19, 38, 0.98) 100%);
+  border: 1.5px solid rgba(245, 192, 78, 0.35);
+  border-radius: 20px;
+  padding: 16px;
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.45), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+}
+
+.dsh-header {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  margin-bottom: 14px;
+  padding-bottom: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+}
+
+.dsh-badge {
+  display: inline-block;
+  transform: skewX(-10deg);
+  background: rgba(245, 192, 78, 0.18);
+  border: 1px solid rgba(245, 192, 78, 0.45);
+  color: #ffd875;
+  padding: 3px 10px;
+  border-radius: 10px;
+  font-size: 11px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 6px;
+}
+.dsh-badge span { transform: skewX(10deg); display: block; }
+
+.dsh-title-box h3 {
+  font-family: var(--f-display);
+  font-size: 19px;
+  font-weight: 800;
+  color: #fff;
+  margin: 0 0 2px;
+}
+
+.dsh-title-box p {
+  font-size: 12px;
+  color: #9bb0dc;
+  margin: 0;
+}
+
+.dsh-timer-box {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 12px;
+  background: rgba(255, 255, 255, 0.06);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  color: #ffd770;
+  font-size: 11.5px;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.daily-shop-grid {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 10px;
+}
+
+.dsh-tile-card {
+  position: relative;
+  transform: skewX(-6deg);
+  background: linear-gradient(165deg, rgba(32, 45, 82, 0.85) 0%, rgba(16, 23, 46, 0.95) 100%);
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  border-top: 1.5px solid rgba(255, 255, 255, 0.22);
+  border-radius: 16px;
+  padding: 12px 10px;
+  box-shadow: 0 6px 16px rgba(0, 0, 0, 0.35);
+  transition: transform .18s ease, box-shadow .18s ease, border-color .18s ease;
+}
+
+.dsh-tile-inner {
+  transform: skewX(6deg);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  height: 100%;
+}
+
+.dsh-top-row {
+  width: 100%;
+  display: flex;
+  justify-content: flex-start;
+  margin-bottom: 6px;
+}
+
+.dsh-tag {
+  font-size: 10px;
+  font-weight: 800;
+  text-transform: uppercase;
+  padding: 2px 7px;
+  border-radius: 6px;
+  letter-spacing: 0.3px;
+}
+.dsh-tag.k-fig { background: rgba(59, 130, 246, 0.2); color: #93c5fd; border: 1px solid rgba(59, 130, 246, 0.35); }
+.dsh-tag.k-frame { background: rgba(236, 72, 153, 0.2); color: #f472b6; border: 1px solid rgba(236, 72, 153, 0.35); }
+.dsh-tag.k-status { background: rgba(34, 197, 94, 0.2); color: #86efac; border: 1px solid rgba(34, 197, 94, 0.35); }
+
+.dsh-visual {
+  min-height: 64px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  margin-bottom: 6px;
+}
+
+.dsh-chip {
+  display: inline-block;
+  padding: 4px 10px;
+  border-radius: 8px;
+  background: rgba(245, 192, 78, 0.15);
+  border: 1px solid rgba(245, 192, 78, 0.4);
+  color: #ffd875;
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.dsh-info {
+  margin-bottom: 8px;
+}
+.dsh-name {
+  font-size: 13px;
+  font-weight: 800;
+  color: #fff;
+  display: block;
+}
+
+.dsh-action {
+  width: 100%;
+  margin-top: auto;
+}
+
+.dsh-btn {
+  width: 100%;
+  height: 34px;
+  border-radius: 10px;
+  border: 0;
+  cursor: pointer;
+  font: 700 12px var(--f-display);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  transition: transform .15s ease, filter .15s ease;
+}
+.dsh-btn.buy {
+  background: linear-gradient(135deg, #f5af19, #e08b10);
+  color: #241402;
+  box-shadow: 0 3px 0 #8c4e04;
+}
+.dsh-btn.buy.poor {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+.dsh-btn.select {
+  background: linear-gradient(135deg, #2563eb, #1d4ed8);
+  color: #fff;
+  box-shadow: 0 3px 0 #1e3a8a;
+}
+.dsh-btn.equipped {
+  background: rgba(255, 255, 255, 0.12);
+  color: #9bb0dc;
+  cursor: default;
+}
+
+/* ==================== Main Menu Top Rating Button ==================== */
+.rank-top-btn {
+  position: relative;
+  display: inline-flex !important;
+  align-items: center;
+  gap: 6px;
+  height: 36px;
+  padding: 0 12px;
+  border-radius: 12px;
+  transform: skewX(-10deg);
+  background: linear-gradient(165deg, #ffd770 0%, #f5af19 50%, #b86b04 100%);
+  color: #261502;
+  font: 800 12px var(--f-display);
+  border: 1px solid rgba(255, 255, 255, 0.4);
+  box-shadow: 0 4px 0 #7d4402, 0 6px 14px rgba(0, 0, 0, 0.4);
+  cursor: pointer;
+  transition: transform .15s ease, box-shadow .15s ease;
+  user-select: none;
+}
+.rank-top-btn span,
+.rank-top-btn svg {
+  transform: skewX(10deg);
+}
+.rank-top-btn:active {
+  transform: skewX(-10deg) translateY(2px);
+  box-shadow: 0 2px 0 #7d4402;
+}
+
+/* ==================== Leaderboard Status & Frame Enhancements ==================== */
+.st-rank-badge {
+  display: inline-block;
+  padding: 2px 8px;
+  border-radius: 6px;
+  background: rgba(245, 192, 78, 0.16);
+  border: 1px solid rgba(245, 192, 78, 0.35);
+  color: #ffd875;
+  font-size: 11px;
+  font-weight: 700;
+  margin: 3px 0;
+  white-space: nowrap;
+}
+.lead .st-rank-badge {
+  font-size: 10.5px;
+  padding: 1.5px 6px;
+  margin-left: 6px;
+}
+.lead .av.fr,
+.pod .av.fr {
+  box-shadow: 0 0 0 2.5px transparent, 0 0 10px rgba(0,0,0,0.5);
+  background-origin: border-box;
+}

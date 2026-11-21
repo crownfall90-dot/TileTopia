@@ -1,0 +1,1035 @@
+/* =====================================================================================================
+   Minimal pass («тихий стол»): one surface, one hairline, one gold call to action per screen. No skew, no double
+   shadows, no glows; the board is the brightest thing on the game screen. Everything here only overrides looks
+   (colour, border, shadow, transform), never layout or behaviour. Tokens: */
+:root{--m-surface:rgba(255,255,255,.045);--m-surface-2:rgba(255,255,255,.075);--m-line:rgba(226,232,255,.09);--m-r:16px;--m-gold:#f2b84b}
+
+/* main menu: flat action row, quiet cards, a calm bottom bar */
+html body .tile-btn,html body .tile-btn .btn-tilt-inner{transform:none}
+html body .tile-btn{border-radius:var(--m-r);transition:transform .15s ease,background .15s ease}
+@media (hover: hover){
+html body .tile-btn:hover{transform:none;filter:none}
+
+}
+html body .tile-btn:active{transform:scale(.97)}
+html body .tile-btn.tile-quest,html body .tile-btn.tile-mode{background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none;color:var(--ink)}
+@media (hover: hover){
+html body .tile-btn.tile-quest:hover,html body .tile-btn.tile-mode:hover{background:var(--m-surface-2);box-shadow:none}
+
+}
+html body .tile-btn.tile-play{background:linear-gradient(180deg,#f6c565,#eeae3c);border:0;box-shadow:0 8px 22px rgba(242,184,75,.22);color:var(--brass-ink)}
+@media (hover: hover){
+html body .tile-btn.tile-play:hover{box-shadow:0 8px 22px rgba(242,184,75,.28)}
+
+}
+html body .menu-rating-card,html body .menu-gift-pill,html body .resume{background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none;backdrop-filter:none}
+html body .menu-gift-pill{border-color:rgba(242,184,75,.32)}
+html body .menu-gift-pill *,html body .menu-rating-card *{text-shadow:none}
+html body .mtop-rank-btn,html body .menu-hub-btn,html body #mprof{background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none}
+html body .mhub-tilt{transform:none}
+html body .logo{text-shadow:none;filter:none}
+html body .bnav{filter:none;gap:3px;padding:5px;border-radius:20px;background:rgba(12,17,32,.92);border:1px solid var(--m-line);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);box-shadow:0 -4px 20px rgba(0,0,0,.4)}
+html body .bnav button{transform:none;background:transparent;border:1px solid transparent;box-shadow:none;border-radius:15px;color:var(--muted);transition:background .22s cubic-bezier(.2,.9,.3,1),color .22s cubic-bezier(.2,.9,.3,1),border-color .22s cubic-bezier(.2,.9,.3,1),box-shadow .22s cubic-bezier(.2,.9,.3,1)}
+html body .bnav button svg{transition:transform .24s cubic-bezier(.34,1.56,.64,1),color .22s ease,filter .22s ease}
+html body .bnav button span{transform:none}
+@media (hover: hover){
+html body .bnav button:hover{transform:none;box-shadow:none;background:var(--m-surface);color:var(--ink)}
+
+}
+html body .bnav button:active{transform:scale(.95);box-shadow:none}
+html body .bnav button.on{background:rgba(242,184,75,.16);border:1px solid rgba(242,184,75,.38);box-shadow:0 0 16px rgba(242,184,75,.2),inset 0 1px 0 rgba(255,255,255,.12);color:var(--m-gold)}
+@keyframes bnavPop{0%{transform:scale(.9)}50%{transform:scale(1.22)}75%{transform:scale(1.08)}100%{transform:scale(1.14)}}
+html body .bnav button.on svg{color:var(--m-gold);transform:scale(1.14);filter:drop-shadow(0 2px 8px rgba(242,184,75,.5));animation:bnavPop .28s cubic-bezier(.34,1.56,.64,1)}
+
+/* cards and headers on the other screens */
+html body .ocard{box-shadow:0 18px 48px rgba(0,0,0,.5)}
+html body .ltop .iconbtn,html body .gtop .iconbtn{background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none}
+
+/* game screen: the board first — a calm night table, the tools in one quiet column, flat player chips */
+html body #scr-game{background-image:none;background-color:#0f1626}
+html body .board{background:radial-gradient(75% 60% at 50% 46%,#1c2944 0%,#121b2f 62%,#0e1524 100%)}
+html body .village-backdrop{display:none}
+html body .relic-name{display:none}
+html body .fabs{gap:2px;padding:4px;border-radius:18px;background:rgba(12,17,32,.72);border:1px solid var(--m-line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+html body .fabs .fab{background:transparent;border:0;box-shadow:none;color:var(--muted);border-radius:13px}
+@media (hover: hover){
+html body .fabs .fab:hover{background:var(--m-surface-2);color:var(--ink)}
+
+}
+html body .fabs .fab:active{transform:scale(.94)}
+.board:focus-visible{outline:2px solid var(--brass);outline-offset:-2px}
+@media (pointer:coarse) and (min-height:560px){html body .fabs .fab{width:44px;height:44px}}
+@media (prefers-reduced-motion:no-preference){.board .slot{transition:background-color .14s ease,border-color .14s ease,box-shadow .14s ease}}
+html body .pl{background:var(--m-surface);border:1px solid transparent;box-shadow:none}
+html body .pl.active{background:rgba(242,184,75,.1);border:1.5px solid var(--m-gold);box-shadow:none}
+html body .deck{background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none}
+html body .tray{background:linear-gradient(180deg,rgba(15,22,38,0),#0f1626 32%);border-top:0}
+html body #status{background:transparent;border-color:transparent;color:var(--muted)}
+html body #rot{background:var(--m-surface);border:1px solid var(--m-line)}
+/* the free spots for a move: a light outline in the player's colour, a faint tint, a small plus */
+html body .slot{border-width:1.5px;background:rgba(255,255,255,.03)}
+html body .slot::before{opacity:.1}
+html body .slot::after{width:16px;height:16px;opacity:.75}
+/* the stack counter: a quiet chip like the rest of the top bar */
+html body .deck{background:var(--m-surface)}
+/* no parallelograms: cards, badges and buttons stand straight (and their contents need no counter-skew) */
+html body .dsh-badge,html body .dsh-badge span,html body .dsh-tile-card,html body .dsh-tile-inner,
+html body .rank-top-btn,html body .rank-top-btn svg,html body .menu-hub-btn,html body .menu-hub-btn .mhub-tilt,
+html body .tile-lead-card,html body .tile-lead-card .av,html body .tile-lead-card .lead-cups-badge,html body .tile-lead-card .lead-player-info,
+html body .tile-lead-card .rank-num,html body .tile-lead-card .st-rank-badge,html body .pod,html body .pod > *,
+html body .pim-card,html body .pim-card > *,html body #scr-shop .gift,html body #scr-shop .gift > *,
+html body #scr-shop .stcustom,html body #scr-shop .stcustom > *,html body #scr-shop .loc,html body #scr-shop .loc > *{transform:none}
+@media (hover: hover){
+html body .dsh-tile-card:hover,html body .tile-lead-card:hover,html body .pod:hover,html body .pim-card:hover,html body .menu-hub-btn:hover,html body .rank-top-btn:hover{transform:translateY(-1px)}
+
+}
+html body .dsh-tile-card:active,html body .tile-lead-card:active,html body .pim-card:active,html body .rank-top-btn:active{transform:scale(.98)}
+html body .dsh-tile-card,html body .pim-card,html body #scr-shop .gift{box-shadow:none;border:1px solid var(--m-line);background:var(--m-surface)}
+html body .dsh-tile-card .dsh-price,html body .dsh-tile-card button{box-shadow:none}
+html body .dsh-btn{box-shadow:none;border:0;border-radius:12px}
+html body .dsh-btn.buy{background:rgba(242,184,75,.16);color:var(--m-gold)}
+html body .dsh-btn.buy.poor{background:var(--m-surface);color:var(--muted)}
+/* main menu header: the nickname gets the room — the menu is a ⋯ icon, cups and gold sit on the level line */
+html body .mtop{gap:8px}
+html body .mtop-right-group{gap:6px;flex:0 0 auto}
+html body #btnMenuHub{width:40px;min-width:40px;height:40px;padding:0;justify-content:center}
+html body #btnMenuHub .mhub-tilt{display:flex;align-items:center;justify-content:center;gap:0}
+html body #btnMenuHub .mhub-tilt > span{display:none}
+html body .mprof{flex:1 1 auto;max-width:none;min-width:0;padding-right:16px}
+html body .mprof .mpi{flex:1 1 auto;min-width:0}
+html body .mprof .mpi b{font-size:clamp(12px,3.6vw,15px);overflow:visible;text-overflow:clip}
+html body .mprof .mpl{gap:8px;flex-wrap:nowrap}
+html body .mprof .mxp{width:28px;flex:0 0 28px}
+html body .mprof .mpl .mpc,html body .mprof .mpl .mpg{font-size:11.5px}
+html body .mprof .mpi b{overflow:hidden;white-space:nowrap}
+
+/* quests: the daily swap button; achievements: the medal of their tier */
+html body .quest .qre{flex:0 0 auto;width:30px;height:30px;border-radius:10px;border:1px solid var(--m-line);background:var(--m-surface);color:var(--muted);font:700 15px var(--f-body);cursor:pointer}
+@media (hover: hover){
+html body .quest .qre:hover{color:var(--ink);background:var(--m-surface-2)}
+
+}
+html body .quest[class*="tier-"] .qi{position:relative}
+html body .quest[class*="tier-"] .qi::after{content:"";position:absolute;right:-3px;bottom:-3px;width:11px;height:11px;border-radius:50%;border:1.5px solid #0f1626}
+html body .quest.tier-bronze .qi::after{background:linear-gradient(135deg,#f0b48a,#b06a3b)}
+html body .quest.tier-silver .qi::after{background:linear-gradient(135deg,#ffffff,#a9b4c6)}
+html body .quest.tier-gold .qi::after{background:linear-gradient(135deg,#fff1b8,#e0a52f)}
+
+/* daily showcase: emoji cards and the «all bought» note */
+html body .dsh-emote{display:block;font-size:40px;line-height:1.15;text-align:center}
+html body .dsh-tag.k-emote{background:rgba(242,184,75,.16);color:var(--m-gold)}
+html body .dsh-tile-card.k-emote.r-rare{border-color:rgba(76,141,255,.5)}
+html body .dsh-tile-card.k-emote.r-epic{border-color:rgba(176,108,240,.6)}
+html body .dsh-empty{padding:18px 14px;border-radius:14px;text-align:center;color:var(--muted);background:var(--m-surface);border:1px dashed var(--m-line)}
+
+/* profile: the card stacks (who → level → chips → account), wherever it is shown; quiet entry cards */
+html body #profile{display:flex;flex-direction:column;align-items:stretch;gap:12px;text-align:left;background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none}
+html body #profile .pctop{min-width:0}
+html body #profile .pwho small{white-space:nowrap;overflow:hidden;text-overflow:ellipsis;word-break:normal}
+html body #profile .pclvl .pi{min-width:0}
+html body #profile .pclvl small{display:block;white-space:normal}
+html body #scr-profile .tutcard.itemsentry,html body #scr-profile .tutcard.historyentry{background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none;color:var(--ink)}
+html body #scr-profile .tutcard.historyentry b,html body #scr-profile .tutcard.historyentry small,html body #scr-profile .tutcard.historyentry .tgo{color:inherit}
+html body #scr-profile .tutcard.historyentry small{color:var(--muted)}
+html body #scr-profile .pstats{background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none}
+
+/* no relics, bonuses or scout on the map */
+html body .fog-relic,html body .scout-radar-wave{display:none!important}
+
+/* ===== main screen header: plate (who, level, experience), trophies and gold under it, the menu pops out under its button ===== */
+html body .mtop{align-items:flex-start;gap:10px}
+html body .mleft{display:flex;flex-direction:column;gap:8px;min-width:0;flex:1 1 auto}
+html body .mprof{display:flex;align-items:center;gap:11px;width:100%;max-width:none;height:auto;min-height:56px;padding:7px 14px 7px 7px;border-radius:18px;text-align:left}
+html body .mprof .av{flex:0 0 auto;width:42px;height:42px;font-size:18px}
+html body .mprof .mpi{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:3px}
+html body .mprof .mpi b{font:800 clamp(13px,3.8vw,16px)/1.1 var(--f-display);color:#fff}
+html body .mprof .mpl{display:flex;align-items:baseline;justify-content:space-between;gap:8px;white-space:nowrap}
+html body .mprof .mpl em{font:700 11.5px var(--f-body);font-style:normal;color:var(--m-gold)}
+html body .mprof .mpl small{font:600 11px var(--f-body);color:var(--muted);font-variant-numeric:tabular-nums}
+html body .mprof .mxp{display:block;width:100%;height:6px;border-radius:4px;background:rgba(255,255,255,.1);overflow:hidden}
+html body .mprof .mxp i{display:block;height:100%;border-radius:inherit;background:linear-gradient(90deg,#f6c565,#f2b84b)}
+html body .mstat{display:flex;gap:6px;padding-left:2px}
+html body .mstat button{display:flex;align-items:center;gap:5px;height:30px;padding:0 11px;border-radius:999px;background:var(--m-surface);border:1px solid var(--m-line);color:var(--ink);font:700 13px var(--f-body);cursor:pointer;font-variant-numeric:tabular-nums}
+html body .mstat button small{color:var(--muted);font:600 11px var(--f-body)}
+html body .mstat button i{color:var(--muted);font-style:normal;margin-left:1px}
+html body .mstat button .coin{width:14px;height:14px;margin:0}
+@media (hover: hover){
+html body .mstat button:hover{background:var(--m-surface-2)}
+
+}
+html body .mstat button:active{transform:scale(.97)}
+html body .mhub-wrap{position:relative}
+html body .mhub-pop{position:absolute;right:0;top:calc(100% + 8px);z-index:30;min-width:210px;padding:6px;border-radius:16px;background:rgba(14,20,38,.97);border:1px solid var(--m-line);box-shadow:0 14px 36px rgba(0,0,0,.5);display:flex;flex-direction:column;gap:2px;opacity:0;transform:translateY(-6px) scale(.98);transform-origin:top right;transition:opacity .15s ease,transform .15s ease;pointer-events:none}
+html body .mhub-pop.open{opacity:1;transform:none;pointer-events:auto}
+html body .mhub-pop[hidden]{display:none}
+html body .mhub-pop button{display:flex;align-items:center;gap:10px;width:100%;padding:10px 12px;border-radius:11px;background:transparent;border:0;color:var(--ink);font:600 14px var(--f-body);text-align:left;cursor:pointer}
+html body .mhub-pop button:focus-visible{background:var(--m-surface-2);outline:none}
+@media (hover: hover){
+html body .mhub-pop button:hover{background:var(--m-surface-2);outline:none}
+
+}
+html body .mhub-pop button span{width:22px;text-align:center}
+html body .mhub-pop button b{flex:1;font-weight:600}
+html body .mhub-pop button i{font-style:normal;color:var(--muted);font-size:12.5px;font-variant-numeric:tabular-nums}
+
+/* ===== progress road: its own tab, vertical ===== */
+html body .rd-head{display:flex;align-items:center;gap:14px;padding:14px;border-radius:18px;background:var(--m-surface);border:1px solid var(--m-line)}
+html body .rd-lvl{flex:0 0 auto;width:62px;height:62px;border-radius:50%;display:grid;place-content:center;text-align:center;border:3px solid var(--m-gold)}
+html body .rd-lvl b{font:800 24px/1 var(--f-display)}
+html body .rd-lvl small{font:600 9.5px var(--f-body);color:var(--muted);text-transform:uppercase;letter-spacing:.06em}
+html body .rd-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:6px}
+html body .rd-info > b{font:800 15px var(--f-display)}
+html body .rd-info small{color:var(--muted);font-size:12px}
+html body .rd-next{margin:12px 2px 6px;color:var(--muted);font-size:13px}
+html body .rd-next b{color:var(--ink)}
+/* the map */
+html body .rd-map{position:relative;margin:6px -2px 0;border-radius:20px;overflow:hidden;border:1px solid var(--m-line);
+  background:radial-gradient(60px 50px at 20% 12%,rgba(40,90,25,.2),transparent 70%),radial-gradient(80px 60px at 78% 38%,rgba(200,230,120,.16),transparent 70%),radial-gradient(70px 60px at 30% 70%,rgba(40,90,25,.18),transparent 70%),radial-gradient(90px 70px at 74% 88%,rgba(200,230,120,.14),transparent 70%),linear-gradient(160deg,#80be56,#62a242)}
+html body .rd-svg{position:absolute;inset:0;width:100%;height:100%;display:block}
+html body .rd-spr{position:absolute;background-size:100% 100%;background-repeat:no-repeat;transform:translate(-50%,-100%);pointer-events:none}
+html body .rd-bridge{position:absolute;width:64px;height:26px;transform:translate(-50%,-50%) rotate(var(--a,0deg));border-radius:4px;background:repeating-linear-gradient(90deg,#a06a3a 0 5px,#7d4f28 5px 6px);border:2px solid #4b2f18;box-shadow:0 3px 6px rgba(0,0,0,.35);pointer-events:none}
+html body .rd-bridge::before,html body .rd-bridge::after{content:"";position:absolute;left:-2px;right:-2px;height:4px;background:#5a3a20;border-radius:2px}
+html body .rd-bridge::before{top:-5px}
+html body .rd-bridge::after{bottom:-5px}
+html body .rd-n{position:absolute;transform:translate(-50%,-50%);display:flex;flex-direction:column;align-items:center;gap:4px;width:160px;pointer-events:none}
+html body .rd-n > *{pointer-events:auto}
+html body .rd-sign{position:absolute;bottom:calc(100% - 6px);left:50%;transform:translateX(-50%);width:max-content;max-width:158px;padding:5px 9px;border-radius:10px;text-align:center;background:rgba(14,20,38,.9);border:1px solid var(--m-line);box-shadow:0 4px 10px rgba(0,0,0,.3);pointer-events:none}
+html body .rd-sign b{display:block;font:700 12.5px/1.2 var(--f-body);color:var(--ink)}
+html body .rd-sign small{display:block;font:500 10.5px/1.25 var(--f-body);color:var(--muted)}
+html body .rd-med{position:relative;width:58px;height:58px;border-radius:50%;display:grid;place-items:center;font-size:25px;background:radial-gradient(circle at 35% 30%,#fff6d8,#e7d3a0 60%,#bda673);border:4px solid #7a5c32;box-shadow:0 5px 10px rgba(0,0,0,.4),inset 0 -3px 0 rgba(0,0,0,.12)}
+html body .rd-med em{position:absolute;top:-8px;left:-8px;min-width:22px;height:22px;padding:0 5px;border-radius:11px;display:grid;place-items:center;font:800 12px var(--f-display);font-style:normal;background:#0f1626;color:#fff;border:2px solid #f2b84b}
+html body .rd-n.locked .rd-med{filter:grayscale(.85) brightness(.85);opacity:.9}
+html body .rd-n.claimed .rd-med{background:radial-gradient(circle at 35% 30%,#fff1b8,#f2c14e 60%,#c8901f);border-color:#8f5807;font-size:23px;font-weight:800;color:#3a2403}
+html body .rd-n.unlocked .rd-med{border-color:#f2b84b;box-shadow:0 0 0 5px rgba(242,184,75,.35),0 5px 10px rgba(0,0,0,.4)}
+html body .rd-n .rd-tag{padding:2px 9px;border-radius:999px;background:rgba(14,20,38,.82);color:var(--muted);font:600 11px var(--f-body);white-space:nowrap}
+html body .rd-n.claimed .rd-tag{color:#9fe3b4}
+html body .rd-n .chip{box-shadow:0 3px 8px rgba(0,0,0,.35)}
+@media (prefers-reduced-motion:no-preference){html body .rd-n.unlocked .rd-med{animation:rdpulse 1.8s ease-in-out infinite}@keyframes rdpulse{50%{box-shadow:0 0 0 9px rgba(242,184,75,.16),0 5px 10px rgba(0,0,0,.4)}}}
+
+/* header fixes: the experience bar is a thin line, the menu list does not wrap */
+html body .mprof .mxp{flex:0 0 auto;height:5px}
+html body .mhub-pop{min-width:232px}
+html body .mhub-pop button b{white-space:nowrap}
+
+/* ===== notifications and rewards: smaller, quieter ===== */
+/* toasts: a small straight chip under the top bar, one line of text, no skew or heavy shadow */
+html body .tile-toast,html body .note{transform:none;transform-origin:top right;top:max(58px,calc(env(safe-area-inset-top,0px) + 52px));right:12px;min-width:0;max-width:min(260px,calc(100vw - 24px));padding:6px 10px;gap:7px;border-radius:12px;background:rgba(14,20,38,.94);border:1px solid var(--m-line);box-shadow:0 6px 18px rgba(0,0,0,.35);backdrop-filter:blur(8px);-webkit-backdrop-filter:blur(8px)}
+html body .tile-toast .tt-body,html body .tile-toast .tt-icon,html body .tile-toast .tt-title,html body .tile-toast .tt-msg,html body .tile-toast .tt-close,html body .note i,html body .note span{transform:none}
+html body .tile-toast .tt-title{font-size:10px;letter-spacing:.06em;opacity:.7}
+html body .tile-toast .tt-msg,html body .note span{font:600 12.5px/1.25 var(--f-body)}
+html body .tile-toast .tt-icon,html body .note i{width:22px;height:22px;font-size:12px;border-radius:7px;box-shadow:none}
+html body .tile-toast.ok .tt-icon,html body .note.ok i{background:rgba(63,194,122,.2);color:#6fe0a2}
+/* the inbox: compact rows instead of big cards */
+html body .notif-card{padding:10px 12px 10px 14px;border-radius:14px;gap:6px;background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none}
+html body .notif-card::before{width:3px}
+html body .nc-icon{font-size:18px;width:30px;height:30px}
+html body .nc-title{font-size:13.5px;line-height:1.25}
+html body .nc-badge{font-size:9.5px;padding:1px 6px}
+html body .nc-date{font-size:10.5px}
+html body .nc-desc{font-size:12px;line-height:1.35;color:var(--muted);display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+html body .nc-reward-pill{font-size:11.5px;padding:2px 8px}
+html body .nc-claim-btn{padding:7px 12px;font-size:12.5px;border-radius:11px;box-shadow:none}
+html body .nc-claim-btn.pri{background:var(--m-gold);color:var(--brass-ink)}
+html body .nc-actions{gap:6px}
+/* toasts sit above the bottom bar, out of the way of the header */
+/* toasts sit at top right under the header, never stretch full screen */
+html body .tile-toast,html body .note,#note{position:fixed!important;bottom:auto!important;height:auto!important;max-height:120px!important;right:12px!important;left:auto!important;z-index:99999!important;padding:7px 12px!important;border-radius:12px!important;box-sizing:border-box!important}
+
+/* the consent line under the sign-up buttons */
+html body .legal{display:block;margin:2px 0 10px;color:var(--muted);font:500 11px/1.4 var(--f-body);text-align:center}
+html body .legal a{color:#8db4ff;text-decoration:underline;word-break:normal}
+.mgrid .mcard:last-child:nth-child(odd){grid-column:1/-1}
+
+/* the consent window: the short reason first, the exact list one tap away */
+html body .ocard details.more{margin:2px 0 12px;text-align:left}
+html body .ocard details.more summary{cursor:pointer;color:#8db4ff;font:600 13px var(--f-body);text-align:center;list-style:none}
+html body .ocard details.more p{margin:8px 0 0;font-size:12.5px;line-height:1.45;color:var(--muted)}
+html body .ocard details.more a{color:#8db4ff}
+
+/* ---- Classic 2.0: six-sided tiles (rules.mode 'hex', html.hexg while such a game is on). A tile is 101.6 x 88 px
+   (corner to corner x side to side, T = 88); the face is clipped to the hexagon, six walls hang from its sides. ---- */
+.tile.hex{width:101.61px;height:88px}
+.tile.hex .face{inset:0;border-radius:0;box-shadow:none;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)}
+.tile.hex .sd{position:absolute;height:14px;transform-origin:0 0;background:linear-gradient(#efdcb3 0,#d9c398 38%,#b39a72 60%,#8a5a33 63%,#6f4426 100%)}
+.tile.hex .sd.h0,.tile.hex .sd.h1,.tile.hex .sd.h5{filter:brightness(1.12)}
+.tile.hex .sd.h2,.tile.hex .sd.h4{filter:brightness(.9)}
+.tile.hex .sd.fall::before{left:calc(50% - 6.5px);width:13px;top:0;bottom:0;right:auto;height:auto}
+.tile.hex .sd.fall::after{left:calc(50% - 11px);width:22px;bottom:-4px;height:8px;top:auto;right:auto}
+html.lowgfx .tile.hex .sd.h0,html.lowgfx .tile.hex .sd.h1,html.lowgfx .tile.hex .sd.h5{display:none}
+.tile.hex.ghost .face,.tile.hex.peek .face{box-shadow:none}
+.tile.hex.ghost::before,.tile.hex.peek::before{content:"";position:absolute;inset:-4px -4.6px;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);background:var(--pc,var(--brass));opacity:.85}
+.tile.hex.glow .face{box-shadow:none;filter:brightness(1.3) saturate(1.15) drop-shadow(0 0 6px #ffe08a)}
+.slot.hex{width:101.61px;border:none;border-radius:0;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);background:color-mix(in srgb,var(--pc,#f2b84b) 22%,rgba(0,0,0,.2))}
+.slot.hex::before{inset:4px;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%);border-radius:0;opacity:.18}
+.slot.hex.tip{border:none;background:rgba(255,215,94,.4)}
+html.hexg .ct{width:84px;height:73px;border-radius:0;box-shadow:none;filter:drop-shadow(0 0 2px var(--c,transparent)) drop-shadow(0 10px 8px rgba(0,0,0,.5))}
+html.hexg .ct .face{border-radius:0;box-shadow:none;clip-path:polygon(25% 0,75% 0,100% 50%,75% 100%,25% 100%,0 50%)}
+html.hexg .ct::after{display:none}
+/* the rendered cards: a slow glint over the water of river cards (masked to the water, see art.js hexWaterMask);
+   it stops with the rest of the board's motion (calm, dragging) and on economy graphics */
+.tile.hex .face[class*="t-hW"]::after{content:"";position:absolute;inset:0;-webkit-mask-size:100% 100%;mask-size:100% 100%;background:linear-gradient(115deg,transparent 38%,rgba(255,255,255,.5) 50%,transparent 62%) 0 0/260% 100%;pointer-events:none;animation:lakeFlow 4.2s steps(42) infinite}
+html.calm .tile.hex .face[class*="t-hW"]::after,.board.dragging .tile.hex .face[class*="t-hW"]::after{animation-play-state:paused}
+html.lowgfx .tile.hex .face[class*="t-hW"]::after{display:none}
+.mcard[data-setmode="hex"] i{font-size:0;width:38px;height:33px;background:url(hex/hC2r.webp) center/contain no-repeat}
+html.hexg .hitem .rimg{background-size:contain;background-repeat:no-repeat;border-radius:0;box-shadow:none;filter:drop-shadow(0 4px 6px rgba(0,0,0,.4))}
+
+/* ==================== Top Menu Header Parallel Alignment ==================== */
+html body .mtop {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  gap: 10px !important;
+  padding: 10px 14px 0 !important;
+}
+
+html body .mleft {
+  display: flex !important;
+  flex-direction: column !important;
+  gap: 8px !important;
+  min-width: 0 !important;
+  flex: 1 1 auto !important;
+}
+
+html body .mprof {
+  display: flex !important;
+  align-items: center !important;
+  gap: 11px !important;
+  width: 100% !important;
+  height: 56px !important;
+  min-height: 56px !important;
+  box-sizing: border-box !important;
+  padding: 7px 14px 7px 7px !important;
+  border-radius: 18px !important;
+  background: var(--m-surface) !important;
+  border: 1px solid var(--m-line) !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3) !important;
+}
+
+html body .mtop-right-group {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  height: 56px !important;
+  flex: 0 0 auto !important;
+}
+
+html body #btnMenuNotif,
+html body #btnMenuHub {
+  width: 56px !important;
+  min-width: 56px !important;
+  height: 56px !important;
+  min-height: 56px !important;
+  border-radius: 18px !important;
+  background: var(--m-surface) !important;
+  border: 1px solid var(--m-line) !important;
+  box-sizing: border-box !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  padding: 0 !important;
+  color: var(--ink) !important;
+  cursor: pointer !important;
+  box-shadow: 0 8px 24px rgba(0,0,0,0.3) !important;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease !important;
+}
+
+@media (hover: hover){
+html body #btnMenuNotif:hover,
+html body #btnMenuHub:hover {
+  background: var(--m-surface-2) !important;
+  border-color: rgba(242, 184, 75, 0.45) !important;
+  transform: translateY(-1px) !important;
+  box-shadow: 0 10px 28px rgba(0,0,0,0.4) !important;
+}
+
+}
+
+html body #btnMenuNotif:active,
+html body #btnMenuHub:active {
+  transform: scale(0.95) !important;
+}
+
+html body #btnMenuHub .mhub-tilt {
+  display: flex !important;
+  align-items: center !important;
+  justify-content: center !important;
+  transform: none !important;
+}
+
+html body #btnMenuHub .mhub-tilt svg,
+html body #btnMenuNotif .nb-icon svg {
+  width: 22px !important;
+  height: 22px !important;
+}
+
+/* ==================== Dedicated Achievements Screen ==================== */
+.ach-header-card {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 16px;
+  border-radius: 18px;
+  background: linear-gradient(135deg, rgba(38, 52, 92, 0.95) 0%, rgba(18, 25, 48, 0.95) 100%);
+  border: 1.5px solid rgba(255, 216, 117, 0.35);
+  box-shadow: 0 10px 28px rgba(0, 0, 0, 0.4), inset 0 1px 0 rgba(255, 255, 255, 0.15);
+  margin-bottom: 14px;
+}
+.ach-header-left {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+}
+.ach-trophy-icon {
+  font-size: 32px;
+  filter: drop-shadow(0 4px 10px rgba(242, 184, 75, 0.4));
+}
+.ach-header-card h3 {
+  margin: 0 0 4px;
+  font: 800 16px/1.2 var(--f-display);
+  color: #fff;
+}
+.ach-header-card p {
+  margin: 0;
+  font: 500 12.5px/1.3 var(--f-body);
+  color: var(--muted);
+}
+.ach-ready-notice {
+  color: #7fe0a8;
+}
+.ach-list {
+  display: flex;
+  flex-direction: column;
+  gap: 9px;
+  margin-bottom: 24px;
+}
+.ach-card {
+  position: relative;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: var(--m-surface);
+  border: 1px solid var(--m-line);
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+.ach-card.ready-glow {
+  border-color: rgba(242, 184, 75, 0.6);
+  background: linear-gradient(135deg, rgba(242, 184, 75, 0.12), rgba(18, 25, 48, 0.9));
+  box-shadow: 0 6px 20px rgba(242, 184, 75, 0.18);
+  animation: achPulse 2s infinite ease-in-out;
+}
+@keyframes achPulse {
+  0%, 100% { box-shadow: 0 4px 16px rgba(242, 184, 75, 0.15); }
+  50% { box-shadow: 0 6px 24px rgba(242, 184, 75, 0.35); }
+}
+.ach-card.got {
+  opacity: 0.65;
+}
+.ach-row-head {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 3px;
+}
+.ach-row-head b {
+  font: 700 13.5px var(--f-display);
+  color: #fff;
+}
+.ach-tier-tag {
+  font: 800 10px var(--f-body);
+  padding: 1px 6px;
+  border-radius: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+}
+.ach-tier-tag.tier-1 { background: rgba(205, 127, 50, 0.25); color: #e59866; border: 1px solid rgba(205, 127, 50, 0.4); }
+.ach-tier-tag.tier-2 { background: rgba(192, 192, 192, 0.25); color: #eaeded; border: 1px solid rgba(192, 192, 192, 0.4); }
+.ach-tier-tag.tier-3 { background: rgba(242, 184, 75, 0.25); color: #ffd877; border: 1px solid rgba(242, 184, 75, 0.5); }
+.ach-tier-tag.tier-4 { background: rgba(162, 155, 254, 0.25); color: #dcdde1; border: 1px solid rgba(162, 155, 254, 0.5); }
+.ach-desc {
+  display: block;
+  font: 500 11.5px/1.3 var(--f-body);
+  color: var(--muted);
+  margin-bottom: 4px;
+}
+.ach-reward-val {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  font: 700 11px var(--f-body);
+  color: #ffd877;
+}
+.ach-claim-btn {
+  font-weight: 800 !important;
+  animation: pulseClaim 1.5s infinite;
+}
+@keyframes pulseClaim {
+  0%, 100% { transform: scale(1); }
+  50% { transform: scale(1.04); }
+}
+/* narrow phones: the text keeps the whole row, the claim button goes under it at full width (44 px to tap) */
+@media (max-width: 440px) {
+  .ach-card { flex-wrap: wrap; }
+  .ach-qt { min-width: 0; }
+  .ach-action-wrap { flex: 1 0 100%; display: flex; }
+  .ach-action-wrap .ach-claim-btn, .ach-action-wrap .pill { flex: 1; min-height: 44px; display: flex; align-items: center; justify-content: center; text-align: center; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .ach-claim-btn, .ach-card.ready-glow { animation: none; }
+}
+
+/* ==================== Shop Stalls (Прилавки Витрины) ==================== */
+.shop-stalls-container {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+  margin: 18px 0 24px;
+}
+
+.shop-stall {
+  position: relative;
+  border-radius: 20px;
+  background: linear-gradient(180deg, #2b1d12 0%, #1a110a 100%);
+  border: 1.5px solid #5a3c20;
+  box-shadow: 0 12px 32px rgba(0,0,0,0.5), inset 0 2px 0 rgba(255, 200, 120, 0.15);
+  overflow: hidden;
+}
+
+.stall-canopy {
+  position: relative;
+  background: linear-gradient(180deg, #422a18 0%, #2e1c10 100%);
+  border-bottom: 2px solid #6b4522;
+  padding: 12px 14px 10px;
+}
+
+.stall-canopy-stripe {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 5px;
+  background: repeating-linear-gradient(90deg, #c0392b 0 18px, #ecf0f1 18px 36px);
+}
+
+.stall-figures .stall-canopy-stripe {
+  background: repeating-linear-gradient(90deg, #e67e22 0 18px, #f1c40f 18px 36px);
+}
+.stall-frames .stall-canopy-stripe {
+  background: repeating-linear-gradient(90deg, #8e44ad 0 18px, #3498db 18px 36px);
+}
+.stall-statuses .stall-canopy-stripe {
+  background: repeating-linear-gradient(90deg, #27ae60 0 18px, #2ecc71 18px 36px);
+}
+.stall-emotes .stall-canopy-stripe {
+  background: repeating-linear-gradient(90deg, #d35400 0 18px, #f39c12 18px 36px);
+}
+.stall-phrases .stall-canopy-stripe {
+  background: repeating-linear-gradient(90deg, #2980b9 0 18px, #1abc9c 18px 36px);
+}
+
+.stall-signboard {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-top: 4px;
+}
+
+.stall-icon {
+  font-size: 26px;
+  filter: drop-shadow(0 2px 6px rgba(0,0,0,0.5));
+}
+
+.stall-titles {
+  flex: 1;
+  min-width: 0;
+}
+
+.stall-title {
+  margin: 0 0 2px;
+  font: 800 15px/1.2 var(--f-display);
+  color: #fff3d1;
+  text-shadow: 0 2px 4px rgba(0,0,0,0.6);
+}
+
+.stall-sub {
+  margin: 0;
+  font: 500 11.5px/1.3 var(--f-body);
+  color: #d1b490;
+}
+
+.stall-badge {
+  font: 700 10.5px var(--f-body);
+  color: #ffd877;
+  padding: 3px 8px;
+  border-radius: 999px;
+  background: rgba(0,0,0,0.35);
+  border: 1px solid rgba(255,216,117,0.3);
+  white-space: nowrap;
+}
+
+.stall-counter {
+  position: relative;
+  padding: 14px 12px 16px;
+  background: radial-gradient(120% 80% at 50% 10%, #3a2618 0%, #1e130b 100%);
+}
+
+.stall-shelf-edge {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(180deg, #784c25 0%, #3e2410 100%);
+  box-shadow: 0 3px 6px rgba(0,0,0,0.4);
+}
+
+/* 3 top and 3 bottom grid: exactly 3x2 */
+.stall-grid.stall-3x2 {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+}
+
+.stall-item {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px 6px 8px;
+  border-radius: 14px;
+  background: linear-gradient(180deg, rgba(58, 38, 24, 0.7) 0%, rgba(32, 20, 12, 0.9) 100%);
+  border: 1px solid rgba(140, 90, 44, 0.5);
+  box-shadow: 0 6px 14px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.08);
+  min-height: 124px;
+  text-align: center;
+  transition: transform 0.15s ease, border-color 0.15s ease;
+}
+
+@media (hover: hover){
+.stall-item:hover {
+  transform: translateY(-2px);
+  border-color: rgba(242, 184, 75, 0.7);
+  box-shadow: 0 8px 18px rgba(0,0,0,0.5), 0 0 12px rgba(242, 184, 75, 0.2);
+}
+
+}
+
+/* Figures on pedestals */
+.fig-pedestal-wrap {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  height: 62px;
+  margin-bottom: 4px;
+}
+
+.fig-art {
+  height: 48px;
+  width: auto;
+  object-fit: contain;
+  filter: drop-shadow(0 6px 8px rgba(0,0,0,0.6));
+  z-index: 2;
+  transition: transform 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+@media (hover: hover){
+.stall-item:hover .fig-art {
+  transform: scale(1.12) translateY(-2px);
+}
+
+}
+
+.fig-pedestal-wood {
+  width: 44px;
+  height: 10px;
+  border-radius: 50%;
+  background: radial-gradient(ellipse at 50% 30%, #a06a3a 0%, #5a3818 70%, #301b0a 100%);
+  border: 1.5px solid #73451e;
+  box-shadow: 0 3px 6px rgba(0,0,0,0.5), inset 0 1px 1px rgba(255,220,150,0.4);
+  margin-top: -6px;
+  z-index: 1;
+}
+
+.stall-item-name {
+  font: 700 11.5px/1.2 var(--f-display);
+  color: #fff;
+  margin: 2px 0 6px;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  min-height: 28px;
+}
+
+/* Frames cushion */
+.frame-cushion-wrap {
+  display: grid;
+  place-items: center;
+  height: 58px;
+  margin-bottom: 4px;
+}
+
+/* Statuses plate */
+.status-plate-wrap {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 58px;
+  width: 100%;
+}
+.stall-chip {
+  max-width: 90px;
+  font-size: 11px !important;
+  white-space: normal !important;
+  line-height: 1.15 !important;
+  padding: 4px 6px !important;
+}
+
+/* Emote token */
+.emote-token-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: 58px;
+}
+.stall-emote-icon {
+  font-size: 28px;
+  line-height: 1;
+  filter: drop-shadow(0 3px 6px rgba(0,0,0,0.5));
+}
+.stall-rar-tag {
+  font: 600 9.5px var(--f-body);
+  color: var(--muted);
+  text-transform: uppercase;
+}
+
+/* Phrase scroll */
+.phrase-scroll-wrap {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 2px;
+  height: 58px;
+  padding: 0 2px;
+}
+.stall-phrase-text {
+  font: 700 11px/1.2 var(--f-body);
+  color: #ffeaa7;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.stall-buy-btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  width: 100%;
+  height: 30px;
+  border-radius: 9px;
+  background: linear-gradient(180deg, #e58e26 0%, #b33927 100%);
+  border: 1px solid rgba(255, 200, 140, 0.6);
+  color: #fff;
+  font: 800 12px var(--f-display);
+  cursor: pointer;
+  box-shadow: 0 3px 8px rgba(0,0,0,0.35);
+  transition: transform 0.12s ease, filter 0.12s ease;
+}
+
+@media (hover: hover){
+.stall-buy-btn:hover {
+  filter: brightness(1.15);
+  transform: translateY(-1px);
+}
+
+}
+
+.stall-buy-btn:active {
+  transform: scale(0.95);
+}
+
+.stall-buy-btn.poor {
+  background: rgba(60, 40, 25, 0.6);
+  border-color: rgba(120, 80, 50, 0.4);
+  color: var(--muted);
+  box-shadow: none;
+}
+
+.stall-empty-sign {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  padding: 24px 16px;
+  border-radius: 14px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px dashed rgba(160, 106, 58, 0.5);
+  text-align: center;
+}
+.stall-empty-sign span {
+  font-size: 32px;
+}
+.stall-empty-sign p {
+  margin: 0;
+  font: 600 12.5px/1.3 var(--f-body);
+  color: #d1b490;
+}
+
+/* ==================== Currencies display (Тайлы, Звёзды) ==================== */
+.menu-cur-trio {
+  display: inline-flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  padding: 0 12px !important;
+  height: 32px !important;
+  border-radius: 999px !important;
+  background: rgba(18, 26, 46, 0.92) !important;
+  border: 1px solid rgba(245, 192, 78, 0.4) !important;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.3) !important;
+  cursor: pointer;
+  transition: all 0.18s ease;
+}
+@media (hover: hover){
+.menu-cur-trio:hover {
+  border-color: rgba(245, 192, 78, 0.8) !important;
+  transform: translateY(-1px);
+  box-shadow: 0 6px 16px rgba(0,0,0,0.4) !important;
+}
+
+}
+.mcur-item {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.mcur-item .coin {
+  width: 16px !important;
+  height: 16px !important;
+  margin: 0 !important;
+}
+.mcur-item b {
+  font: 800 12.5px var(--f-display);
+  font-variant-numeric: tabular-nums;
+  line-height: 1;
+}
+.mcur-item.copper b { color: #f28b5b; }
+.mcur-item.silver b { color: #e2e8f0; }
+.mcur-item.gold b { color: #ffd875; }
+.mcur-sep {
+  width: 1px;
+  height: 13px;
+  background: rgba(255, 255, 255, 0.16);
+}
+
+/* Static 3-coin pill on other headers */
+.goldchip.trio-chip {
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 4px 10px;
+}
+.chip-coin-sub {
+  display: inline-flex;
+  align-items: center;
+  gap: 4px;
+}
+.chip-coin-sub .coin {
+  width: 15px;
+  height: 15px;
+}
+.chip-coin-sub b {
+  font-size: 12px;
+}
+
+/* ==================== Fullscreen Progress Road ==================== */
+#scr-progress.scr-road-fullscreen {
+  padding: 0 !important;
+  margin: 0 !important;
+  width: 100vw !important;
+  max-width: 100vw !important;
+  overflow-x: hidden;
+  /* a screen keeps .screen's position: absolute; inset: 0, so it is as tall as the phone and the road scrolls inside */
+  background: linear-gradient(160deg, #78b84e 0%, #5a963b 100%);
+}
+
+#scr-progress.scr-road-fullscreen .road-fullscreen-wrap {
+  width: 100%;
+  max-width: 540px;
+  margin: 0 auto;
+  position: relative;
+  padding: calc(var(--it, 0px) + 64px) 0 96px;   /* room for the floating Back / Quests buttons and the bottom bar */
+}
+#scr-progress.scr-road-fullscreen .rd-head, #scr-progress.scr-road-fullscreen .rd-next { margin-left: 14px; margin-right: 14px; }
+
+#scr-progress.scr-road-fullscreen .rd-map {
+  width: 100% !important;
+  margin: 0 !important;
+  border-radius: 0 !important;
+  border: none !important;
+}
+
+.road-floating-hud {
+  position: fixed;
+  top: calc(var(--it, 0px) + 14px);
+  left: 12px;
+  right: 12px;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  pointer-events: none;
+  z-index: 45;
+}
+
+.road-float-btn {
+  pointer-events: auto;
+  display: inline-flex;
+  align-items: center;
+  gap: 7px;
+  padding: 8px 14px;
+  height: 40px;
+  border-radius: 999px;
+  background: rgba(14, 20, 38, 0.9);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1.5px solid rgba(255, 255, 255, 0.2);
+  color: #fff;
+  font: 700 13px var(--f-display);
+  box-shadow: 0 8px 24px rgba(0, 0, 0, 0.45);
+  cursor: pointer;
+  transition: transform 0.15s ease, background 0.15s ease, border-color 0.15s ease;
+}
+@media (hover: hover){
+.road-float-btn:hover {
+  transform: translateY(-2px);
+  background: rgba(22, 32, 58, 0.96);
+  border-color: rgba(245, 192, 78, 0.6);
+}
+
+}
+.road-float-btn:active {
+  transform: scale(0.95);
+}
+.road-quests-btn {
+  background: linear-gradient(135deg, rgba(32, 45, 80, 0.95), rgba(18, 26, 48, 0.98));
+  border-color: rgba(245, 192, 78, 0.55);
+  color: #ffd875;
+  position: relative;
+}
+.road-dot {
+  position: absolute;
+  top: 2px;
+  right: 2px;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: #ff5252;
+  border: 2px solid #0f1626;
+  box-shadow: 0 0 8px #ff5252;
+}
+
+/* Quests Slide-over Sheet */
+.road-quests-sheet {
+  position: fixed;
+  inset: 0;
+  z-index: 55;
+  background: rgba(8, 12, 22, 0.75);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+}
+.road-quests-sheet[hidden] {
+  display: none !important;
+}
+.road-sheet-card {
+  width: 100%;
+  max-width: 520px;
+  max-height: 85vh;
+  max-height: 85dvh;
+  background: linear-gradient(180deg, #18223c 0%, #0e1526 100%);
+  border: 1.5px solid rgba(245, 192, 78, 0.4);
+  border-radius: 24px 24px 0 0;
+  box-shadow: 0 -12px 40px rgba(0, 0, 0, 0.7);
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+}
+.road-sheet-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 14px 18px 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+}
+.road-sheet-header h3 {
+  margin: 0;
+  font: 800 17px var(--f-display);
+  color: #fff;
+}
+.road-sheet-body {
+  padding: 16px 18px 24px;
+  overflow-y: auto;
+  flex: 1;
+}
+
+/* Claimed Single Chest Showcase State */
+.gift-showcase-card.claimed-today {
+  border-color: rgba(245, 192, 78, 0.25);
+  background: radial-gradient(circle at 50% 20%, rgba(28, 40, 72, 0.95) 0%, rgba(12, 18, 34, 0.98) 100%);
+}
+.gift-badge-pill.done {
+  background: rgba(126, 231, 135, 0.15);
+  border-color: rgba(126, 231, 135, 0.4);
+  color: #7ee787;
+  box-shadow: 0 0 10px rgba(126, 231, 135, 0.2);
+}
+.gift-claimed-single {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  padding: 16px 14px 18px;
+  margin: 12px 0 16px;
+  border-radius: 18px;
+  background: rgba(0, 0, 0, 0.25);
+  border: 1px dashed rgba(245, 192, 78, 0.3);
+}
+.gift-claimed-art {
+  width: 84px;
+  height: 72px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  filter: drop-shadow(0 8px 16px rgba(0,0,0,0.5));
+}
+.gift-claimed-art svg {
+  width: 100%;
+  height: 100%;
+}
+.gift-claimed-info {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 4px;
+  text-align: center;
+}
+.gift-claimed-status {
+  font: 700 13px var(--f-display);
+  color: #7ee787;
+}
+.gift-claimed-timer {
+  font: 500 12px var(--f-body);
+  color: var(--muted);
+}

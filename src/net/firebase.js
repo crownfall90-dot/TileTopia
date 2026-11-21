@@ -2,6 +2,8 @@
 // Same requests, same localStorage key ('fbAuth') and the same session shape as before the move out of game.html,
 // so players stay signed in after the update. fetch and storage are passed in, so tests run without a network.
 
+import {accountDeletionPatch} from './account-deletion.js';
+
 /**
  * @param {{apiKey: string, dbUrl: string, storage: Storage, fetch: typeof fetch, onChange?: (a: object|null) => void}} o
  */
@@ -9,6 +11,7 @@ export function createFirebase({apiKey, dbUrl, storage, fetch, onChange}) {
   let auth = null;
   let sessionVersion = 0;
   let pendingToken = null;
+  let deleting = false;
   const set = a => { auth = a; sessionVersion++; if (onChange) onChange(auth); };
   const save = () => { try { storage.setItem('fbAuth', JSON.stringify(auth)); } catch (_) {} };
   /** The saved session, read from storage the first time it is needed. */
@@ -27,6 +30,11 @@ export function createFirebase({apiKey, dbUrl, storage, fetch, onChange}) {
   }
   /** A valid ID token: the saved one, a refreshed one, or (for a guest) a new anonymous account. */
   function token() {
+    if (deleting) return Promise.reject(new Error('account deletion in progress'));
+    return acquireToken();
+  }
+
+  function acquireToken() {
     const session = load();
     if (session && session.exp > Date.now() + 60000) return Promise.resolve(session.idToken);
     if (pendingToken?.version === sessionVersion) return pendingToken.promise;
@@ -48,7 +56,7 @@ export function createFirebase({apiKey, dbUrl, storage, fetch, onChange}) {
     }
     // A request from a prior session cannot start a guest sign-up or update the current player.
     if (version !== sessionVersion) throw new Error('auth changed');
-    if (!j && session?.email) throw new Error('auth expired');
+    if (!j && (session?.email || (deleting && session?.uid))) throw new Error('auth expired');
     if (!j) {
       const r = await fetch('https://identitytoolkit.googleapis.com/v1/accounts:signUp?key=' + apiKey, {method: 'POST', headers: {'Content-Type': 'application/json'}, body: '{"returnSecureToken":true}'});
       if (!r.ok) throw new Error('auth ' + r.status);
@@ -67,5 +75,35 @@ export function createFirebase({apiKey, dbUrl, storage, fetch, onChange}) {
   async function get(path) { const r = await fetch(await url(path)); if (!r.ok) throw new Error(r.status === 401 ? 'rules' : 'get ' + r.status); return r.json(); }
   async function put(path, v) { const r = await fetch(await url(path), {method: 'PUT', body: JSON.stringify(v)}); if (!r.ok) throw new Error('put ' + r.status); }
   async function del(path) { try { await fetch(await url(path), {method: 'DELETE'}); } catch (_) {} }
-  return {load, keep, clear, token, idt, url, get, put, del, session: () => auth};
+  async function deleteAccount({friendCode, usageDay}) {
+    if (deleting) throw new Error('account deletion in progress');
+    deleting = true;
+    try {
+      // A fresh offline player may have local data and no Firebase identity.
+      // If guest sign-up is in progress, finish it before checking for that case.
+      const initialUid = load()?.uid;
+      if (pendingToken) await pendingToken.promise;
+      const uid = load()?.uid;
+      if (initialUid && initialUid !== uid) throw new Error('auth changed');
+      if (!uid) return;
+      const idToken = await acquireToken();
+      const samePlayer = () => { if (auth?.uid !== uid) throw new Error('auth changed'); };
+      samePlayer();
+      const endpoint = path => `${dbUrl}/${path}.json?auth=${encodeURIComponent(idToken)}`;
+      const read = async path => {
+        const response = await fetch(endpoint(path));
+        if (!response.ok) throw new Error('delete lookup ' + response.status);
+        return response.json();
+      };
+      const patch = await accountDeletionPatch({uid, read, friendCode, usageDay});
+      samePlayer();
+      const result = await fetch(endpoint(''), {method: 'PATCH', headers: {'Content-Type': 'application/json'}, body: JSON.stringify(patch)});
+      if (!result.ok) throw new Error('delete data ' + result.status);
+      samePlayer();
+      await idt('delete', {idToken});
+      samePlayer();
+      clear();
+    } finally { deleting = false; }
+  }
+  return {load, keep, clear, token, idt, url, get, put, del, deleteAccount, session: () => auth};
 }

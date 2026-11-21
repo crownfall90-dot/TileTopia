@@ -47,7 +47,12 @@ export const PREFS = [
   {k: 'stats', ic: '📊', label: 'Статистика', hint: 'Анонимные числа о том, чем пользуются в игре. Без текстов и имён', opts: [[true, 'Вкл'], [false, 'Выкл']]},
 ];
 
-export const PREF_GROUPS = [['Звук', ['sound', 'music', 'vib']], ['Игра', ['coach', 'view', 'botlvl', 'speed', 'alert', 'zones']], ['Экран', ['gfx']], ['Уведомления', ['notify']], ['Данные', ['stats']]];
+export const PREF_GROUPS = [
+  ['Звук и отклик', ['sound', 'music', 'vib']],
+  ['Игровое поле', ['view', 'gfx', 'coach', 'zones', 'alert']],
+  ['Настройки ботов', ['botlvl', 'speed'], true],
+  ['Уведомления и данные', ['notify', 'stats'], true],
+];
 
 export const STREAK_GOLD = [10, 15, 20, 25, 35, 50, 100];
 

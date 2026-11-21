@@ -1,0 +1,331 @@
+/* ==================== FEATURE ENHANCEMENTS BATCH 2026 ==================== */
+
+/* 1. Rectangle Banner Shape Styling (Hero Avatar) */
+.av.sh-rect {
+  border-radius: 12px !important;
+  aspect-ratio: 2.2 / 1 !important;
+  width: auto !important;
+  height: 100% !important;
+  max-width: 130px !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.4), inset 0 0 0 1.5px rgba(242, 184, 75, 0.45);
+}
+.mprof .av.sh-rect {
+  height: 42px !important;
+  width: 92px !important;
+  max-width: 92px !important;
+}
+.pctop .av.big.sh-rect {
+  height: 52px !important;
+  width: 114px !important;
+  max-width: 114px !important;
+  border-radius: 14px !important;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.5), inset 0 0 0 2px rgba(242, 184, 75, 0.55);
+}
+.pcard .av.big.sh-rect {
+  height: 54px !important;
+  width: 118px !important;
+  max-width: 118px !important;
+  border-radius: 14px !important;
+}
+.shop-stall.stall-avatars .av.sh-rect {
+  height: 38px !important;
+  width: 84px !important;
+}
+.avpick button .av.sh-rect {
+  height: 34px !important;
+  width: 75px !important;
+}
+.avpick .avsh button .av.sh-rect {
+  height: 30px !important;
+  width: 66px !important;
+}
+
+/* 2. Stall Category Hints & Banner Purchase Lock */
+.stall-hint-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 5px;
+  background: rgba(242, 184, 75, 0.14);
+  border: 1px solid rgba(242, 184, 75, 0.38);
+  color: var(--brass, #f2b84b);
+  border-radius: 12px;
+  padding: 5px 10px;
+  font: 700 11.5px var(--f-body, sans-serif);
+  cursor: pointer;
+  transition: all 0.18s ease;
+  white-space: nowrap;
+}
+.stall-hint-btn:hover {
+  background: rgba(242, 184, 75, 0.25);
+  border-color: rgba(242, 184, 75, 0.6);
+  color: #fff;
+}
+.stall-hint-modal {
+  position: fixed;
+  inset: 0;
+  z-index: 130;
+  background: rgba(6, 10, 20, 0.78);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+.stall-hint-card {
+  width: 100%;
+  max-width: 400px;
+  background: linear-gradient(170deg, #18233c 0%, #0e1526 100%);
+  border: 1.5px solid rgba(242, 184, 75, 0.5);
+  border-radius: 24px;
+  padding: 22px;
+  box-shadow: 0 16px 48px rgba(0, 0, 0, 0.65), 0 0 32px rgba(242, 184, 75, 0.2);
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+.shm-head {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.08);
+  padding-bottom: 12px;
+}
+.shm-icon {
+  font-size: 26px;
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: rgba(242, 184, 75, 0.16);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(242, 184, 75, 0.35);
+}
+.shm-head h3 {
+  margin: 0;
+  font: 800 18px var(--f-display, sans-serif);
+  color: #fff;
+}
+.shm-body {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+.shm-row {
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+}
+.shm-row b {
+  font: 700 12px var(--f-body, sans-serif);
+  text-transform: uppercase;
+  letter-spacing: 0.6px;
+  color: var(--brass, #f2b84b);
+}
+.shm-row p {
+  margin: 0;
+  font: 500 13.5px/1.45 var(--f-body, sans-serif);
+  color: rgba(255, 255, 255, 0.88);
+}
+.shm-btn {
+  margin-top: 6px;
+}
+
+/* Banner lock state */
+.avatar-stall-card.lock-need-banner {
+  position: relative;
+  border-color: rgba(239, 83, 80, 0.35);
+  background: rgba(239, 83, 80, 0.04);
+}
+.stall-need-pill {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  background: rgba(239, 83, 80, 0.88);
+  color: #fff;
+  font: 700 10.5px var(--f-body, sans-serif);
+  padding: 3px 8px;
+  border-radius: 999px;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.4);
+  z-index: 3;
+}
+.stall-buy-btn.locked {
+  background: rgba(255, 255, 255, 0.06);
+  color: rgba(255, 255, 255, 0.4);
+  border-color: rgba(255, 255, 255, 0.1);
+  cursor: not-allowed;
+  filter: none !important;
+}
+
+/* 3. Screen Swipe Slide Animations (Dual screens visible during transition) */
+
+/* 3.1 Clash Royale Ribbon Transitions (Between main bottom nav tabs) */
+.screen.tab-enter-from-right {
+  animation: tabEnterFromRight 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform;
+  z-index: 2;
+  box-shadow: -10px 0 28px rgba(0, 0, 0, 0.45);
+}
+.screen.tab-exit-to-left {
+  animation: tabExitToLeft 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform;
+  pointer-events: none;
+  z-index: 1;
+}
+.screen.tab-enter-from-left {
+  animation: tabEnterFromLeft 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform;
+  z-index: 2;
+  box-shadow: 10px 0 28px rgba(0, 0, 0, 0.45);
+}
+.screen.tab-exit-to-right {
+  animation: tabExitToRight 0.26s cubic-bezier(0.22, 1, 0.36, 1) both;
+  will-change: transform;
+  pointer-events: none;
+  z-index: 1;
+}
+
+@keyframes tabEnterFromRight {
+  0% { transform: translate3d(100%, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+@keyframes tabExitToLeft {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(-100%, 0, 0); }
+}
+@keyframes tabEnterFromLeft {
+  0% { transform: translate3d(-100%, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+@keyframes tabExitToRight {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(100%, 0, 0); }
+}
+
+/* 3.2 Hierarchical Screen Push/Pop (Sub-screens & Modals) */
+.screen.screen-enter-from-right {
+  animation: screenEnterFromRight 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform;
+  z-index: 2;
+  box-shadow: -12px 0 32px rgba(0, 0, 0, 0.55);
+}
+.screen.screen-exit-to-left {
+  animation: screenExitToLeft 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
+  pointer-events: none;
+  z-index: 1;
+}
+.screen.screen-enter-from-left {
+  animation: screenEnterFromLeft 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform, opacity;
+  z-index: 1;
+}
+.screen.screen-exit-to-right {
+  animation: screenExitToRight 0.28s cubic-bezier(0.16, 1, 0.3, 1) both;
+  will-change: transform;
+  pointer-events: none;
+  z-index: 2;
+  box-shadow: -12px 0 32px rgba(0, 0, 0, 0.55);
+}
+
+@keyframes screenEnterFromRight {
+  0% { transform: translate3d(100%, 0, 0); }
+  100% { transform: translate3d(0, 0, 0); }
+}
+@keyframes screenExitToLeft {
+  0% { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
+  100% { transform: translate3d(-26%, 0, 0) scale(0.98); opacity: 0.25; }
+}
+@keyframes screenEnterFromLeft {
+  0% { transform: translate3d(-26%, 0, 0) scale(0.98); opacity: 0.25; }
+  100% { transform: translate3d(0, 0, 0) scale(1); opacity: 1; }
+}
+@keyframes screenExitToRight {
+  0% { transform: translate3d(0, 0, 0); }
+  100% { transform: translate3d(100%, 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .screen.tab-enter-from-right,
+  .screen.tab-exit-to-left,
+  .screen.tab-enter-from-left,
+  .screen.tab-exit-to-right,
+  .screen.screen-enter-from-right,
+  .screen.screen-exit-to-left,
+  .screen.screen-enter-from-left,
+  .screen.screen-exit-to-right {
+    animation: none !important;
+  }
+}
+
+/* 4. Match Bottom Tray Nickname Legibility */
+.turnfig {
+  flex: 0 0 auto;
+  min-width: 72px;
+  max-width: 140px;
+  width: auto;
+  padding: 0 4px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 3px;
+  filter: drop-shadow(0 4px 10px rgba(0, 0, 0, 0.5));
+}
+.turnfig small {
+  max-width: 135px;
+  font: 700 11.5px var(--f-display, sans-serif);
+  color: var(--c);
+  text-shadow: 0 1px 4px rgba(0, 0, 0, 0.9);
+  white-space: nowrap;
+  overflow: visible;
+  text-align: center;
+}
+#cname {
+  font-size: 13.5px;
+  font-weight: 700;
+  max-width: none;
+  white-space: nowrap;
+  overflow: visible;
+}
+#cname small {
+  display: block;
+  font-size: 11px;
+  font-weight: 600;
+  color: #a8b6d4;
+  white-space: nowrap;
+}
+
+/* 5. Authentic Table Tiles (Stack & Shuffle) */
+.cback.hex {
+  clip-path: polygon(50% 0%, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%);
+  border-radius: 0;
+  border: none;
+  background: radial-gradient(circle at 50% 50%, #f2d68a 0 14%, transparent 15%),
+              radial-gradient(circle at 50% 50%, #7a5a2a 0 19%, transparent 20%),
+              repeating-linear-gradient(60deg, #5d9d40 0 6px, #6aab4a 6px 12px);
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.45));
+}
+.cback.sq {
+  border-radius: 8px;
+  background: radial-gradient(circle at 50% 50%, #f2d68a 0 14%, transparent 15%),
+              radial-gradient(circle at 50% 50%, #7a5a2a 0 19%, transparent 20%),
+              repeating-linear-gradient(45deg, #5d9d40 0 6px, #6aab4a 6px 12px);
+  border: 2.5px solid #ead9b0;
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.15), 0 6px 12px rgba(0, 0, 0, 0.4);
+}
+
+/* 6. Progress Road Scenery & Smooth Progression */
+.rd-grand-bridge {
+  filter: drop-shadow(0 6px 12px rgba(0, 0, 0, 0.55));
+}
+.rd-rail {
+  stroke: rgba(140, 150, 175, 0.65);
+  stroke-dasharray: 2 4;
+}
+#scr-progress .lb {
+  padding-bottom: calc(var(--nav-h, 64px) + 24px);
+}
+.roadwrap {
+  padding-bottom: calc(var(--nav-h, 64px) + 32px);
+}

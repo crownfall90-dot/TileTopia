@@ -3,7 +3,7 @@ on:
   workflow_dispatch:
   push:
     branches: [dev/stage2-account-network-20261029]
-    paths: ['app/src/main/java/**', 'tests/**', '.github/workflows/account-verify.yml', 'web/game.html']
+    paths: ['app/src/main/java/**', 'tests/**', '.github/workflows/account-verify.yml', 'web/**', 'src/**', 'scripts/compose-page.cjs']
 permissions:
   contents: write
 concurrency:

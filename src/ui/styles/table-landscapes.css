@@ -1,0 +1,229 @@
+/* ==================== Village Location Atmospheric Backdrop ==================== */
+.village-backdrop {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.vb-sky {
+  position: absolute;
+  inset: 0;
+  background: radial-gradient(100% 85% at 50% 15%, #253966 0%, #172342 50%, #0d1428 100%);
+}
+
+.vb-sun {
+  position: absolute;
+  top: 15%;
+  left: 65%;
+  width: 220px;
+  height: 220px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(255, 230, 150, 0.22) 0%, rgba(245, 175, 25, 0.08) 45%, transparent 70%);
+  filter: blur(12px);
+}
+
+.vb-hills-far {
+  position: absolute;
+  bottom: 0;
+  left: -20%;
+  right: -20%;
+  height: 48%;
+  background: radial-gradient(75% 100% at 50% 100%, rgba(35, 62, 54, 0.45) 0%, rgba(20, 38, 38, 0.2) 65%, transparent 100%);
+  border-radius: 50% 50% 0 0 / 25px 25px 0 0;
+}
+
+.vb-hills-near {
+  position: absolute;
+  bottom: -40px;
+  left: -15%;
+  right: -15%;
+  height: 38%;
+  background: radial-gradient(65% 100% at 45% 100%, rgba(42, 78, 48, 0.5) 0%, rgba(24, 48, 32, 0.25) 75%, transparent 100%);
+  border-radius: 60% 60% 0 0 / 30px 30px 0 0;
+}
+
+.vb-trees-silhouette {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 12px;
+  background-image: repeating-linear-gradient(90deg, rgba(15, 30, 20, 0.35) 0 4px, transparent 4px 14px, rgba(15, 30, 20, 0.3) 14px 22px);
+  filter: blur(1px);
+}
+
+/* ==================== Fog of War (Uncharted Lands) ==================== */
+.fog-svg {
+  position: absolute;
+  left: -1600px;
+  top: -1600px;
+  width: 3200px;
+  height: 3200px;
+  transform: translateZ(-5px);
+  pointer-events: none;
+  z-index: 5;
+  transition: opacity .4s ease;
+}
+
+.fog-clear-circle {
+  transition: r .4s cubic-bezier(0.16, 1, 0.3, 1);
+}
+
+/* ==================== Fog Relics, Biome Particles & Scout ==================== */
+.fog-relic {
+  position: absolute;
+  width: 72px;
+  height: 72px;
+  margin-left: -36px;
+  margin-top: -36px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  z-index: 15;
+  pointer-events: none;
+  user-select: none;
+  transition: transform 0.3s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.4s ease;
+}
+
+.relic-pulse {
+  position: absolute;
+  width: 56px;
+  height: 56px;
+  border-radius: 50%;
+  background: radial-gradient(circle, rgba(245, 175, 25, 0.45) 0%, rgba(245, 175, 25, 0) 70%);
+  animation: relicAura 2.4s ease-in-out infinite;
+}
+
+@keyframes relicAura {
+  0%, 100% { transform: scale(0.9); opacity: 0.6; }
+  50% { transform: scale(1.4); opacity: 1; }
+}
+
+.relic-ico {
+  position: relative;
+  font-size: 30px;
+  filter: drop-shadow(0 4px 8px rgba(0, 0, 0, 0.6));
+  animation: relicFloat 3s ease-in-out infinite alternate;
+}
+
+@keyframes relicFloat {
+  0% { transform: translateY(0); }
+  100% { transform: translateY(-5px); }
+}
+
+.relic-name {
+  position: relative;
+  font-family: var(--f-display, 'Unbounded', sans-serif);
+  font-size: 8px;
+  font-weight: 800;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  color: #ffd875;
+  background: rgba(10, 14, 26, 0.75);
+  padding: 2px 6px;
+  border-radius: 6px;
+  border: 1px solid rgba(245, 175, 25, 0.4);
+  white-space: nowrap;
+  margin-top: 3px;
+  box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+}
+
+.fog-relic.collected {
+  animation: relicBurst 0.65s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+}
+
+@keyframes relicBurst {
+  0% { transform: scale(1); opacity: 1; filter: brightness(1); }
+  50% { transform: scale(1.6); opacity: 0.8; filter: brightness(2); }
+  100% { transform: scale(2.2); opacity: 0; filter: brightness(3); }
+}
+
+.fog-relic.scout-beacon .relic-pulse {
+  background: radial-gradient(circle, rgba(94, 234, 212, 0.7) 0%, rgba(94, 234, 212, 0) 70%);
+  animation: beaconPing 1s cubic-bezier(0, 0, 0.2, 1) infinite;
+}
+
+@keyframes beaconPing {
+  0% { transform: scale(0.8); opacity: 1; }
+  100% { transform: scale(2.8); opacity: 0; }
+}
+
+/* Biome Particles */
+.fog-particle {
+  position: absolute;
+  pointer-events: none;
+  user-select: none;
+  font-size: 16px;
+  z-index: 12;
+  opacity: 0.65;
+  animation: particleFloat 6s ease-in-out infinite;
+}
+
+@keyframes particleFloat {
+  0% { transform: translate(0, 0) scale(0.8); opacity: 0.2; }
+  50% { transform: translate(15px, -20px) scale(1.1); opacity: 0.85; }
+  100% { transform: translate(-10px, -40px) scale(0.8); opacity: 0.2; }
+}
+
+.p-firefly {
+  filter: drop-shadow(0 0 6px #a3e635);
+  animation-name: fireflyDrift;
+}
+
+@keyframes fireflyDrift {
+  0%, 100% { transform: translate(0, 0); opacity: 0.3; }
+  30% { transform: translate(25px, -15px); opacity: 0.9; }
+  70% { transform: translate(-20px, -30px); opacity: 0.7; }
+}
+
+.p-snow {
+  filter: drop-shadow(0 0 4px #e0f2fe);
+  animation-name: snowDrift;
+}
+
+@keyframes snowDrift {
+  0% { transform: translateY(-30px); opacity: 0.2; }
+  50% { opacity: 0.9; }
+  100% { transform: translateY(60px); opacity: 0; }
+}
+
+/* Scout Radar Wave */
+.scout-radar-wave {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 20px;
+  height: 20px;
+  margin: -10px 0 0 -10px;
+  border-radius: 50%;
+  border: 3px solid rgba(94, 234, 212, 0.85);
+  box-shadow: 0 0 30px rgba(94, 234, 212, 0.6);
+  pointer-events: none;
+  z-index: 25;
+  animation: radarWaveExpand 1.2s cubic-bezier(0.1, 0.8, 0.3, 1) forwards;
+}
+
+@keyframes radarWaveExpand {
+  0% { transform: scale(1); opacity: 1; }
+  100% { transform: scale(55); opacity: 0; }
+}
+
+.fab.scoutb {
+  background: linear-gradient(135deg, rgba(20, 48, 64, 0.9), rgba(12, 28, 38, 0.9));
+  border-color: rgba(94, 234, 212, 0.4);
+  color: #5eead4;
+}
+.fab.scoutb:active {
+  border-color: #5eead4;
+  box-shadow: 0 0 16px rgba(94, 234, 212, 0.4);
+}
+@media (hover: hover){
+.fab.scoutb:hover {
+  border-color: #5eead4;
+  box-shadow: 0 0 16px rgba(94, 234, 212, 0.4);
+}
+
+}

@@ -1,11 +1,12 @@
 // The game must start: one missing element in its start-up code stopped it for every player (v266, a removed
 // #ptabs still got a click handler). These checks catch that before a release.
 'use strict';
+const { gameSource } = require('../scripts/compose-page.cjs');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 
-const html = fs.readFileSync('web/game.html', 'utf8');
+const html = gameSource();
 
 test('start-up: every element the game wires up at the top level exists in the page', () => {
   const ids = new Set([...html.matchAll(/id="([\w-]+)"/g)].map(m => m[1]));
