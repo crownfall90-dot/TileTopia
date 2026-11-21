@@ -174,16 +174,26 @@ def bridge(ctx, sh):
     W = ctx.geo['road'] * U * 1.15
     c = to3(sh['bridge']['at']).to_2d()
     ca, sa = math.cos(h), math.sin(h)
-    n = 9
+    n = 11
+    step = L / n
     for i in range(n):
         t = (i + .5) / n - .5
         z = .05 * (1 - (2 * t) ** 2) + .012
         x, y = c[0] + ca * t * L, c[1] + sa * t * L
-        box((x, y, 0), (L / n * 1.04, W, z), ctx.mat('stone'), 'bridge', rot=h, bevel=.004)
-        box((x, y, z), (L / n * 1.04, W * .78, .004), ctx.mat('cobble'), 'deck', rot=h, bevel=0)
+        box((x, y, 0), (step * 1.04, W, z), ctx.mat('stone'), 'bridge', rot=h, bevel=.004)
+        for lane in (-1, 0, 1):
+            offset = lane * W * .245
+            drift = step * .13 if i % 2 and lane == 0 else 0
+            mx, my = x - sa * offset + ca * drift, y + ca * offset + sa * drift
+            surface = ctx.mat('stone_rim' if (i + lane) % 4 == 0 else 'cobble')
+            box((mx, my, z - .001), (step * .9, W * .235, .008), surface, 'bridge_sett', rot=h, bevel=.002)
         for side in (-1, 1):
             px, py = x - sa * side * W * .45, y + ca * side * W * .45
-            box((px, py, z), (L / n * .9, W * .12, .026), ctx.mat('stone_dark'), 'parapet', rot=h, bevel=.003)
+            box((px, py, z), (step * .97, W * .12, .026), ctx.mat('stone_dark'), 'parapet', rot=h, bevel=.003)
+            box((px, py, z + .024), (step * .93, W * .15, .011), ctx.mat('stone_rim'), 'coping', rot=h, bevel=.002)
+            if i in (0, n - 1):
+                box((px, py, z - .006), (step * 1.04, W * .22, .049), ctx.mat('stone'), 'end_post', rot=h, bevel=.006)
+                box((px, py, z + .041), (step * 1.08, W * .25, .009), ctx.mat('stone_rim'), 'post_cap', rot=h, bevel=.003)
     # the arch's shadow on the water on both sides of the river
     for side in (-1, 1):
         px, py = c[0] - sa * side * W * .62, c[1] + ca * side * W * .62

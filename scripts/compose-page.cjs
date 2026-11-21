@@ -8,9 +8,15 @@ const read = file => readFileSync(path.join(root, file), 'utf8').replaceAll('\r\
 const include = /^ *<!-- include: ((?:web\/views|src\/app\/runtime)\/[a-z0-9-]+\.(?:html|js)) -->\n/gm;
 const stylesheet = /^@import "(styles\/[a-z0-9-]+\.css)";\n/gm;
 const styleSlot = /^<!-- styles: src\/ui\/styles\.css.*-->$/m;
+const splashFile = 'web/views/boot.html';
+
+function splashMarkup() {
+  const art = readFileSync(path.join(root, 'web/splash-landscape.webp')).toString('base64');
+  return read(splashFile).replace('__SPLASH_ART__', `data:image/webp;base64,${art}`);
+}
 
 function gameSource() {
-  return read('web/game.html').replace(include, (_, file) => read(file));
+  return read('web/game.html').replace(include, (_, file) => file === splashFile ? splashMarkup() : read(file));
 }
 
 function stylesSource() {
@@ -24,7 +30,7 @@ function gameMarkup() {
 const addStyles = (html, css) => html.replace(styleSlot, () => `<style>\n${css}</style>`);
 
 function packagedMarkup() {
-  const splash = read('web/views/boot.html');
+  const splash = splashMarkup();
   const splashCss = read('src/ui/styles/splash.css');
   const bundle = read('build/bundle/pg.js');
   const game = addStyles(gameSource().replace(splash, ''), stylesSource().replace(splashCss, ''))

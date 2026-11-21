@@ -250,6 +250,18 @@ function placeGhost() {
   if (!ghost) { ghostDeg = current.r * ROT(); ghost = tileEl({x: sel.x, y: sel.y, type: current.type, r: current.r}); ghost.classList.add('ghost'); world.append(ghost); }
   const [gl, gt] = cellLT(sel.x, sel.y); ghost.style.left = gl + 'px'; ghost.style.top = gt + 'px';
 }
+function markTileSeams(x, y) {
+  ghost.querySelector('.tile-seams')?.remove();
+  const width = HEX ? HW : T;
+  const lines = VV().flatMap(([nx, ny], side) => {
+    const [adjacentX, adjacentY] = nbXY(x, y, side);
+    if (!at(adjacentX, adjacentY)) return [];
+    const cx = width / 2 + nx * (T / 2 - 4);
+    const cy = T / 2 + ny * (T / 2 - 4);
+    return `<path d="M${cx - ny * 13} ${cy + nx * 13}L${cx + ny * 13} ${cy - nx * 13}"/>`;
+  });
+  if (lines.length) ghost.insertAdjacentHTML('beforeend', `<svg class="tile-seams" viewBox="0 0 ${width} ${T}" aria-hidden="true">${lines.join('')}</svg>`);
+}
 function selectSlot(x, y) {
   if (tut && !tutAllows(x, y)) return;
   setTimeout(() => tutEvent('select'));
@@ -257,15 +269,15 @@ function selectSlot(x, y) {
   sel = {x, y};
   setRot(rots.includes(current.r) ? current.r : rots[0]);
   slotEls.forEach(s => s.classList.toggle('sel', +s.dataset.x === x && +s.dataset.y === y));
-  placeGhost(); okBtn.disabled = false; peekSend();
-  setStatus(rots.length > 1 ? 'Можно повернуть плитку или <b>поставить</b>' : 'Плитка подходит. Нажмите <b>«Поставить»</b>');
+  placeGhost(); markTileSeams(x, y); okBtn.disabled = false; peekSend();
+  setStatus(rots.length > 1 ? 'Края совпали. Можно повернуть или <b>поставить</b>' : 'Края совпали. Нажмите <b>«Поставить»</b>');
 }
 function rotate() {
   if (phase !== 'place' || !current) return;
   beep('rotate'); tutEvent('rotate');
   if (!sel) return setRot((current.r + 1) % NDIR());
   const rots = legalRots(current.type, sel.x, sel.y);
-  if (rots.length < 2) { useCount('turn:rotate_locked'); toast('В этой клетке подходит один поворот'); return; }
+  if (rots.length < 2) { useCount('turn:rotate_locked'); toast('При другом повороте края не совпадут. Можно выбрать другую клетку.'); return; }
   setRot(rots[(rots.indexOf(current.r) + 1) % rots.length]);
 }
 rotBtn.onclick = rotate;
@@ -387,18 +399,23 @@ function askMeeple(mainTile, opts, p) {
   meepleOpts = opts; phase = 'meeple'; tutEvent('meeple');
   const anyMode = mainTile == null;
   const gms = opts.map((o, i) => { const [x, y] = groupPos(o.t, o.g); const b = addSprite(o.t.el, 'mg', x, y, 'gm', null, 1.25); b.dataset.i = i; return b; });
-  if (anyMode) {
-    mrow.innerHTML = '<button class="chip skip" data-i="-1">Без фишки</button>';
-    setStatus(`Фишка вернулась! Нажмите на место на поле или «Без фишки». Осталось <b>${players[p].meeples}</b>`);
-  } else {
-    const note = o => coachOn() && isLocal(p) ? BOTS.featureNote(tiles, meeples, o.t, o.g) : '';
-    mrow.innerHTML = opts.map((o, i) => `<button class="chip" data-i="${i}">${meepleImg(p)}${label(o.g)}${o.done ? ' · очки сразу' : ''}${note(o) && !o.done ? `<small class="cnote">${note(o)}</small>` : ''}</button>`).join('') + '<button class="chip skip" data-i="-1">Без фишки</button>';
-    setStatus(`Поставить фишку? Осталось <b>${players[p].meeples}</b>. Очки придут, когда объект достроят`);
-  }
+  const choices = anyMode ? '' : opts.map((o, i) => {
+    const timing = o.done ? 'Очки сразу' : 'Очки при завершении';
+    const note = !o.done && coachOn() && isLocal(p) ? BOTS.featureNote(tiles, meeples, o.t, o.g) : '';
+    return `<button class="chip" data-i="${i}">${meepleImg(p)}<span>${label(o.g)}<small>${[timing, note].filter(Boolean).join(' · ')}</small></span></button>`;
+  }).join('');
+  mrow.innerHTML = `${choices ? `<div class="meeple-choices" role="group" aria-label="Объект для фишки">${choices}</div>` : ''}<button class="chip skip" data-i="-1" ${tut ? 'hidden' : ''}>Без фишки</button>`;
+  const action = anyMode ? 'Фишка вернулась. Выберите объект на поле' : 'Выберите объект для фишки';
+  setStatus(`${action}. В запасе <b>${players[p].meeples}</b>`);
   prow.hidden = true; mrow.hidden = false;
   return new Promise(res => {
     meepleResolve = o => { meepleResolve = null; setTimeout(() => tutEvent('meepleDone')); gms.forEach(b => b.remove()); mrow.hidden = true; prow.hidden = false; res(o); };
-    mrow.onpointerover = e => { const b = e.target.closest('.chip'); gms.forEach((m, i) => m.classList.toggle('hl', b && +b.dataset.i === i)); };
+    const highlight = event => {
+      const index = event?.target.closest('[data-i]')?.dataset.i;
+      gms.forEach((marker, i) => marker?.classList.toggle('hl', index != null && +index === i));
+    };
+    mrow.onpointerover = mrow.onfocusin = highlight;
+    mrow.onpointerleave = mrow.onfocusout = () => highlight();
   });
 }
 mrow.addEventListener('click', e => { const b = e.target.closest('.chip'); if (!b || !meepleResolve) return; meepleActed = true; const i = +b.dataset.i; if (tut && i < 0) return; meepleResolve(i < 0 ? null : meepleOpts[i]); });

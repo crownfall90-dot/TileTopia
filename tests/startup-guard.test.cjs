@@ -8,6 +8,25 @@ const fs = require('node:fs');
 
 const html = gameSource();
 
+test('splash: every touching tile edge matches and the detailed art is embedded', async () => {
+  const {edgeAt} = await import('../src/engine/board.js');
+  const layout = require('../tools/splash/tiles.json');
+  const matched = new Set();
+  for (const [y, row] of layout.entries()) {
+    for (const [x, [type, r]] of row.entries()) {
+      for (const [next, side] of [[row[x + 1], 1], [layout[y + 1]?.[x], 2]]) {
+        if (!next) continue;
+        const edge = edgeAt({type, r}, side);
+        assert.equal(edge, edgeAt({type: next[0], r: next[1]}, (side + 2) % 4), `${x},${y} side ${side}`);
+        matched.add(edge);
+      }
+    }
+  }
+  for (const edge of ['w', 'r', 'c']) assert.ok(matched.has(edge));
+  assert.match(html, /class="boot-art" src="data:image\/webp;base64,/);
+  assert.ok(fs.statSync('web/splash-landscape.webp').size < 80 * 1024);
+});
+
 test('start-up: every element the game wires up at the top level exists in the page', () => {
   const ids = new Set([...html.matchAll(/id="([\w-]+)"/g)].map(m => m[1]));
   const missing = [];

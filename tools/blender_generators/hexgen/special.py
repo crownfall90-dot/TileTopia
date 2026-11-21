@@ -166,6 +166,13 @@ def big_bridge(ctx):
                 ctx.mat('stone_dark'), 'parapet', bevel=.004)
             box((x, lane * width * .43, height + .062), (step, width * .175, .014),
                 ctx.mat('stone_rim'), 'coping', bevel=.003)
+            if i in (0, 4, 8):
+                box((x, lane * width * .43, height + .013), (step * .78, width * .22, .078),
+                    ctx.mat('stone'), 'bridge_pilaster', bevel=.004)
+                box((x, lane * width * .43, height + .088), (step * .89, width * .26, .013),
+                    ctx.mat('stone_rim'), 'pilaster_cap', bevel=.003)
+        box((x, 0, height + .001), (step * .93, width * .105, .014),
+            ctx.mat('stone_rim' if i % 3 == 1 else 'cobble'), 'deck_center_sett', bevel=.002)
     for y in (-width * .43, width * .43):
         box((-.145 * U, y, .009), (.096, .07, .12), ctx.mat('stone'), 'abutment', bevel=.009)
 

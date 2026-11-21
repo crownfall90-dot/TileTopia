@@ -19,12 +19,12 @@
 .boot-art {
   display: block;
   flex: none;
-  width: min(82vw, 340px);
+  width: min(89vw, 360px);
   height: auto;
   animation: boot-enter .22s ease-out both;
 }
 .boot-logo {
-  margin-top: -10px;
+  margin-top: 2px;
   font: 800 clamp(32px, 10.5vw, 54px)/1.18 system-ui, sans-serif;
   letter-spacing: -.045em;
   text-shadow: 0 3px 18px #060b17a6;
@@ -48,8 +48,8 @@
 .boot-label { margin-top: 10px; color: #c1cce0; font: 500 13px/1.4 system-ui, sans-serif; }
 
 @keyframes boot-enter {
-  from { opacity: .7; transform: translate3d(0, 6px, 0); }
-  to { opacity: 1; transform: translate3d(0, 0, 0); }
+  from { opacity: .75; transform: translate3d(0, 9px, 0) scale(.975); }
+  to { opacity: 1; transform: translate3d(0, 0, 0) scale(1); }
 }
 
 #boot.withupd { justify-content: flex-start; }

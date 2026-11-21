@@ -24,7 +24,9 @@ test('tutorial: all steps, from the first card to the win', {skip: !pw && 'playw
     const initialWidth = await tableWidth();
     assert.ok(initialWidth > 88, 'the opening tile and its adjacent cells sit on the table');
     await tap('#world .slot'); await waitCoach(/Нажмите «Поставить»/);
+    assert.ok(await page.locator('#world .tile.ghost .tile-seams path').count(), 'the preview marks the matched edge');
     await tap('#ok'); await waitCoach(/фишку на город/);
+    assert.match(await page.locator('#mrow .chip:not(.skip) small').first().textContent(), /Очки/);
     const table = await page.locator('#world').evaluate(el => getComputedStyle(el, '::before').pointerEvents);
     assert.equal(table, 'none', 'the table does not intercept taps on the board');
     await tap('#mrow .chip:not(.skip)'); await waitCoach(/Проведите пальцем/, 15000);
