@@ -125,10 +125,10 @@
     <rect x="22.5" y="22.5" width="63" height="63" rx="13.5" fill="none" stroke="rgba(255,255,255,0.4)" stroke-width="0.8" pointer-events="none"/>
   </g>
 
-  <!-- Central Tile Emblem Badge: 'Tt' Monogram & 'TileTopia' -->
+  <!-- Central badge and monogram -->
   <g filter="url(#badgeShadow)">
     <!-- Slanted Trapezoid Tile Emblem Plate -->
-    <g transform="translate(54, 54) scale(1.06)">
+    <g transform="translate(54, 52) scale(1.06)">
       <!-- Badge Base -->
       <rect x="-24" y="-14" width="48" height="28" rx="7" transform="skewX(-10)" fill="#11182c" stroke="#3b4d7c" stroke-width="1.2"/>
       <!-- Gold Inner Border -->
@@ -137,16 +137,16 @@
       <!-- Red Regal Ribbon Inset -->
       <rect x="-20" y="-10.5" width="40" height="21" rx="4.5" transform="skewX(-10)" fill="#9e2020" stroke="#520e0e" stroke-width="0.8"/>
       
-      <!-- 'Tt' Monogram with 3D Gold effect -->
-      <!-- Drop shadow for text -->
-      <text x="0" y="4.5" text-anchor="middle" font-family="'Unbounded', 'Arial Black', sans-serif" font-weight="900" font-size="14" fill="#3b0a0a" letter-spacing="-0.5px">Tt</text>
-      <!-- Gold fill text -->
-      <text x="0" y="3.5" text-anchor="middle" font-family="'Unbounded', 'Arial Black', sans-serif" font-weight="900" font-size="14" fill="url(#goldBanner)" letter-spacing="-0.5px">Tt</text>
-      <!-- Tiny Crown above Tt -->
-      <path d="M -4 -6.5 L -2 -4 L 0 -7 L 2 -4 L 4 -6.5 L 3.5 -3 L -3.5 -3 Z" fill="url(#goldBanner)" stroke="#520e0e" stroke-width="0.4"/>
-      
-      <!-- Subtitle 'TILETOPIA' beneath -->
-      <text x="0" y="9" text-anchor="middle" font-family="'Onest', sans-serif" font-weight="700" font-size="4.5" fill="#fff" letter-spacing="0.9px">TILETOPIA</text>
+      <g text-anchor="middle" font-family="'Unbounded', 'Arial Black', sans-serif" font-weight="900" font-size="17" letter-spacing="-0.5px">
+        <text y="7" fill="#3b0a0a">Tt</text>
+        <text y="6" fill="url(#goldBanner)">Tt</text>
+      </g>
     </g>
+  </g>
+
+  <!-- Horizontal wordmark at the foot of the tile -->
+  <g transform="translate(54, 78.5)">
+    <rect x="-24" y="-4.9" width="48" height="9.8" rx="2.1" fill="#152239" stroke="#d7b978" stroke-width="0.85"/>
+    <text y="2.1" text-anchor="middle" font-family="'Onest', sans-serif" font-weight="700" font-size="5.9" fill="#fff6dc" letter-spacing="0.9px">TILETOPIA</text>
   </g>
 </svg>
