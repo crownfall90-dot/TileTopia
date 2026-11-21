@@ -516,7 +516,7 @@ function hexWaterMask(id) {
 
 const SPR = {};
 function sprite(name, w, h, draw) { const [c, g] = cv(w, h, 4); draw(g, w, h); SPR[name] = {url: c.toDataURL(), w, h}; }
-function drawSprites() {
+function drawScenerySprites() {
   // Small helpers: a filled polygon with an optional outline, a vertical/diagonal gradient, a soft contact shadow.
   const poly = (g, pts, fill, line) => { g.beginPath(); pts.forEach(([x, y], i) => i ? g.lineTo(x, y) : g.moveTo(x, y)); g.closePath(); g.fillStyle = fill; g.fill(); if (line) { g.strokeStyle = line; g.lineWidth = .45; g.stroke(); } };
   const lin = (g, x0, y0, x1, y1, stops) => { const gr = g.createLinearGradient(x0, y0, x1, y1); stops.forEach(([o, c]) => gr.addColorStop(o, c)); return gr; };
@@ -714,6 +714,9 @@ function drawSprites() {
     g.fillStyle = '#f6d36a'; g.beginPath(); g.arc(19, .9, 1, 0, 7); g.fill();
     g.fillStyle = 'rgba(255,255,255,.7)'; g.beginPath(); g.arc(18.7, .6, .35, 0, 7); g.fill();
   });
+}
+
+function drawMeepleSprites() {
   const meeple = (fill, stroke) => (g, w, h) => {
     const p = new Path2D(MEEPLE_D); g.save(); g.translate(1, 1); g.scale((w - 2) / 100, (h - 2) / 110);
     g.fillStyle = fill; g.fill(p); g.save(); g.clip(p);
@@ -725,14 +728,33 @@ function drawSprites() {
   sprite('mg', 20, 22, meeple('rgba(255,255,255,.7)', '#f2b84b'));
 }
 const TILE_URL = {}, DRAWN = {};
-function injectArt() {
-  drawSprites();
+const spriteCss = keys => keys.map(k => `.s-${k}{background-image:url(${SPR[k].url})}`).join('');
+function addArtStyles(css) {
+  const style = document.createElement('style');
+  style.textContent = css;
+  document.head.appendChild(style);
+}
+
+let sceneryReady = false;
+function injectSceneryArt() {
+  if (sceneryReady) return;
+  const first = Object.keys(SPR).length;
+  drawScenerySprites();
+  addArtStyles(spriteCss(Object.keys(SPR).slice(first)));
+  sceneryReady = true;
+}
+
+function injectArt({withFallback = true} = {}) {
+  drawMeepleSprites();
   let css = '';
   // The cards are the Blender renders in assets/tiles/ (tools/blender_generators/generate_tiles.py, seen from above),
   // the same pictures as Classic 2.0; the drawn face lies under each, for a page whose app has no tiles/ folder yet.
-  for (const id in TYPES) { const drawn = DRAWN[id] = drawTile(id); TILE_URL[id] = `tiles/${id}.webp`; css += `.t-${id}{background-image:url(tiles/${id}.webp),url(${drawn})}`; }
-  for (const k in SPR) css += `.s-${k}{background-image:url(${SPR[k].url})}`;
-  const st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+  for (const id in TYPES) {
+    const url = TILE_URL[id] = `tiles/${id}.webp`;
+    if (withFallback) DRAWN[id] = drawTile(id);
+    css += `.t-${id}{background-image:url(${url})${DRAWN[id] ? `,url(${DRAWN[id]})` : ''}}`;
+  }
+  addArtStyles(css + spriteCss(Object.keys(SPR)));
 }
 // Classic 2.0: the card pictures come from assets/hex/ (loaded only when a card shows up); the river glints get their masks.
 let hexDone = false;
@@ -743,9 +765,9 @@ function injectHexArt() {
     TILE_URL[id] = `hex/${id}.webp`; css += `.t-${id}{background-image:url(hex/${id}.webp)}`;
     if (HTYPES[id].e.includes('w')) { const m = hexWaterMask(id); css += `.tile .face.t-${id}::after{-webkit-mask-image:url(${m});mask-image:url(${m})}`; }
   }
-  const st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
+  addArtStyles(css);
 }
 
 
-  return {cv, drawTile, SPR, sprite, TILE_URL, DRAWN, injectArt, injectHexArt};
+  return {cv, drawTile, SPR, sprite, TILE_URL, DRAWN, injectArt, injectHexArt, injectSceneryArt};
 }

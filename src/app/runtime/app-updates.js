@@ -2,7 +2,7 @@
 function showWhatsNew(version) { return PG.app.update.showWhatsNew(version); }
 
 let updBox = null, pendingUpdate = null;
-var boot = {checked: !window.AndroidApp, min: false, update: false, gone: false};
+var boot = {checked: !window.AndroidApp || Boolean(window.__updateChecked), min: false, update: false, gone: false};
 var bootDone, bootReady = new Promise(resolve => { bootDone = resolve; });
 function bootHide() {
   if (boot.gone || !boot.min || !boot.checked || boot.update) return;

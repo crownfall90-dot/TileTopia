@@ -111,11 +111,11 @@ build_page() {
   {
     printf '<!doctype html>\n<html lang="ru"><head><meta charset="utf-8">\n'
     printf '<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover,user-scalable=no">\n'
-    printf '<link rel="stylesheet" href="fonts/fonts.css">\n'
+    printf '%s\n' '<link rel="stylesheet" href="fonts/fonts.css" media="print" onload="this.media=&quot;all&quot;">'
     if [ "$target" = web ]; then
       cat <<'HEAD'
 <meta name="theme-color" content="#101729">
-<script defer src="https://telegram.org/js/telegram-web-app.js" onload="PG.app.telegram.initTelegramWebApp()"></script>
+<script defer src="https://telegram.org/js/telegram-web-app.js" onload="window.Telegram?.WebApp?.ready?.()"></script>
 <script>
 // iPhone: the same physical size as in the Android app (which zooms by the screen diagonal). Safari has no
 // diagonal, so the narrow side in points stands in for it: a wider layout, scaled down to fit the screen.
@@ -150,7 +150,6 @@ HEAD
       printf '<script>'; cat web/boot-guard.js; printf '</script>\n'
     fi
     printf '<script>window.RELEASE_NOTES = %s; window.FIREBASE = %s;</script>\n' "$notes" "$firebase"
-    printf '<script>'; cat build/bundle/pg.js; printf '</script>\n'
     printf '</head><body>\n'
     # The same composed page ships as an offline HTML resource and on GitHub Pages.
     node scripts/compose-page.cjs
@@ -163,5 +162,6 @@ if [ "$target" = web ]; then
   build_page "$out" "false" "$webver"
   build_page "$site/staging/index.html" "true" "$webver"
 else
+  cp web/splash-landscape.webp app/src/main/assets/launch-cover.webp
   build_page "$out" "false" "$webver"
 fi

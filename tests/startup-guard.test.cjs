@@ -8,6 +8,44 @@ const fs = require('node:fs');
 
 const html = gameSource();
 
+test('Android hands off its launch cover once the embedded illustration can paint', () => {
+  const vm = require('node:vm');
+  const listeners = {};
+  let ready = 0;
+  const AndroidApp = {launchArtReady() { ready++; }};
+  const window = {AndroidApp, addEventListener() {}};
+  const art = {complete: false, addEventListener(name, fn) { listeners[name] = fn; }};
+  const document = {addEventListener() {}, querySelector: () => art};
+  vm.runInNewContext(fs.readFileSync('web/boot-guard.js', 'utf8'), {window, AndroidApp, document, setTimeout() {}});
+  window.__showWebLaunch();
+  assert.equal(ready, 0);
+  listeners.load();
+  assert.equal(ready, 1);
+  art.complete = true;
+  window.__showWebLaunch();
+  assert.equal(ready, 2);
+  assert.deepEqual(fs.readFileSync('app/src/main/assets/launch-cover.webp'), fs.readFileSync('web/splash-landscape.webp'));
+});
+
+test('splash: every touching tile edge matches and the detailed art is embedded', async () => {
+  const {edgeAt} = await import('../src/engine/board.js');
+  const layout = require('../tools/splash/tiles.json');
+  const matched = new Set();
+  for (const [y, row] of layout.entries()) {
+    for (const [x, [type, r]] of row.entries()) {
+      for (const [next, side] of [[row[x + 1], 1], [layout[y + 1]?.[x], 2]]) {
+        if (!next) continue;
+        const edge = edgeAt({type, r}, side);
+        assert.equal(edge, edgeAt({type: next[0], r: next[1]}, (side + 2) % 4), `${x},${y} side ${side}`);
+        matched.add(edge);
+      }
+    }
+  }
+  for (const edge of ['w', 'r', 'c']) assert.ok(matched.has(edge));
+  assert.match(html, /class="boot-art" src="data:image\/webp;base64,/);
+  assert.ok(fs.statSync('web/splash-landscape.webp').size < 80 * 1024);
+});
+
 test('start-up: every element the game wires up at the top level exists in the page', () => {
   const ids = new Set([...html.matchAll(/id="([\w-]+)"/g)].map(m => m[1]));
   const missing = [];
@@ -44,21 +82,26 @@ test('updates over the air: the page reports its start, the app checks a signatu
   assert.match(fs.readFileSync('.github/workflows/promote-production.yml', 'utf8'), /if: inputs\.announce/, 'Telegram only on request');
 });
 
-test('splash: motion animates without image or animation callbacks, and reduced motion opens immediately', async () => {
-  const {startSplash} = await import('../src/app/splash.js');
-  for (const reducedMotion of [false, true]) {
-    const boot = {min: false, checked: true};
-    const pending = [];
-    let opened = false;
-    startSplash({boot, element: {}, reducedMotion, finish: () => { opened = boot.min && boot.checked; },
-      schedule: (fn, ms) => pending.push({fn, ms})});
-    assert.equal(opened, reducedMotion);
-    assert.equal(pending.length, reducedMotion ? 0 : 1);
-    if (pending.length) {
-      assert.ok(pending[0].ms <= 1000);
-      pending[0].fn();
+test('splash: allow an initial paint, start once on deadline, and skip the wait for reduced motion', () => {
+  const vm = require('node:vm');
+  for (const reduced of [false, true]) {
+    const window = {addEventListener() {}};
+    const frames = [], timers = new Map();
+    vm.runInNewContext(fs.readFileSync('web/boot-guard.js', 'utf8'), {
+      window, document: {addEventListener() {}, hidden: false}, matchMedia: () => ({matches: reduced}),
+      requestAnimationFrame: fn => frames.push(fn),
+      setTimeout: (fn, ms) => { timers.set(ms, fn); return ms; }, clearTimeout: ms => timers.delete(ms),
+    });
+    let starts = 0;
+    window.__afterSplash(() => starts++);
+    assert.equal(starts, reduced ? 1 : 0);
+    if (!reduced) {
+      const fallback = timers.get(400);
+      frames.shift()(); frames.shift()();
+      assert.equal(starts, 0);
+      timers.get(240)(); fallback();
+      assert.equal(starts, 1);
     }
-    assert.ok(opened);
   }
 });
 
@@ -67,7 +110,7 @@ test('splash: a silent native update check has a deadline even with reduced moti
   const boot = {min: false, checked: false};
   let opened = false;
   let deadline;
-  startSplash({boot, element: {}, reducedMotion: true, finish: () => { opened = boot.min && boot.checked; },
+  startSplash({boot, finish: () => { opened = boot.min && boot.checked; },
     schedule: (fn, ms) => { assert.ok(ms <= 2000); deadline = fn; }});
   assert.ok(boot.min);
   assert.ok(!opened);

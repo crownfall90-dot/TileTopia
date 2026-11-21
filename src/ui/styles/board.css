@@ -225,6 +225,9 @@ html.lowgfx .tile .sd.s{display:block}
 
 .tile.ghost{--pc:#ffe09a;transform:translateZ(2px)}
 
+.tile-seams{display:none}
+.tile.ghost .tile-seams{display:block;position:absolute;inset:0;width:100%;height:100%;transform:translateZ(1px);pointer-events:none;fill:none;stroke:#dcffb6;stroke-width:4;stroke-linecap:round;filter:drop-shadow(0 0 2px #183326)}
+
 .tile.ghost .face{box-shadow:0 0 0 2.5px var(--pc,var(--brass)),0 0 26px color-mix(in srgb,var(--pc,#f2b84b) 65%,transparent)}
 
 .tile.peek{pointer-events:none;opacity:.78}.tile.peek .face{box-shadow:0 0 0 2.5px var(--pc,var(--brass)),0 0 22px color-mix(in srgb,var(--pc,#f2b84b) 60%,transparent)}
@@ -309,11 +312,14 @@ html.lowgfx .tile .sd.s{display:block}
 
 .cta.wide{width:100%}
 
-.mrow{display:flex;flex-wrap:wrap;gap:8px;justify-content:center}
+.mrow{display:flex;align-items:center;justify-content:center;gap:6px;min-width:0}
+.meeple-choices{display:flex;gap:6px;min-width:0;overflow-x:auto;overscroll-behavior-inline:contain;padding:3px;scrollbar-width:thin}
+.meeple-choices .chip{flex:0 0 auto;max-width:min(168px,48vw);min-height:44px;height:auto;padding-block:5px;white-space:normal;text-align:left;line-height:1.2}
+.meeple-choices small{display:block;margin-top:2px;color:var(--muted);font-size:10px}
+.mrow .skip{flex:none;min-height:44px}
 
 .chip{display:inline-flex;align-items:center;gap:6px;height:40px;padding:0 13px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.07);font:600 13px var(--f-body);cursor:pointer}
 
-.mrow .chip:has(.cnote){height:auto;min-height:40px;flex-wrap:wrap;padding:6px 13px;max-width:100%;justify-content:center}.cnote{flex-basis:100%;text-align:center;font:500 11px/1.25 var(--f-body);color:#ffe7a3}
 
 .chip svg{width:14px;height:15px} .chip.skip{color:var(--muted)} .chip.sel{background:rgba(76,141,255,.2);border-color:rgba(76,141,255,.6);color:#a8c8ff}
 

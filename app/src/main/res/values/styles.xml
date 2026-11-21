@@ -6,4 +6,5 @@
         <item name="android:navigationBarColor">@color/night</item>
     </style>
     <color name="night">#101729</color>
+    <string name="launch_preparing">Подготовка поля…</string>
 </resources>

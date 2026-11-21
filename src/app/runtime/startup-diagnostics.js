@@ -90,7 +90,8 @@ window.addEventListener('keydown', e => {
   }
 });
 
-try { injectArt(); } catch (e) { plog('error', 'injectArt: ' + (e.message || e)); }
+// The site and Android 300+ ship all the WebP faces. Older OTA hosts and the demo retain the generated faces.
+try { injectArt({withFallback: !(isWeb || (isAndroid && appCode() >= 300))}); } catch (e) { plog('error', 'injectArt: ' + (e.message || e)); }
 try { dailyBonus(); } catch (_) {}
 try { renderPrefs(); } catch (_) {}
 try { checkMaintenance(); } catch (_) {}

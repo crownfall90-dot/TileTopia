@@ -6,6 +6,40 @@
   var shown = false;
   // Until the game takes over, an update found by the app is kept here (the game picks it up, see game.html).
   window.onUpdateAvailable = function (info) { window.__upd = info; if (shown) fail(); };
+  window.onUpdateChecked = function () { window.__updateChecked = true; };
+  window.onDeepLink = function (href) { window.__earlyDeepLink = href; };
+  window.__pageParsed = new Promise(function (resolve) {
+    document.addEventListener('DOMContentLoaded', resolve, {once: true});
+  });
+  function reveal() {
+    if (window.AndroidApp && AndroidApp.launchArtReady) AndroidApp.launchArtReady();
+  }
+  window.__showWebLaunch = function () {
+    if (!window.AndroidApp || !AndroidApp.launchArtReady) return;
+    var art = document.querySelector('#boot .boot-art');
+    if (!art || art.complete) return reveal();
+    art.addEventListener('load', reveal, {once: true});
+    art.addEventListener('error', reveal, {once: true});
+  };
+  window.__afterSplash = function (start) {
+    if (matchMedia('(prefers-reduced-motion: reduce)').matches || document.hidden) return start();
+    var started = false, frameDelay;
+    function run() {
+      if (started) return;
+      started = true;
+      clearTimeout(fallback);
+      clearTimeout(frameDelay);
+      start();
+    }
+    // Give the splash a paint and a short entrance before running the synchronous game setup.
+    // The deadline also covers WebViews that suspend frame callbacks.
+    var fallback = setTimeout(run, 400);
+    requestAnimationFrame(function () {
+      requestAnimationFrame(function () {
+        if (!started) frameDelay = setTimeout(run, 240);
+      });
+    });
+  };
   function btn(id, text, main) {
     return '<button id="' + id + '" style="background:' + (main ? '#f2b84b;color:#2a1a02' : 'rgba(255,255,255,.08);color:#eef1f8') + ';border:none;padding:13px 24px;border-radius:14px;font:700 15px sans-serif;cursor:pointer;margin:0 0 10px;min-width:240px">' + text + '</button>';
   }
@@ -23,6 +57,7 @@
     if (b) b.onclick = function () { b.disabled = true; b.textContent = 'Загружаем обновление…'; try { a.startUpdate(u.url); } catch (e) {} };
     if (c) c.onclick = function () { c.textContent = 'Проверяем…'; try { a.checkUpdates(); } catch (e) {} setTimeout(function () { if (!window.__upd) c.textContent = 'Обновлений нет · проверить снова'; }, 6000); };
     document.getElementById('bootRetry').onclick = function () { location.reload(); };
+    reveal();
   }
   // an error while the game sets itself up means it will not start: say so at once (after a moment for the page to settle)
   window.addEventListener('error', function () { if (!window.__ready) setTimeout(fail, 1500); });

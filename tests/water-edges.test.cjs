@@ -17,6 +17,12 @@ test('water edges: every water side has the river mouth, every pair lines up in 
       const S = 192, V = [[0,-1],[1,0],[0,1],[-1,0]];
       const art = PG.render.createArt({S, V, PL0: ['#e33', '#33e', '#3a3', '#ea3', '#a3e'], MEEPLE_D: ''});
       const T = PG.engine.TYPES, ids = Object.keys(T).filter(k => T[k].e.includes('w'));
+      art.injectArt({withFallback: false});
+      const packagedFaces = Object.keys(art.TILE_URL).length;
+      const generatedFaces = Object.keys(art.DRAWN).length;
+      const sceneryOnStartup = Boolean(art.SPR.keep);
+      art.injectSceneryArt();
+      const sceneryOnProgress = Boolean(art.SPR.keep && art.SPR.mg);
       const edge = (id, r, d) => T[id].e[(d - r + 4) % 4];
       // the card turned r quarter turns, as the table shows it
       const turned = {};
@@ -34,9 +40,13 @@ test('water edges: every water side has the river mouth, every pair lines up in 
       for (const id of ids) for (let r = 0; r < 4; r++) for (let d = 0; d < 4; d++) if (edge(id, r, d) === 'w') mouths.push([id, r, d, span(turned[id + r], d)]);
       for (const a of ids) for (let ra = 0; ra < 4; ra++) if (edge(a, ra, 1) === 'w')
         for (const b of ids) for (let rb = 0; rb < 4; rb++) if (edge(b, rb, 3) === 'w') seams.push([a, ra, b, rb, span(turned[a + ra], 1), span(turned[b + rb], 3)]);
-      return {mouths, seams, ids};
+      return {mouths, seams, ids, packagedFaces, generatedFaces, sceneryOnStartup, sceneryOnProgress};
     });
     assert.ok(res.ids.includes('wLake') && res.ids.includes('wTee'), 'lakes are among the water cards');
+    assert.equal(res.packagedFaces, 37);
+    assert.equal(res.generatedFaces, 0, 'the packaged deck does not draw reserve images on startup');
+    assert.equal(res.sceneryOnStartup, false);
+    assert.equal(res.sceneryOnProgress, true);
     for (const [id, r, d, sp] of res.mouths) {
       assert.ok(sp, `${id} turned ${r}: no water on side ${d}`);
       const [lo, hi, n] = sp;
@@ -69,7 +79,7 @@ test('packaged art covers both decks and keeps both lakes, the big bridge and th
     const results = await page.evaluate(async files => {
       const canvas = document.createElement('canvas');
       const context = canvas.getContext('2d', {willReadFrequently: true});
-      const special = new Set(['wLake', 'wTee', 'wS', 'brHalf', 'rEnd']);
+      const special = new Set(['wLake', 'wTee', 'wS', 'wBr', 'hWBr', 'brHalf', 'rEnd']);
       const artefacts = {};
       const wrongSize = [];
       for (const file of files) {
@@ -82,11 +92,12 @@ test('packaged art covers both decks and keeps both lakes, the big bridge and th
         context.drawImage(image, 0, 0);
         const pixel = (x, y) => context.getImageData(x, y, 1, 1).data;
         const water = ([r, g, b, a]) => a === 255 && b > r + 60 && b > g + 12;
-        const N = canvas.width;
+        const {width, height} = canvas;
         const spans = [0, 1, 2, 3].map(side => {
           const hit = [];
-          for (let i = 0; i < N; i++) {
-            const coords = [[i, 2], [N - 3, i], [i, N - 3], [2, i]];
+          const length = side % 2 ? height : width;
+          for (let i = 0; i < length; i++) {
+            const coords = [[i, 2], [width - 3, i], [i, height - 3], [2, i]];
             if (water(pixel(...coords[side]))) hit.push(i);
           }
           return hit.length ? [hit[0], hit.at(-1)] : null;
@@ -98,15 +109,19 @@ test('packaged art covers both decks and keeps both lakes, the big bridge and th
       return {wrongSize, artefacts};
     }, files);
     assert.deepEqual(results.wrongSize, []);
-    const {wS, wLake, wTee, brHalf, rEnd} = results.artefacts;
-    for (const {spans, edges} of [wLake, wTee]) {
+    const {wS, wLake, wTee, wBr, hWBr, brHalf, rEnd} = results.artefacts;
+    for (const {spans, edges} of [wLake, wTee, wBr]) {
       for (let side = 0; side < 4; side++) {
         const span = spans[side];
         if (edges[side] !== 'w') { assert.equal(span, null); continue; }
         assert.ok(span, `water missing on side ${side}`);
         assert.ok(span.every((edge, n) => Math.abs(edge - wS.spans[0][n]) <= 4),
-          `lake side ${side} (${span}) misses the river mouth (${wS.spans[0]})`);
+          `side ${side} (${span}) misses the river mouth (${wS.spans[0]})`);
       }
+    }
+    for (const side of [0, 2]) {
+      const span = hWBr.spans[side];
+      assert.ok(span && span[0] < 320 && span[1] > 320, `hex bridge water must reach edge ${side} at its center`);
     }
     assert.deepEqual(brHalf.bridgeWater, [true, true, false, false], 'water sits on both sides of the joined deck');
     assert.deepEqual(rEnd.cliffAlpha, [255, 0, 0], 'only the playable half is visible under the road');
