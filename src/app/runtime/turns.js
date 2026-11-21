@@ -145,9 +145,12 @@ async function resolveFeature(c, final, placer) {
 let catchT = 0;
 function catchKeep() { catchUp = true; clearTimeout(catchT); catchT = setTimeout(catchEnd, 900); }
 function catchEnd() { clearTimeout(catchT); if (!catchUp) return; catchUp = false; focusLast(); }
-function focusLast() {
+function focusLast(center = false) {
   const t = lastPlaced; if (!t || !t.el) return;
-  ensureVisible(t.x, t.y);
+  if (center) {
+    const [x, y] = cellXY(t.x, t.y);
+    tweenCam({px: -x * T, py: -y * T}, 350);
+  } else ensureVisible(t.x, t.y);
   t.el.classList.add('glow'); setTimeout(() => t.el.classList.remove('glow'), 1500);
 }
 /* Calm: the water keeps flowing only while something is going on. A few seconds after the last touch or move the

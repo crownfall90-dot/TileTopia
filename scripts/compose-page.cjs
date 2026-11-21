@@ -18,11 +18,27 @@ function stylesSource() {
 }
 
 function gameMarkup() {
-  return gameSource().replace(styleSlot, () => '<style>\n' + stylesSource() + '</style>');
+  return addStyles(gameSource(), stylesSource());
 }
 
-module.exports = { gameSource, stylesSource, gameMarkup };
+const addStyles = (html, css) => html.replace(styleSlot, () => `<style>\n${css}</style>`);
+
+function packagedMarkup() {
+  const splash = read('web/views/boot.html');
+  const splashCss = read('src/ui/styles/splash.css');
+  const bundle = read('build/bundle/pg.js');
+  const game = addStyles(gameSource().replace(splash, ''), stylesSource().replace(splashCss, ''))
+    .split('\n').filter(line => !/fonts\.(?:googleapis|gstatic)\.com/.test(line)).join('\n');
+  const start = '<script>\n(() => {\n';
+  const end = '\n})();\n\n</script>';
+  if (!game.includes(start) || !game.includes(end)) throw new Error('Missing game script boundaries');
+  const runtime = game.replace(start, () => `<script>\nwindow.__afterSplash(() => {\n${bundle}\nwindow.PG = PG;\n(() => {\n`)
+    .replace(end, () => '\n})();\n});\n</script>');
+  return `<style>\n${splashCss}</style>\n${splash}\n${runtime}`;
+}
+
+module.exports = { gameSource, stylesSource, gameMarkup, packagedMarkup };
 
 if (require.main === module) {
-  process.stdout.write(gameMarkup().split('\n').filter(line => !/fonts\.(?:googleapis|gstatic)\.com/.test(line)).join('\n'));
+  process.stdout.write(packagedMarkup());
 }

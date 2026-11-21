@@ -39,7 +39,7 @@ if (isApp) {
   const tutorialReady = bootReady.then(() => new Promise(resolve => setTimeout(resolve, 300))).then(offerTutorial);
   if (isWeb) {
     // Deferred Telegram SDK can finish after the first paint. Only web invites need it.
-    const linksReady = new Promise(resolve => document.addEventListener('DOMContentLoaded', resolve, {once: true}));
+    const linksReady = window.__pageParsed || new Promise(resolve => document.addEventListener('DOMContentLoaded', resolve, {once: true}));
     Promise.all([tutorialReady, linksReady]).then(() => {
       openLink();
       setTimeout(firstInstallHint, 400);
@@ -48,7 +48,11 @@ if (isApp) {
 }
 // The app opens on the menu (a saved game must survive); the browser mock-up opens straight into a game.
 if (!isApp) newGame(); else buildMini();
+if (window.__earlyDeepLink) {
+  window.onDeepLink(window.__earlyDeepLink);
+  delete window.__earlyDeepLink;
+}
 window.__ready = true;
 // Retain an authenticated OTA page after the client starts.
 try { if (window.AndroidApp && AndroidApp.contentReady) AndroidApp.contentReady(); } catch (_) {}
-PG.app.splash.startSplash({boot, element: $('#boot'), reducedMotion: RM, finish: bootHide});
+PG.app.splash.startSplash({boot, finish: bootHide});

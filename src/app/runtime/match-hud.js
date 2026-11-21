@@ -374,6 +374,7 @@ async function dropAt(t) {
   }
   if (token !== match) return;
   preview.remove(); ghost = null; lastPlaced = t;
+  $('#lastMoveBtn').hidden = false;
   t.el = tileEl(t); world.append(t.el); tiles.set(key(t.x, t.y), t); resizeTable(); wallsAround(t); markOwn();
   if (!fast()) beep('place');
   if (!fast()) { const pf = document.createElement('i'); pf.className = 'puff'; t.el.append(pf); setTimeout(() => pf.remove(), 600); }

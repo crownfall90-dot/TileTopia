@@ -160,6 +160,7 @@ function fling() {
 $('#zin').onclick = () => { tutEvent('zoom'); tweenCam({z: Math.min(1.8, cam.z * 1.25)}, 250); };
 $('#zout').onclick = () => tweenCam({z: Math.max(.45, cam.z / 1.25)}, 250);
 $('#ctr').onclick = () => centerCam(true);
+$('#lastMoveBtn').onclick = () => { boardTools.open = false; focusLast(true); };
 // Tilt presets: regular 3D and top-down; the button switches between them.
 const TILTS = [[55, '3D'], [22, '2D']];
 $('#view').onclick = () => {

@@ -43,6 +43,7 @@ function startGame(cfg, replay = []) {
   const gameScr = $('#scr-game');
   if (gameScr) gameScr.dataset.loc = locId;
   $('#boardTools').open = false;
+  $('#lastMoveBtn').hidden = true;
   $('#sayBtn').hidden = false; $('#sayBox').hidden = true;
   queue = replay.map(m => ({...m, old: true})); applied = 0; clearTimeout(catchT); catchUp = replay.length > 0; lastPlaced = null; markOwn();
   gameLog = {cfg, moves: replay.slice()};

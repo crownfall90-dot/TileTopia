@@ -108,6 +108,7 @@ function routeLink({room, friend}) {
 window.onDeepLink = href => { const l = parseLink(href); if (l) bootReady.then(() => setTimeout(() => routeLink(l), 400)); };
 function openLink() {
   if (typeof PG !== 'undefined' && PG.app && PG.app.telegram) {
+    PG.app.telegram.initTelegramWebApp();
     const tgRoom = PG.app.telegram.getTelegramStartParam();
     if (tgRoom && tgRoom.length === 5) {
       return routeLink({room: tgRoom});

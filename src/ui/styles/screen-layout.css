@@ -60,7 +60,7 @@ html body .fabs .fab:active{transform:scale(.94)}
 .board-tools summary{list-style:none}
 .board-tools summary::-webkit-details-marker{display:none}
 .board-tools summary:focus-visible{outline:2px solid var(--brass);outline-offset:1px}
-.board-tools-panel{position:absolute;right:calc(100% + 7px);bottom:0;display:grid;width:168px;padding:4px;background:#141e30;border:1px solid var(--m-line);border-radius:13px;box-shadow:0 8px 20px #090f1ea0}
+.board-tools-panel{position:absolute;right:calc(100% + 7px);bottom:0;display:grid;width:176px;padding:4px;background:#141e30;border:1px solid var(--m-line);border-radius:13px;box-shadow:0 8px 20px #090f1ea0}
 html body .fabs .board-tools-panel .fab{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:42px;padding:0 9px;color:var(--ink);font:650 13px var(--f-body);white-space:nowrap}
 #boardAngle{color:var(--m-gold)}
 .board:focus-visible{outline:2px solid var(--brass);outline-offset:-2px}
@@ -79,7 +79,7 @@ html body .slot::after{width:16px;height:16px;opacity:.75}
 .world.nohint .slot:not(.tip)::before{display:none}
 @media (orientation:landscape) and (max-height:440px){
   html body .fabs{top:6px;right:6px;transform:none;flex-direction:row}
-  .board-tools-panel{top:calc(100% + 5px);right:0;bottom:auto}
+  .board-tools-panel{top:calc(100% + 5px);right:0;bottom:auto;width:min(300px,calc(100vw - 18px));grid-template-columns:repeat(2,minmax(0,1fr))}
   .phone #scr-game .gtop{padding-block:4px}
   .phone #scr-game .players{padding-block:0 4px}
   .phone #scr-game .tray{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);align-items:center;gap:5px;padding-block:4px calc(5px + env(safe-area-inset-bottom,0px))}
