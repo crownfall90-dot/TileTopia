@@ -1,44 +1,53 @@
-# 📊 TileTopia Feature & Gameplay Analytics for Developer Agents
+# Tiletopia feature usage
 
-Updated: 2026-11-20 23:42:02 UTC
+UTC dates 2026-10-23 through 2026-11-21. Today is partial.
+Opt-in counters only. Each row needs at least three distinct players in the window.
 
-## Overview of Player Activity & Preferences
-- **Total Registered / Active Profiles:** 22
-- **Classic Mode Leaderboard Players:** 19
-- **Classic 2.0 (Hex) Leaderboard Players:** 3
-- **Presence Device Records:** 5
-
-### Most Tapped Features & Screens
-
-| Feature ID | Total Taps |
-|---|---|
-| `btn:ok` | 2401 |
-| `screen:menu` | 1047 |
-| `btn:rot` | 426 |
-| `screen:progress` | 390 |
-| `claim:achievement` | 269 |
-| `nav:progress` | 258 |
-| `screen:friends` | 253 |
-| `screen:game` | 237 |
-| `go:menu` | 208 |
-| `screen:shop` | 175 |
-| `btn:btnMenuHub` | 160 |
-| `nav:menu` | 144 |
-| `nav:friends` | 142 |
-| `screen:setup` | 127 |
-| `btn:zout` | 103 |
-| `nav:shop` | 101 |
-| `screen:rating` | 98 |
-| `btn:btnRoadQuests` | 94 |
-| `btn:btnOpenModes` | 94 |
-| `btn:view` | 94 |
-| `screen:profile` | 88 |
-| `go:results` | 86 |
-| `screen:results` | 86 |
-| `btn:start` | 83 |
-| `btn:btnCloseRoadQuests` | 80 |
-| `btn:btnMenuNotif` | 80 |
-| `screen:inbox` | 80 |
-| `btn:mprof` | 79 |
-| `screen:lobby` | 78 |
-| `go:rating` | 71 |
+| Feature | Players | Count |
+|---|---:|---:|
+| `screen:menu` | 7 | 1067 |
+| `screen:profile` | 7 | 88 |
+| `screen:progress` | 6 | 402 |
+| `screen:shop` | 6 | 189 |
+| `btn:btnMenuHub` | 6 | 162 |
+| `nav:shop` | 6 | 107 |
+| `btn:mprof` | 6 | 79 |
+| `btn:ok` | 5 | 2401 |
+| `btn:rot` | 5 | 426 |
+| `screen:friends` | 5 | 270 |
+| `nav:progress` | 5 | 268 |
+| `screen:game` | 5 | 237 |
+| `nav:menu` | 5 | 150 |
+| `screen:setup` | 5 | 127 |
+| `screen:rating` | 5 | 99 |
+| `btn:btnOpenModes` | 5 | 94 |
+| `btn:view` | 5 | 94 |
+| `screen:results` | 5 | 86 |
+| `btn:btnMenuNotif` | 5 | 83 |
+| `screen:inbox` | 5 | 83 |
+| `screen:lobby` | 5 | 78 |
+| `btn:btnMainPlay` | 5 | 68 |
+| `screen:match` | 5 | 58 |
+| `claim:quest` | 5 | 47 |
+| `mode:online` | 5 | 44 |
+| `screen:settings` | 5 | 34 |
+| `btn:gameMenu` | 5 | 33 |
+| `hub:settings` | 5 | 30 |
+| `btn:menuGiftPill` | 5 | 20 |
+| `claim:road` | 5 | 18 |
+| `nav:friends` | 4 | 150 |
+| `screen:items` | 4 | 43 |
+| `hub:rating` | 4 | 22 |
+| `rules:fast` | 4 | 19 |
+| `btn:menuQuestBanner` | 4 | 18 |
+| `claim:weekly` | 4 | 8 |
+| `claim:achievement` | 3 | 269 |
+| `btn:sayBtn` | 3 | 50 |
+| `buy:daily` | 3 | 25 |
+| `say:emote` | 3 | 23 |
+| `say:phrase` | 3 | 19 |
+| `btn:itemsBtn` | 3 | 18 |
+| `screen:rules` | 3 | 16 |
+| `screen:history` | 3 | 15 |
+| `mode:bots` | 3 | 12 |
+| `rules:classic` | 3 | 7 |
