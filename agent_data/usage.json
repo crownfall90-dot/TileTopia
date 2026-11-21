@@ -5,7 +5,7 @@
   "features": [
     {
       "feature": "screen:menu",
-      "count": 1067,
+      "count": 1059,
       "players": 7
     },
     {
@@ -15,22 +15,22 @@
     },
     {
       "feature": "screen:progress",
-      "count": 402,
+      "count": 393,
       "players": 6
     },
     {
       "feature": "screen:shop",
-      "count": 189,
+      "count": 176,
       "players": 6
     },
     {
       "feature": "btn:btnMenuHub",
-      "count": 162,
+      "count": 160,
       "players": 6
     },
     {
       "feature": "nav:shop",
-      "count": 107,
+      "count": 102,
       "players": 6
     },
     {
@@ -49,13 +49,13 @@
       "players": 5
     },
     {
-      "feature": "screen:friends",
-      "count": 270,
+      "feature": "nav:progress",
+      "count": 261,
       "players": 5
     },
     {
-      "feature": "nav:progress",
-      "count": 268,
+      "feature": "screen:friends",
+      "count": 253,
       "players": 5
     },
     {
@@ -65,7 +65,7 @@
     },
     {
       "feature": "nav:menu",
-      "count": 150,
+      "count": 145,
       "players": 5
     },
     {
@@ -95,12 +95,12 @@
     },
     {
       "feature": "btn:btnMenuNotif",
-      "count": 83,
+      "count": 81,
       "players": 5
     },
     {
       "feature": "screen:inbox",
-      "count": 83,
+      "count": 81,
       "players": 5
     },
     {
@@ -129,23 +129,23 @@
       "players": 5
     },
     {
-      "feature": "screen:settings",
-      "count": 34,
-      "players": 5
-    },
-    {
       "feature": "btn:gameMenu",
       "count": 33,
       "players": 5
     },
     {
+      "feature": "screen:settings",
+      "count": 33,
+      "players": 5
+    },
+    {
       "feature": "hub:settings",
-      "count": 30,
+      "count": 29,
       "players": 5
     },
     {
       "feature": "btn:menuGiftPill",
-      "count": 20,
+      "count": 19,
       "players": 5
     },
     {
@@ -155,7 +155,7 @@
     },
     {
       "feature": "nav:friends",
-      "count": 150,
+      "count": 142,
       "players": 4
     },
     {
@@ -214,12 +214,12 @@
       "players": 3
     },
     {
-      "feature": "screen:rules",
-      "count": 16,
+      "feature": "screen:history",
+      "count": 15,
       "players": 3
     },
     {
-      "feature": "screen:history",
+      "feature": "screen:rules",
       "count": 15,
       "players": 3
     },
