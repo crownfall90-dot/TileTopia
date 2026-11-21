@@ -16,7 +16,8 @@ test('help window: points per object and the rules, in a running game', {skip: !
     await page.evaluate(c => { window.__pg.startGame(c, []); window.__pg.show('game'); }, cfg);
     await page.waitForFunction(() => window.__pg.state().phase === 'place', null, {timeout: 20000});
     const before = await page.evaluate(SNAPSHOT);
-    await page.click('#helpBtn');
+    const openHelp = async () => { await page.click('#boardTools summary'); await page.click('#helpBtn'); };
+    await openHelp();
     const text = () => page.textContent('#helpBox');
     let t = await text();
     for (const want of ['Город', 'Дорога', 'Монастырь', '2 очка за каждую карту города', '9 очков', 'Классика']) assert.ok(t.includes(want), 'points tab shows ' + want);
@@ -25,7 +26,7 @@ test('help window: points per object and the rules, in a running game', {skip: !
     for (const want of ['Цель', 'Ваш ход', 'Конец игры']) assert.ok(t.includes(want), 'rules tab shows ' + want);
     await page.keyboard.press('Escape');
     assert.equal(await page.evaluate(() => !!document.getElementById('helpBox')), false, 'Escape closes it');
-    await page.click('#helpBtn'); await page.click('[data-hx]');
+    await openHelp(); await page.click('[data-hx]');
     assert.equal(await page.evaluate(() => !!document.getElementById('helpBox')), false, 'the button closes it');
     assert.deepEqual(await page.evaluate(SNAPSHOT), before, 'the game is untouched');
     assert.deepEqual(errors, []);

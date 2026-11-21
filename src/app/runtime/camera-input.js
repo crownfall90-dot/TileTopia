@@ -17,6 +17,15 @@ function applyCam() {
 }
 let boundsCache = null;
 function bounds() { if (boundsCache && boundsCache.n === tiles.size) return boundsCache; boundsCache = calcBounds(); boundsCache.n = tiles.size; return boundsCache; }
+function resizeTable() {
+  const {x0, x1, y0, y1} = bounds();
+  const margin = 2 * T;
+  const halfWidth = (HEX ? HW : T) / 2;
+  world.style.setProperty('--table-left', `${x0 * T - halfWidth - margin}px`);
+  world.style.setProperty('--table-top', `${y0 * T - T / 2 - margin}px`);
+  world.style.setProperty('--table-width', `${(x1 - x0) * T + halfWidth * 2 + margin * 2}px`);
+  world.style.setProperty('--table-height', `${(y1 - y0 + 1) * T + margin * 2}px`);
+}
 function calcBounds() {
   if (HEX) {
     let x0 = 0, x1 = 0, y0 = 0, y1 = 0;
@@ -91,9 +100,18 @@ let hintTimer = setTimeout(hideHint, 7000);
 function hideHint() { hint.classList.add('gone'); clearTimeout(hintTimer); }
 
 const pts = new Map();
+const boardTools = $('#boardTools');
+boardTools.addEventListener('keydown', e => {
+  if (e.key !== 'Escape' || !boardTools.open) return;
+  boardTools.open = false;
+  boardTools.querySelector('summary').focus();
+  e.stopPropagation();
+});
 let moved = false, sx = 0, sy = 0, pinch = null, vel = {x: 0, y: 0}, lastT = 0;
 board.addEventListener('pointerdown', e => {
-  if (e.target.closest('.fab,.over,.helppill')) return;
+  if (e.target.closest('#boardTools,.over,.helppill')) return;
+  boardTools.open = false;
+  if (e.target.closest('.fab')) return;
   camAnim++; inertia++;
   try { board.setPointerCapture(e.pointerId); } catch (_) {}
   pts.set(e.pointerId, {x: e.clientX, y: e.clientY});
@@ -144,9 +162,9 @@ $('#zout').onclick = () => tweenCam({z: Math.max(.45, cam.z / 1.25)}, 250);
 $('#ctr').onclick = () => centerCam(true);
 // Tilt presets: regular 3D and top-down; the button switches between them.
 const TILTS = [[55, '3D'], [22, '2D']];
-$('#view').onclick = e => {
+$('#view').onclick = () => {
   const i = (TILTS.findIndex(t => Math.abs(t[0] - cam.tilt) < 4) + 1) % TILTS.length;
-  e.currentTarget.textContent = TILTS[i][1];
+  $('#boardAngle').textContent = TILTS[i][1];
   tweenCam({tilt: TILTS[i][0]}, 500);
 };
 $('#turnL').onclick = () => tweenCam({rot: Math.round((cam.rot - ROT()) / ROT()) * ROT()}, 450);

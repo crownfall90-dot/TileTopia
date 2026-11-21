@@ -79,7 +79,8 @@ export function formatTurnStatusText({
   turnPlayerName,
   isLocal,
   localHumansCount = 1,
-  isAway = false
+  isAway = false,
+  showHints = true
 }) {
   if (isAway) {
     return 'За вас ходит бот <button class="chip" id="imHere">Вернуться</button>';
@@ -87,8 +88,7 @@ export function formatTurnStatusText({
   if (!isLocal) {
     return `Ходит <b>${turnPlayerName}</b>…`;
   }
-  if (localHumansCount > 1) {
-    return `Ход: <b>${turnPlayerName}</b>. Тапните по подсвеченному месту`;
-  }
-  return '<b>Ваш ход.</b> Тапните по подсвеченному месту';
+  const turn = localHumansCount > 1 ? `Ход: <b>${turnPlayerName}</b>.` : '<b>Ваш ход.</b>';
+  const next = showHints ? 'Выберите клетку с «+»' : 'Выберите клетку рядом с плитками';
+  return `${turn} ${next}`;
 }

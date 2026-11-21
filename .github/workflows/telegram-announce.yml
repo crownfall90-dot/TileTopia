@@ -8,6 +8,10 @@ on:
         description: 'Release tag (empty = latest), e.g. v240'
         type: string
         default: ''
+      notes:
+        description: 'Custom text for one post (empty = GitHub release notes)'
+        type: string
+        default: ''
 
 permissions:
   contents: read
@@ -20,14 +24,20 @@ jobs:
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID || '@diarydevelopment' }}
       TAG: ${{ inputs.tag }}
+      NOTES: ${{ inputs.notes }}
     steps:
       - uses: actions/checkout@v4
       - name: Send
         run: |
           test -n "$TELEGRAM_BOT_TOKEN" || { echo "Secret TELEGRAM_BOT_TOKEN is not set (Settings > Secrets and variables > Actions > Repository secrets)"; exit 1; }
           if [ -z "$TAG" ]; then TAG=$(gh release view --json tagName -q .tagName); fi
+          [[ "$TAG" =~ ^v[0-9]+$ ]] || { echo "Expected a numbered release tag"; exit 1; }
           CODE="${TAG#v}"
-          gh release view "$TAG" --json body -q .body > notes.md
+          if [ -n "$NOTES" ]; then
+            printf '%s\n' "$NOTES" > notes.md
+          else
+            gh release view "$TAG" --json body -q .body > notes.md
+          fi
           python3 scripts/telegram-notify.py "1.0.$CODE" notes.md \
             "https://${GITHUB_REPOSITORY_OWNER}.github.io/${GITHUB_REPOSITORY#*/}/" \
             "https://github.com/${GITHUB_REPOSITORY}/releases/download/${TAG}/Tiletopia-1.0.${CODE}.apk"

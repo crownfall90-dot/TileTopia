@@ -1,26 +1,5 @@
 /* ---------------- setup ---------------- */
 
-function buildBoard() {
-  const R = rng(20261023);
-  const pool = [];
-  for (const id in TYPES) for (let i = 0; i < TYPES[id].n; i++) pool.push(id);
-  pool.splice(pool.indexOf('capRS'), 1);
-  for (let i = pool.length - 1; i > 0; i--) { const j = (R() * (i + 1)) | 0; [pool[i], pool[j]] = [pool[j], pool[i]]; }
-  tiles = new Map(); G.tiles = tiles;
-  tiles.set(key(0, 0), {x: 0, y: 0, type: 'capRS', r: 0, seed: 1});
-  let placed = 1, guard = 0;
-  while (placed < 21 && guard++ < 300) {
-    const id = pool.shift(), moves = allMoves(id);
-    if (!moves.length) { pool.push(id); continue; }
-    let best = null, bs = -1e9;
-    for (const m of moves) { let n = 0; for (let d = 0; d < 4; d++) if (at(m.x + DX[d], m.y + DY[d])) n++; const s = n * 1.4 + R() * 2 - Math.hypot(m.x, m.y) * .25; if (s > bs) { bs = s; best = m; } }
-    tiles.set(key(best.x, best.y), {x: best.x, y: best.y, type: id, r: best.r, seed: (R() * 1e9) | 0});
-    placed++;
-  }
-  deck = pool; deckMax = pool.length;
-  for (let i = deck.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [deck[i], deck[j]] = [deck[j], deck[i]]; }
-  return R;
-}
 function makeDeck(rules) {
   const d = rules.mode === 'hex' ? HX.deckList(rules) : deckList(rules);
   for (let i = d.length - 1; i > 0; i--) { const j = (Math.random() * (i + 1)) | 0; [d[i], d[j]] = [d[j], d[i]]; }
@@ -63,12 +42,12 @@ function startGame(cfg, replay = []) {
   const locId = (cfg && cfg.loc) || wallet.loc || 'village';
   const gameScr = $('#scr-game');
   if (gameScr) gameScr.dataset.loc = locId;
+  $('#boardTools').open = false;
   $('#sayBtn').hidden = false; $('#sayBox').hidden = true;
   queue = replay.map(m => ({...m, old: true})); applied = 0; clearTimeout(catchT); catchUp = replay.length > 0; lastPlaced = null; markOwn();
   gameLog = {cfg, moves: replay.slice()};
   if (meepleResolve) { meepleResolve = null; mrow.hidden = true; prow.hidden = false; }
-  // The menu shows a small built-up kingdom; the game itself starts from an empty table.
-  useGeo(false); buildBoard(); buildMini(); useGeo(cfg.rules && cfg.rules.mode === 'hex');
+  buildMini(); useGeo(cfg.rules && cfg.rules.mode === 'hex');
   world.innerHTML = '';
   ghost = null; slotEls = []; meeples = []; doneFeats = []; turn = 0; phase = 'idle';
   const rules = gameRules = cfg.rules;
@@ -92,12 +71,13 @@ function startGame(cfg, replay = []) {
   // Tutorial: the first piece counts as the player's own, so the town they close on move one can take a figure at once.
   if (cfg.tut) first.by = 0;
   tiles = new Map([[key(0, 0), first]]); G.tiles = tiles;
-  first.el = tileEl(first); world.append(first.el);
+  first.el = tileEl(first); world.append(first.el); resizeTable();
   $('#over').hidden = true;
   // The first card's neighbours sit about 136 px per unit of zoom from the centre; keep them clear of the zoom buttons
   // on the right edge (48 px) on narrow phones, never above the usual 1.05.
-  Object.assign(cam, {px: 0, py: 0, z: Math.max(.7, Math.min(1.05, (document.documentElement.clientWidth / 2 - 54) / 136)), tilt: wallet.view === 'top' ? 22 : 55}); applyCam();
-  $('#view').textContent = wallet.view === 'top' ? '2D' : '3D';
+  const maxZoom = matchMedia('(orientation: landscape) and (max-height: 440px)').matches ? .8 : 1.05;
+  Object.assign(cam, {px: 0, py: 0, z: Math.max(.7, Math.min(maxZoom, (document.documentElement.clientWidth / 2 - 54) / 136)), tilt: wallet.view === 'top' ? 22 : 55}); applyCam();
+  $('#boardAngle').textContent = wallet.view === 'top' ? '2D' : '3D';
   renderPlayers(); renderResults(false);
   if (replay.length || cfg.noIntro) { toast(`Первая карта из стопки: ${TY(first.type).name}`); return startTurn(); }
   const my = token;

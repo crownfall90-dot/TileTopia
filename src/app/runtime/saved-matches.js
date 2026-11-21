@@ -87,6 +87,8 @@ function pendingGame() {
 }
 function autoResume() {
   if (tut || resumeHold || gameVisible || document.hidden || mm) return false;
+  const menu = $('#scr-menu');
+  if (!isApp || menu.hidden || _outgoingScr === menu) return false;
   // only what must be answered first holds it back: an update offer, the maintenance screen, the reinstall card
   if ((updBox && document.body.contains(updBox)) || document.getElementById('maintBox') || document.getElementById('reinst')) return false;
   const g = pendingGame(); if (!g) return false;

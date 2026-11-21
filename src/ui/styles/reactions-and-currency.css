@@ -172,10 +172,6 @@
   z-index: 1;
 }
 
-.ground {
-  background: radial-gradient(closest-side, rgba(65, 108, 62, 0.36) 0%, rgba(34, 58, 48, 0.15) 50%, transparent 80%) !important;
-}
-
 
 /* ==================== Progress Road & Main Menu Rating ==================== */
 .mtop-right-group {

@@ -1,14 +1,14 @@
 # Tiletopia — Инструкции для разработчиков и ИИ-агентов (Claude / Antigravity)
 
 > **Статус проекта: АКТИВЕН И ПОЛНОСТЬЮ СИНХРОНИЗИРОВАН.**
-> **Текущая боевая версия (Production):** [`v296`](https://github.com/crownfall90-dot/TileTopia/releases/tag/v296) (`1.0.296`, APK `app.crownfall.tiletopia`).
+> **Текущая боевая версия (Production):** [`v298`](https://github.com/crownfall90-dot/TileTopia/releases/tag/v298) (`1.0.298`, APK `app.crownfall.tiletopia`).
 > **Тестовая среда (Staging):** отдельный пакет `app.crownfall.tiletopia.test`, авто-публикация в `staging-latest`.
-> **Тесты:** в полном прогоне v296 прошли 315 проверок, включая 24 эталонных партии. Для браузерных проверок установи Playwright Chromium.
+> **Тесты:** в полном прогоне v298 прошли 322 проверки, включая 24 эталонные партии. Для браузерных проверок установи Playwright Chromium.
 > **Свежая передача контекста:** [журнал выпуска](docs/coordination/HANDOFF.md), [план развития архитектуры](docs/ENGINEERING-ROADMAP.md) и [пакет Google Play](docs/product/PLAY-RELEASE.md).
 
 ---
 
-## 1. Архитектура и ключевые возможности на v296
+## 1. Архитектура и ключевые возможности на v298
 
 1. **Лента главного меню со свайпом 1:1 (в стиле Clash Royale):**
    - Непрерывная горизонтальная лента с точным следованием за пальцем, физикой инерции и эластичным сопротивлением у границ экрана.

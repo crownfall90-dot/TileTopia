@@ -50,13 +50,19 @@ html body #scr-game{background-image:none;background-color:#0f1626}
 html body .board{background:radial-gradient(75% 60% at 50% 46%,#1c2944 0%,#121b2f 62%,#0e1524 100%)}
 html body .village-backdrop{display:none}
 html body .relic-name{display:none}
-html body .fabs{gap:2px;padding:4px;border-radius:18px;background:rgba(12,17,32,.72);border:1px solid var(--m-line);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px)}
+html body .fabs{gap:2px;padding:3px;border-radius:15px;background:#141e30;border:1px solid var(--m-line)}
 html body .fabs .fab{background:transparent;border:0;box-shadow:none;color:var(--muted);border-radius:13px}
 @media (hover: hover){
 html body .fabs .fab:hover{background:var(--m-surface-2);color:var(--ink)}
 
 }
 html body .fabs .fab:active{transform:scale(.94)}
+.board-tools summary{list-style:none}
+.board-tools summary::-webkit-details-marker{display:none}
+.board-tools summary:focus-visible{outline:2px solid var(--brass);outline-offset:1px}
+.board-tools-panel{position:absolute;right:calc(100% + 7px);bottom:0;display:grid;width:168px;padding:4px;background:#141e30;border:1px solid var(--m-line);border-radius:13px;box-shadow:0 8px 20px #090f1ea0}
+html body .fabs .board-tools-panel .fab{display:flex;justify-content:space-between;align-items:center;width:100%;min-height:42px;padding:0 9px;color:var(--ink);font:650 13px var(--f-body);white-space:nowrap}
+#boardAngle{color:var(--m-gold)}
 .board:focus-visible{outline:2px solid var(--brass);outline-offset:-2px}
 @media (pointer:coarse) and (min-height:560px){html body .fabs .fab{width:44px;height:44px}}
 @media (prefers-reduced-motion:no-preference){.board .slot{transition:background-color .14s ease,border-color .14s ease,box-shadow .14s ease}}
@@ -67,9 +73,22 @@ html body .tray{background:linear-gradient(180deg,rgba(15,22,38,0),#0f1626 32%);
 html body #status{background:transparent;border-color:transparent;color:var(--muted)}
 html body #rot{background:var(--m-surface);border:1px solid var(--m-line)}
 /* the free spots for a move: a light outline in the player's colour, a faint tint, a small plus */
-html body .slot{border-width:1.5px;background:rgba(255,255,255,.03)}
+html body .slot{--pc:#d5efdb;border-width:1.5px;background:rgba(255,255,255,.03)}
 html body .slot::before{opacity:.1}
 html body .slot::after{width:16px;height:16px;opacity:.75}
+.world.nohint .slot:not(.tip)::before{display:none}
+@media (orientation:landscape) and (max-height:440px){
+  html body .fabs{top:6px;right:6px;transform:none;flex-direction:row}
+  .board-tools-panel{top:calc(100% + 5px);right:0;bottom:auto}
+  .phone #scr-game .gtop{padding-block:4px}
+  .phone #scr-game .players{padding-block:0 4px}
+  .phone #scr-game .tray{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.35fr);align-items:center;gap:5px;padding-block:4px calc(5px + env(safe-area-inset-bottom,0px))}
+  .phone #scr-game .tray .prow{gap:6px}
+  .phone #scr-game .tray :is(.ct,.rbtn,#ok){height:44px}
+  .phone #scr-game .tray :is(.ct,.rbtn){width:44px}
+  .phone #scr-game .tray .ct.hex{width:50.8px}
+  .phone #scr-game .tray .cname small,.phone #scr-game .turnfig,.phone #scr-game .hint{display:none}
+}
 /* the stack counter: a quiet chip like the rest of the top bar */
 html body .deck{background:var(--m-surface)}
 /* no parallelograms: cards, badges and buttons stand straight (and their contents need no counter-skew) */

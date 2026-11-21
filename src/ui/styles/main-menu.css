@@ -696,9 +696,7 @@
 
 @keyframes pz8{0%,66.7%{opacity:0;transform:translateZ(80px)}75.0%{opacity:1;transform:translateZ(0)}82%{opacity:1;transform:translateZ(0)}93%,100%{opacity:0;transform:translateZ(-6px)}}
 
-#boot{position:fixed;inset:0;z-index:100;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:26px;background:radial-gradient(120% 60% at 50% 40%,#34477a 0%,#18213d 55%,#0f1528 100%);transition:opacity .35s}
 
-#boot.gone{opacity:0;pointer-events:none}#boot.withupd{justify-content:flex-start;padding-top:calc(9vh + var(--it,0px));gap:18px}#boot.withupd .bootpz{width:150px;height:150px}#boot.withupd small{display:none}#boot small{color:var(--muted);font-size:13px;margin-top:-14px;animation:blink 1.4s ease-in-out infinite}#boot .pz{width:200px;height:200px}#boot b{font:800 26px var(--f-display);color:var(--ink)}#boot b span{color:var(--brass)}
 
 .lbwait{display:flex;align-items:center;gap:14px}
 

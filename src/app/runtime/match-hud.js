@@ -237,17 +237,17 @@ function setRot(nr) {
 function clearSlots() { slotEls.forEach(x => x.remove()); slotEls = []; }
 function renderSlots() {
   clearSlots();
+  const slots = document.createDocumentFragment();
   for (const c of emptyCells()) {
     if (!legalRots(current.type, c.x, c.y).length || (tut && !tutAllows(c.x, c.y))) continue;
     const el = document.createElement('div'); el.className = 'slot' + (HEX ? ' hex' : '') + (tut ? ' tutpulse' : ''); el.dataset.x = c.x; el.dataset.y = c.y;
-    if (players[turn]) el.style.setProperty('--pc', players[turn].col);
     const [l, tp] = cellLT(c.x, c.y); el.style.left = l + 'px'; el.style.top = tp + 'px';
-    world.append(el); slotEls.push(el);
+    slots.append(el); slotEls.push(el);
   }
+  world.append(slots);
 }
 function placeGhost() {
   if (!ghost) { ghostDeg = current.r * ROT(); ghost = tileEl({x: sel.x, y: sel.y, type: current.type, r: current.r}); ghost.classList.add('ghost'); world.append(ghost); }
-  ghost.style.setProperty('--pc', players[turn].col);
   const [gl, gt] = cellLT(sel.x, sel.y); ghost.style.left = gl + 'px'; ghost.style.top = gt + 'px';
 }
 function selectSlot(x, y) {
@@ -258,14 +258,14 @@ function selectSlot(x, y) {
   setRot(rots.includes(current.r) ? current.r : rots[0]);
   slotEls.forEach(s => s.classList.toggle('sel', +s.dataset.x === x && +s.dataset.y === y));
   placeGhost(); okBtn.disabled = false; peekSend();
-  setStatus(rots.length > 1 ? 'Поверните карту или нажмите <b>«Поставить»</b>' : 'Здесь карта встаёт только так · <b>«Поставить»</b>');
+  setStatus(rots.length > 1 ? 'Можно повернуть плитку или <b>поставить</b>' : 'Плитка подходит. Нажмите <b>«Поставить»</b>');
 }
 function rotate() {
   if (phase !== 'place' || !current) return;
   beep('rotate'); tutEvent('rotate');
   if (!sel) return setRot((current.r + 1) % NDIR());
   const rots = legalRots(current.type, sel.x, sel.y);
-  if (rots.length < 2) { useCount('turn:rotate_locked'); toast('Другие повороты не сходятся с соседями'); if (ghost) { ghost.classList.remove('shake'); void ghost.offsetWidth; ghost.classList.add('shake'); setTimeout(() => ghost && ghost.classList.remove('shake'), 360); } return; }
+  if (rots.length < 2) { useCount('turn:rotate_locked'); toast('В этой клетке подходит один поворот'); return; }
   setRot(rots[(rots.indexOf(current.r) + 1) % rots.length]);
 }
 rotBtn.onclick = rotate;
@@ -316,7 +316,7 @@ function helpWindow(tab = 'pts') {
   box.onclick = e => { if (e.target === box || e.target.closest('[data-hx]')) return close(); const t = e.target.closest('[data-ht]'); if (t) { close(); helpWindow(t.dataset.ht); } };
   track('help_open');
 }
-$('#helpBtn').onclick = () => helpWindow();
+$('#helpBtn').onclick = () => { boardTools.open = false; helpWindow(); };
 // The hint button: on your own turn (not online, not in the tutorial, when the table plays with hints) it picks the
 // best spot for the card, turns the card to fit and says why. The choice lives in src/engine/bots.js.
 const tipBtn = $('#tip');
@@ -363,13 +363,18 @@ function tap(x, y) {
   if (s) { useCount('turn:slot'); selectSlot(+s.dataset.x, +s.dataset.y); }
 }
 async function dropAt(t) {
+  const match = token;
   peekClear();
   sel = {x: t.x, y: t.y};
   if (!ghost) placeGhost();
-  ghost.classList.remove('ghost');
-  if (!(RM || fast())) await ghost.animate([{transform: 'translateZ(26px)'}, {transform: 'translateZ(0)'}], {duration: 260, easing: 'cubic-bezier(.5,0,.8,.4)'}).finished;
-  ghost.remove(); ghost = null; lastPlaced = t;
-  t.el = tileEl(t); world.append(t.el); tiles.set(key(t.x, t.y), t); wallsAround(t); markOwn();
+  const preview = ghost;
+  preview.classList.remove('ghost');
+  if (!(RM || fast() || wallet.gfx === 'low')) {
+    await preview.animate([{transform: 'translateZ(8px)'}, {transform: 'translateZ(0)'}], {duration: 140, easing: 'ease-in'}).finished.catch(() => {});
+  }
+  if (token !== match) return;
+  preview.remove(); ghost = null; lastPlaced = t;
+  t.el = tileEl(t); world.append(t.el); tiles.set(key(t.x, t.y), t); resizeTable(); wallsAround(t); markOwn();
   if (!fast()) beep('place');
   if (!fast()) { const pf = document.createElement('i'); pf.className = 'puff'; t.el.append(pf); setTimeout(() => pf.remove(), 600); }
   if (!fast()) { t.el.classList.add('puzzle-lock'); setTimeout(() => { if (t.el) t.el.classList.remove('puzzle-lock'); }, 350); }

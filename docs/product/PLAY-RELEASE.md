@@ -4,7 +4,7 @@
 
 ## Пакет для магазина
 
-- Пакет `app.crownfall.tiletopia`, Android App Bundle варианта `playRelease`. Подписанный AAB версии 297 опубликован рядом с GitHub APK. Для подачи версии 298 собрать её AAB и сверить сертификат подписи с ключом загрузки в Play Console. Установка и обновление Play-версии идут через магазин.
+- Пакет `app.crownfall.tiletopia`, Android App Bundle варианта `playRelease`. Подписанный AAB v298 опубликован рядом с GitHub APK и проверен bundletool. Для подачи сверить сертификат подписи с ключом загрузки в Play Console. Установка и обновление Play-версии идут через магазин. [Пакет v298](https://github.com/crownfall90-dot/TileTopia/releases/tag/v298)
 - `targetSdk 36` соответствует текущему требованию к новым телефонным приложениям и обновлениям. При наличии нативных библиотек проверить их совместимость со страницами памяти 16 КБ. [Требования к API](https://support.google.com/googleplay/android-developer/answer/11926878) · [Поддержка 16 КБ](https://developer.android.com/guide/practices/page-sizes)
 - [Карточка на русском](../../store/listing-ru.md) и [карточка на английском](../../store/listing-en.md) используют одно название и значок. Описания соответствуют доступным режимам. Интерфейс игры в текущей версии на русском.
 - [Политика конфиденциальности](https://crownfall90-dot.github.io/TileTopia/privacy.html) · [Английская политика](https://crownfall90-dot.github.io/TileTopia/privacy-en.html) · [Запрос на удаление аккаунта](https://crownfall90-dot.github.io/TileTopia/delete-account.html) · [Данные для заполнения анкеты](GOOGLE-PLAY-DATA-SAFETY.md)

@@ -53,4 +53,4 @@ $('#checkUpd').onclick = () => { checkLabel('Проверяем…'); AndroidApp
 // A version this session already heard about (and the player put off) is still an update, whatever a later check says.
 window.onNoUpdate = () => { checkLabel('Проверить обновления'); if (lastUpd && lastUpd.code > appCode()) return window.onUpdateAvailable(lastUpd, true); toastAny('У вас последняя версия'); };
 window.onCheckFailed = () => { checkLabel('Проверить обновления'); toastAny('Не удалось проверить обновления — попробуйте чуть позже'); };
-function setView(v) { const top = v === 'top'; $('#view').textContent = top ? '2D' : '3D'; tweenCam({tilt: top ? 22 : 55}, 400); }
+function setView(v) { const top = v === 'top'; $('#boardAngle').textContent = top ? '2D' : '3D'; tweenCam({tilt: top ? 22 : 55}, 400); }

@@ -35,73 +35,20 @@ plog('open', {p: installKind(), v: appVersion()});
 if (window.WEBAPP && FB && FB.googleClientId) googleReturn();
 // back from Google's page with the browser's Back button: the page comes from the cache with the button still pressed
 addEventListener('pageshow', e => { if (e.persisted) document.querySelectorAll('#accGoogle').forEach(b => { b.disabled = false; }); });
-if (isApp) bootReady.then(() => setTimeout(() => { offerTutorial(); if (isWeb) { openLink(); setTimeout(firstInstallHint, 400); } }, 300));
-// The app opens on the menu (a saved game must survive); the browser mock-up opens straight into a game.
-if (!isApp) newGame(); else { buildBoard(); buildMini(); }
-/* Loaders lay real pieces one by one, and they fit like in a game: road to road, river to river,
-   town to town. Each cycle shows a new 3x3 layout found by a small backtracking search. */
-const loaderImgs = {};
-function loaderLayout() {
-  const bag = Object.keys(TYPES).filter(k => !TYPES[k].e.includes('b') && TYPES[k].e !== 'ffff' && !TYPES[k].rare).flatMap(k => Array(TYPES[k].n).fill(k));
-  const grid = [], side = (c, d) => TYPES[c.type].e[(d - c.r + 4) % 4];
-  const fitsAt = (i, type, r) => { const e = d => TYPES[type].e[(d - r + 4) % 4];
-    return !(i % 3 && side(grid[i - 1], 1) !== e(3)) && !(i >= 3 && side(grid[i - 3], 2) !== e(0)); };
-  const solve = i => {
-    if (i === 9) return true;
-    for (let k = 0; k < 80; k++) {
-      const type = bag[(Math.random() * bag.length) | 0], r = (Math.random() * 4) | 0;
-      if (!fitsAt(i, type, r)) continue;
-      grid[i] = {type, r};
-      if (solve(i + 1)) return true;
-    }
-    return false;
-  };
-  return solve(0) ? grid : null;
-}
-function pieceUrl({type, r}) {
-  const img = loaderImgs[type];
-  if (!img || !img.complete || !img.naturalWidth) return TILE_URL[type] || '';
-  const c = document.createElement('canvas'); c.width = c.height = 96; const g = c.getContext('2d');
-  g.translate(48, 48); g.rotate(r * Math.PI / 2);
-  try {
-    g.drawImage(img, -48, -48, 96, 96);
-    return c.toDataURL('image/jpeg', .85);
-  } catch (_) {
-    return (img && img.src) || TILE_URL[type] || '';
+if (isApp) {
+  const tutorialReady = bootReady.then(() => new Promise(resolve => setTimeout(resolve, 300))).then(offerTutorial);
+  if (isWeb) {
+    // Deferred Telegram SDK can finish after the first paint. Only web invites need it.
+    const linksReady = new Promise(resolve => document.addEventListener('DOMContentLoaded', resolve, {once: true}));
+    Promise.all([tutorialReady, linksReady]).then(() => {
+      openLink();
+      setTimeout(firstInstallHint, 400);
+    });
   }
 }
-function relayLoader(pz) {
-  const grid = loaderLayout(); if (!grid) return;
-  pz.querySelectorAll('i').forEach((el, i) => { el.style.backgroundImage = `url(${pieceUrl(grid[i])})`; });
-}
-const loaderReady = Promise.all(Object.keys(TYPES).map(k => new Promise(res => { const im = new Image(); im.onload = im.onerror = res; im.src = TILE_URL[k]; loaderImgs[k] = im; }))).then(() => {
-  document.querySelectorAll('.pz').forEach(pz => {
-    relayLoader(pz);
-    // all pieces are hidden at the end of a cycle: swap in a new layout then
-    pz.querySelector('i').addEventListener('animationiteration', () => relayLoader(pz));
-  });
-});
+// The app opens on the menu (a saved game must survive); the browser mock-up opens straight into a game.
+if (!isApp) newGame(); else buildMini();
 window.__ready = true;
-// tell the app the page started: a game update downloaded over the air is then kept (ContentUpdater.java)
+// Retain an authenticated OTA page after the client starts.
 try { if (window.AndroidApp && AndroidApp.contentReady) AndroidApp.contentReady(); } catch (_) {}
-// In the app the loader stays a moment as a splash, long enough to see a few tiles land.
-// On app start the splash lays one full fitting 3x3 (restarted once the real pieces are in).
-{ const el = $('#boot'); if (el) {
-  let done = false;
-  const finishBoot = () => {
-    if (done) return;
-    done = true;
-    boot.min = true;
-    boot.checked = true;
-    bootHide();
-  };
-  // Play loading screen animation to the very end before transitioning to the game:
-  // tiles fly in and assemble -> title appears -> golden glow -> sheen sweeps -> meeple drops and lands
-  el.addEventListener('animationend', e => {
-    if (e.animationName === 'bootmeeple' || e.animationName === 'bootsheen') {
-      setTimeout(finishBoot, 350);
-    }
-  });
-  // Fallback in case animations are disabled or cancelled
-  setTimeout(finishBoot, 6000);
-} }
+PG.app.splash.startSplash({boot, element: $('#boot'), reducedMotion: RM, finish: bootHide});

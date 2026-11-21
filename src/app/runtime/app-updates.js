@@ -8,7 +8,14 @@ function bootHide() {
   if (boot.gone || !boot.min || !boot.checked || boot.update) return;
   boot.gone = true;
   const el = $('#boot');
-  if (el) { el.classList.add('gone'); setTimeout(() => el.remove(), 400); }
+  if (el) {
+    if (RM) el.remove();
+    else {
+      el.classList.add('gone');
+      el.setAttribute('aria-hidden', 'true');
+      setTimeout(() => el.remove(), 260);
+    }
+  }
   bootDone();
 }
 
