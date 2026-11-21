@@ -1,14 +1,14 @@
 # Tiletopia — Инструкции для разработчиков и ИИ-агентов (Claude / Antigravity)
 
 > **Статус проекта: АКТИВЕН И ПОЛНОСТЬЮ СИНХРОНИЗИРОВАН.**
-> **Текущая боевая версия (Production):** `v295` (код сборки `1.0.295`, APK `app.crownfall.tiletopia`)
-> **Тестовая среда (Staging):** `1.0.334-test` (отдельный пакет `app.crownfall.tiletopia.test`), авто-публикация в `staging-latest`.
-> **Тесты:** **258 unit-тестов проходят на 100% (0 fail)** при запуске `npm test` (`node --test tests/*.test.cjs`).
-> **Свежая передача контекста:** `docs/STATE_HANDOFF_FOR_CLAUDE.md` и мастер-промпт перехода на Rust `docs/HYBRID-RUST-MIGRATION-PROMPT.md`.
+> **Текущая боевая версия (Production):** [`v296`](https://github.com/crownfall90-dot/TileTopia/releases/tag/v296) (`1.0.296`, APK `app.crownfall.tiletopia`).
+> **Тестовая среда (Staging):** отдельный пакет `app.crownfall.tiletopia.test`, авто-публикация в `staging-latest`.
+> **Тесты:** в полном прогоне v296 прошли 315 проверок, включая 24 эталонных партии. Для браузерных проверок установи Playwright Chromium.
+> **Свежая передача контекста:** [журнал выпуска](docs/coordination/HANDOFF.md), [план развития архитектуры](docs/ENGINEERING-ROADMAP.md) и [пакет Google Play](docs/product/PLAY-RELEASE.md).
 
 ---
 
-## 1. Текущий архитектурный статус и ключевые возможности (Checkpoint v295)
+## 1. Архитектура и ключевые возможности на v296
 
 1. **Лента главного меню со свайпом 1:1 (в стиле Clash Royale):**
    - Непрерывная горизонтальная лента с точным следованием за пальцем, физикой инерции и эластичным сопротивлением у границ экрана.

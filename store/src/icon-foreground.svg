@@ -128,14 +128,14 @@
   <!-- Central Tile Emblem Badge: 'Tt' Monogram & 'TileTopia' -->
   <g filter="url(#badgeShadow)">
     <!-- Slanted Trapezoid Tile Emblem Plate -->
-    <g transform="translate(54, 54)">
+    <g transform="translate(54, 54) scale(1.06)">
       <!-- Badge Base -->
       <rect x="-24" y="-14" width="48" height="28" rx="7" transform="skewX(-10)" fill="#11182c" stroke="#3b4d7c" stroke-width="1.2"/>
       <!-- Gold Inner Border -->
       <rect x="-22" y="-12.5" width="44" height="25" rx="5.5" transform="skewX(-10)" fill="url(#goldBanner)" stroke="#fff" stroke-width="0.7"/>
 
       <!-- Red Regal Ribbon Inset -->
-      <rect x="-20" y="-10.5" width="40" height="21" rx="4.5" transform="skewX(-10)" fill="#8c1d1d" stroke="#520e0e" stroke-width="0.8"/>
+      <rect x="-20" y="-10.5" width="40" height="21" rx="4.5" transform="skewX(-10)" fill="#9e2020" stroke="#520e0e" stroke-width="0.8"/>
       
       <!-- 'Tt' Monogram with 3D Gold effect -->
       <!-- Drop shadow for text -->
@@ -146,7 +146,7 @@
       <path d="M -4 -6.5 L -2 -4 L 0 -7 L 2 -4 L 4 -6.5 L 3.5 -3 L -3.5 -3 Z" fill="url(#goldBanner)" stroke="#520e0e" stroke-width="0.4"/>
       
       <!-- Subtitle 'TILETOPIA' beneath -->
-      <text x="0" y="8.8" text-anchor="middle" font-family="'Onest', sans-serif" font-weight="800" font-size="4.2" fill="#fff" letter-spacing="1px" opacity="0.95">TILETOPIA</text>
+      <text x="0" y="9" text-anchor="middle" font-family="'Onest', sans-serif" font-weight="700" font-size="4.5" fill="#fff" letter-spacing="0.9px">TILETOPIA</text>
     </g>
   </g>
 </svg>
