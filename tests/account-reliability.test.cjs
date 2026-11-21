@@ -370,5 +370,6 @@ test('app text is not selectable by long press, typing fields and codes are', ()
 
 test('the starting zoom keeps the first card\'s neighbours clear of the zoom buttons on narrow phones', () => {
   assert.ok(html.includes('(document.documentElement.clientWidth / 2 - 54) / 136'));
-  assert.ok(html.includes('Math.max(.7, Math.min(1.05,'));
+  assert.ok(html.includes("matchMedia('(orientation: landscape) and (max-height: 440px)').matches ? .8 : 1.05"));
+  assert.ok(html.includes('Math.max(.7, Math.min(maxZoom,'));
 });

@@ -12,6 +12,7 @@ on:
       - docs/coordination/HANDOFF.md
       - docs/product/PLAY-RELEASE.md
       - docs/product/PLAYER-USAGE.md
+      - 'tests/**'
       - .github/workflows/pages.yml
   # Releases are cut only on request (workflow_dispatch): changes accumulate in release-notes.md
   # and go out together when the owner says so. Merging to main does not release.

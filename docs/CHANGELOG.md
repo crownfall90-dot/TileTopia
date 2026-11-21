@@ -2869,3 +2869,14 @@
 - Merge pull request #265 from crownfall90-dot/codex/compact-interface
 - feat(game): simplify the interface and split client responsibilities
 
+## 1.0.299 — 2026-11-21
+
+**Игрокам:**
+- Новая заставка собирает игровое поле из трёх плиток. При уменьшенном движении показывается статичная версия, а открытие игры не зависит от анимации.
+- Плитки лежат на игровом столе, который растёт вместе с партией. Выберите клетку с «+», проверьте плитку и нажмите «Поставить».
+- Масштаб и возврат к центру остаются под рукой. Вид 2D/3D, поворот поля и правила собраны в меню на поле.
+
+**В коде:**
+- Merge pull request #266 from crownfall90-dot/codex/v299-motion-splash
+- feat(game): add a tactile game table and reliable motion splash
+
