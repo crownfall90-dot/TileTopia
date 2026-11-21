@@ -58,10 +58,10 @@ export function renderFriendsListHtml({
   const fRow = (f, btn, sub) => renderFriendRow(f, btn, sub);
   let h = '';
   if (invs.length) {
-    h += `<div class="h3 fsec-hdr"><span>🎮</span><b>Зовут играть</b><em>${invs.length}</em></div><ul class="flist">${invs.map(([k, v]) => fRow({n: cleanFn(v.n), c: '#f2b84b', uid: v.u}, `<button class="chip go" data-fjoin="${k}">Войти</button><button class="chip x" data-fdrop="${k}" aria-label="Отклонить">✕</button>`, 'комната ' + cleanFn(v.code))).join('')}</ul>`;
+    h += `<div class="h3 fsec-hdr"><span>🎮</span><b>Зовут играть</b><em>${invs.length}</em></div><ul class="flist">${invs.map(([k, v]) => fRow({n: cleanFn(v.n), c: '#f2b84b', uid: k.slice(0, -2)}, `<button class="chip go" data-fjoin="${k}">Войти</button><button class="chip x" data-fdrop="${k}" aria-label="Отклонить">✕</button>`, 'комната ' + cleanFn(v.code))).join('')}</ul>`;
   }
   if (reqs.length) {
-    h += `<div class="h3 fsec-hdr"><span>📩</span><b>Заявки в друзья</b><em>${reqs.length}</em></div><ul class="flist">${reqs.map(([k, v]) => fRow({n: cleanFn(v.n), c: '#f2b84b', uid: v.u}, `<button class="chip go" data-facc="${k.slice(0, -2)}">Принять</button><button class="chip x" data-fdrop="${k}" aria-label="Отклонить">✕</button>`, 'хочет дружить')).join('')}</ul>`;
+    h += `<div class="h3 fsec-hdr"><span>📩</span><b>Заявки в друзья</b><em>${reqs.length}</em></div><ul class="flist">${reqs.map(([k, v]) => fRow({n: cleanFn(v.n), c: '#f2b84b', uid: k.slice(0, -2)}, `<button class="chip go" data-facc="${k.slice(0, -2)}">Принять</button><button class="chip x" data-fdrop="${k}" aria-label="Отклонить">✕</button>`, 'хочет дружить')).join('')}</ul>`;
   }
   h += `<div class="h3 fsec-hdr"><span class="fdot on"></span><b>В сети</b></div><ul class="flist">${on.map(f => fRow(f, `<button class="chip go" data-finv="${f.uid}">${room && invited.code === room && invited.joined && invited.joined.has(f.uid) ? '✓ Принял' : room && invited.code === room && invited.uids && invited.uids.has(f.uid) ? 'Ещё раз' : 'Позвать'}</button>`, (f.p && stateTextMap[f.p.s]) || 'в игре')).join('') || '<li class="qnote fempty-note">Никого из друзей нет в сети</li>'}</ul>`;
   if (off.length) {

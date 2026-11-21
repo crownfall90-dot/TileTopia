@@ -1,14 +1,13 @@
 // Tests for feedback modernization, device diagnostics & lag telemetry, and game name proposal contest.
 'use strict';
+const { gameSource, stylesSource } = require('../scripts/compose-page.cjs');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const GAME_PATH = path.join(__dirname, '..', 'web', 'game.html');
 const ADMIN_PATH = path.join(__dirname, '..', 'tools', 'founder-admin.html');
 const RULES_PATH = path.join(__dirname, '..', 'docs', 'firebase-rules.json');
-const STYLES_PATH = path.join(__dirname, '..', 'src', 'ui', 'styles.css');
 
 test('firebase rules: suggestions/names, extended feedback and error telemetry', () => {
   const rules = JSON.parse(fs.readFileSync(RULES_PATH, 'utf8'));
@@ -32,7 +31,7 @@ test('firebase rules: suggestions/names, extended feedback and error telemetry',
 });
 
 test('game.html: device diagnostics & lag telemetry', () => {
-  const code = fs.readFileSync(GAME_PATH, 'utf8');
+  const code = gameSource();
 
   assert.ok(code.includes('function getDeviceDiagnostics()'), 'getDeviceDiagnostics function exists');
   assert.ok(code.includes('platform'), 'diagnostics captures platform');
@@ -49,7 +48,7 @@ test('game.html: device diagnostics & lag telemetry', () => {
 });
 
 test('game.html: upgraded feedback UI with 5-star rating & device diagnostics', () => {
-  const code = fs.readFileSync(GAME_PATH, 'utf8');
+  const code = gameSource();
 
   assert.ok(code.includes('fb-stars'), 'feedback includes star rating element');
   assert.ok(code.includes('data-val="5"'), 'feedback includes 5 star options');
@@ -61,7 +60,7 @@ test('game.html: upgraded feedback UI with 5-star rating & device diagnostics', 
 });
 
 test('game.html: new game name proposal contest (+100 gold)', () => {
-  const code = fs.readFileSync(GAME_PATH, 'utf8');
+  const code = gameSource();
 
   assert.ok(code.includes('function showNameProposalDialog('), 'showNameProposalDialog exists');
   assert.ok(code.includes('function checkNameProposal('), 'checkNameProposal exists');
@@ -89,7 +88,7 @@ test('founder-admin.html: displays name proposals, stars, and device diagnostics
 });
 
 test('styles.css: contains styles for star ratings, diagnostics & name card', () => {
-  const css = fs.readFileSync(STYLES_PATH, 'utf8');
+  const css = stylesSource();
 
   assert.ok(css.includes('.fb-stars'), 'contains .fb-stars style');
   assert.ok(css.includes('.fb-star'), 'contains .fb-star style');

@@ -3,20 +3,19 @@
 // 2. Founder admin panel: empty nickname guest filtering, purge empty accounts,
 //    aggregate match mode statistics, and human-readable action logs.
 'use strict';
+const { gameSource, stylesSource } = require('../scripts/compose-page.cjs');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 const vm = require('node:vm');
 
-const GAME_PATH = path.join(__dirname, '..', 'web', 'game.html');
 const ADMIN_PATH = path.join(__dirname, '..', 'tools', 'founder-admin.html');
 const RULES_PATH = path.join(__dirname, '..', 'docs', 'firebase-rules.json');
-const STYLES_PATH = path.join(__dirname, '..', 'src', 'ui', 'styles.css');
 
 test('history tab relocated: button in main menu header, profile has 3 tabs, dedicated history screen', () => {
-  const gameHtml = fs.readFileSync(GAME_PATH, 'utf8');
-  const stylesCss = fs.readFileSync(STYLES_PATH, 'utf8');
+  const gameHtml = gameSource();
+  const stylesCss = stylesSource();
 
   // 1. Main menu top right tools contains history button
   assert.ok(gameHtml.includes('data-go="history"'), 'main screen header has data-go="history"');

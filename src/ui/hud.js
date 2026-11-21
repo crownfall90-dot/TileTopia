@@ -63,7 +63,8 @@ export function renderPlayersListHtml(players, ctx) {
     const activeClass = (i === turn && phase !== 'end') ? ' active' : '';
     const bumpClass = (bump && bump.includes(i)) ? ' bump' : '';
     const outClass = p.resigned ? ' out' : '';
-    const uidAttr = (p.uid && !isMe(p)) ? ` data-pl="${String(p.uid).replace(/[^\w-]/g, '').slice(0, 64)}" data-n="${p.name}" data-c="${p.col}"` : '';
+    const uid = ctx.contactUid ? ctx.contactUid(p) : p.uid;
+    const uidAttr = (uid && !isMe(p)) ? ` data-pl="${String(uid).replace(/[^\w-]/g, '').slice(0, 64)}"${p.uid ? '' : ' data-guest="1"'} data-n="${p.name}" data-c="${p.col}"` : '';
     const ringStyle = (isMe(p) && myRing()) ? ` fr" style="--fr:${myRing()}` : '';
     const dispName = p.resigned ? 'сдался' : p.missed >= 1 ? '🤖 ' + p.name : p.name;
     const botPill = !p.human && !p.ghost ? ' <span class="botpill">бот</span>' : '';

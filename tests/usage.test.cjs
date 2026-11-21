@@ -1,5 +1,6 @@
 // What players use: counters per screen and button, a bounded daily record, and the owner's summary.
 'use strict';
+const { gameSource } = require('../scripts/compose-page.cjs');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
@@ -83,7 +84,7 @@ test('consent: statistics need a yes, errors and security events do not; the set
   for (const k of ['error', 'maintenance', 'wallet_sig_mismatch', 'net_down']) assert.equal(U.mayRecord(k, false), true, k + ' is needed to keep the game working');
   const C = await import('../src/state/config.js');
   assert.ok(C.PREFS.some(p => p.k === 'stats') && C.PREF_GROUPS.some(([, ks]) => ks.includes('stats')), 'a Statistics switch in Settings');
-  const fs = require('node:fs'), html = fs.readFileSync(__dirname + '/../web/game.html', 'utf8');
+  const fs = require('node:fs'), html = gameSource();
   assert.equal((html.match(/class="legal"/g) || []).length, 2, 'the consent line is on both sign-up dialogs');
   for (const page of ['terms.html', 'privacy.html', 'licenses.html']) assert.ok(html.includes('/TileTopia/' + page), page + ' is linked');
   assert.ok(html.includes('wallet.stats !== true'), 'the usage counters wait for consent');
@@ -94,7 +95,7 @@ test('consent: statistics need a yes, errors and security events do not; the set
 });
 
 test('consent window: a short plain reason, and the exact list of what is collected one tap away', () => {
-  const html = require('node:fs').readFileSync(__dirname + '/../web/game.html', 'utf8');
+  const html = gameSource();
   const box = html.slice(html.indexOf("id = 'statsBox'"), html.indexOf("id=\"statsNo\""));
   assert.match(box, /убрать лишнее и сделать игру удобнее/, 'the purpose is named');
   assert.match(box, /<details class="more">/, 'the details are one tap away');

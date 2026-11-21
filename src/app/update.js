@@ -1,4 +1,5 @@
 // Update pause during online matches and release notes handling.
+import {showReleaseNotes, showReleaseDialog, showReinstallDialog} from './update-dialogs.js';
 
 export const UPD_WAIT = 10 * 60 * 1000;
 
@@ -9,24 +10,19 @@ export function appCode(isAndroid) {
   return 1e9;
 }
 
-export function showWhatsNew(ver, storage = typeof localStorage !== 'undefined' ? localStorage : null) {
-  if (!storage || !ver) return false;
+export function showWhatsNew(ver, storage, shell = globalThis.window) {
+  if (!ver) return false;
   let last = null;
   try {
+    if (storage === undefined) storage = shell?.localStorage;
+    if (!storage) return false;
     last = storage.getItem('seenVersion');
     storage.setItem('seenVersion', ver);
   } catch (_) {
     return false;
   }
-  if (!last || last === ver || typeof window === 'undefined' || !window.RELEASE_NOTES) return false;
-
-  const box = document.createElement('div');
-  box.className = 'over';
-  box.style.position = 'fixed';
-  box.innerHTML = `<div class="ocard"><h3>Что нового в версии ${ver}</h3><div class="notes-list"></div><button class="cta wide">Играть</button></div>`;
-  box.querySelector('.notes-list').textContent = window.RELEASE_NOTES;
-  box.querySelector('.cta').onclick = () => box.remove();
-  document.body.append(box);
+  if (!last || last === ver || !shell?.RELEASE_NOTES) return false;
+  showReleaseNotes(shell.document, ver, shell.RELEASE_NOTES);
   return true;
 }
 
@@ -49,11 +45,14 @@ export function formatUpdCountdown(secondsLeft) {
   return `Само продолжится через ${Math.floor(s / 60)}:${String(s % 60).padStart(2, '0')}`;
 }
 
-export function isUpdateMandatory(info, minRequiredCode = 0, currentCode = 0) {
+function isTestRelease(info, staging) {
+  return Boolean(staging || info?.version?.includes('-test') || info?.package?.endsWith('.test'));
+}
+
+export function isUpdateMandatory(info, minRequiredCode = 0, currentCode = 0, staging = false) {
   if (!info) return false;
   // Test / staging builds (-test) are NOT mandatory by default (testers can postpone)
-  const isTest = (info.version && info.version.includes('-test')) || (info.package && info.package.endsWith('.test'));
-  if (isTest) return Boolean(info.force === true);
+  if (isTestRelease(info, staging)) return info.force === true;
 
   // Production build: ALL updates are mandatory by default unless explicitly disabled
   if (info.mandatory === false) {
@@ -65,12 +64,66 @@ export function isUpdateMandatory(info, minRequiredCode = 0, currentCode = 0) {
   return true;
 }
 
-export function shouldPromptUpdate(info, {manual = false, minRequiredCode = 0, currentCode = 0} = {}) {
+export function shouldPromptUpdate(info, {manual = false, minRequiredCode = 0, currentCode = 0, staging = false} = {}) {
   if (!info) return false;
-  if (manual) return true;
-  // Test builds always notify testers of new builds so they can choose to update or postpone
-  if (info.version && info.version.includes('-test')) return true;
+  if (manual || info.reinstall || isTestRelease(info, staging)) return true;
   return isUpdateMandatory(info, minRequiredCode, currentCode);
+}
+
+// Java supplies the reinstall decision after checking the installed package and signature.
+// The runtime supplies live match/profile/bridge state, which can change between callbacks.
+export function createReleaseController({doc, boot, finishBoot, getPolicy, getMatch, defer, startUpdate, notify, migration}) {
+  let release = null;
+  let reinstall = null;
+
+  function checked() {
+    boot.checked = true;
+    finishBoot();
+  }
+
+  function offer(info, manual) {
+    const policy = {...getPolicy(), manual};
+    if (!shouldPromptUpdate(info, policy)) return checked();
+    const match = getMatch();
+    if (!manual && match.active && match.visible) return defer(info);
+
+    if (info.reinstall) {
+      release?.box.remove();
+      release = null;
+      boot.update = false;
+      checked();
+      if (reinstall?.box.isConnected && reinstall.code === info.code && reinstall.url === info.url) {
+        reinstall.refresh();
+        return;
+      }
+      reinstall?.box.remove();
+      reinstall = {...showReinstallDialog(doc, info, {...migration, notify}), code: info.code, url: info.url};
+      return;
+    }
+    if (release?.box.isConnected) return;
+    reinstall?.box.remove();
+    reinstall = null;
+    boot.checked = true;
+    boot.update = !boot.gone;
+    release = showReleaseDialog(doc, info, {
+      mandatory: isUpdateMandatory(info, policy.minRequiredCode, policy.currentCode, policy.staging),
+      onSplash: boot.update,
+      match,
+      startUpdate,
+      postpone() { boot.update = false; finishBoot(); }
+    });
+  }
+
+  return {
+    offer, checked,
+    get box() { return release?.box || null; },
+    progress(percent) { release?.progress(percent); },
+    error(message) {
+      if (!release?.box.isConnected) return;
+      release.error();
+      notify(message);
+    }
+  };
 }
 
 export function formatUpdateSettingsBadge(info) {

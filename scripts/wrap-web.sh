@@ -153,8 +153,8 @@ HEAD
     printf '<script>window.RELEASE_NOTES = %s; window.FIREBASE = %s;</script>\n' "$notes" "$firebase"
     printf '<script>'; cat build/bundle/pg.js; printf '</script>\n'
     printf '</head><body>\n'
-    # The page with its styles put back in place of the marker line (same spot, so the cascade order is unchanged).
-    grep -v -e 'fonts.googleapis.com' -e 'fonts.gstatic.com' web/game.html | awk '/^<!-- styles: src\/ui\/styles.css/ { print "<style>"; while ((getline l < "src/ui/styles.css") > 0) print l; print "</style>"; next } { print }'
+    # The same composed page ships as an offline HTML resource and on GitHub Pages.
+    node scripts/compose-page.cjs
     printf '\n</body></html>\n'
   } > "$dest"
   echo "wrote $dest"

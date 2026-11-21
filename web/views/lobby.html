@@ -1,0 +1,118 @@
+      <section class="screen scroll" id="scr-lobby" hidden>
+        <div class="lb">
+          <div class="ltop">
+            <button class="iconbtn" id="lobbyBack" aria-label="Назад"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+            <b id="lobbyTitle">Сетевая игра</b>
+          </div>
+
+          <!-- Lobby Entrance Screen: Create or Join -->
+          <div class="col lb-entrance" id="lbJoin">
+            <input class="field" id="myName" hidden>
+            <div class="lobby-card create-card">
+              <div class="l-card-head">
+                <b>Своя комната</b>
+                <small>Выберите правила и пригласите друзей.</small>
+              </div>
+              <button class="cta wide pri" id="create">
+                <span>Создать комнату</span>
+                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M12 5l7 7-7 7"/></svg>
+              </button>
+            </div>
+
+            <div class="lobby-card join-card">
+              <div class="l-card-head">
+                <b>Войти по коду</b>
+              </div>
+              <div class="joinrow">
+                <input class="field codein" id="codeIn" maxlength="5" placeholder="Код из 5 знаков" aria-label="Код комнаты" autocomplete="off" autocapitalize="characters" spellcheck="false">
+                <button class="cta" id="join">Войти</button>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Room Screen -->
+          <div class="col lb-room-view" id="lbRoom" hidden>
+            <div class="codecard">
+              <div class="codecard-tag">Комната создана</div>
+              <small>Код комнаты для друзей</small>
+              <div class="code tap" id="codeShow" role="button" tabindex="0" aria-label="Скопировать код комнаты"></div>
+              <small class="code-hint">Нажмите на код, чтобы скопировать</small>
+              <button class="chip pri lb-invite" id="lbInvite">
+                <span>👥 Пригласить друзей</span>
+              </button>
+            </div>
+
+            <!-- Table size (2..5) -->
+            <div class="col-card" id="lbTableCard">
+              <div class="h3-bar">
+                <div class="h3-left">
+                  <span class="h3-icon">🪑</span>
+                  <span class="h3">Размер партии</span>
+                </div>
+                <span class="muted-note" id="lbTableNote">4 игрока</span>
+              </div>
+              <div class="table-size-group" id="lbTableSize"></div>
+            </div>
+
+            <!-- Open matchmaking toggle (Public vs Private) -->
+            <button class="matchbadge" id="lbOpenMatch" aria-label="Добор из онлайна"></button>
+
+            <!-- Live matchmaking status bar (shown when openMatch is active) -->
+            <div class="match-seeking-bar" id="lbMatchSeeking" hidden>
+              <div class="seek-pulse"><span></span><span></span><span></span></div>
+              <div class="seek-info">
+                <b id="lbSeekTitle">Ищем игроков онлайн…</b>
+                <small id="lbSeekSub">В комнате 2 из 4</small>
+              </div>
+              <button class="chip pri-chip" id="btnFillBotsNow">🤖 Заполнить ботами</button>
+            </div>
+
+            <button class="cupsbadge" id="lbCups"></button>
+
+            <div class="col-card">
+              <div class="h3-bar">
+                <span class="h3-icon">🎨</span>
+                <span class="h3">Ваш цвет</span>
+              </div>
+              <div class="mycolor" id="myColor"></div>
+            </div>
+
+            <div class="col-card">
+              <div class="h3-bar player-bar">
+                <div class="h3-left">
+                  <span class="h3-icon">👥</span>
+                  <span class="h3" id="lbCount">Игроки</span>
+                </div>
+                <div style="display:flex;gap:6px;align-items:center">
+                  <button class="chip addbot-chip" id="addBot">+ Добавить бота</button>
+                  <button class="chip pri-chip" id="btnFillBotsBar" hidden>🤖 Дополнить ботами</button>
+                </div>
+              </div>
+              <ul class="plist" id="plist"></ul>
+            </div>
+
+            <div id="lobbyOnline" hidden>
+              <div class="h3" id="lobbyOnlineTitle">Друзья онлайн</div>
+              <ul class="flist" id="lobbyOnlineList"></ul>
+            </div>
+
+            <div class="col-card">
+              <div class="h3-bar">
+                <span class="h3-icon">📜</span>
+                <span class="h3">Правила партии</span>
+              </div>
+              <div class="rulesbox" data-rules id="lbRules"></div>
+            </div>
+
+            <div class="room-actions">
+              <button class="cta wide" id="backToGame" hidden>Вернуться в партию</button>
+              <button class="cta wide pri-start" id="lobbyStart">Начать игру</button>
+              <button class="cta wide alt-ready" id="lobbyReady" hidden>Готов</button>
+              <div class="lbwait" id="lbWait" hidden>
+                <div class="pz sm"><div class="pzb"><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i><i></i></div></div>
+                <p class="shint">Ожидание старта партии…</p>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>

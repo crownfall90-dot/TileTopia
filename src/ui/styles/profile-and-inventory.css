@@ -1,0 +1,160 @@
+/* statuses and "my items" */
+
+.stgrid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-bottom:8px}
+
+.stb{display:flex;flex-direction:column;align-items:center;gap:5px;padding:10px 6px;border-radius:16px;background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--ink);font:600 12px var(--f-body);cursor:pointer;min-width:0}
+
+.stb.sel{border-color:var(--brass);background:rgba(242,184,75,.12)}.stb.poor{opacity:.55}.stb small{color:var(--muted);font-size:11px;display:flex;gap:3px;align-items:center}.stb.sel small{color:var(--brass)}
+
+.stchip{display:inline-block;max-width:100%;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;font:700 13px var(--f-display);color:#fff;background:linear-gradient(135deg,#4c8dff,#b06cf0);border-radius:999px;padding:3px 12px}
+
+.stchip.ex{background:linear-gradient(135deg,#f2b84b,#ef7a2f);color:#2a1b05}
+
+.stcustom{display:flex;gap:8px;margin-bottom:16px}.stcustom .field{flex:1;min-width:0}.stcustom .cta{flex:0 0 auto;display:flex;gap:5px;align-items:center;padding:0 14px}
+
+.itabs{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:5px;margin-bottom:14px;padding:3px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:15px}
+.itabs button{padding:9px 2px;font-size:12px;font-weight:600;border-radius:12px;transition:all .2s cubic-bezier(.2,.8,.2,1);border:1px solid transparent;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.itabs button[aria-pressed="true"]{background:linear-gradient(135deg,rgba(242,184,75,.32),rgba(242,184,75,.12));border-color:rgba(242,184,75,.65);color:#fff;box-shadow:0 4px 14px rgba(242,184,75,.22)}
+
+.icount{color:var(--muted);font-size:13px;margin:2px 2px 8px}.icount b{color:var(--brass);font-size:15px}
+
+.itnow{display:flex;align-items:center;gap:8px;margin:0 0 10px;color:var(--muted);font-size:13px}
+
+.exlist{display:flex;flex-direction:column;gap:8px;margin-bottom:12px}.exrow{display:flex;align-items:center;gap:10px;padding:10px 12px;border-radius:16px;border:1px dashed rgba(242,184,75,.4);background:rgba(242,184,75,.06)}
+
+.exrow .exic{font-size:24px}.exrow b{display:block}.exrow small{color:var(--muted);font-size:11.5px}.exrow i{margin-left:auto;font-style:normal}.exrow.soon{opacity:.55}
+
+.lockd{opacity:.55;cursor:default}.itemsentry{margin:6px 0 12px}
+
+#scr-items .figgrid,#scr-items .frgrid,#scr-items .locgrid{margin-bottom:8px}
+
+/* profile: one even hero, 2x2 mastery, quiet account block at the bottom */
+
+.pchips{flex-wrap:nowrap;gap:6px}.pchips span{min-width:0;padding:9px 4px;font-size:12px;gap:4px;white-space:nowrap}
+
+.mgrid{grid-template-columns:repeat(2,minmax(0,1fr))}.mcard{padding:10px 12px}.mcard.empty{opacity:.75}.mcard .mnone{color:var(--muted)}
+
+.goalline{padding:10px 12px;border-radius:14px;background:rgba(76,141,255,.12);border:1px solid rgba(76,141,255,.35);font-size:13px;margin-bottom:6px}.goalline.ready{background:rgba(242,184,75,.14);border-color:rgba(242,184,75,.5)}
+
+.itemsentry{background:linear-gradient(135deg,rgba(242,184,75,.22),rgba(242,184,75,.06));border:1px solid rgba(242,184,75,.5);color:var(--ink)}
+
+.itemsentry small{color:var(--muted)!important}.itemsentry b{color:var(--ink)}
+
+.profile .pacts{display:flex;width:100%}.profile .pacts .chip{flex:1;justify-content:center;padding:10px 8px}
+
+/* room: invited friends who have not come yet */
+
+.plist li.inv{opacity:.88;border-style:dashed}.plist li.inv .who small{color:var(--brass)}.plist li.inv.late .who small{color:var(--muted)}
+
+.plist li.inv .av{filter:saturate(.6)}
+
+.who .fst{display:block;width:fit-content}
+
+.fbcard #fbHero .mhero{background:linear-gradient(135deg,#5a86e8,#3a62c4);border:1px solid rgba(255,255,255,.22);box-shadow:0 6px 16px rgba(0,0,0,.35);width:100%;box-sizing:border-box}
+
+
+
+/* Bot difficulty chip in room */
+
+.botlvl-chip{height:30px;padding:0 10px;font-size:11.5px;font-weight:700;background:rgba(242,184,75,.15);border:1px solid rgba(242,184,75,.35);color:var(--brass);cursor:pointer;border-radius:10px;display:inline-flex;align-items:center;gap:4px;transition:all .15s ease}
+
+@media (hover: hover){
+.botlvl-chip:hover{background:rgba(242,184,75,.28);transform:scale(1.03)}
+
+}
+
+.botlvl-chip:active{transform:scale(.97)}
+
+
+
+/* Player showcase & try-on in "My items" */
+
+.player-showcase-card{border-radius:22px;padding:14px 16px;background:linear-gradient(175deg,#182346 0%,#0d142a 100%);border:1.5px solid rgba(242,184,75,.35);border-top:1.5px solid rgba(255,230,150,.65);box-shadow:0 14px 36px rgba(0,0,0,.55),0 0 20px rgba(242,184,75,.08);margin-bottom:14px;position:relative}
+
+.psc-top{display:flex;align-items:center;justify-content:space-between;gap:8px;margin-bottom:10px;font-size:11.5px;font-weight:700;color:var(--muted);text-transform:uppercase;letter-spacing:.08em}
+
+.psc-body{display:flex;align-items:center;gap:14px}
+
+.psc-av-wrap{position:relative;flex:0 0 auto}
+
+.psc-av-wrap .av{width:56px;height:56px;font-size:24px;box-shadow:0 6px 18px rgba(0,0,0,.45)}
+
+.psc-info{flex:1;min-width:0;display:flex;flex-direction:column;gap:4px}
+
+.psc-name-line{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+
+.psc-name{font:800 16px var(--f-display);color:var(--ink);letter-spacing:.01em;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+.psc-flabel{color:var(--muted);font-size:12px;font-weight:600}
+
+.psc-fig-wrap{flex:0 0 auto;display:flex;flex-direction:column;align-items:center;gap:2px;padding-left:10px;border-left:1px solid rgba(255,255,255,.08)}
+
+.psc-fig{width:40px;height:50px;object-fit:contain;filter:drop-shadow(0 4px 8px rgba(0,0,0,.45))}
+
+.psc-fig-wrap small{font-size:10.5px;color:var(--muted);font-weight:600;max-width:56px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.pst-none{font-size:11px;color:var(--muted);font-style:italic}
+
+.psc-apply{height:28px;padding:0 10px;font-size:11px}
+
+
+
+/* Compact 2-column locations grid */
+
+.locgrid{display:grid;grid-template-columns:repeat(2,1fr) !important;gap:8px;margin-bottom:12px}
+
+.loc{position:relative;border-radius:14px;overflow:hidden;border:1.5px solid rgba(255,255,255,.08);background:linear-gradient(175deg,rgba(32,44,82,.85) 0%,rgba(16,22,48,.95) 100%);box-shadow:0 6px 16px rgba(0,0,0,.35);display:flex;flex-direction:column}
+
+.loc svg{display:block;width:100%;height:68px;object-fit:cover}
+
+.loc .li{padding:6px 8px 8px}
+
+.loc .li b{display:block;font:700 12.5px var(--f-display);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+.loc .li small{color:var(--muted);font-size:10px;line-height:1.25;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
+
+.loc .badge{position:absolute;top:6px;left:6px;font:800 9.5px var(--f-body);letter-spacing:.05em;text-transform:uppercase;padding:2px 7px;border-radius:6px;background:#2ecc71;color:#fff;box-shadow:0 2px 6px rgba(0,0,0,.35)}
+
+.loc.locked svg{filter:saturate(.25) brightness(.6)}
+
+.loc.locked .badge{background:rgba(10,14,26,.85);color:var(--muted);border:1px solid rgba(255,255,255,.14);box-shadow:none}
+
+
+
+#nameProposalBtn{display:none!important}
+
+
+
+/* tablets and large screens in the app: the game stays a phone-sized column in the middle instead of stretching (the
+
+   buttons, cards and the board were drawn at phone proportions, which looked huge and shifted on a 11" tablet) */
+
+@media (min-width:700px){
+
+  html.app body{display:flex;justify-content:center;background:radial-gradient(1100px 700px at 50% 0%,#1a2650,#0a0f20 70%)}
+
+  html.app .page{width:min(100%,560px);max-width:560px}
+
+  html.app .phone{max-width:560px;margin:0 auto;box-shadow:0 0 0 1px rgba(255,255,255,.07),0 0 80px rgba(0,0,0,.55)}
+
+}
+
+@media (min-width:1100px){html.app .page{width:min(100%,620px);max-width:620px}html.app .phone{max-width:620px}}
+
+/* profile creation: a clear column — avatar, nickname with a dice, colour swatches, buttons */
+
+.newprof{width:min(360px,92vw);max-width:none;text-align:center}
+
+.newprof p{margin:2px 0 12px;font-size:13px;color:var(--muted)}
+
+.newprof .plabel{display:block;text-align:left;font:700 11.5px var(--f-display);letter-spacing:.08em;text-transform:uppercase;color:var(--muted);margin:10px 2px 6px}
+
+.newprof .nickrow{display:flex;gap:8px;align-items:stretch}.newprof .nickrow .field{flex:1;min-width:0;text-align:left}
+
+.newprof .dicebtn{flex:0 0 46px;border-radius:12px;background:rgba(255,255,255,.07);border:1px solid var(--line);font-size:21px;cursor:pointer}
+
+.newprof .cpick{flex-wrap:nowrap;justify-content:space-between;gap:6px;margin:2px 0 14px;padding:4px 2px}.newprof .cpick button{width:34px;height:34px;flex:0 0 auto}
+
+.newprof .cpick button[aria-checked="true"]{outline:3px solid #fff;outline-offset:2px}
+
+.newprof .cta{margin-top:2px}

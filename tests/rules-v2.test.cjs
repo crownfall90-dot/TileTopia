@@ -1,6 +1,7 @@
 // Rules v2: a player may add figures to an object held only by their own figures (one per card and feature); equal
 // figures are decided by who laid more cards of the object; a rival's figure still blocks; v1 is unchanged.
 'use strict';
+const { gameSource } = require('../scripts/compose-page.cjs');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
@@ -28,7 +29,7 @@ test('engine: rules v2 reinforcement and card tie-break', async () => {
 });
 
 test('source: draw is accepted at once when the others are away; resume offer survives a stale room', async () => {
-  const src = require('node:fs').readFileSync(__dirname + '/../web/game.html', 'utf8');
+  const src = gameSource();
   assert.match(src, /activeHumans\(\)\.every\(i => i === m\.p \|\| players\[i\]\.missed >= 1\)/);
   assert.match(src, /activeHumans\(\)\.every\(i => d\.yes\.has\(i\) \|\| players\[i\]\.missed >= 1\)/);
   assert.match(src, /lg = lastOnline\(\) && \(!net \|\| !gameVisible\)/);

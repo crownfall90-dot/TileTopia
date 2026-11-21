@@ -4,9 +4,9 @@
 // 3. In-game Emotes & Reactions offline / bot replies
 // 4. Soft Save Progress Card prompt
 'use strict';
+const { gameSource, stylesSource } = require('../scripts/compose-page.cjs');
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
 const path = require('node:path');
 
 test('comfort: generateRandomNickname generates universal valid names <= 12 chars', async () => {
@@ -51,8 +51,8 @@ test('comfort: LOCS have stable identifiers and village is open while future loc
 });
 
 test('comfort: game.html and styles support location picker, dice buttons, offline emotes and soft save prompt', () => {
-  const html = fs.readFileSync(path.join(__dirname, '../web/game.html'), 'utf8');
-  const css = fs.readFileSync(path.join(__dirname, '../src/ui/styles.css'), 'utf8');
+  const html = gameSource();
+  const css = stylesSource();
 
   // 1. Nickname dice in renameDialog and profile
   assert.ok(html.includes('id="rnDice"'), 'Rename dialog should contain #rnDice');

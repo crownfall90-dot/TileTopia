@@ -1,6 +1,7 @@
 // src/engine/rng.js: the numbers every phone in an online game must agree on. Frozen values: if they change,
 // old and new versions of the game build different games from the same seed.
 'use strict';
+const { gameSource } = require('../scripts/compose-page.cjs');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
@@ -13,7 +14,7 @@ test('engine/rng: frozen sequence and hash', async () => {
 });
 
 test('game.html takes rng and hash from the bundle, not its own copy', () => {
-  const html = require('node:fs').readFileSync('web/game.html', 'utf8');
+  const html = gameSource();
   assert.ok(html.includes('const {rng, hash} = PG.engine;'));
   assert.ok(!html.includes('const rng = seed =>'));
 });

@@ -1,3 +1,4 @@
+const { gameSource } = require('../scripts/compose-page.cjs');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
@@ -7,7 +8,7 @@ const path = require('node:path');
 const cp = require('node:child_process');
 
 const java = fs.readFileSync('app/src/main/java/com/crownfall/mosaic/MainActivity.java', 'utf8');
-const html = fs.readFileSync('web/game.html', 'utf8');
+const html = gameSource();
 
 function fn(name) {
   const i = html.indexOf('function ' + name + '(');

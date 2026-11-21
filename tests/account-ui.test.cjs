@@ -1,5 +1,6 @@
+const { gameSource } = require('../scripts/compose-page.cjs');
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs');
-const s=fs.readFileSync('web/game.html','utf8');
+const s=gameSource();
 const bridge=fs.readFileSync('app/src/main/java/com/crownfall/mosaic/MainActivity.java','utf8');
 test('existing settings expose account container and lobby color picker (source check)',()=>{
   for(const q of ['id="scr-settings"','id="acct"','id="myColor"']) assert.ok(s.includes(q));

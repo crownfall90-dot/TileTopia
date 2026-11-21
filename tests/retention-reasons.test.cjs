@@ -1,15 +1,15 @@
 // Tests for Task 4 (R-5, R-12, R-7, R-6, R-8): Reasons to return
 'use strict';
+const { gameSource } = require('../scripts/compose-page.cjs');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const GAME_PATH = path.join(__dirname, '..', 'web', 'game.html');
 const RULES_PATH = path.join(__dirname, '..', 'docs', 'firebase-rules.json');
 
 test('R-5: menu quest banner exists and is wired in game.html', () => {
-  const code = fs.readFileSync(GAME_PATH, 'utf8');
+  const code = gameSource();
 
   // Verify markup in #scr-menu
   assert.ok(code.includes('id="menuQuestBanner"'), 'menuQuestBanner button exists');
@@ -73,7 +73,7 @@ test('R-7: weekly quests and chest reward tracking', async () => {
 });
 
 test('R-8: rating friends scope filter and R-6 season tag', () => {
-  const code = fs.readFileSync(GAME_PATH, 'utf8');
+  const code = gameSource();
 
   // Verify friends scope tabs in renderTop
   assert.ok(code.includes('id="topScopeAll"'), 'topScopeAll button exists');

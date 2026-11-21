@@ -1,5 +1,6 @@
+const { gameSource } = require('../scripts/compose-page.cjs');
 const test=require('node:test'),assert=require('node:assert/strict'),fs=require('node:fs'),vm=require('node:vm');
-const html=fs.readFileSync('web/game.html','utf8');
+const html=gameSource();
 function fn(name){const i=html.indexOf('function '+name+'(');assert.ok(i>=0);const b=html.indexOf('{',i);let d=0;for(let j=b;j<html.length;j++){if(html[j]==='{')d++;else if(html[j]==='}'&&!--d)return html.slice(i,j+1);}throw Error(name);}
 const c={};vm.runInNewContext(fn('confirmTextParts'),c);
 const explanation='Прогресс сохранится в аккаунте. На этом устройстве начнётся новая игра, а войти можно будет в любой аккаунт';

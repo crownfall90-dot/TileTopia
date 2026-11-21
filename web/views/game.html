@@ -1,0 +1,47 @@
+      <section class="screen" id="scr-game">
+        <div class="gtop">
+          <button class="iconbtn" id="gameMenu" aria-label="Меню партии"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round"><path d="M4 7h16M4 12h16M4 17h16"/></svg></button>
+          <div class="room"><b>Комната K7Q2</b><span><i></i>онлайн · 4 игрока</span></div>
+          <button class="iconbtn saybtn" id="sayBtn" hidden aria-label="Быстрые фразы"><svg width="19" height="19" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M4 5.5h16v10H10l-4.5 4v-4H4z"/><path d="M8.5 10.5h.01M12 10.5h.01M15.5 10.5h.01"/></svg></button>
+
+          <div class="deck"><svg class="dstack" viewBox="0 0 56 50" width="46" height="41" aria-hidden="true"><defs><linearGradient id="dkG" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#9bd96b"/><stop offset="1" stop-color="#4f9a3b"/></linearGradient></defs><g transform="translate(-2 7)" opacity=".5"><path d="M12 12H30A6 6 0 0 1 36 18V23C37 23 39 22 42 22A5 5 0 1 1 42 32C39 32 37 31 36 31V36A6 6 0 0 1 30 42H12A6 6 0 0 1 6 36V18A6 6 0 0 1 12 12Z" fill="#4f7f3a" stroke="#27421e" stroke-width="1.6"/></g><g transform="translate(2 3.5)" opacity=".8"><path d="M12 12H30A6 6 0 0 1 36 18V23C37 23 39 22 42 22A5 5 0 1 1 42 32C39 32 37 31 36 31V36A6 6 0 0 1 30 42H12A6 6 0 0 1 6 36V18A6 6 0 0 1 12 12Z" fill="#5f9a45" stroke="#27421e" stroke-width="1.6"/></g><g transform="translate(6 0)"><path d="M12 12H30A6 6 0 0 1 36 18V23C37 23 39 22 42 22A5 5 0 1 1 42 32C39 32 37 31 36 31V36A6 6 0 0 1 30 42H12A6 6 0 0 1 6 36V18A6 6 0 0 1 12 12Z" fill="url(#dkG)" stroke="#27421e" stroke-width="1.6"/><path d="M21 42V30M21 30q9 0 11-9" fill="none" stroke="#ecdca8" stroke-width="3.4" stroke-linecap="round"/></g></svg><span class="dtx"><b id="deckN">0</b><small>в стопке</small><i class="dbar"><i id="deckBar"></i></i></span></div>
+        </div>
+        <div class="players" id="players"></div>
+        <div class="saybox" id="sayBox" hidden></div>
+        <div class="coach" id="coach" hidden></div>
+        <div class="board" id="board" tabindex="0" aria-label="Игровое поле" aria-keyshortcuts="ArrowLeft ArrowRight R Enter" title="Стрелки — выбрать место, R — повернуть плитку, Enter — поставить">
+          <!-- Thematic Village Location Backdrop -->
+          <div class="village-backdrop" aria-hidden="true">
+            <div class="vb-sky"></div>
+            <div class="vb-sun"></div>
+            <div class="vb-hills-far"></div>
+            <div class="vb-hills-near"></div>
+            <div class="vb-trees-silhouette"></div>
+          </div>
+          <div class="vp"><div class="world" id="world"></div></div>
+          <div class="toast" id="toast"></div>
+          <div class="netbad" id="netBad" hidden role="status"><i></i>Нет связи — переподключаемся…</div>
+          <div class="edgeglow" id="edgeglow"></div>
+          <div class="fabs">
+            <button class="fab tipb" id="tip" aria-label="Подсказка: лучший ход" hidden><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M9 18h6M10 21h4"/><path d="M12 3a6 6 0 00-3.6 10.8c.7.6 1.1 1.3 1.1 2.2h5c0-.9.4-1.6 1.1-2.2A6 6 0 0012 3z"/></svg></button>
+            <button class="fab helpb" id="helpBtn" aria-label="Очки и правила" title="Очки и правила"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.1" stroke-linecap="round" stroke-linejoin="round"><path d="M5 4.5h10a3 3 0 013 3V20H8a3 3 0 01-3-3z"/><path d="M5 17a3 3 0 013-3h10M9 8.5h5"/></svg></button>
+            <button class="fab" id="zin" aria-label="Приблизить"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M12 5v14M5 12h14"/></svg></button>
+            <button class="fab" id="zout" aria-label="Отдалить"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round"><path d="M5 12h14"/></svg></button>
+            <button class="fab" id="ctr" aria-label="К центру поля"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="7"/><circle cx="12" cy="12" r="2" fill="currentColor"/><path d="M12 2v3M12 19v3M2 12h3M19 12h3"/></svg></button>
+            <button class="fab" id="turnL" aria-label="Повернуть поле"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M4 12a8 8 0 102.4-5.7"/><path d="M4 4v5h5"/></svg></button>
+            <button class="fab" id="view" aria-label="Сменить наклон камеры">3D</button>
+          </div>
+          <div class="hint" id="hint"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M9 11V5a1.5 1.5 0 013 0v5m0-1a1.5 1.5 0 013 0v2m0-1a1.5 1.5 0 013 0v4a6 6 0 01-6 6h-1a6 6 0 01-5-2.7L4 14a1.5 1.5 0 012.5-1.6L9 15"/></svg>Палец — двигать поле, два пальца — масштаб, поворот и наклон</div>
+          <div class="over" id="over" hidden></div>
+        </div>
+        <div class="tray">
+          <div class="status" id="status"></div>
+          <div class="prow" id="prow">
+            <div class="turnfig" id="turnFig" aria-live="polite"></div>
+            <button class="rbtn" id="rot" aria-label="Повернуть карту"><svg width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.3" stroke-linecap="round" stroke-linejoin="round"><path d="M20 12a8 8 0 11-2.4-5.7"/><path d="M20 4v5h-5"/></svg></button>
+            <div class="card"><div class="ctw"><div class="ct" id="ct"><div class="face" id="tface"></div></div></div><div class="cname" id="cname"></div></div>
+            <button class="cta" id="ok" disabled>Поставить</button>
+          </div>
+          <div class="mrow" id="mrow" hidden></div>
+        </div>
+      </section>

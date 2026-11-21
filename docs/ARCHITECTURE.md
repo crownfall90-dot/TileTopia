@@ -19,17 +19,20 @@ flowchart LR
   U --> GH
 ```
 
-* **Вся игра — один файл** `web/game.html` (HTML + CSS + JS, без сборщиков). Скрипт `scripts/wrap-web.sh` заворачивает его в `app/src/main/assets/index.html` (шрифты, заметки к версии, конфиг Firebase).
+* **Клиент собирается из частей**. Vite собирает модули из `src/`. `scripts/compose-page.cjs` соединяет шаблоны экранов, сценарии приложения и стили. `scripts/wrap-web.sh` встраивает их, шрифты, заметки и конфигурацию Firebase в страницу для WebView и веба. Единый HTML остаётся форматом доставки Android и OTA.
 * **Android-часть тонкая**: WebView, обновления, пуши, отчёты о сбоях (Crashlytics). Логика игры в Java не дублируется.
 * **Сервера своего нет**: онлайн, рейтинг, присутствие и профили — Firebase Realtime Database через REST, вход — Firebase Auth через REST (аноним, почта с паролем, Google).
-* **Вход через Google**: WebView не запускает Google-вход сам, поэтому токен даёт нативная шторка на телефоне (`AndroidApp.googleSignIn` → Credential Manager → `window.onGoogleToken`), дальше игра меняет его на сессию Firebase (`accounts:signInWithIdp`). В веб-сборке кнопку рисует Google Identity Services. Нужен web OAuth-клиент (`client_type` 3) в `google-services.json`. Настройка: Firebase → Authentication → Sign-in method → Google вкл.; в Firebase → Project settings → Your apps добавить SHA-1 ключа подписи (отпечаток `app/release.keystore` и ключа подписи Google Play) — тогда Firebase создаёт Android-клиент; перекачать `google-services.json` (в нём появится web-клиент) и выпустить сборку. GitHub-сборка: `keytool -list -v -keystore app/release.keystore -alias mosaic` (пароль по умолчанию в `app/build.gradle`).
+* **Вход через Google**. Android получает токен через Credential Manager и передаёт его в `window.onGoogleToken`. Веб использует Google Identity Services. Оба клиента обменивают токен на сессию Firebase. Для GitHub APK зарегистрирован новый сертификат. Сертификат подписи Google Play сверяется после настройки канала в Play Console. [Смена ключа](SIGNING-KEY-ROTATION.md)
 
 ## Файлы
 
 | Путь | Что внутри |
 |---|---|
-| `web/game.html` | Игра целиком: экраны, графика, правила, боты, онлайн, прогресс, обучение |
-| `scripts/wrap-web.sh` | Сборка `assets/index.html` из `web/game.html` (запускать после каждой правки); `wrap-web.sh web N` — сайт в `build/web/` |
+| `web/game.html`, `web/views/` | Каркас и 17 HTML-шаблонов экранов |
+| `src/ui/styles.css`, `src/ui/styles/` | Порядок подключения и тематические таблицы стилей. `interface.css` задаёт общие поверхности, отступы и приоритет действий |
+| `src/app/runtime/` | Сценарии экранов, партии, аккаунта, комнат и Android-моста. Порядок запуска указан в `web/game.html` |
+| `src/engine/`, `src/game/`, `src/net/`, `src/account/`, `src/ui/` | Модули движка, партии, сети, аккаунта и рендера интерфейса |
+| `scripts/compose-page.cjs`, `scripts/wrap-web.sh` | Единая сборка для тестов, `assets/index.html` и сайта `build/web/` |
 | `web/manifest.webmanifest`, `web/sw.js`, `web/icons/` | Веб-версия: установка на экран «Домой», офлайн-кэш, иконки |
 | `.github/workflows/pages.yml` | Публикация веб-версии на GitHub Pages при каждом push в `main` |
 | `app/src/main/java/.../MainActivity.java` | WebView, полный экран, вырез камеры → CSS-переменные `--it/--ib/--il/--ir/--itg`, мост `AndroidApp` |
@@ -38,7 +41,7 @@ flowchart LR
 | `app/src/main/java/.../PushService.java` | FCM: тема `updates-github` / `updates-play` |
 | `app/src/main/java/.../UpdateNotifier.java` | Уведомление «вышло обновление»: одно на версию; если телефон уже получил уведомление о версии, до которой ещё не обновился, следующие молчат (пуш уходит на тему, решает сам телефон) |
 | `app/src/main/java/.../UpdateNotifier.java` | Фоновая проверка версии и уведомление |
-| `.github/workflows/android.yml` | Сборка APK/AAB, релиз `vNNN` (`versionCode = 100 + номер запуска`), пуш игрокам |
+| `.github/workflows/promote-production.yml` | Подписанный релиз APK/AAB. Код версии равен номеру предыдущего тега плюс один |
 | `.github/workflows/notify.yml` | Ручная отправка пуша о версии |
 | `.github/workflows/news.yml` | Пуш-новость всем игрокам (тема `news`; проверка — `news-test`). Запускается из скрытой «Панели владельца»: 7 нажатий на «Версия» в настройках, токен GitHub хранится только на телефоне владельца |
 | `scripts/fcm-send.py` | Отправка пуша FCM (секрет `FIREBASE_SERVICE_ACCOUNT`) |
@@ -46,9 +49,9 @@ flowchart LR
 | `release-notes.md` | «Что нового» — показывается в игре после обновления |
 | `docs/google-play.md`, `docs/privacy-policy.md`, `store/` | Всё для публикации в Google Play |
 
-## Разделы `web/game.html`
+## Сценарии клиента
 
-Файл поделён комментариями `/* ---------------- раздел ---------------- */`. Искать по ним.
+Каждый сценарий лежит в отдельном файле `src/app/runtime/`. Обработчики переходного рантайма используют общее состояние партии и профиля. Новые самостоятельные функции экспортируются через `src/main.js` и тестируются без страницы.
 
 | Раздел | Главное |
 |---|---|

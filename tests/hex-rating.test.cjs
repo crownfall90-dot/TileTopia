@@ -1,3 +1,4 @@
+const { gameSource } = require('../scripts/compose-page.cjs');
 const test = require('node:test');
 const assert = require('node:assert');
 const fs = require('node:fs');
@@ -5,7 +6,7 @@ const path = require('node:path');
 const read = f => fs.readFileSync(path.join(__dirname, '..', f), 'utf8');
 
 test('Classic 2.0 cups go to their own board, the others stay on the main one', () => {
-  const h = read('web/game.html');
+  const h = gameSource();
   assert.match(h, /const hexRated = !!\(gameRules && gameRules\.mode === 'hex'\);/);
   assert.match(h, /if \(rated && hexRated\) \{ PROG\.hcups = \(PROG\.hcups \|\| 0\) \+ cups; syncRating\(false, 'hex'\); \}/);
   assert.match(h, /else if \(rated\) \{ PROG\.cups \+= cups; syncRating\(\); \}/);
@@ -15,7 +16,7 @@ test('Classic 2.0 cups go to their own board, the others stay on the main one', 
 });
 
 test('the progress road counts the cups of both ratings', () => {
-  const h = read('web/game.html');
+  const h = gameSource();
   assert.strictEqual((h.match(/myCups = \(PROG\.cups \|\| 0\) \+ \(PROG\.hcups \|\| 0\)/g) || []).length, 3);
 });
 

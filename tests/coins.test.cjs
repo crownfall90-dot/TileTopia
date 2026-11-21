@@ -1,7 +1,7 @@
+const { gameSource } = require('../scripts/compose-page.cjs');
 // Two currencies: tiles (wallet.gold) and stars (wallet.stars). No exchange. Old three-coin wallets are moved once.
 const test = require('node:test');
 const assert = require('node:assert/strict');
-const fs = require('node:fs');
 
 test('coins: prices are paid in tiles, the dearest ones in stars', async () => {
   const C = await import('../src/state/coins.js');
@@ -47,7 +47,7 @@ test('coins: a saved wallet is migrated on load, and the game has no exchange le
   const st = {getItem: k => mem[k] || null, setItem: (k, v) => { mem[k] = v; }};
   const w = loadWallet(st, () => true, '#ef5350');
   assert.deepEqual([w.gold, w.stars], [400, 1]);
-  const html = fs.readFileSync(__dirname + '/../web/game.html', 'utf8');
+  const html = gameSource();
   assert.ok(!/data-exch|renderExchange|id="exch"/.test(html), 'no exchange in the page');
   assert.ok(!/class="coin (copper|silver|gold)"/.test(html), 'no old coins in the page');
 });

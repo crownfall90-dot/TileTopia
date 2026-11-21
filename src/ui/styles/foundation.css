@@ -1,0 +1,145 @@
+/* Layout: portrait phone prototype on a night "game table"; screen tabs above, notes beside on wide screens. In the app (html.app) the phone fills the whole screen. */
+
+:root{
+
+  color-scheme: dark;
+
+  --night:#0e1322; --panel:#1a2341; --ink:#eef1f8; --muted:#98a3c2;
+
+  --brass:#f2b84b; --brass-ink:#2a1a02; --line:rgba(226,232,255,.10);
+
+  --glass:rgba(17,23,43,.82); --sky-top:#2a3a63; --sky-bot:#101729;
+
+  --f-display:'Unbounded','Arial Black',system-ui,sans-serif;
+
+  --f-body:'Onest',system-ui,-apple-system,'Segoe UI',Roboto,sans-serif;
+
+  --tilt:55deg;
+
+}
+
+html,body{height:100%}
+
+[hidden]{display:none!important}
+
+*{box-sizing:border-box}
+
+body{margin:0;background:var(--night);color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.45;
+
+  padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px));
+
+  background-image:radial-gradient(1200px 700px at 50% -10%,#1d2848 0%,transparent 60%)}
+
+button{font-family:inherit;color:inherit}
+
+button:focus-visible{outline:2px solid var(--brass);outline-offset:2px}
+
+.page{max-width:1100px;margin:0 auto;padding-block:16px 28px;display:flex;flex-direction:column;gap:14px}
+
+.head{display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+
+.brand h1{font-family:var(--f-display);font-weight:800;font-size:19px;margin:0}
+
+.brand p{margin:2px 0 0;color:var(--muted);font-size:12.5px}
+
+.tabs{display:flex;gap:3px;overflow-x:auto;max-width:100%;background:var(--panel);padding:4px;border-radius:999px;border:1px solid var(--line)}
+
+.tabs button{appearance:none;border:0;background:transparent;color:var(--muted);font:600 13px var(--f-body);padding:7px 13px;border-radius:999px;cursor:pointer}
+
+.tabs button[aria-selected="true"]{background:var(--brass);color:var(--brass-ink)}
+
+.stage{display:flex;gap:40px;justify-content:center;align-items:flex-start;flex-wrap:wrap}
+
+.phone{position:relative;height:min(820px,calc(100vh - 110px));height: min(820px,calc(100dvh - 110px));min-height:600px;aspect-ratio:9/19;max-width:100%;border-radius:40px;background:#04060c;padding:10px;box-shadow:0 30px 80px rgba(0,0,0,.55),inset 0 0 0 1.5px #2a3150;box-sizing:border-box}
+
+.scr{position:relative;width:100%;height:100%;border-radius:31px;overflow:hidden;background:var(--sky-bot)}
+
+.sbar{position:absolute;top:0;left:0;right:0;height:28px;display:flex;align-items:center;justify-content:space-between;padding:0 22px;font:600 12px var(--f-body);z-index:20;pointer-events:none}
+
+.sbar .cam{width:10px;height:10px;border-radius:50%;background:#000;box-shadow:0 0 0 2px #111}
+
+.screen{position:absolute;inset:0;display:flex;flex-direction:column;padding-top:28px}
+
+.scroll{overflow-y:auto}
+
+.notes{flex:0 1 290px;min-width:0;padding-top:12px}
+
+.notes h2{font-family:var(--f-display);font-size:14px;font-weight:700;margin:0 0 10px}
+
+.notes ul{list-style:none;margin:0 0 22px;padding:0;display:flex;flex-direction:column;gap:8px}
+
+.notes li{color:var(--muted)} .notes li b{color:var(--ink)}
+
+.notes dl{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin:0 0 22px} .notes dt{font-weight:600} .notes dd{margin:0;color:var(--muted)}
+
+.notes p{color:var(--muted);margin:0}
+
+@media (max-width:620px){
+
+  .phone{height:calc(100dvh - 120px);min-height:560px;aspect-ratio:auto;width:100%;padding:5px;border-radius:28px}
+
+  .scr{border-radius:23px} .tabs{width:100%} .tabs button{flex:1;padding:7px 4px}
+
+}
+
+/* app mode: no frame, no tabs */
+
+html.app body{padding:0;background:var(--sky-bot)}
+
+html.app .head,html.app .notes,html.app .sbar{display:none}
+
+html.app .page{padding:0;max-width:none;height:100%}
+
+html.app .stage{height:100%;display:block}
+
+html.app .phone{height:100%;width:100%;min-height:0;aspect-ratio:auto;padding:0;border-radius:0;box-shadow:none;background:none}
+
+html.app .scr{border-radius:0}
+
+/* Full-screen app: --it… are the camera-cutout insets from Android; the game and main menu use
+
+   the whole height (their top buttons sit in the corners, clear of a central camera hole). */
+
+html.app .screen{padding-top:var(--it,0px);padding-left:var(--il,0px);padding-right:var(--ir,0px)}
+
+html.app #scr-menu{padding-top:var(--itg,0px)}
+
+/* The game bar has things in the middle too, so it always starts below any camera cutout. */
+
+html.app #scr-game{padding-top:var(--it,0px)}
+
+html.app .gtop{padding-top:6px}
+
+html.app .room{flex:0 1 auto;max-width:42%}
+
+html.app .deck{margin-left:auto}
+
+html.app .room b,html.app .room span{white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+
+html.app .tray{padding-bottom:calc(12px + var(--ib,0px))}
+
+/* Web build (iPhone, Android browsers, computers): cut-outs and the home bar come from env(). */
+
+html.web{--it:env(safe-area-inset-top,0px);--ib:env(safe-area-inset-bottom,0px);--il:env(safe-area-inset-left,0px);--ir:env(safe-area-inset-right,0px);--itg:env(safe-area-inset-top,0px)}
+
+html.web,html.web body{height:100%;overflow:hidden;overscroll-behavior:none}
+
+html.web body{-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none;-webkit-text-size-adjust:100%}
+
+html.web input,html.web textarea{-webkit-user-select:text;user-select:text}
+
+/* The app is not a document: long-pressing a label must not start a text selection. Typing fields, links and codes people copy stay selectable. */
+
+html.app body{-webkit-tap-highlight-color:transparent;-webkit-touch-callout:none;-webkit-user-select:none;user-select:none}
+
+html.app input,html.app textarea,html.app a,html.app [contenteditable],html.app .code,html.app .code *,html.app .copyable,html.web a,html.web .code,html.web .code *,html.web .copyable{-webkit-user-select:text;user-select:text}
+
+
+
+@supports (height:100dvh){html.web .page{height:100dvh}}
+
+/* On a computer or tablet the game stays phone-shaped in the middle of the screen. */
+
+@media (min-width:700px){html.web body{background:#0a0e1a radial-gradient(900px 600px at 50% 0%,#1d2848,transparent 70%)}
+
+  html.web .phone{max-width:460px;margin:0 auto;box-shadow:0 0 0 1px var(--line),0 30px 80px rgba(0,0,0,.6)}}

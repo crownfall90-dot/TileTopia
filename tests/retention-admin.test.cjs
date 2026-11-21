@@ -1,16 +1,16 @@
 // H-2 Retention in owner panel: verifies presence markers, funnel events in LOG_KINDS,
 // and the retention calculation logic for D1 and D7 cohorts.
 'use strict';
+const { gameSource } = require('../scripts/compose-page.cjs');
 const test = require('node:test');
 const assert = require('node:assert/strict');
 const fs = require('node:fs');
 const path = require('node:path');
 
-const GAME_PATH = path.join(__dirname, '..', 'web', 'game.html');
 const ADMIN_PATH = path.join(__dirname, '..', 'tools', 'founder-admin.html');
 
 test('retention & funnel (H-1, H-2): game logs funnel events and sends retention markers in presence', () => {
-  const gameCode = fs.readFileSync(GAME_PATH, 'utf8');
+  const gameCode = gameSource();
 
   // Verify funnel events in LOG_KINDS
   for (const ev of ['first_open', 'first_game_done', 'second_game_done', 'third_game_done', 'save_prompt_tap', 'return_d1', 'return_d3', 'return_d7']) {
