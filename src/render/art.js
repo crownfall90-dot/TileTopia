@@ -725,12 +725,16 @@ function drawSprites() {
   sprite('mg', 20, 22, meeple('rgba(255,255,255,.7)', '#f2b84b'));
 }
 const TILE_URL = {}, DRAWN = {};
-function injectArt() {
+function injectArt({withFallback = true} = {}) {
   drawSprites();
   let css = '';
   // The cards are the Blender renders in assets/tiles/ (tools/blender_generators/generate_tiles.py, seen from above),
   // the same pictures as Classic 2.0; the drawn face lies under each, for a page whose app has no tiles/ folder yet.
-  for (const id in TYPES) { const drawn = DRAWN[id] = drawTile(id); TILE_URL[id] = `tiles/${id}.webp`; css += `.t-${id}{background-image:url(tiles/${id}.webp),url(${drawn})}`; }
+  for (const id in TYPES) {
+    const url = TILE_URL[id] = `tiles/${id}.webp`;
+    if (withFallback) DRAWN[id] = drawTile(id);
+    css += `.t-${id}{background-image:url(${url})${DRAWN[id] ? `,url(${DRAWN[id]})` : ''}}`;
+  }
   for (const k in SPR) css += `.s-${k}{background-image:url(${SPR[k].url})}`;
   const st = document.createElement('style'); st.textContent = css; document.head.appendChild(st);
 }
