@@ -5,7 +5,7 @@
   "features": [
     {
       "feature": "screen:menu",
-      "count": 1060,
+      "count": 1065,
       "players": 7
     },
     {
@@ -15,7 +15,7 @@
     },
     {
       "feature": "screen:progress",
-      "count": 394,
+      "count": 396,
       "players": 6
     },
     {
@@ -25,7 +25,7 @@
     },
     {
       "feature": "btn:btnMenuHub",
-      "count": 160,
+      "count": 161,
       "players": 6
     },
     {
@@ -50,12 +50,12 @@
     },
     {
       "feature": "nav:progress",
-      "count": 262,
+      "count": 264,
       "players": 5
     },
     {
       "feature": "screen:friends",
-      "count": 253,
+      "count": 254,
       "players": 5
     },
     {
@@ -65,7 +65,7 @@
     },
     {
       "feature": "nav:menu",
-      "count": 145,
+      "count": 146,
       "players": 5
     },
     {
@@ -75,7 +75,7 @@
     },
     {
       "feature": "screen:rating",
-      "count": 99,
+      "count": 100,
       "players": 5
     },
     {
@@ -95,12 +95,12 @@
     },
     {
       "feature": "btn:btnMenuNotif",
-      "count": 81,
+      "count": 82,
       "players": 5
     },
     {
       "feature": "screen:inbox",
-      "count": 81,
+      "count": 82,
       "players": 5
     },
     {
@@ -129,18 +129,18 @@
       "players": 5
     },
     {
+      "feature": "screen:settings",
+      "count": 34,
+      "players": 5
+    },
+    {
       "feature": "btn:gameMenu",
       "count": 33,
       "players": 5
     },
     {
-      "feature": "screen:settings",
-      "count": 33,
-      "players": 5
-    },
-    {
       "feature": "hub:settings",
-      "count": 29,
+      "count": 30,
       "players": 5
     },
     {
@@ -155,7 +155,7 @@
     },
     {
       "feature": "nav:friends",
-      "count": 142,
+      "count": 143,
       "players": 4
     },
     {
