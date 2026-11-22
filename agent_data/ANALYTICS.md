@@ -1,20 +1,20 @@
 # Tiletopia feature usage
 
-UTC dates 2026-10-23 through 2026-11-21. Today is partial.
+UTC dates 2026-10-24 through 2026-11-22. Today is partial.
 Opt-in counters only. Each row needs at least three distinct players in the window.
 
 | Feature | Players | Count |
 |---|---:|---:|
-| `screen:menu` | 7 | 1059 |
+| `screen:menu` | 7 | 1060 |
 | `screen:profile` | 7 | 88 |
-| `screen:progress` | 6 | 393 |
-| `screen:shop` | 6 | 176 |
+| `screen:progress` | 6 | 394 |
+| `screen:shop` | 6 | 177 |
 | `btn:btnMenuHub` | 6 | 160 |
-| `nav:shop` | 6 | 102 |
+| `nav:shop` | 6 | 103 |
 | `btn:mprof` | 6 | 79 |
 | `btn:ok` | 5 | 2401 |
 | `btn:rot` | 5 | 426 |
-| `nav:progress` | 5 | 261 |
+| `nav:progress` | 5 | 262 |
 | `screen:friends` | 5 | 253 |
 | `screen:game` | 5 | 237 |
 | `nav:menu` | 5 | 145 |
