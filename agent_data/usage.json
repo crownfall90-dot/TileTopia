@@ -1,11 +1,11 @@
 {
-  "from": "2026-10-24",
-  "through": "2026-11-22",
+  "from": "2026-10-25",
+  "through": "2026-11-23",
   "minimum_players": 3,
   "features": [
     {
       "feature": "screen:menu",
-      "count": 1065,
+      "count": 1070,
       "players": 7
     },
     {
@@ -15,12 +15,12 @@
     },
     {
       "feature": "screen:progress",
-      "count": 396,
+      "count": 398,
       "players": 6
     },
     {
       "feature": "screen:shop",
-      "count": 177,
+      "count": 178,
       "players": 6
     },
     {
@@ -50,7 +50,7 @@
     },
     {
       "feature": "nav:progress",
-      "count": 264,
+      "count": 266,
       "players": 5
     },
     {
@@ -65,7 +65,7 @@
     },
     {
       "feature": "nav:menu",
-      "count": 146,
+      "count": 147,
       "players": 5
     },
     {
@@ -75,7 +75,7 @@
     },
     {
       "feature": "screen:rating",
-      "count": 100,
+      "count": 102,
       "players": 5
     },
     {
@@ -95,12 +95,12 @@
     },
     {
       "feature": "btn:btnMenuNotif",
-      "count": 82,
+      "count": 83,
       "players": 5
     },
     {
       "feature": "screen:inbox",
-      "count": 82,
+      "count": 83,
       "players": 5
     },
     {
@@ -145,7 +145,7 @@
     },
     {
       "feature": "btn:menuGiftPill",
-      "count": 19,
+      "count": 20,
       "players": 5
     },
     {

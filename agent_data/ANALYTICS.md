@@ -1,30 +1,30 @@
 # Tiletopia feature usage
 
-UTC dates 2026-10-24 through 2026-11-22. Today is partial.
+UTC dates 2026-10-25 through 2026-11-23. Today is partial.
 Opt-in counters only. Each row needs at least three distinct players in the window.
 
 | Feature | Players | Count |
 |---|---:|---:|
-| `screen:menu` | 7 | 1065 |
+| `screen:menu` | 7 | 1070 |
 | `screen:profile` | 7 | 88 |
-| `screen:progress` | 6 | 396 |
-| `screen:shop` | 6 | 177 |
+| `screen:progress` | 6 | 398 |
+| `screen:shop` | 6 | 178 |
 | `btn:btnMenuHub` | 6 | 161 |
 | `nav:shop` | 6 | 103 |
 | `btn:mprof` | 6 | 79 |
 | `btn:ok` | 5 | 2401 |
 | `btn:rot` | 5 | 426 |
-| `nav:progress` | 5 | 264 |
+| `nav:progress` | 5 | 266 |
 | `screen:friends` | 5 | 254 |
 | `screen:game` | 5 | 237 |
-| `nav:menu` | 5 | 146 |
+| `nav:menu` | 5 | 147 |
 | `screen:setup` | 5 | 127 |
-| `screen:rating` | 5 | 100 |
+| `screen:rating` | 5 | 102 |
 | `btn:btnOpenModes` | 5 | 94 |
 | `btn:view` | 5 | 94 |
 | `screen:results` | 5 | 86 |
-| `btn:btnMenuNotif` | 5 | 82 |
-| `screen:inbox` | 5 | 82 |
+| `btn:btnMenuNotif` | 5 | 83 |
+| `screen:inbox` | 5 | 83 |
 | `screen:lobby` | 5 | 78 |
 | `btn:btnMainPlay` | 5 | 68 |
 | `screen:match` | 5 | 58 |
@@ -33,7 +33,7 @@ Opt-in counters only. Each row needs at least three distinct players in the wind
 | `screen:settings` | 5 | 34 |
 | `btn:gameMenu` | 5 | 33 |
 | `hub:settings` | 5 | 30 |
-| `btn:menuGiftPill` | 5 | 19 |
+| `btn:menuGiftPill` | 5 | 20 |
 | `claim:road` | 5 | 18 |
 | `nav:friends` | 4 | 143 |
 | `screen:items` | 4 | 43 |
