@@ -24,6 +24,12 @@ test('Android hands off its launch cover once the embedded illustration can pain
   art.complete = true;
   window.__showWebLaunch();
   assert.equal(ready, 2);
+  AndroidApp.holdsLaunchCover = () => true;
+  window.__showWebLaunch();
+  assert.equal(ready, 2, 'native motion stays above the WebView during setup');
+  window.__finishNativeLaunch();
+  assert.equal(ready, 3);
+  assert.equal(window.__nativeLaunchFinished, true);
   assert.deepEqual(fs.readFileSync('app/src/main/assets/launch-cover.webp'), fs.readFileSync('web/splash-landscape.webp'));
 });
 
@@ -44,6 +50,19 @@ test('splash: every touching tile edge matches and the detailed art is embedded'
   for (const edge of ['w', 'r', 'c']) assert.ok(matched.has(edge));
   assert.match(html, /class="boot-art" src="data:image\/webp;base64,/);
   assert.ok(fs.statSync('web/splash-landscape.webp').size < 80 * 1024);
+  const motion = require('../web/splash-tiles.json');
+  const delays = new Set(motion.tiles.map(tile => tile.delay));
+  assert.equal((html.match(/class="boot-tile"/g) || []).length, 9);
+  assert.equal(delays.size, 9);
+  assert.ok(motion.duration + Math.max(...delays) < 1000);
+  assert.ok(fs.statSync('web/splash-tiles.webp').size < 100 * 1024);
+  for (const asset of ['splash-tiles.json', 'splash-tiles.webp']) {
+    assert.deepEqual(fs.readFileSync(`app/src/main/assets/${asset}`), fs.readFileSync(`web/${asset}`));
+  }
+  for (const {frame: [x, y, width, height], anchor: [left, top]} of motion.tiles) {
+    assert.ok(x > 0 && y > 0 && x + width < motion.atlas[0] && y + height < motion.atlas[1]);
+    assert.ok(left >= 0 && top >= 0 && left + width <= motion.size[0] && top + height <= motion.size[1]);
+  }
 });
 
 test('start-up: every element the game wires up at the top level exists in the page', () => {
@@ -87,19 +106,23 @@ test('splash: allow an initial paint, start once on deadline, and skip the wait 
   for (const reduced of [false, true]) {
     const window = {addEventListener() {}};
     const frames = [], timers = new Map();
+    const classes = new Set();
+    const scene = {classList: classes, dataset: {settle: '760'}};
     vm.runInNewContext(fs.readFileSync('web/boot-guard.js', 'utf8'), {
-      window, document: {addEventListener() {}, hidden: false}, matchMedia: () => ({matches: reduced}),
+      window, document: {addEventListener() {}, hidden: false, querySelector: () => scene}, matchMedia: () => ({matches: reduced}),
       requestAnimationFrame: fn => frames.push(fn),
       setTimeout: (fn, ms) => { timers.set(ms, fn); return ms; }, clearTimeout: ms => timers.delete(ms),
     });
     let starts = 0;
+    window.__showWebLaunch();
+    assert.equal(classes.has('boot-motion'), !reduced);
     window.__afterSplash(() => starts++);
     assert.equal(starts, reduced ? 1 : 0);
     if (!reduced) {
-      const fallback = timers.get(400);
+      const fallback = timers.get(1100);
       frames.shift()(); frames.shift()();
       assert.equal(starts, 0);
-      timers.get(240)(); fallback();
+      timers.get(855)(); fallback();
       assert.equal(starts, 1);
     }
   }

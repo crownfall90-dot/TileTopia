@@ -1,7 +1,6 @@
 package com.crownfall.mosaic;
 
 import android.content.Context;
-import android.graphics.drawable.Drawable;
 import android.graphics.drawable.GradientDrawable;
 import android.graphics.Typeface;
 import android.text.SpannableString;
@@ -9,16 +8,12 @@ import android.text.Spanned;
 import android.text.style.ForegroundColorSpan;
 import android.util.TypedValue;
 import android.view.Gravity;
-import android.widget.ImageView;
 import android.widget.LinearLayout;
 import android.widget.TextView;
 
-import java.io.IOException;
-import java.io.InputStream;
-
 /** Shows the launch art while Android starts the WebView renderer. */
 final class LaunchCover extends LinearLayout {
-    private final ImageView art;
+    private final LaunchTiles art;
     private final TextView name;
     private final GradientDrawable background;
 
@@ -33,14 +28,8 @@ final class LaunchCover extends LinearLayout {
         background.setGradientCenter(.5f, .39f);
         setBackground(background);
 
-        art = new ImageView(context);
-        art.setScaleType(ImageView.ScaleType.FIT_CENTER);
-        art.setImportantForAccessibility(IMPORTANT_FOR_ACCESSIBILITY_NO);
-        try (InputStream stream = context.getAssets().open("launch-cover.webp")) {
-            art.setImageDrawable(Drawable.createFromStream(stream, null));
-        } catch (IOException ignored) {
-            art.setImageDrawable(context.getApplicationInfo().loadIcon(context.getPackageManager()));
-        }
+        setClipChildren(false);
+        art = new LaunchTiles(context);
         addView(art, new LayoutParams(0, 0));
 
         name = new TextView(context);
@@ -59,6 +48,21 @@ final class LaunchCover extends LinearLayout {
         LayoutParams statusParams = new LayoutParams(LayoutParams.WRAP_CONTENT, LayoutParams.WRAP_CONTENT);
         statusParams.topMargin = dp(12);
         addView(status, statusParams);
+    }
+
+    void whenSettled(Runnable ready) {
+        art.whenSettled(ready);
+    }
+
+    void fadeOut(Runnable done) {
+        if (art.usesMotion()) animate().alpha(0f).setDuration(180).withEndAction(done).start();
+        else done.run();
+    }
+
+    void resetHandoff() {
+        whenSettled(null);
+        animate().cancel();
+        setAlpha(1f);
     }
 
     private int dp(float value) {
