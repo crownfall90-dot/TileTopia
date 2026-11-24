@@ -1,6 +1,6 @@
 # Tiletopia feature usage
 
-UTC dates 2026-10-25 through 2026-11-23. Today is partial.
+UTC dates 2026-10-26 through 2026-11-24. Today is partial.
 Opt-in counters only. Each row needs at least three distinct players in the window.
 
 | Feature | Players | Count |
