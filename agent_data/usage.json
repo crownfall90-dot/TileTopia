@@ -5,7 +5,7 @@
   "features": [
     {
       "feature": "screen:menu",
-      "count": 1070,
+      "count": 1075,
       "players": 7
     },
     {
@@ -15,22 +15,22 @@
     },
     {
       "feature": "screen:progress",
-      "count": 398,
+      "count": 400,
       "players": 6
     },
     {
       "feature": "screen:shop",
-      "count": 178,
+      "count": 179,
       "players": 6
     },
     {
       "feature": "btn:btnMenuHub",
-      "count": 161,
+      "count": 163,
       "players": 6
     },
     {
       "feature": "nav:shop",
-      "count": 103,
+      "count": 104,
       "players": 6
     },
     {
@@ -40,7 +40,7 @@
     },
     {
       "feature": "btn:ok",
-      "count": 2401,
+      "count": 2404,
       "players": 5
     },
     {
@@ -50,37 +50,37 @@
     },
     {
       "feature": "nav:progress",
-      "count": 266,
+      "count": 268,
       "players": 5
     },
     {
       "feature": "screen:friends",
-      "count": 254,
+      "count": 256,
       "players": 5
     },
     {
       "feature": "screen:game",
-      "count": 237,
+      "count": 238,
       "players": 5
     },
     {
       "feature": "nav:menu",
-      "count": 147,
+      "count": 148,
       "players": 5
     },
     {
       "feature": "screen:setup",
-      "count": 127,
+      "count": 128,
       "players": 5
     },
     {
       "feature": "screen:rating",
-      "count": 102,
+      "count": 103,
       "players": 5
     },
     {
       "feature": "btn:btnOpenModes",
-      "count": 94,
+      "count": 95,
       "players": 5
     },
     {
@@ -110,7 +110,7 @@
     },
     {
       "feature": "btn:btnMainPlay",
-      "count": 68,
+      "count": 69,
       "players": 5
     },
     {
@@ -155,12 +155,12 @@
     },
     {
       "feature": "nav:friends",
-      "count": 143,
+      "count": 145,
       "players": 4
     },
     {
       "feature": "screen:items",
-      "count": 43,
+      "count": 45,
       "players": 4
     },
     {
