@@ -30,6 +30,7 @@ final class LaunchTiles extends FrameLayout {
     private boolean started, settled;
     private Runnable onSettled;
     private final Runnable settle = this::finish;
+    private final Runnable startMotion = this::animatePieces;
 
     LaunchTiles(Context context) {
         super(context);
@@ -97,15 +98,23 @@ final class LaunchTiles extends FrameLayout {
             if (!started) {
                 p.setTranslationX(p.dx * sx);
                 p.setTranslationY(p.dy * sy);
-                p.setAlpha(0f);
-                p.animate().translationX(0f).translationY(0f).alpha(1f)
-                        .setInterpolator(EASING).setDuration(duration).setStartDelay(p.delay).start();
+                p.setAlpha(.18f);
             }
         }
         if (!started) {
             started = true;
-            postDelayed(settle, Math.round((duration + lastDelay) * motionScale) + 32L);
+            // Let the system splash expose this view before it consumes the animation's first frames.
+            postOnAnimationDelayed(startMotion, 100);
         }
+    }
+
+    private void animatePieces() {
+        for (int i = 1; i < getChildCount(); i++) {
+            Piece p = (Piece) getChildAt(i);
+            p.animate().translationX(0f).translationY(0f).alpha(1f)
+                    .setInterpolator(EASING).setDuration(duration).setStartDelay(p.delay).start();
+        }
+        postDelayed(settle, Math.round((duration + lastDelay) * motionScale) + 32L);
     }
 
     private void finish() {
@@ -116,6 +125,7 @@ final class LaunchTiles extends FrameLayout {
     }
 
     @Override protected void onDetachedFromWindow() {
+        removeCallbacks(startMotion);
         removeCallbacks(settle);
         onSettled = null;
         super.onDetachedFromWindow();

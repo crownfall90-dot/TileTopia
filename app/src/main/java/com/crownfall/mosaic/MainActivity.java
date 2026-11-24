@@ -104,8 +104,9 @@ public class MainActivity extends Activity {
         hideSystemBars();
         grabLink(getIntent());
         registerBack();
-        // Allow Android to draw the cover before constructing the WebView on the UI thread.
-        root.postOnAnimation(() -> root.postOnAnimation(() -> {
+        // WebView construction can block Android's UI thread on a cold launch.
+        // Keep that work outside the visible tile assembly on slower devices.
+        launchCover.whenSettled(() -> root.postOnAnimation(() -> {
             if (!isDestroyed() && !isFinishing()) createWebView();
         }));
     }
