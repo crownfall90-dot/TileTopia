@@ -75,7 +75,7 @@ final class LaunchCover extends LinearLayout {
         int height = MeasureSpec.getSize(heightSpec);
         boolean compact = height <= dp(480);
         int artWidth = compact ? Math.min(dp(280), Math.min(width * 65 / 100, height * 46 / 100))
-                : Math.min(dp(360), width * 89 / 100);
+                : Math.min(dp(348), width * 86 / 100);
         LayoutParams params = (LayoutParams) art.getLayoutParams();
         params.width = artWidth;
         params.height = artWidth * 443 / 576;
