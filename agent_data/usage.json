@@ -1,11 +1,11 @@
 {
-  "from": "2026-10-26",
-  "through": "2026-11-24",
+  "from": "2026-10-27",
+  "through": "2026-11-25",
   "minimum_players": 3,
   "features": [
     {
       "feature": "screen:menu",
-      "count": 1075,
+      "count": 1090,
       "players": 7
     },
     {
@@ -15,22 +15,22 @@
     },
     {
       "feature": "screen:progress",
-      "count": 400,
+      "count": 402,
       "players": 6
     },
     {
       "feature": "screen:shop",
-      "count": 179,
+      "count": 182,
       "players": 6
     },
     {
       "feature": "btn:btnMenuHub",
-      "count": 163,
+      "count": 171,
       "players": 6
     },
     {
       "feature": "nav:shop",
-      "count": 104,
+      "count": 105,
       "players": 6
     },
     {
@@ -50,17 +50,17 @@
     },
     {
       "feature": "nav:progress",
-      "count": 268,
+      "count": 269,
       "players": 5
     },
     {
       "feature": "screen:friends",
-      "count": 256,
+      "count": 260,
       "players": 5
     },
     {
       "feature": "screen:game",
-      "count": 238,
+      "count": 239,
       "players": 5
     },
     {
@@ -70,17 +70,17 @@
     },
     {
       "feature": "screen:setup",
-      "count": 128,
+      "count": 130,
       "players": 5
     },
     {
       "feature": "screen:rating",
-      "count": 103,
+      "count": 105,
       "players": 5
     },
     {
       "feature": "btn:btnOpenModes",
-      "count": 95,
+      "count": 96,
       "players": 5
     },
     {
@@ -110,12 +110,12 @@
     },
     {
       "feature": "btn:btnMainPlay",
-      "count": 69,
+      "count": 70,
       "players": 5
     },
     {
       "feature": "screen:match",
-      "count": 58,
+      "count": 59,
       "players": 5
     },
     {
@@ -125,27 +125,27 @@
     },
     {
       "feature": "mode:online",
-      "count": 44,
+      "count": 45,
       "players": 5
     },
     {
       "feature": "screen:settings",
-      "count": 34,
+      "count": 35,
       "players": 5
     },
     {
       "feature": "btn:gameMenu",
-      "count": 33,
+      "count": 34,
       "players": 5
     },
     {
       "feature": "hub:settings",
-      "count": 30,
+      "count": 31,
       "players": 5
     },
     {
       "feature": "btn:menuGiftPill",
-      "count": 20,
+      "count": 22,
       "players": 5
     },
     {
@@ -155,27 +155,27 @@
     },
     {
       "feature": "nav:friends",
-      "count": 145,
+      "count": 149,
       "players": 4
     },
     {
       "feature": "screen:items",
-      "count": 45,
+      "count": 46,
       "players": 4
     },
     {
       "feature": "hub:rating",
-      "count": 22,
+      "count": 24,
+      "players": 4
+    },
+    {
+      "feature": "btn:menuQuestBanner",
+      "count": 19,
       "players": 4
     },
     {
       "feature": "rules:fast",
       "count": 19,
-      "players": 4
-    },
-    {
-      "feature": "btn:menuQuestBanner",
-      "count": 18,
       "players": 4
     },
     {
@@ -215,12 +215,12 @@
     },
     {
       "feature": "screen:history",
-      "count": 15,
+      "count": 17,
       "players": 3
     },
     {
       "feature": "screen:rules",
-      "count": 15,
+      "count": 16,
       "players": 3
     },
     {
