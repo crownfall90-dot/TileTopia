@@ -1,51 +1,51 @@
 # Tiletopia feature usage
 
-UTC dates 2026-10-27 through 2026-11-25. Today is partial.
+UTC dates 2026-10-28 through 2026-11-26. Today is partial.
 Opt-in counters only. Each row needs at least three distinct players in the window.
 
 | Feature | Players | Count |
 |---|---:|---:|
-| `screen:menu` | 7 | 1090 |
+| `screen:menu` | 7 | 1103 |
 | `screen:profile` | 7 | 88 |
-| `screen:progress` | 6 | 402 |
-| `screen:shop` | 6 | 182 |
-| `btn:btnMenuHub` | 6 | 171 |
+| `screen:progress` | 6 | 408 |
+| `screen:shop` | 6 | 183 |
+| `btn:btnMenuHub` | 6 | 172 |
 | `nav:shop` | 6 | 105 |
 | `btn:mprof` | 6 | 79 |
-| `btn:ok` | 5 | 2404 |
+| `btn:ok` | 5 | 2417 |
 | `btn:rot` | 5 | 426 |
-| `nav:progress` | 5 | 269 |
-| `screen:friends` | 5 | 260 |
-| `screen:game` | 5 | 239 |
-| `nav:menu` | 5 | 148 |
-| `screen:setup` | 5 | 130 |
-| `screen:rating` | 5 | 105 |
+| `nav:progress` | 5 | 273 |
+| `screen:friends` | 5 | 261 |
+| `screen:game` | 5 | 240 |
+| `nav:menu` | 5 | 150 |
+| `screen:setup` | 5 | 131 |
+| `screen:rating` | 5 | 107 |
 | `btn:btnOpenModes` | 5 | 96 |
-| `btn:view` | 5 | 94 |
-| `screen:results` | 5 | 86 |
-| `btn:btnMenuNotif` | 5 | 83 |
-| `screen:inbox` | 5 | 83 |
+| `btn:view` | 5 | 95 |
+| `screen:results` | 5 | 87 |
+| `btn:btnMenuNotif` | 5 | 84 |
+| `screen:inbox` | 5 | 84 |
 | `screen:lobby` | 5 | 78 |
-| `btn:btnMainPlay` | 5 | 70 |
+| `btn:btnMainPlay` | 5 | 71 |
 | `screen:match` | 5 | 59 |
-| `claim:quest` | 5 | 47 |
+| `claim:quest` | 5 | 48 |
 | `mode:online` | 5 | 45 |
-| `screen:settings` | 5 | 35 |
+| `screen:settings` | 5 | 36 |
 | `btn:gameMenu` | 5 | 34 |
-| `hub:settings` | 5 | 31 |
-| `btn:menuGiftPill` | 5 | 22 |
+| `hub:settings` | 5 | 32 |
+| `btn:menuGiftPill` | 5 | 23 |
 | `claim:road` | 5 | 18 |
-| `nav:friends` | 4 | 149 |
+| `nav:friends` | 4 | 150 |
 | `screen:items` | 4 | 46 |
 | `hub:rating` | 4 | 24 |
-| `btn:menuQuestBanner` | 4 | 19 |
+| `btn:menuQuestBanner` | 4 | 21 |
 | `rules:fast` | 4 | 19 |
 | `claim:weekly` | 4 | 8 |
 | `claim:achievement` | 3 | 269 |
-| `btn:sayBtn` | 3 | 50 |
+| `btn:sayBtn` | 3 | 55 |
 | `buy:daily` | 3 | 25 |
-| `say:emote` | 3 | 23 |
-| `say:phrase` | 3 | 19 |
+| `say:emote` | 3 | 25 |
+| `say:phrase` | 3 | 20 |
 | `btn:itemsBtn` | 3 | 18 |
 | `screen:history` | 3 | 17 |
 | `screen:rules` | 3 | 16 |

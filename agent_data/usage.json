@@ -1,11 +1,11 @@
 {
-  "from": "2026-10-27",
-  "through": "2026-11-25",
+  "from": "2026-10-28",
+  "through": "2026-11-26",
   "minimum_players": 3,
   "features": [
     {
       "feature": "screen:menu",
-      "count": 1090,
+      "count": 1103,
       "players": 7
     },
     {
@@ -15,17 +15,17 @@
     },
     {
       "feature": "screen:progress",
-      "count": 402,
+      "count": 408,
       "players": 6
     },
     {
       "feature": "screen:shop",
-      "count": 182,
+      "count": 183,
       "players": 6
     },
     {
       "feature": "btn:btnMenuHub",
-      "count": 171,
+      "count": 172,
       "players": 6
     },
     {
@@ -40,7 +40,7 @@
     },
     {
       "feature": "btn:ok",
-      "count": 2404,
+      "count": 2417,
       "players": 5
     },
     {
@@ -50,32 +50,32 @@
     },
     {
       "feature": "nav:progress",
-      "count": 269,
+      "count": 273,
       "players": 5
     },
     {
       "feature": "screen:friends",
-      "count": 260,
+      "count": 261,
       "players": 5
     },
     {
       "feature": "screen:game",
-      "count": 239,
+      "count": 240,
       "players": 5
     },
     {
       "feature": "nav:menu",
-      "count": 148,
+      "count": 150,
       "players": 5
     },
     {
       "feature": "screen:setup",
-      "count": 130,
+      "count": 131,
       "players": 5
     },
     {
       "feature": "screen:rating",
-      "count": 105,
+      "count": 107,
       "players": 5
     },
     {
@@ -85,22 +85,22 @@
     },
     {
       "feature": "btn:view",
-      "count": 94,
+      "count": 95,
       "players": 5
     },
     {
       "feature": "screen:results",
-      "count": 86,
+      "count": 87,
       "players": 5
     },
     {
       "feature": "btn:btnMenuNotif",
-      "count": 83,
+      "count": 84,
       "players": 5
     },
     {
       "feature": "screen:inbox",
-      "count": 83,
+      "count": 84,
       "players": 5
     },
     {
@@ -110,7 +110,7 @@
     },
     {
       "feature": "btn:btnMainPlay",
-      "count": 70,
+      "count": 71,
       "players": 5
     },
     {
@@ -120,7 +120,7 @@
     },
     {
       "feature": "claim:quest",
-      "count": 47,
+      "count": 48,
       "players": 5
     },
     {
@@ -130,7 +130,7 @@
     },
     {
       "feature": "screen:settings",
-      "count": 35,
+      "count": 36,
       "players": 5
     },
     {
@@ -140,12 +140,12 @@
     },
     {
       "feature": "hub:settings",
-      "count": 31,
+      "count": 32,
       "players": 5
     },
     {
       "feature": "btn:menuGiftPill",
-      "count": 22,
+      "count": 23,
       "players": 5
     },
     {
@@ -155,7 +155,7 @@
     },
     {
       "feature": "nav:friends",
-      "count": 149,
+      "count": 150,
       "players": 4
     },
     {
@@ -170,7 +170,7 @@
     },
     {
       "feature": "btn:menuQuestBanner",
-      "count": 19,
+      "count": 21,
       "players": 4
     },
     {
@@ -190,7 +190,7 @@
     },
     {
       "feature": "btn:sayBtn",
-      "count": 50,
+      "count": 55,
       "players": 3
     },
     {
@@ -200,12 +200,12 @@
     },
     {
       "feature": "say:emote",
-      "count": 23,
+      "count": 25,
       "players": 3
     },
     {
       "feature": "say:phrase",
-      "count": 19,
+      "count": 20,
       "players": 3
     },
     {
