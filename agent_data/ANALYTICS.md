@@ -1,23 +1,23 @@
 # Tiletopia feature usage
 
-UTC dates 2026-10-28 through 2026-11-26. Today is partial.
+UTC dates 2026-10-29 through 2026-11-27. Today is partial.
 Opt-in counters only. Each row needs at least three distinct players in the window.
 
 | Feature | Players | Count |
 |---|---:|---:|
-| `screen:menu` | 7 | 1103 |
+| `screen:menu` | 7 | 1105 |
 | `screen:profile` | 7 | 88 |
-| `screen:progress` | 6 | 408 |
-| `screen:shop` | 6 | 183 |
+| `screen:progress` | 6 | 410 |
+| `screen:shop` | 6 | 184 |
 | `btn:btnMenuHub` | 6 | 172 |
 | `nav:shop` | 6 | 105 |
 | `btn:mprof` | 6 | 79 |
 | `btn:ok` | 5 | 2417 |
 | `btn:rot` | 5 | 426 |
-| `nav:progress` | 5 | 273 |
-| `screen:friends` | 5 | 261 |
+| `nav:progress` | 5 | 275 |
+| `screen:friends` | 5 | 262 |
 | `screen:game` | 5 | 240 |
-| `nav:menu` | 5 | 150 |
+| `nav:menu` | 5 | 151 |
 | `screen:setup` | 5 | 131 |
 | `screen:rating` | 5 | 107 |
 | `btn:btnOpenModes` | 5 | 96 |
@@ -33,9 +33,9 @@ Opt-in counters only. Each row needs at least three distinct players in the wind
 | `screen:settings` | 5 | 36 |
 | `btn:gameMenu` | 5 | 34 |
 | `hub:settings` | 5 | 32 |
-| `btn:menuGiftPill` | 5 | 23 |
+| `btn:menuGiftPill` | 5 | 24 |
 | `claim:road` | 5 | 18 |
-| `nav:friends` | 4 | 150 |
+| `nav:friends` | 4 | 151 |
 | `screen:items` | 4 | 46 |
 | `hub:rating` | 4 | 24 |
 | `btn:menuQuestBanner` | 4 | 21 |
