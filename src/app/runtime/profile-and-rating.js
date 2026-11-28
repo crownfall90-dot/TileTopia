@@ -75,9 +75,15 @@ function openBannerFitting(initialId, initialKind = 'banner') {
     // Build stage previews
     let stageHtml = '';
     const picObj = previewPicId ? AV.PICS[previewPicId] : null;
-    const picStyle = picObj ? `--pic:url(${picObj.src});--pp:${picObj.pos || 'center'};` : '';
-    const avPreviewCls = `av big${previewShape === 'rect' ? ' banner-crest' : (previewShape === 'square' ? ' sh-square' : '')}${ring ? ' fr' : ''}${picObj ? ' pic' : ''}`;
+    const picStyle = picObj ? `--pic:url(${picObj.src});--pp:${picObj.pos || '50% 16%'};` : '';
+    const shapeCls = previewShape === 'rect' ? ' banner-crest' : (previewShape === 'square' ? ' sh-square' : ' sh-round');
+    const avPreviewCls = `av big${shapeCls}${ring ? ' fr' : ''}${picObj ? ' pic' : ''}`;
+    const rivalAvCls = `pl-v2-av${previewShape === 'rect' ? ' crest' : (previewShape === 'square' ? ' sh-square' : ' sh-round')}${ring ? ' fr' : ''}${picObj ? ' pic' : ''}`;
     const avPreviewStyle = `--c:${col};${frameStyle}${picStyle}`;
+    const stText = myStatus();
+    const statusPillHtml = stText
+      ? `<span class="pl-v2-status-pill"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffd875" stroke-width="2.5" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> <em class="fst">${stText}</em></span>`
+      : '';
 
     if (curView === 'profile') {
       stageHtml = `
@@ -90,7 +96,7 @@ function openBannerFitting(initialId, initialKind = 'banner') {
               <div class="pwho">
                 <div class="pnick-row">
                   <b class="pnick">${name}</b>
-                  ${myStatus() ? `<em class="fst">${myStatus()}</em>` : ''}
+                  ${statusPillHtml}
                 </div>
               </div>
             </div>
@@ -118,13 +124,13 @@ function openBannerFitting(initialId, initialKind = 'banner') {
             <div class="pl-hero-shade"></div>
             <div class="pl-hero-row">
               <div class="pl-v2-av-box" style="--pl-c:${col}">
-                <span class="${avPreviewCls}" style="${avPreviewStyle}">${initial}</span>
+                <span class="${rivalAvCls}" style="${avPreviewStyle}">${initial}</span>
                 <span class="pl-v2-lvl">${PROG.lvl || 1}</span>
               </div>
               <div class="pl-v2-identity">
                 <div class="pl-v2-name-row">
                   <h3 class="pl-v2-name">${name}</h3>
-                  ${myStatus() ? `<span class="pl-v2-status-pill"><em class="fst">${myStatus()}</em></span>` : ''}
+                  ${statusPillHtml}
                 </div>
                 <div class="pl-v2-presence-row">
                   <span class="pl-v2-badge on"><i class="pl-v2-dot"></i> <span>В сети</span></span>
@@ -482,7 +488,7 @@ async function syncRating(force, board) {
   if (!FB || (sent >= have && !force)) return;
   try {
     const tok = await fbToken(), target = Math.min(have, sent + 10);
-    const r = await fetch(`${FB.dbUrl}/${hex ? 'leaders_hex' : 'leaders'}/${fbAuth.uid}.json?auth=${tok}`, {method: 'PUT', body: JSON.stringify({n: profileName(), st: myStatus(), c: validCol(wallet.color) ? wallet.color : '', r: target, w: PROG.st.owins, t: {'.sv': 'timestamp'}})});
+    const r = await fetch(`${FB.dbUrl}/${hex ? 'leaders_hex' : 'leaders'}/${fbAuth.uid}.json?auth=${tok}`, {method: 'PUT', body: JSON.stringify({n: profileName(), st: myStatus(), fr: FRAMES[wallet.frame] ? wallet.frame : '', av: (wallet.avatar && AV.PICS[wallet.avatar]) ? wallet.avatar : '', sh: wallet.avShape || 'round', bn: (wallet.avShape === 'rect' && wallet.banner && AV.BANNERS[wallet.banner]) ? wallet.banner : '', c: validCol(wallet.color) ? wallet.color : '', r: target, w: PROG.st.owins, t: {'.sv': 'timestamp'}})});
     if (r.ok) {
       if (hex) PROG.hup = target; else PROG.up = target;
       saveWallet(); progressDot();

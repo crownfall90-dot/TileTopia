@@ -71,13 +71,30 @@
 .pl-hero-banner .pl-v2-av {
   width: 100%;
   height: 100%;
-  border-radius: 18px;
+  border-radius: 50%;
   font: 800 24px var(--f-display);
   display: flex;
   align-items: center;
   justify-content: center;
   box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
   background: var(--c, #5b6684);
+  color: #fff;
+}
+.pl-hero-banner .pl-v2-av.sh-square {
+  border-radius: 24%;
+}
+.pl-hero-banner .pl-v2-av.crest {
+  border-radius: 18px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.65), 0 0 0 2px rgba(242, 184, 75, 0.65);
+}
+.pl-hero-banner .pl-v2-av.pic {
+  background: var(--pic) var(--pp, 50% 16%)/cover no-repeat, var(--c);
+  color: transparent;
+  text-shadow: none;
+  font-size: 0;
+}
+.pl-hero-banner .pl-v2-av.fr.pic {
+  background: var(--pic) var(--pp, 50% 16%)/cover no-repeat padding-box, var(--fr) border-box;
 }
 
 .pl-hero-banner .pl-v2-lvl {
@@ -134,6 +151,9 @@
   border: 1px solid rgba(242, 184, 75, 0.5);
   color: #ffd875;
   font: 700 11px var(--f-body);
+  font-style: normal;
+}
+.pl-hero-banner .pl-v2-status-pill em.fst {
   font-style: normal;
 }
 

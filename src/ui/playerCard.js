@@ -50,6 +50,9 @@ export function renderPlayerCardHtml({
   achievements = null,
   achTotal = 0,
   level = null,
+  avShape = 'round',
+  picSrc = '',
+  picPos = '50% 16%',
   hasBanner = false,
   bannerSrc = '',
   bannerPos = 'center',
@@ -152,7 +155,7 @@ export function renderPlayerCardHtml({
         <div class="pl-hero-shade"></div>
         <div class="pl-hero-row">
           <div class="pl-v2-av-box" style="--pl-c:${safeCol}">
-            <span class="pl-v2-av${hasBanner ? ' crest' : ''}${frameRing ? ' fr' : ''}" style="--c:${safeCol}${frameRing ? ';--fr:' + String(frameRing).replace(/[;"<>]/g, '') : ''}">${initial}</span>${level != null ? `<span class="pl-v2-lvl">${+level || 1}</span>` : ''}
+            <span class="pl-v2-av${hasBanner || avShape === 'rect' ? ' crest' : (avShape === 'square' ? ' sh-square' : ' sh-round')}${frameRing ? ' fr' : ''}${picSrc ? ' pic' : ''}" style="--c:${safeCol}${frameRing ? ';--fr:' + String(frameRing).replace(/[;"<>]/g, '') : ''}${picSrc ? `;--pic:url(${String(picSrc).replace(/[)"<>]/g, '')});--pp:${String(picPos || '50% 16%').replace(/[;"<>]/g, '')}` : ''}">${initial}</span>${level != null ? `<span class="pl-v2-lvl">${+level || 1}</span>` : ''}
           </div>
           <div class="pl-v2-identity">
             <div class="pl-v2-name-row">

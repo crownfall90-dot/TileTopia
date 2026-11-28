@@ -342,12 +342,28 @@ html body #scr-profile #profile .prof-banner-btn:active {
   display: flex;
   align-items: center;
   justify-content: center;
-  width: 50px;
-  height: 50px;
-  border-radius: 16px;
+  width: 58px;
+  height: 58px;
+  border-radius: 50%;
   background: var(--c, #5b6684);
   color: #fff;
-  font: 800 22px var(--f-display);
+  font: 800 24px var(--f-display);
+}
+.bf-rival-card .pl-v2-av.sh-square {
+  border-radius: 24%;
+}
+.bf-rival-card .pl-v2-av.crest {
+  border-radius: 18px;
+  box-shadow: 0 6px 18px rgba(0, 0, 0, 0.65), 0 0 0 2px rgba(242, 184, 75, 0.65);
+}
+.bf-rival-card .pl-v2-av.pic {
+  background: var(--pic) var(--pp, 50% 16%)/cover no-repeat, var(--c);
+  color: transparent;
+  text-shadow: none;
+  font-size: 0;
+}
+.bf-rival-card .pl-v2-av.fr.pic {
+  background: var(--pic) var(--pp, 50% 16%)/cover no-repeat padding-box, var(--fr) border-box;
 }
 .bf-rival-card .pl-v2-lvl {
   position: absolute;
