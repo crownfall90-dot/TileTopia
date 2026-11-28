@@ -23,13 +23,26 @@ export function renderPodiumHtml(podiumEntries, meepleImgFn) {
 }
 
 /**
+ * The only points outside object scoring come from finishing another player's object.
+ * Old history rows may have a total without a breakdown.
+ */
+export function scoreBreakdown(player) {
+  const {score, stats} = player;
+  if (!stats) return null;
+  const {c, r, f} = stats;
+  if (![score, c, r, f].every(value => Number.isSafeInteger(value) && value >= 0)) return null;
+  const help = score - c - r - f;
+  return help >= 0 ? {c, r, f, help} : null;
+}
+
+/**
  * Generates breakdown table HTML for #bd
  */
 export function renderBreakdownTableHtml(rankedPlayers) {
   return rankedPlayers.map(p => {
     const botPill = !p.human ? ' <span class="botpill">бот</span>' : '';
-    const stats = p.stats || {c: 0, r: 0, f: 0, t: 0};
-    return `<tr style="--c:${p.col}"><td><span class="dot"></span>${p.name}${botPill}</td><td>${stats.c}</td><td>${stats.r}</td><td>${stats.f}</td><td>${stats.t || 0}</td><td>${p.score}</td></tr>`;
+    const breakdown = scoreBreakdown(p);
+    return `<tr style="--c:${p.col}"><td><span class="dot"></span>${p.name}${botPill}</td><td>${breakdown?.c ?? '—'}</td><td>${breakdown?.r ?? '—'}</td><td>${breakdown?.f ?? '—'}</td><td>${breakdown?.help ?? '—'}</td><td>${p.stats?.t ?? '—'}</td><td>${p.score}</td></tr>`;
   }).join('');
 }
 

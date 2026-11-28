@@ -81,6 +81,13 @@ html body .pl-v2-stat-lbl{font-size:10.5px}
 .hp2>b{font:800 13px var(--f-display);text-align:right}
 .hp2 .hadd{grid-column:3 / -1;justify-self:start;margin-top:2px}
 .hp2[data-pl]{cursor:pointer}
+.history-score{margin-top:8px;padding-top:8px;border-top:1px solid var(--line);font-size:13px}
+.history-score summary{cursor:pointer;color:var(--muted)}
+.history-score-list{display:grid;gap:8px;margin-top:8px}
+.history-score-list dl{display:flex;flex-wrap:wrap;gap:4px 12px;margin:3px 0 0}
+.history-score-list dl>div{display:flex;align-items:baseline;gap:4px}
+.history-score-list dt{color:var(--muted);font-size:12px}
+.history-score-list dd{margin:0;font-variant-numeric:tabular-nums}
 
 /* ==================== Two currencies: Тайлы and Звёзды ====================
    The coin pictures are rendered in Blender (tools/blender_generators/generate_coins.py, aa_coin and aa_star).

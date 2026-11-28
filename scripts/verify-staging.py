@@ -1,10 +1,8 @@
-import hashlib
 import os
 from pathlib import Path
 import re
 import subprocess
 import sys
-import tempfile
 from ci.apk_cert import signer_digest
 
 report = {'status': 'verification_error', 'expected': 'unavailable', 'actual': 'unavailable'}
@@ -18,55 +16,40 @@ def run(args):
 def verify():
     apk = Path('app/build/outputs/apk/staging/release/app-staging-release.apk')
     if not apk.is_file():
-        apk = Path('app/build/outputs/apk/github/release/app-github-release.apk')
-    if not apk.is_file():
-        apk = Path('app/build/outputs/apk/staging/debug/app-staging-debug.apk')
-    if not apk.is_file():
-        candidates = list(Path('app/build/outputs/apk').glob('*/*/*.apk'))
-        if candidates:
-            apk = candidates[0]
-        else:
-            raise FileNotFoundError('No APK found in app/build/outputs/apk')
+        report['status'] = 'staging_apk_missing'
+        return False
 
-    root = Path(os.environ.get('ANDROID_HOME', '')) / 'build-tools'
-    tools = None
-    if root.is_dir():
-        candidates = [p for p in root.iterdir() if (p / 'aapt').is_file() and (p / 'apksigner').is_file()]
-        if candidates:
-            tools = max(candidates, key=lambda p: tuple(int(n) for n in re.findall(r'\d+', p.name)))
+    sdk = os.environ.get('ANDROID_HOME') or os.environ.get('ANDROID_SDK_ROOT')
+    aapt, apksigner = ('aapt.exe', 'apksigner.bat') if os.name == 'nt' else ('aapt', 'apksigner')
+    root = Path(sdk) / 'build-tools' if sdk else None
+    candidates = [p for p in root.iterdir() if (p / aapt).is_file() and (p / apksigner).is_file()] if root and root.is_dir() else []
+    if not candidates:
+        report['status'] = 'sdk_tools_missing'
+        return False
+    tools = max(candidates, key=lambda p: tuple(int(n) for n in re.findall(r'\d+', p.name)))
 
-    if tools:
-        badging = run([str(tools / 'aapt'), 'dump', 'badging', str(apk)])
-        if not re.search(r"^package: name='(com\.crownfall\.mosaic|app\.crownfall\.tiletopia)", badging, re.M):
-            report['status'] = 'wrong_application_id'
-            return False
-        permissions = run([str(tools / 'aapt'), 'dump', 'permissions', str(apk)])
-        if 'android.permission.INTERNET' not in permissions:
-            report['status'] = 'internet_permission_missing'
-            return False
-        certs = run([str(tools / 'apksigner'), 'verify', '--verbose', '--print-certs-pem', str(apk)])
-        try:
-            report['actual'] = signer_digest(certs)
-        except ValueError:
-            report['status'] = 'signer_digest_parse_error'
-            return False
+    badging = run([str(tools / aapt), 'dump', 'badging', str(apk)])
+    if not re.search(r"^package: name='app\.crownfall\.tiletopia\.test'", badging, re.M):
+        report['status'] = 'wrong_application_id'
+        return False
+    permissions = run([str(tools / aapt), 'dump', 'permissions', str(apk)])
+    if "'android.permission.INTERNET'" not in permissions:
+        report['status'] = 'internet_permission_missing'
+        return False
 
-        key = os.environ.get('KEYSTORE_FILE') or os.environ.get('STAGING_KEYSTORE_FILE')
-        if not key and Path('app/release.keystore').is_file():
-            key = 'app/release.keystore'
-
-        if key and Path(key).is_file():
-            with tempfile.TemporaryDirectory(dir=os.environ.get('RUNNER_TEMP', tempfile.gettempdir())) as temp:
-                der = Path(temp) / 'public.der'
-                alias = os.environ.get('KEY_ALIAS') or ('mosaic' if 'release.keystore' in str(key) else 'staging')
-                pwd = os.environ.get('KEYSTORE_PASSWORD') or os.environ.get('STORE_PASSWORD') or 'mosaic-kingdom'
-                run(['keytool', '-exportcert', '-keystore', str(key), '-alias', alias, '-storepass', pwd, '-file', str(der)])
-                report['expected'] = hashlib.sha256(der.read_bytes()).hexdigest()
-            report['status'] = 'match' if report['actual'] == report['expected'] else 'certificate_mismatch'
-            return report['status'] == 'match'
-
-    report['status'] = 'match'
-    return True
+    expected = os.environ.get('SIGNING_CERT_SHA256', '').strip().lower()
+    if not re.fullmatch(r'[a-f0-9]{64}', expected):
+        report['status'] = 'expected_signer_missing'
+        return False
+    report['expected'] = expected
+    certs = run([str(tools / apksigner), 'verify', '--print-certs-pem', str(apk)])
+    try:
+        report['actual'] = signer_digest(certs)
+    except ValueError:
+        report['status'] = 'signer_digest_parse_error'
+        return False
+    report['status'] = 'match' if report['actual'] == expected else 'certificate_mismatch'
+    return report['status'] == 'match'
 
 ok = False
 try:

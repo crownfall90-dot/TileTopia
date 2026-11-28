@@ -93,6 +93,7 @@ test('net/matchmaking: createMatchState and filterOpenRooms', async () => {
   const now = 100000;
   const seeks = new Map([
     ['ROOM1', {ts: now - 5000, n: 1, want: 2}], // 1 needed
+    ['OLDER', {ts: now - 1000, firstTs: now - 19000, n: 2, want: 3}], // older, but refreshed more recently
     ['ROOM2', {ts: now - 2000, n: 2, want: 4}], // 2 needed
     ['STALE', {ts: now - 30000, n: 1, want: 2}], // expired
     ['CLOSED', {ts: now - 1000, n: 1, want: 2}]
@@ -101,9 +102,45 @@ test('net/matchmaking: createMatchState and filterOpenRooms', async () => {
   const skip = new Set();
 
   const open = mm.filterOpenRooms(seeks, closed, skip, now);
-  assert.equal(open.length, 2);
-  assert.equal(open[0].code, 'ROOM1', 'closest to start comes first');
-  assert.equal(open[1].code, 'ROOM2');
+  assert.deepEqual(open.map(x => x.code), ['OLDER', 'ROOM1', 'ROOM2']);
+});
+
+test('room host reserves the last seat before the lobby stream echoes', async context => {
+  const {loadPlaywright, openGame, instrumentedCopy} = require('./golden/harness.cjs');
+  const pw = loadPlaywright();
+  if (!pw) return context.skip('Playwright is required');
+  const fs = require('node:fs');
+  const path = require('node:path');
+  const browser = await pw.chromium.launch();
+  const file = instrumentedCopy();
+  try {
+    const html = fs.readFileSync(file, 'utf8');
+    const end = html.lastIndexOf('})();');
+    const hook = `window.__lobbyTest = async () => {
+      const sent = [], closes = [];
+      TRANSPORT.send = async (code, message) => { sent.push(message); };
+      FIRE.send = async (code, message) => { closes.push(message); };
+      net = {code: 'TEST1', host: true, hostId: myId, max: 3, seen: new Set(), uidOf: new Map(), since: 0};
+      const emit = (id, message) => onNet({id, message: JSON.stringify(message), time: 1});
+      [myId, 'one', 'two', 'three'].forEach((id, i) => emit('join' + i, {t:'hello', id, name:'Игрок ' + i}));
+      const seatsBeforeEcho = net.lobby.seats.map(x => x.owner === myId ? 'host' : x.owner);
+      await net.lobbySend;
+      emit('stale', sent[0]);
+      const seatsAfterEcho = net.lobby.seats.map(x => x.owner === myId ? 'host' : x.owner);
+      net.host = false; net.openMatch = true;
+      leaveRoom();
+      return {seatsBeforeEcho, seatsAfterEcho, snapshots: sent.map(l => l.seats.length), closes};
+    };`;
+    fs.writeFileSync(file, html.slice(0, end) + hook + '\n' + html.slice(end));
+    const {page, errors} = await openGame(browser, file, 42);
+    assert.deepEqual(await page.evaluate(() => window.__lobbyTest()), {
+      seatsBeforeEcho: ['host', 'one', 'two'], seatsAfterEcho: ['host', 'one', 'two'], snapshots: [1, 2, 3], closes: [],
+    });
+    assert.deepEqual(errors, []);
+  } finally {
+    await browser.close();
+    fs.rmSync(path.dirname(file), {recursive: true});
+  }
 });
 
 test('net/matchmaking: H-5 bot fallback triggers and fills seats', async () => {

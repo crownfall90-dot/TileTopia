@@ -20,15 +20,15 @@ async function googleIdp(idToken, session) {
   const body = {postBody: 'id_token=' + encodeURIComponent(idToken) + '&providerId=google.com', requestUri: 'http://localhost', returnIdpCredential: true, returnSecureToken: true};
   if (session) body.idToken = session;
   const j = await idt('signInWithIdp', body);
-  if (!j.idToken) throw {error: {message: j.needConfirmation ? 'NEED_CONFIRMATION' : String(j.errorMessage || 'NO_SESSION')}};
+  if (j.needConfirmation || j.errorMessage || !j.idToken) {
+    throw {error: {message: j.needConfirmation ? 'NEED_CONFIRMATION' : String(j.errorMessage || 'NO_SESSION')}, email: j.email};
+  }
   return j;
 }
 const gErr = (e, re) => !!(e && e.error && re.test(String(e.error.message || '')));
 let googleBusy = false;
 let lastGoogleToken = '';
 let lastGoogleTokenTime = 0;
-// A Google token for an e-mail that already has a password profile: it is attached after the password sign-in.
-let pendingGoogle = null;
 // One button for both cases. A Google account the game has not seen becomes a registration of THIS profile (gold,
 // figures and progress stay; then a nickname finishes it). A Google account that already has a profile signs in to it.
 async function finishGoogle(idToken, link, onFail) {
@@ -49,11 +49,15 @@ async function finishGoogle(idToken, link, onFail) {
       }
     }
     if (!j) j = await googleIdp(idToken, null);
+    const accountEmail = j.email || email || '';
+    if (joined) keepAuth(j, accountEmail);
+    const loaded = !joined && await cloudLoad(j, accountEmail);
     lastGoogleToken = idToken; lastGoogleTokenTime = Date.now();
-    keepAuth(j, email || j.email || '');
     document.querySelectorAll('body > .over').forEach(e => e.remove()); // dialogs only: #over inside the game screen is the game's own results board
-    const loaded = !joined && await cloudLoad();
-    if (loaded) {
+    if (joined && wasRegistered) {
+      await cloudSave(); renderAccount(); presenceMark(true);
+      toastAny('Google подключён к вашему профилю');
+    } else if (loaded) {
       track('login', {method: 'google'});
       wallet.tut = wallet.tutAsked = true; saveWallet();
       toastAny(`С возвращением, ${profileName()}!`);
@@ -69,23 +73,17 @@ async function finishGoogle(idToken, link, onFail) {
   } catch (e) {
     if (gErr(e, /NEED_CONFIRMATION|EMAIL_EXISTS/)) {
       // This e-mail already has a profile with a password: sign in with it once, Google gets attached to it.
-      pendingGoogle = {token: idToken, at: Date.now()};
-      document.querySelectorAll('body > .over').forEach(x => x.remove());
-      toastAny('Эта почта уже зарегистрирована с паролем. Войдите по почте один раз — и Google подключится к профилю');
-      accountDialog('login', jwtEmail(idToken));
+      const email = String(e.email || jwtEmail(idToken)).trim();
+      if (email) {
+        document.querySelectorAll('body > .over').forEach(x => x.remove());
+        accountDialog('login', email, {token: idToken, email, at: Date.now()});
+      } else toastAny('Войдите по почте, затем подключите Google в настройках профиля');
     } else {
       const [t] = authErr(e, link); toastAny(t);
       if (link && gErr(e, /FEDERATED_USER_ID_ALREADY_LINKED|CREDENTIAL_ALREADY_IN_USE/)) setTimeout(() => accountDialog('login'), 400);
     }
     if (onFail) onFail(e);
   } finally { googleBusy = false; }
-}
-// After a password sign-in: attach the Google account that was waiting for it (the token lives an hour).
-async function attachPendingGoogle() {
-  const g = pendingGoogle; pendingGoogle = null;
-  if (!g || Date.now() - g.at > 50 * 60 * 1000) return;
-  try { const j = await googleIdp(g.token, fbAuth.idToken); keepAuth(j, fbAuth.email); toastAny('Google подключён — теперь можно входить в один тап'); }
-  catch (e) { authErr(e, true); }
 }
 // After a registration the status «Олд» waits in Notifications → Rewards: the red dot lights up and a toast says so.
 function oldStatusNote() {

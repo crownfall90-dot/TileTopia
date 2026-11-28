@@ -2,6 +2,8 @@
 'use strict';
 const test = require('node:test');
 const assert = require('node:assert/strict');
+const fs = require('node:fs');
+const vm = require('node:vm');
 
 const hud = require('../src/ui/hud.js');
 const results = require('../src/ui/results.js');
@@ -60,7 +62,7 @@ test('ui/results: winTitle produces appropriate win title', () => {
 
 test('ui/results: renderPodiumHtml and renderBreakdownTableHtml format podium and scores', () => {
   const players = [
-    {i: 0, name: 'Вы', col: '#ef5350', score: 24, human: true, stats: {c: 12, r: 8, f: 4, t: 15, m: 3}},
+    {i: 0, name: 'Вы', col: '#ef5350', score: 25, human: true, stats: {c: 12, r: 8, f: 4, t: 15, m: 3}},
     {i: 1, name: 'Бот Сова', col: '#4c8dff', score: 18, human: false, stats: {c: 10, r: 4, f: 4, t: 14, m: 2}}
   ];
 
@@ -71,9 +73,47 @@ test('ui/results: renderPodiumHtml and renderBreakdownTableHtml format podium an
 
   const podiumHtml = results.renderPodiumHtml(podEntries, (i) => `<img>`);
   assert.ok(podiumHtml.includes('pc first'), 'winner has pc first class');
-  assert.ok(podiumHtml.includes('24'), 'winner points displayed');
+  assert.ok(podiumHtml.includes('25'), 'winner points displayed');
 
   const bdHtml = results.renderBreakdownTableHtml(players);
-  assert.ok(bdHtml.includes('<td>12</td>'), 'city stats rendered');
-  assert.ok(bdHtml.includes('<td>24</td>'), 'total score rendered');
+  assert.match(bdHtml, /<td>12<\/td><td>8<\/td><td>4<\/td><td>1<\/td><td>15<\/td><td>25<\/td>/);
+  assert.match(bdHtml, /<td>10<\/td><td>4<\/td><td>4<\/td><td>0<\/td><td>14<\/td><td>18<\/td>/);
+});
+
+test('ui/history: preserves the score breakdown after saving a match', async () => {
+  const {renderHistoryHtml} = await import('../src/ui/progress.js');
+  const {saveHistoryEntry} = await import('../src/state/save.js');
+  const source = fs.readFileSync('src/app/runtime/saved-matches.js', 'utf8');
+  const historySave = source.match(/^function historySave\(reason, final\) \{[\s\S]*?^\}/m)[0];
+  const players = [
+    {name: 'Аня', score: 27, col: '#ef5350', human: true, stats: {c: 12, r: 5, f: 9, t: 13}},
+    {name: 'Боря', score: 18, col: '#4c8dff', human: true, uid: 'boris', stats: {c: 8, r: 5, f: 5, t: 13}}
+  ];
+  const stored = new Map();
+  const localStorage = {getItem: key => stored.get(key), setItem: (key, value) => stored.set(key, value)};
+  const ctx = {players, localStorage, gameKey: () => 'o:test', isMe: p => p === players[0], PG: {state: {save: {saveHistoryEntry}}}};
+  vm.runInNewContext(`${historySave}; historySave('deck', true);`, ctx);
+  players[0].stats.c = 99;
+
+  const rows = JSON.parse(stored.get('gameHistory'));
+  assert.deepEqual(rows[0].players[0].stats, {c: 12, r: 5, f: 9});
+  const html = renderHistoryHtml(rows, uid => uid === 'boris');
+  assert.match(html, /data-pl="boris"/);
+  assert.match(html, /<summary>Разбор очков<\/summary>/);
+  assert.match(html, /Аня<\/b><dl>.*<dt>Города<\/dt><dd>12<\/dd>.*<dt>Помощь<\/dt><dd>1<\/dd>/);
+});
+
+test('ui/history: old or incomplete rows retain their total without invented category points', async () => {
+  const {renderHistoryHtml} = await import('../src/ui/progress.js');
+  const html = renderHistoryHtml([{
+    id: 'l:legacy', at: 1700000000000, reason: 'deck',
+    players: [
+      {name: 'Аня', score: 24, me: true},
+      {name: 'Боря', score: 18, stats: {c: 9, r: 5}},
+      {name: 'Вера', score: 11, stats: {c: 9, r: 3, f: 0}}
+    ]
+  }]);
+  assert.match(html, /Победа/);
+  assert.match(html, /<b>24<\/b>/);
+  assert.doesNotMatch(html, /Разбор очков/);
 });

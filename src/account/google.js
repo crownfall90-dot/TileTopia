@@ -29,6 +29,17 @@ export function googleIdpBody(idToken, session = null) {
   return body;
 }
 
+export async function linkPasswordSession(credential, passwordSession, link, now = Date.now()) {
+  const email = String(passwordSession.email || '').trim().toLowerCase();
+  if (!credential.token || !email || email !== credential.email.trim().toLowerCase()
+      || !passwordSession.localId || !passwordSession.idToken || now - credential.at > 45 * 60 * 1000) {
+    throw new Error('GOOGLE_CONFIRMATION_EXPIRED');
+  }
+  const linked = await link(credential.token, passwordSession.idToken);
+  if (!linked.idToken || linked.localId !== passwordSession.localId) throw new Error('GOOGLE_PROFILE_MISMATCH');
+  return linked;
+}
+
 /** Classify Google Sign-In error codes. */
 export function classifyGoogleError(err) {
   const msg = String(err && err.message ? err.message : err || '');

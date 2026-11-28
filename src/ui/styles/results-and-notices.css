@@ -20,6 +20,8 @@
 
 .pc.first .blk{background:linear-gradient(180deg,var(--brass),#b97a1c);color:var(--brass-ink)}
 
+.score-table-scroll{overflow-x:auto}
+.score-help{margin:8px 0 0;color:var(--muted);font-size:12px}
 table.bd{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric:tabular-nums}
 
 .bd th{font-weight:600;color:var(--muted);font-size:11px;text-align:right;padding:6px 4px;border-bottom:1px solid var(--line)}
@@ -244,21 +246,6 @@ table.bd{width:100%;border-collapse:collapse;font-size:13px;font-variant-numeric
 .tile-toast.bad .tt-title {
   color: #fca5a5;
 }
-
-/* Relic / Mystery discovery */
-.tile-toast.relic {
-  border-color: rgba(245, 175, 25, 0.75);
-  box-shadow: 0 16px 36px rgba(0, 0, 0, 0.55), 0 0 20px rgba(245, 175, 25, 0.35);
-  background: linear-gradient(135deg, rgba(38, 28, 12, 0.96) 0%, rgba(18, 14, 8, 0.98) 100%);
-}
-.tile-toast.relic .tt-icon {
-  background: linear-gradient(135deg, #f5af19, #e65100);
-  color: #fff;
-}
-.tile-toast.relic .tt-title {
-  color: #ffd54f;
-}
-
 
 /* profile: one card — identity row, level row, account buttons */
 

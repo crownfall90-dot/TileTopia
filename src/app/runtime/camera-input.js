@@ -109,7 +109,7 @@ boardTools.addEventListener('keydown', e => {
 });
 let moved = false, sx = 0, sy = 0, pinch = null, vel = {x: 0, y: 0}, lastT = 0;
 board.addEventListener('pointerdown', e => {
-  if (e.target.closest('#boardTools,.over,.helppill')) return;
+  if (e.target.closest('#boardTools,.over,.helppill,.timelapse-hud')) return;
   boardTools.open = false;
   if (e.target.closest('.fab')) return;
   camAnim++; inertia++;

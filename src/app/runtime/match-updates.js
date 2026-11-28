@@ -57,6 +57,8 @@ function renderUpdPause() {
 // Android "Back": close a dialog, open the game menu, or go back to the main menu; false lets the app close.
 let backAt = 0;
 window.onBack = () => {
+  if (ownershipDialog.open) { ownershipDialog.close(); return true; }
+  if (stopTimelapse) { stopTimelapse(); return true; }
   if ($('#modeSheetBackdrop')?.classList.contains('open')) { $('#btnCloseSheet').click(); return true; }
   const dlg = [...document.querySelectorAll('body > .over')].pop();
   if (dlg && dlg.id === 'updpause') return true;

@@ -3,6 +3,33 @@
 const test = require('node:test');
 const assert = require('node:assert/strict');
 
+test('a password profile links Google only for its confirmed email and original UID', async () => {
+  const {linkPasswordSession} = await import('../src/account/google.js');
+  const g = {token: 'google-token', email: 'Player@example.com', at: 1000};
+  const pass = {email: 'player@example.com', localId: 'original', idToken: 'password-session'};
+  const linked = {email: pass.email, localId: pass.localId, idToken: 'linked-session'};
+  assert.equal(await linkPasswordSession(g, pass, async (token, session) => {
+    assert.equal(token, g.token);
+    assert.equal(session, pass.idToken);
+    return linked;
+  }, 2000), linked);
+  await assert.rejects(linkPasswordSession(g, {...pass, email: 'other@example.com'}, async () => assert.fail('different email'), 2000), /GOOGLE_CONFIRMATION_EXPIRED/);
+  await assert.rejects(linkPasswordSession(g, pass, async () => assert.fail('expired'), 3000000), /GOOGLE_CONFIRMATION_EXPIRED/);
+  await assert.rejects(linkPasswordSession(g, pass, async () => ({...linked, localId: 'other'}), 2000), /GOOGLE_PROFILE_MISMATCH/);
+});
+
+test('password reset keeps the user message consistent for unknown emails but propagates delivery errors', async () => {
+  const {requestPasswordReset} = await import('../src/account/auth.js');
+  const email = 'player@example.com';
+  const sent = await requestPasswordReset(async (method, body) => {
+    assert.equal(method, 'sendOobCode');
+    assert.deepEqual(body, {requestType: 'PASSWORD_RESET', email});
+  }, email);
+  const unknown = await requestPasswordReset(async () => { throw {error: {message: 'EMAIL_NOT_FOUND'}}; }, email);
+  assert.equal(unknown, sent);
+  await assert.rejects(requestPasswordReset(async () => { throw Error('NETWORK_ERROR'); }, email), /NETWORK_ERROR/);
+});
+
 test('account/google: jwtPayload decodes UTF-8 and handles malformed tokens', async () => {
   const {jwtPayload, jwtEmail, googleIdpBody, classifyGoogleError} = await import('../src/account/google.js');
 

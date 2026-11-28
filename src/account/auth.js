@@ -116,6 +116,7 @@ export const AUTH_ERR = {
   EMAIL_EXISTS: ['Эта почта уже привязана к другому профилю. Войдите в него или укажите другую почту', 'mail'],
   EMAIL_NOT_FOUND: ['Профиля с такой почтой нет. Проверьте почту или сначала сохраните профиль', 'mail'],
   INVALID_PASSWORD: ['Неверный пароль. Проверьте раскладку и Caps Lock или нажмите «Забыли пароль?»', 'pass'],
+  PROFILE_LOAD_FAILED: ['Не удалось загрузить сохранённый профиль. Проверьте связь и повторите вход', ''],
   INVALID_LOGIN_CREDENTIALS: ['Почта или пароль не подходят. Проверьте оба поля — нажмите 👁, чтобы увидеть пароль', 'both'],
   INVALID_EMAIL: ['Почта записана с ошибкой. Пример: name@mail.ru', 'mail'],
   MISSING_EMAIL: ['Введите почту', 'mail'],
@@ -157,6 +158,16 @@ export function checkAuthInput(mail, pass, link) {
   if (link && pass.length < 6) return [`Пароль слишком короткий: ${pass.length} из 6 символов`, 'pass'];
   if (link && pass !== pass.trim()) return ['В начале или в конце пароля пробел — уберите его, чтобы потом не ошибиться', 'pass'];
   return null;
+}
+
+export async function requestPasswordReset(request, email) {
+  try {
+    await request('sendOobCode', {requestType: 'PASSWORD_RESET', email});
+  } catch (error) {
+    const code = String(error?.error?.message || error?.message || '').split(/[ :]/)[0];
+    // Use the same confirmation in projects with or without email-enumeration protection.
+    if (code !== 'EMAIL_NOT_FOUND' && code !== 'USER_NOT_FOUND') throw error;
+  }
 }
 
 export const EYE_OPEN = '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M2 12s3.6-7 10-7 10 7 10 7-3.6 7-10 7S2 12 2 12z"/><circle cx="12" cy="12" r="3"/></svg>';

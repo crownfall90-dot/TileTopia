@@ -27,7 +27,7 @@ export function createMatchState({want = 2, mode = 'classic', create = false, no
 export function filterOpenRooms(seeks, closed, skip, now = Date.now(), freshMs = SEEK_FRESH, currentCode = null) {
   return [...seeks]
     .filter(([c, o]) => !closed.has(c) && !skip.has(c) && (now - o.ts < freshMs) && o.n < o.want && (!currentCode || c !== currentCode))
-    .sort((a, b) => (a[1].want - a[1].n) - (b[1].want - b[1].n) || b[1].ts - a[1].ts)
+    .sort((a, b) => (a[1].want - a[1].n) - (b[1].want - b[1].n) || (a[1].firstTs ?? a[1].ts) - (b[1].firstTs ?? b[1].ts) || a[0].localeCompare(b[0]))
     .map(([code, o]) => ({code, n: o.n}));
 }
 

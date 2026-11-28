@@ -1,7 +1,7 @@
 /* ---------------- quick match ("Играть онлайн") ----------------
    Waiting rooms announce themselves in one shared log (room QMATCH): {t:'seek', code} every
    10 s while they wait, {t:'close', code} once they start or give up. A player looking for a
-   game joins the freshest open room or, if there is none, opens one and waits there. Two
+   game joins the room closest to filling or, if there is none, opens one and waits there. Two
    players who opened rooms at the same moment meet in the one with the smaller code. The
    room's creator starts the game a few seconds after the second player comes in (at once
    when it is full); from then on it is an ordinary online game. */
@@ -29,7 +29,14 @@ async function quickMatch(create) {
       if (!/^[A-Z0-9]{5}$/.test(m.code || '')) return;
       if (m.t === 'close') me.closed.add(m.code);
       // any waiting room counts, whatever its mode and size: the room keeps its own rules
-      if (m.t === 'seek' && m.id !== myId) { const o = me.seeks.get(m.code); if (!o || (v.ts || 0) >= o.ts) me.seeks.set(m.code, {ts: v.ts || 0, n: +m.n || 1, want: Math.min(5, Math.max(2, +m.want || 2))}); }
+      if (m.t === 'seek' && m.id !== myId) {
+        const ts = Number(v.ts);
+        if (!Number.isFinite(ts) || ts <= 0) return;
+        const previous = me.seeks.get(m.code);
+        const firstTs = Math.min(ts, previous?.firstTs ?? ts);
+        if (!previous || ts >= previous.ts) me.seeks.set(m.code, {ts, firstTs, n: +m.n || 1, want: Math.min(5, Math.max(2, +m.want || 2))});
+        else previous.firstTs = firstTs;
+      }
     };
     const put = e => {
       let d; try { d = JSON.parse(e.data); } catch (_) { return; }
@@ -49,10 +56,7 @@ function matchFail(me) { if (mm !== me) return; toastAny('Нет связи с �
 const matchSay = (msg) => FIRE.send(MATCH_ROOM, msg).catch(() => {});
 // Open rooms others wait in, the closest to starting first: one free seat, then two, and so on (any mode and size).
 function matchOpen(me) {
-  if (PG.net && PG.net.matchmaking) return PG.net.matchmaking.filterOpenRooms(me.seeks, me.closed, me.skip, Date.now(), SEEK_FRESH, net ? net.code : null);
-  const now = Date.now();
-  return [...me.seeks].filter(([c, o]) => !me.closed.has(c) && !me.skip.has(c) && now - o.ts < SEEK_FRESH && o.n < o.want && (!net || c !== net.code))
-    .sort((a, b) => (a[1].want - a[1].n) - (b[1].want - b[1].n) || b[1].ts - a[1].ts).map(([code, o]) => ({code, n: o.n}));
+  return PG.net.matchmaking.filterOpenRooms(me.seeks, me.closed, me.skip, Date.now(), SEEK_FRESH, net?.code);
 }
 function matchDecide(me) {
   if (mm !== me || !me.ready) return;
@@ -88,7 +92,7 @@ function matchTick(me) {
   // We knocked but the room's creator never let us in (closed the app, or the room is full).
   if (!net.host && Date.now() - net.since * 1000 > 9000 && !seats.some(x => x.owner === myId)) return matchSkip(net.code);
   // Guest waiting alone or with unresponsive host for >= 10s: skip to own room
-  if (!net.host && sec >= FILL_SECS && !me.startAt && seats.length < me.want) return matchSkip(net.code);
+  if (!net.host && Date.now() - net.since * 1000 >= FILL_SECS * 1000 && seats.length < matchRoomSize(me)) return matchSkip(net.code);
 
   // H-5: if no human opponent found within ~10 seconds, auto-fill remaining seats with bots so player doesn't wait in empty room
   if (net.host && !me.startAt && sec >= FILL_SECS && seats.length < me.want) {
@@ -100,7 +104,6 @@ function matchTick(me) {
     // seats added by the module above carry no human-like name yet
     nextSeats.forEach(x => { if (x.bot && !x.owner && !x.ghost) { x.ghost = 1; x.name = ghostName(nextSeats.filter(y => y !== x)); } });
     publishLobby(nextSeats);
-    if (net.lobby) net.lobby.seats = nextSeats;
     me.startAt = Date.now() + 1500;
     matchSay({t: 'close', code: net.code});
   }
@@ -109,9 +112,10 @@ function matchTick(me) {
   matchRender();
 }
 const meLabel = (me, name) => (name = clean(name), me && name !== 'Вы' ? name + ' (вы)' : name);
+const matchRoomSize = me => net?.quick && net.lobby?.max ? roomMax() : me.seeks.get(net?.code)?.want || me.want;
 function matchRender() {
   if (!mm) return;
-  const seats = net && net.quick && net.lobby ? net.lobby.seats : [], want = mm.want;
+  const seats = net && net.quick && net.lobby ? net.lobby.seats : [], want = matchRoomSize(mm);
   if (net && net.host && seats.length >= want && !mm.startAt) {
     mm.startAt = Date.now() + START_IN * 1000;
     matchSay({t: 'close', code: net.code});
@@ -242,7 +246,8 @@ $('#sayBox').addEventListener('click', e => {
     const botIdxs = players.map((p, i) => !isMe(p) && !p.human ? i : -1).filter(i => i >= 0);
     if (botIdxs.length && Math.random() < 0.45) {
       const bIdx = botIdxs[Math.floor(Math.random() * botIdxs.length)];
-      const botReplies = [0, 1, 5, 7, 10, 11, 12, 14, 15]; // '👍', '😄', '👏', '🤔', '❤️', '🤝', '👑', '🎯', '💪'
+      const botReplyPool = ['👑', '🔥', '🤝', '🎯', '🥳', '😎', '👏', '❤️', 'Отличный ход!', 'Красиво строишь!'];
+      const botReplies = botReplyPool.map(x => SAYS.indexOf(x)).filter(idx => idx >= 0);
       const reply = botReplies[Math.floor(Math.random() * botReplies.length)];
       setTimeout(() => { if (typeof phase !== 'undefined' && phase !== 'end') showSay(bIdx, reply); }, 1200 + Math.random() * 800);
     }
@@ -263,5 +268,5 @@ function showSay(p, i, uid) {
     sp.style.cssText = `left:${cx - 8}px;top:${cy + 10}px;--dx:${((k - 3) * 16 + (Math.random() - .5) * 14) | 0}px;--dy:${(-30 - Math.random() * 50) | 0}px;--rt:${((Math.random() - .5) * 90) | 0}deg;animation-delay:${k * 70}ms`;
     document.body.append(sp); setTimeout(() => sp.remove(), 1900 + k * 70);
   }
-  if (!isMe(players[p])) beep('turn');
+  if (!isMe(players[p])) beep('chat');
 }

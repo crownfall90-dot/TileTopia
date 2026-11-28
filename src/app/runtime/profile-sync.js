@@ -50,13 +50,17 @@ let syncing = null, syncAgain = false, cloudTimer = 0;
 function cloudSync(push) {
   if (!linkedNow()) return Promise.resolve(false);
   if (syncing) { syncAgain = syncAgain || push || 'pull'; return syncing; }
+  const uid = fbAuth.uid;
   syncing = (async () => {
     try {
-      const tok = await fbToken(), url = `${FB.dbUrl}/profiles/${fbAuth.uid}.json?auth=${tok}`;
+      const tok = await fbToken();
+      if (fbAuth?.uid !== uid) return false;
+      const url = `${FB.dbUrl}/profiles/${uid}.json?auth=${tok}`;
       for (let attempt = 0; attempt < 4; attempt++) {
         const r = await fetch(url, {headers: {'X-Firebase-ETag': 'true'}}); if (!r.ok) return false;
         const etag = r.headers.get('ETag'), d = await r.json();
-        let base = loadBase(); if (base && base.uid !== fbAuth.uid) base = null;
+        if (fbAuth?.uid !== uid) return false;
+        let base = loadBase(); if (base && base.uid !== uid) base = null;
         const mine = syncable(wallet);
         let next = mine;
         if (d && d.w && (!base || base.t !== d.t)) { // the cloud changed since this device last synced
@@ -86,8 +90,12 @@ function cloudSync(push) {
         const bodyPayload = {w: JSON.stringify(wallet), s: JSON.stringify(setup.seats[0]), t: {'.sv': 'timestamp'}, by: {c: myId, v: appCode(), p: installKind()}};
         if (Array.isArray(currentHist) && currentHist.length) bodyPayload.h = JSON.stringify(currentHist.slice(0, 30));
         const w = await fetch(url, {method: 'PUT', headers: etag ? {'if-match': etag} : {}, body: JSON.stringify(bodyPayload)});
+        if (fbAuth?.uid !== uid) return false;
         if (w.status === 412) continue; // another device saved in between: merge again
-        if (w.ok) { const saved = await w.json().catch(() => null); saveBase(wallet, saved && saved.t); }
+        if (w.ok) {
+          const saved = await w.json().catch(() => null);
+          if (fbAuth?.uid === uid) saveBase(JSON.parse(bodyPayload.w), saved?.t);
+        }
         return w.ok;
       }
     } catch (_) {} finally {
@@ -127,14 +135,21 @@ async function profileListen() {
 document.addEventListener('visibilitychange', () => { if (document.hidden && cloudTimer) { clearTimeout(cloudTimer); cloudTimer = 0; cloudSync(true); } });
 addEventListener('online', () => { cloudSync(true); profileListen(); });
 // Signing in on this device: the cloud profile replaces what is here.
-async function cloudLoad() {
-  const tok = await fbToken(), r = await fetch(`${FB.dbUrl}/profiles/${fbAuth.uid}.json?auth=${tok}`);
-  const d = r.ok ? await r.json() : null; if (!d || !d.w) return false;
-  const w = JSON.parse(d.w); for (const k of Object.keys(wallet)) delete wallet[k]; Object.assign(wallet, w); COINS.migrate(wallet);
-  for (const k of Object.keys(PROG)) delete PROG[k];
-  Object.assign(PROG, w.prog || {}); wallet.prog = PROG;
-  if (d.s) { const s0 = JSON.parse(d.s); setup.seats[0].name = s0.name; setup.seats[0].col = s0.col; }
-  try { localStorage.setItem('wallet', JSON.stringify(wallet)); } catch (_) {} saveSetup();
+async function cloudLoad(session, email, stillActive = () => true) {
+  const r = await fetch(`${FB.dbUrl}/profiles/${session.localId}.json?auth=${session.idToken}`);
+  if (!r.ok) throw {error: {message: 'PROFILE_LOAD_FAILED'}};
+  const d = await r.json();
+  const w = d?.w ? JSON.parse(d.w) : null;
+  const seat = d?.s ? JSON.parse(d.s) : null;
+  if (d && (!w || typeof w !== 'object' || Array.isArray(w))) throw {error: {message: 'PROFILE_LOAD_FAILED'}};
+  if (!w && fbAuth?.email && fbAuth.uid !== session.localId) throw {error: {message: 'PROFILE_LOAD_FAILED'}};
+  if (!stillActive()) return null;
+  // Confirm the profile read before switching sessions. A failed read must not save the old wallet to the new account.
+  keepAuth(session, email);
+  if (!w) return false;
+  if (seat?.name) setup.seats[0].name = seat.name;
+  if (validCol(seat?.col)) setup.seats[0].col = seat.col;
+  applyCloudWallet(w);
   saveBase(wallet, d.t);
   return true;
 }
@@ -148,7 +163,7 @@ const EYE_OPEN = (typeof PG !== 'undefined' && PG.account && PG.account.auth && 
 const EYE_SHUT = (typeof PG !== 'undefined' && PG.account && PG.account.auth && PG.account.auth.EYE_SHUT)
   ? PG.account.auth.EYE_SHUT
   : '<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M3 3l18 18"/><path d="M10.6 5.1A10.8 10.8 0 0112 5c6.4 0 10 7 10 7a17 17 0 01-3.2 4.1M6.6 6.6C3.8 8.4 2 12 2 12s3.6 7 10 7a10 10 0 005.4-1.6"/><path d="M9.9 9.9a3 3 0 004.2 4.2"/></svg>';
-function accountDialog(mode, prefill) {
+function accountDialog(mode, prefill, googleCredential) {
   if (!FB) return toastAny('Профили доступны в приложении');
   const box = document.createElement('div'); box.className = 'over'; box.style.position = 'fixed';
   const link = mode === 'link';
@@ -167,7 +182,16 @@ function accountDialog(mode, prefill) {
   const mailEl = box.querySelector('#accMail'), passEl = box.querySelector('#accPass'), eye = box.querySelector('#accEye'), hint = box.querySelector('#accHint');
   const mail = () => mailEl.value.trim(), pass = () => passEl.value;
   const gbtn = box.querySelector('#accGoogle');
-  if (gbtn) {
+  if (googleCredential) {
+    mailEl.value = googleCredential.email;
+    mailEl.readOnly = true;
+    box.querySelector('h3').textContent = 'Подтвердите вход для Google';
+    box.querySelector('h3 + p').textContent = 'Введите пароль от этого профиля. После подтверждения оба способа входа будут открывать ваш прогресс.';
+    box.querySelector('#accGSlot').hidden = true;
+    box.querySelector('#accOr').hidden = true;
+    box.querySelector('#accGo').textContent = 'Войти и подключить Google';
+  }
+  if (gbtn && !googleCredential) {
     if (!googleAvailable() && !googleWebOk()) { gbtn.hidden = true; const or = box.querySelector('#accOr'); if (or) or.hidden = true; }
     else if (!googleAvailable()) googleWebButton(gbtn, link, null);
     else gbtn.onclick = () => { gbtn.disabled = true; startGoogle(link, () => { gbtn.disabled = false; }, gbtn); };
@@ -209,9 +233,18 @@ function accountDialog(mode, prefill) {
   };
   const rs = box.querySelector('#accReset');
   if (rs) rs.onclick = async () => {
-    const bad = checkAuthInput(mail(), 'x', false); if (bad && bad[1] === 'mail' && !bad[2]) return err(bad[0] === 'Введите почту' ? 'Введите почту, на неё придёт письмо для смены пароля' : bad[0], 'mail');
-    try { await idt('sendOobCode', {requestType: 'PASSWORD_RESET', email: mail()}); err(''); box.querySelector('#accErr').textContent = `Письмо для смены пароля отправлено на ${mail()}. Проверьте и папку «Спам»`; }
-    catch (j) { showErr(j); }
+    const email = mail();
+    const bad = checkAuthInput(email, 'x', false);
+    if (bad) return err(bad[0], 'mail');
+    rs.disabled = true;
+    err('');
+    try {
+      await PG.account.auth.requestPasswordReset(idt, email);
+      box.querySelector('#accErr').textContent = `Если к ${email} привязан профиль, придёт письмо для смены пароля. Проверьте также папку «Спам».`;
+    } catch (j) {
+      const [message] = authErr(j, false);
+      err(message);
+    } finally { rs.disabled = false; }
   };
   box.querySelector('#accGo').onclick = async () => {
     const go = box.querySelector('#accGo');
@@ -233,8 +266,10 @@ function accountDialog(mode, prefill) {
       // Sign in first. An unknown e-mail (Firebase may also answer INVALID_LOGIN_CREDENTIALS for it) becomes a new
       // profile: a guest's own session gets the e-mail, so the gold and progress on this phone stay.
       let j = null, created = false;
-      try { j = await idt('signInWithPassword', {email: mail(), password: pass(), returnSecureToken: true}); }
+      const email = mail();
+      try { j = await idt('signInWithPassword', {email, password: pass(), returnSecureToken: true}); }
       catch (e) {
+        if (googleCredential) throw e;
         const msg = String((e && e.error && e.error.message) || (e && e.message) || '');
         if (!/^(EMAIL_NOT_FOUND|INVALID_LOGIN_CREDENTIALS)/.test(msg)) throw e;
         if (pass().length < 6) throw {error: {message: 'SHORT_OR_WRONG'}};
@@ -262,17 +297,29 @@ function accountDialog(mode, prefill) {
           throw e2;
         }
       }
-      keepAuth(j, mail());
+      if (!box.isConnected) return;
+      let googleStatus = '';
+      if (googleCredential) {
+        try {
+          j = await PG.account.google.linkPasswordSession(googleCredential, j, googleIdp);
+          googleStatus = 'Google подключён к вашему профилю';
+        } catch (_) {
+          googleStatus = 'Вы вошли по паролю. Google можно заново подключить в настройках профиля';
+        }
+      }
+      if (!box.isConnected) return;
       if (created) {
+        keepAuth(j, j.email || email);
         track('sign_up', {method: 'email'});
         await cloudSave(); box.remove(); renderAccount(); presenceMark(true); socialReset();
         finishSignup();
       } else {
+        const ok = await cloudLoad(j, j.email || email, () => box.isConnected);
+        if (ok === null) return;
         track('login', {method: 'email'});
-        const ok = await cloudLoad(); box.remove();
-        attachPendingGoogle();
+        box.remove();
         wallet.tut = wallet.tutAsked = true; saveWallet();
-        toastAny(ok ? `С возвращением, ${profileName()}!` : 'Вход выполнен');
+        toastAny(googleStatus || (ok ? `С возвращением, ${profileName()}!` : 'Вход выполнен'));
         const toFriends = !$('#scr-friends').hidden;
         renderAccount(); renderSetup(); renderShop && renderShop(); progressDot(); show(toFriends ? 'friends' : 'menu'); presenceMark(true); syncRating(); syncRating(false, 'hex'); socialReset();
         if (!wallet.name) finishSignup();

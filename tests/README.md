@@ -1,4 +1,17 @@
-# Lifecycle tests
+# Проверки Tiletopia
+
+Полный набор использует Chromium. Выполните из корня репозитория:
+
+```sh
+npm ci
+npx playwright install chromium
+npm run build
+npm test
+```
+
+В pull request к `main` эти же проверки запускает GitHub Actions.
+
+## Жизненный цикл партии
 
 `node --test tests/lifecycle.test.cjs` — автономные регрессии Node 20 без сети, Firebase, npm-зависимостей и ключей.
 
