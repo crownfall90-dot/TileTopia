@@ -1,11 +1,11 @@
 {
-  "from": "2026-10-29",
-  "through": "2026-11-27",
+  "from": "2026-10-30",
+  "through": "2026-11-28",
   "minimum_players": 3,
   "features": [
     {
       "feature": "screen:menu",
-      "count": 1105,
+      "count": 1109,
       "players": 7
     },
     {
@@ -15,12 +15,12 @@
     },
     {
       "feature": "screen:progress",
-      "count": 410,
+      "count": 415,
       "players": 6
     },
     {
       "feature": "screen:shop",
-      "count": 184,
+      "count": 187,
       "players": 6
     },
     {
@@ -30,7 +30,7 @@
     },
     {
       "feature": "nav:shop",
-      "count": 105,
+      "count": 108,
       "players": 6
     },
     {
@@ -50,12 +50,12 @@
     },
     {
       "feature": "nav:progress",
-      "count": 275,
+      "count": 280,
       "players": 5
     },
     {
       "feature": "screen:friends",
-      "count": 262,
+      "count": 265,
       "players": 5
     },
     {
@@ -65,7 +65,7 @@
     },
     {
       "feature": "nav:menu",
-      "count": 151,
+      "count": 154,
       "players": 5
     },
     {
@@ -155,7 +155,7 @@
     },
     {
       "feature": "nav:friends",
-      "count": 151,
+      "count": 154,
       "players": 4
     },
     {
