@@ -21,6 +21,13 @@ test('ui/playerCard: formatPresenceDetails, renderPlayerCardHtml, renderReportDi
     name: 'Александр',
     col: '#2563eb',
     frame: 'gold',
+    frameRing: 'linear-gradient(135deg,#ffd875,#c47d17)',
+    avShape: 'rect',
+    picSrc: 'tiles/rC.webp',
+    picPos: '50% 20%',
+    hasBanner: true,
+    bannerSrc: 'tiles/rC.webp',
+    bannerPos: 'center',
     statusText: 'Следопыт',
     cups: 350,
     wins: 24,
@@ -34,6 +41,10 @@ test('ui/playerCard: formatPresenceDetails, renderPlayerCardHtml, renderReportDi
 
   assert.ok(peerCard.includes('Александр'), 'renders name');
   assert.ok(peerCard.includes('Следопыт'), 'renders status');
+  assert.ok(peerCard.includes('pl-v2-status-pill'), 'renders unified status pill');
+  assert.ok(peerCard.includes('pl-v2-av crest fr pic'), 'renders crest, frame, and picture classes');
+  assert.ok(peerCard.includes('--pic:url(tiles/rC.webp)'), 'renders avatar picture variable');
+  assert.ok(peerCard.includes('--banner-bg:url(tiles/rC.webp)'), 'renders banner art variable');
   assert.ok(peerCard.includes('350'), 'renders cups');
   assert.ok(peerCard.includes('24'), 'renders wins');
   assert.ok(peerCard.includes('40'), 'renders games');

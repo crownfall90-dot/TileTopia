@@ -84,7 +84,7 @@ async function presenceMark(on) {
     if (on) checkTitles();
     const url = `${FB.dbUrl}/presence/${fbAuth.uid}.json?auth=${tok}`;
     const vs = versionSeen(), di = devInfo(), dev = {p: installKind(), v: vs.v, u: vs.t, ...(di.m ? {m: di.m, i: di.i} : {})};
-    const ret = {fr: FRAMES[wallet.frame] ? wallet.frame : '', a: ACH.filter(x => PROG.ach[x.id] === 'got').length, lv: PROG.lvl || 1, w: (PROG.st && PROG.st.wins) || 0, g: (PROG.st && PROG.st.games) || 0, c: validCol(wallet.color) ? wallet.color : '', st: myStatus(), fs: wallet.firstSeen || today(), d1: (wallet.rd && wallet.rd[1]) ? 1 : 0, d7: (wallet.rd && wallet.rd[7]) ? 1 : 0};
+    const ret = {fr: FRAMES[wallet.frame] ? wallet.frame : '', av: (wallet.avatar && AV.PICS[wallet.avatar]) ? wallet.avatar : '', sh: wallet.avShape || 'round', bn: (wallet.avShape === 'rect' && wallet.banner && AV.BANNERS[wallet.banner]) ? wallet.banner : '', a: ACH.filter(x => PROG.ach[x.id] === 'got').length, lv: PROG.lvl || 1, w: (PROG.st && PROG.st.wins) || 0, g: (PROG.st && PROG.st.games) || 0, c: validCol(wallet.color) ? wallet.color : '', st: myStatus(), fs: wallet.firstSeen || today(), d1: (wallet.rd && wallet.rd[1]) ? 1 : 0, d7: (wallet.rd && wallet.rd[7]) ? 1 : 0};
     if (on) await fetch(url, {method: 'PUT', body: JSON.stringify({t: {'.sv': 'timestamp'}, n: profileName(), s: presenceState(), r: registered() ? 1 : 0, ...dev, ...ret})});
     else await fetch(url, {method: 'PUT', keepalive: true, body: JSON.stringify({t: {'.sv': 'timestamp'}, n: profileName(), s: 'off', ...dev, ...ret})});
   } catch (_) {}

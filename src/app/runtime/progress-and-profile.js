@@ -162,17 +162,19 @@ function renderProfile() {
     }
 
     const lk = AV.look(wallet);
-    const avCls = isBannerShape
-      ? `av big banner-crest${myRing() ? ' fr' : ''}`
-      : `av big${myRing() ? ' fr' : ''}${lk.cls}`;
-    const avStyle = isBannerShape
-      ? `--c:${wallet.color};${myRing() ? `--fr:${myRing()};` : ''}`
-      : `--c:${wallet.color};${myRing() ? `--fr:${myRing()};` : ''}${lk.style}`;
+    const hasPic = Boolean(wallet.avatar && AV.PICS[wallet.avatar]);
+    const shapeCls = isBannerShape ? ' banner-crest' : (wallet.avShape === 'square' ? ' sh-square' : ' sh-round');
+    const avCls = `av big${shapeCls}${myRing() ? ' fr' : ''}${hasPic ? ' pic' : ''}`;
+    const avStyle = `--c:${wallet.color};${myRing() ? `--fr:${myRing()};` : ''}${hasPic ? lk.style : ''}`;
 
     const pct = Math.max(0, Math.min(100, 100 * PROG.xp / need));
     const achGot = ACH.filter(a => PROG.ach[a.id] === 'got').length;
     const hasBanner = isBannerShape && !!curBanner;
     const bannerHeroStyle = hasBanner ? `style="--banner-bg:url(${bannerSrc});--banner-pos:${bannerPos}"` : '';
+    const stText = myStatus();
+    const statusPillHtml = stText
+      ? `<span class="pl-v2-status-pill"><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#ffd875" stroke-width="2.5" stroke-linecap="round"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg> <em class="fst">${stText}</em></span>`
+      : '';
 
     profEl.innerHTML = `
       <div class="pctop${hasBanner ? ' with-banner' : ''}" ${bannerHeroStyle}>
@@ -182,7 +184,7 @@ function renderProfile() {
           <div class="pwho">
             <div class="pnick-row">
               <b class="pnick">${name}</b>
-              ${myStatus() ? `<em class="fst">${myStatus()}</em>` : ''}
+              ${statusPillHtml}
             </div>
           </div>
           <button class="iconbtn prof-banner-btn" id="profBannerTry" aria-label="Примерить баннер" title="Примерить баннер">

@@ -87,6 +87,12 @@ async function openPlayer(uid, name, col, meta = {}) {
   let ach = null, level = null;
 
   const renderCard = (pData = {}) => {
+    const effAv = pData.av != null ? pData.av : (me ? wallet.avatar : '');
+    const effShape = pData.avShape || (me ? (wallet.avShape || 'round') : 'round');
+    const effBannerId = pData.banner != null ? pData.banner : (me && effShape === 'rect' ? wallet.banner : '');
+    const bannerObj = (effBannerId && AV.BANNERS[effBannerId]) ? AV.BANNERS[effBannerId] : null;
+    const isBanner = effShape === 'rect' || Boolean(bannerObj);
+    const picObj = (effAv && AV.PICS[effAv]) ? AV.PICS[effAv] : null;
     if (PG.ui.playerCard && PG.ui.playerCard.renderPlayerCardHtml) {
       box.innerHTML = PG.ui.playerCard.renderPlayerCardHtml({
         uid,
@@ -109,9 +115,12 @@ async function openPlayer(uid, name, col, meta = {}) {
         incomingRequest: Boolean(inbox && inbox[uid + '_f']),
         hasActiveRoom: Boolean(room),
         roomCode: room || '',
-        hasBanner: Boolean((pData.banner && AV.BANNERS[pData.banner]) || (me && wallet.avShape === 'rect' && wallet.banner && AV.BANNERS[wallet.banner])),
-        bannerSrc: ((pData.banner && AV.BANNERS[pData.banner]) || (me && wallet.avShape === 'rect' && wallet.banner && AV.BANNERS[wallet.banner])) ? ((pData.banner && AV.BANNERS[pData.banner]) || AV.BANNERS[wallet.banner]).src : '',
-        bannerPos: ((pData.banner && AV.BANNERS[pData.banner]) || (me && wallet.avShape === 'rect' && wallet.banner && AV.BANNERS[wallet.banner])) ? ((pData.banner && AV.BANNERS[pData.banner]) || AV.BANNERS[wallet.banner]).pos : 'center'
+        avShape: effShape,
+        picSrc: picObj ? picObj.src : '',
+        picPos: picObj ? (picObj.pos || '50% 16%') : '50% 16%',
+        hasBanner: isBanner,
+        bannerSrc: bannerObj ? bannerObj.src : (isBanner ? 'tiles/rC.webp' : ''),
+        bannerPos: bannerObj ? (bannerObj.pos || 'center') : 'center'
       });
       wireCardEvents();
     } else {
@@ -210,8 +219,11 @@ async function openPlayer(uid, name, col, meta = {}) {
     ach = pres && pres.a != null ? +pres.a : null; level = pres && pres.lv ? +pres.lv : null;
     statusText = PG.state.status.shownStatus((pres && pres.st) || (lead && lead.st) || statusText);
     frame = (lead && lead.fr) || (pres && pres.fr) || frame;
+    const av = (pres && pres.av) || (lead && lead.av) || (me ? wallet.avatar : '');
+    const avShape = (pres && pres.sh) || (lead && lead.sh) || (me ? (wallet.avShape || 'round') : 'round');
+    const banner = (pres && pres.bn) || (lead && lead.bn) || (me && avShape === 'rect' ? wallet.banner : '');
 
-    const data = {cups, wins, games, statusText, frame, ach, level, isOnline: details.isOnline, seenText: details.seenText};
+    const data = {cups, wins, games, statusText, frame, av, avShape, banner, ach, level, isOnline: details.isOnline, seenText: details.seenText};
     plCache.set(uid, data);
     if (!box.isConnected) return;
     renderCard(data);
