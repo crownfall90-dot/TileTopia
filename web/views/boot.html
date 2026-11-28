@@ -1,6 +1,11 @@
 <div id="boot" role="status" aria-live="polite">
-  <img class="boot-art" src="__SPLASH_ART__" width="576" height="443" alt="" aria-hidden="true">
+  <div class="boot-scene" aria-hidden="true" style="--tile-duration:__SPLASH_DURATION__ms;--tiles-end:__SPLASH_END__ms" data-settle="__SPLASH_END__">
+    <img class="boot-art" src="__SPLASH_ART__" width="576" height="443" alt="">
+    <div class="boot-tiles" style="--tile-atlas:url(__SPLASH_ATLAS__)">
+    __SPLASH_TILES__
+    </div>
+  </div>
   <b class="boot-logo">Tile<span>topia</span></b>
-  <div class="boot-indicator" aria-hidden="true"><i></i></div>
   <small class="boot-label">Подготовка поля…</small>
+  <div class="boot-bar" aria-hidden="true"><i></i></div>
 </div>

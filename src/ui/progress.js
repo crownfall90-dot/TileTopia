@@ -1,6 +1,7 @@
 // Progress and profile UI helpers (E-1.4)
 // Renders level circles, mastery grids, and quests.
 import {uiIcon} from './icons.js';
+import {scoreBreakdown} from './results.js';
 
 /** Generates circular SVG progress ring. */
 export function ringSvg(frac) {
@@ -119,6 +120,7 @@ export function renderAchievementsHtml({
       ? `<button class="chip pri ach-claim-btn" data-claima="${a.id}">Забрать +${a.g} <i class="coin c-${a.coin || 'tile'}"></i></button>`
       : '<span class="pill lock">В процессе</span>';
 
+    const starWord = n => n === 1 ? 'звезда' : (n >= 2 && n <= 4) ? 'звезды' : 'звёзд';
     return `
       <div class="quest ach-card${got ? ' got' : ok ? ' done ready-glow' : ' lock'}${a.tier ? ' tier-' + a.tier : ''}">
         <span class="qi ach-qi">${a.ic}</span>
@@ -128,7 +130,7 @@ export function renderAchievementsHtml({
             ${tierTag}
           </div>
           <small class="ach-desc">${a.d}</small>
-          <div class="ach-reward-val"><i class="coin c-${a.coin || 'tile'}"></i> +${a.g} ${a.coin === 'star' ? 'звёзд' : 'тайлов'}</div>
+          <div class="ach-reward-val"><i class="coin c-${a.coin || 'tile'}"></i> +${a.g} ${a.coin === 'star' ? starWord(a.g) : 'тайлов'}</div>
         </span>
         <div class="ach-action-wrap">
           ${statusPill}
@@ -136,13 +138,15 @@ export function renderAchievementsHtml({
       </div>`;
   }).join('');
 
+  const pct = totalCount ? Math.round(100 * gotCount / totalCount) : 0;
   const summaryHeader = `
     <div class="ach-header-card">
-      <div class="ach-header-left">
+      <div class="ach-header-left" style="width:100%">
         <span class="ach-trophy-icon">🎖️</span>
-        <div>
+        <div style="flex:1;min-width:0">
           <h3>Достижения</h3>
           <p>Собрано <b>${gotCount}</b> из <b>${totalCount}</b> достижений${readyCount ? ` · <b class="ach-ready-notice">${readyCount} готово к получению!</b>` : ''}</p>
+          <div class="xpbar" style="margin-top:8px"><i style="width:${pct}%"></i></div>
         </div>
       </div>
     </div>`;
@@ -178,8 +182,11 @@ export function renderHistoryHtml(rows = [], isFriendFn = () => false) {
     const top = Math.max(1, ...ps.map(p => +p.score || 0));
     const res = r.reason === 'draw' ? 'draw' : head.includes('Победа') ? 'win' : head === 'Поражение' ? 'loss' : 'place';
     const medal = res === 'win' ? '🥇' : me === 1 ? '🥈' : me === 2 ? '🥉' : res === 'draw' ? '🤝' : '🎲';
+    const breakdown = [];
     const who = ps.map((p, k) => {
       const cleanName = String(p.name || 'Игрок').replace(/[<>&"]/g, '');
+      const points = scoreBreakdown(p);
+      if (points) breakdown.push(`<div><b>${cleanName}</b><dl><div><dt>Города</dt><dd>${points.c}</dd></div><div><dt>Дороги</dt><dd>${points.r}</dd></div><div><dt>Монастыри</dt><dd>${points.f}</dd></div><div><dt>Помощь</dt><dd>${points.help}</dd></div></dl></div>`);
       const validCol = typeof p.col === 'string' && /^#[0-9a-f]{6}$/i.test(p.col) ? p.col : '';
       const uidStr = String(p.uid || '').replace(/[^\w-]/g, '').slice(0, 64);
       const isFr = isFriendFn(p.uid);
@@ -189,6 +196,7 @@ export function renderHistoryHtml(rows = [], isFriendFn = () => false) {
       return `<span class="hp2${p.me ? ' me' : ''}"${plData}><em>${k + 1}</em><i style="--c:${validCol || '#5b6684'}"></i><span class="hp2-n">${cleanName}${resignedTag}</span>`
         + `<span class="hp2-bar"><i style="width:${Math.round(100 * (+p.score || 0) / top)}%;--c:${validCol || '#5b6684'}"></i></span><b>${+p.score || 0}</b>${addBtn}</span>`;
     }).join('');
-    return `<div class="hrow2 ${res}"><div class="hr2-head"><span class="hr2-medal">${medal}</span><span class="hr2-title"><b>${head.replace('🏆 ', '')}</b><small>${when(r.at)} · ${online ? 'онлайн' : 'офлайн'}</small></span></div><div class="hr2-board">${who}</div></div>`;
+    const details = breakdown.length ? `<details class="history-score"><summary>Разбор очков</summary><div class="history-score-list">${breakdown.join('')}</div></details>` : '';
+    return `<div class="hrow2 ${res}"><div class="hr2-head"><span class="hr2-medal">${medal}</span><span class="hr2-title"><b>${head.replace('🏆 ', '')}</b><small>${when(r.at)} · ${online ? 'онлайн' : 'офлайн'}</small></span></div><div class="hr2-board">${who}</div>${details}</div>`;
   }).join('');
 }

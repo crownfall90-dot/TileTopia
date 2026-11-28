@@ -27,7 +27,7 @@ const LOG_KINDS = new Set([
   'game_start', 'game_end', 'net_down', 'net_back', 'google_error', 'google_redirect', 'spend_virtual_currency',
   'tutorial_begin', 'tutorial_complete', 'wallet_sig_mismatch', 'friend_invite', 'error', 'maintenance',
   'first_open', 'first_game_done', 'second_game_done', 'third_game_done', 'save_prompt_tap', 'return_d1', 'return_d3', 'return_d7',
-  'perf_lag', 'name_suggested', 'feedback_sent'
+  'perf_lag', 'name_suggested', 'feedback_sent', 'first_online_move'
 ]);
 const logBuf = [];
 let logTimer = 0;

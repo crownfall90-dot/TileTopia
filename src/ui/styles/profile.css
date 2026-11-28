@@ -515,3 +515,37 @@ html body #scr-profile .pstats .sec-title {
   gap: 8px;
   margin-bottom: 8px;
 }
+
+html body #scr-profile #profile .pchip-item {
+  cursor: pointer;
+  text-align: left;
+  color: inherit;
+  transition: transform .15s ease, border-color .15s ease;
+}
+html body #scr-profile #profile .pchip-item:active {
+  transform: scale(.97);
+}
+html body #scr-profile #profile .prof-items-btn {
+  position: relative;
+  z-index: 2;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 11px 14px;
+  border-radius: 16px;
+  border: 1px solid rgba(255, 255, 255, 0.12);
+  background: rgba(255, 255, 255, 0.05);
+  color: #e6eefc;
+  font: 600 13.5px var(--f-body);
+  cursor: pointer;
+  transition: background .15s ease, transform .15s ease;
+}
+html body #scr-profile #profile .prof-items-btn i {
+  font-style: normal;
+  font-size: 18px;
+  color: var(--brass);
+}
+html body #scr-profile #profile .prof-items-btn:active {
+  transform: scale(.98);
+}

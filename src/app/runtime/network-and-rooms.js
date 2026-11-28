@@ -147,7 +147,7 @@ function netSend(msg) {
 let openMatchTimer = 0;
 function leaveRoom() {
   clearRematchTimer();
-  if (net && net.openMatch && typeof FIRE !== 'undefined' && FIRE && typeof FIRE.send === 'function') {
+  if (net && net.host && net.openMatch && typeof FIRE !== 'undefined' && FIRE && typeof FIRE.send === 'function') {
     FIRE.send(MATCH_ROOM, {t: 'close', code: net.code}).catch(() => {});
   }
   clearInterval(openMatchTimer);
@@ -179,7 +179,7 @@ function netRetry(me) {
   if (net !== me) return;
   if (me.close) me.close();
   me.down = null; netDown(me);
-  me.close = TRANSPORT.listen(me.code, {open: () => net === me && netUp(me), error: () => {}, msg: d => { if (net === me) onNet(d); }});
+  me.close = TRANSPORT.listen(me.code, {open: () => net === me && netUp(me), error: () => { if (net === me) netDown(me); }, msg: d => { if (net === me) onNet(d); }});
 }
 addEventListener('offline', () => { if (net && net.gameId) netDown(net); });
 // Before going online: one request to the game server with a time limit (Wi-Fi alone proves nothing).
@@ -213,7 +213,15 @@ function connect(code, asHost, quick) {
   renderLobby();
 }
 // max: how many seats the creator chose for the room.
-function publishLobby(seats) { netSend({t: 'lobby', seats, rules: setup.rules, max: roomMax(), openMatch: !!net.openMatch}); }
+function publishLobby(seats) {
+  const room = net;
+  const lobby = {t: 'lobby', seats: seats.map(seat => ({...seat})), rules: {...setup.rules}, max: roomMax(), openMatch: !!room.openMatch, seq: (room.lobby?.seq || 0) + 1};
+  // Several hello messages can arrive in one stream event before any lobby update returns.
+  room.lobby = lobby;
+  room.lobbySend = (room.lobbySend || Promise.resolve()).then(() => {
+    if (net === room) return netSend(lobby);
+  });
+}
 const roomMax = () => (PG.net && PG.net.rooms) ? PG.net.rooms.roomMax(net, 5) : Math.min(5, Math.max(2, (net && (net.max || net.lobby && net.lobby.max)) || 5));
 /* Who may say what in a room (audit S-2). Every message carries d.u, the account id of the phone that wrote it (the
    database rules force it to be true). The first time a phone says hello its client id is tied to that account id;
@@ -276,6 +284,7 @@ function onNet(d) {
     return;
   }
   if (m.t === 'lobby') {
+    if (net.lobby?.seq > 0 && (!Number.isSafeInteger(m.seq) || m.seq < net.lobby.seq)) return;
     net.lobby = m;
     if (!net.host) {
       Object.assign(setup.rules, m.rules);

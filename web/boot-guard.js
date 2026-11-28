@@ -14,8 +14,20 @@
   function reveal() {
     if (window.AndroidApp && AndroidApp.launchArtReady) AndroidApp.launchArtReady();
   }
+  window.__finishNativeLaunch = function () {
+    window.__nativeLaunchFinished = true;
+    reveal();
+  };
   window.__showWebLaunch = function () {
-    if (!window.AndroidApp || !AndroidApp.launchArtReady) return;
+    if (!window.AndroidApp || !AndroidApp.launchArtReady) {
+      var scene = document.querySelector('#boot .boot-scene');
+      if (scene && !document.hidden && !matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        scene.classList.add('boot-motion');
+        window.__webLaunchMs = Number(scene.dataset.settle) + 95;
+      }
+      return;
+    }
+    if (AndroidApp.holdsLaunchCover && AndroidApp.holdsLaunchCover()) return;
     var art = document.querySelector('#boot .boot-art');
     if (!art || art.complete) return reveal();
     art.addEventListener('load', reveal, {once: true});
@@ -31,12 +43,12 @@
       clearTimeout(frameDelay);
       start();
     }
-    // Give the splash a paint and a short entrance before running the synchronous game setup.
-    // The deadline also covers WebViews that suspend frame callbacks.
-    var fallback = setTimeout(run, 400);
+    // Keep synchronous setup off the browser's first motion frames. Android animates those independently.
+    var delay = window.__webLaunchMs || 0;
+    var fallback = setTimeout(run, delay ? 1100 : 400);
     requestAnimationFrame(function () {
       requestAnimationFrame(function () {
-        if (!started) frameDelay = setTimeout(run, 240);
+        if (!started) frameDelay = setTimeout(run, delay || 0);
       });
     });
   };
@@ -57,7 +69,7 @@
     if (b) b.onclick = function () { b.disabled = true; b.textContent = 'Загружаем обновление…'; try { a.startUpdate(u.url); } catch (e) {} };
     if (c) c.onclick = function () { c.textContent = 'Проверяем…'; try { a.checkUpdates(); } catch (e) {} setTimeout(function () { if (!window.__upd) c.textContent = 'Обновлений нет · проверить снова'; }, 6000); };
     document.getElementById('bootRetry').onclick = function () { location.reload(); };
-    reveal();
+    window.__finishNativeLaunch();
   }
   // an error while the game sets itself up means it will not start: say so at once (after a moment for the page to settle)
   window.addEventListener('error', function () { if (!window.__ready) setTimeout(fail, 1500); });

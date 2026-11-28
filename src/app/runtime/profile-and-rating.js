@@ -7,7 +7,7 @@ function openBannerFitting(initialId, initialKind = 'banner') {
     if (curKind === 'banner') curId = wallet.banner || 'meadow';
     else if (curKind === 'pic') curId = wallet.avatar || 'peasant';
     else if (curKind === 'shape') curId = wallet.avShape || 'round';
-    else if (curKind === 'frame') curId = wallet.frame || 'wood';
+    else if (curKind === 'frame') curId = (wallet.frame && wallet.frame !== 'none' && FRAMES[wallet.frame]) ? wallet.frame : 'gold';
   }
   let curView = 'profile'; // 'profile' | 'rival'
   const old = $('#bannerFittingModal');
@@ -42,7 +42,7 @@ function openBannerFitting(initialId, initialKind = 'banner') {
     const achGot = ACH.filter(a => PROG.ach[a.id] === 'got').length;
 
     // Check ownership and equipped status for the currently selected item
-    let isOwned = false, isEquipped = false, itemPrice = 0, itemName = '';
+    let isOwned = false, isEquipped = false, itemPrice = 0, itemName = '', itemEarn = '';
     if (curKind === 'banner') {
       const bObj = AV.BANNERS[curId] || AV.BANNERS.meadow;
       itemName = bObj.name;
@@ -62,9 +62,10 @@ function openBannerFitting(initialId, initialKind = 'banner') {
       isOwned = (curId === 'round' || AV.owns(wallet, 'shape', curId));
       isEquipped = ((wallet.avShape || 'round') === curId);
     } else if (curKind === 'frame') {
-      const fObj = FRAMES[curId] || FRAMES.wood;
+      const fObj = FRAMES[curId] || FRAMES.gold;
       itemName = fObj.name;
       itemPrice = fObj.price || 0;
+      itemEarn = fObj.earn || '';
       isOwned = (curId === 'none' || (wallet.frames || []).includes(curId) || (!fObj.price && !fObj.earn));
       isEquipped = ((wallet.frame || 'none') === curId);
     }
@@ -211,6 +212,8 @@ function openBannerFitting(initialId, initialKind = 'banner') {
       actionBtnHtml = `<button class="ghostbtn bf-action-btn" id="bfUnequipBtn">Снять</button>`;
     } else if (isOwned) {
       actionBtnHtml = `<button class="cta wide bf-action-btn" id="bfEquipBtn">Надеть «${itemName}»</button>`;
+    } else if (itemEarn) {
+      actionBtnHtml = `<button class="ghostbtn bf-action-btn" disabled>🔒 ${itemEarn}</button>`;
     } else if (curKind === 'banner' && !AV.owns(wallet, 'shape', 'rect')) {
       actionBtnHtml = `<button class="cta wide bf-action-btn lock" id="bfNeedShapeBtn">Открыть форму баннера (2500 🪙)</button>`;
     } else {
@@ -276,7 +279,7 @@ function openBannerFitting(initialId, initialKind = 'banner') {
         if (curKind === 'banner') curId = wallet.banner || 'meadow';
         else if (curKind === 'pic') curId = wallet.avatar || 'peasant';
         else if (curKind === 'shape') curId = wallet.avShape || 'round';
-        else if (curKind === 'frame') curId = wallet.frame || 'wood';
+        else if (curKind === 'frame') curId = (wallet.frame && wallet.frame !== 'none' && FRAMES[wallet.frame]) ? wallet.frame : 'gold';
         render();
       };
     });
@@ -335,6 +338,7 @@ function openBannerFitting(initialId, initialKind = 'banner') {
     const buyBtn = modal.querySelector('#bfBuyBtn');
     if (buyBtn) {
       buyBtn.onclick = () => {
+        if (itemEarn) return;
         if (!COINS.canPay(wallet, itemPrice)) return toastAny(COINS.lackText(wallet, itemPrice));
         if (curKind === 'banner') {
           const res = AV.buy(wallet, 'banner', curId);
@@ -386,13 +390,15 @@ function openBannerFitting(initialId, initialKind = 'banner') {
 
 function editProfile() {
   const box = document.createElement('div'); box.className = 'over'; box.style.position = 'fixed';
-  box.innerHTML = `<div class="ocard prof"><div class="pav" id="epAv" style="--c:${wallet.color}">${(profileName()[0] || '?').toUpperCase()}</div><h3>Редактировать профиль</h3><p>Цвет игрока — в профиле и по умолчанию в партиях</p><span id="epAnchor"></span>
-    <button class="cta wide" id="epName">Сменить никнейм · <i class="coin" style="display:inline-block;width:12px;height:12px"></i> ${RENAME_PRICE}</button><button class="ghostbtn" id="epOk">Готово</button></div>`;
+  const lk = AV.look(wallet), ring = myRing();
+  box.innerHTML = `<div class="ocard prof"><div class="pav${ring ? ' fr' : ''}${lk.cls}" id="epAv" style="--c:${wallet.color};${ring ? `--fr:${ring};` : ''}${lk.style}">${(profileName()[0] || '?').toUpperCase()}</div><h3>Редактировать профиль</h3><p>Цвет игрока — в профиле и по умолчанию в партиях</p><span id="epAnchor"></span>
+    <button class="cta wide" id="epName">Сменить никнейм · <i class="coin" style="display:inline-block;width:12px;height:12px"></i> ${RENAME_PRICE}</button><button class="ghostbtn" id="epLook">Образ, аватарка и рамка</button><button class="ghostbtn" id="epOk">Готово</button></div>`;
   document.body.append(box);
   colorPick(box.querySelector('#epAnchor'), box.querySelector('#epAv'));
   const done = () => { box.remove(); renderProgress(); renderAccount(); renderMenuProfile(); };
   box.querySelector('#epOk').onclick = done;
   box.querySelector('#epName').onclick = () => { done(); renameDialog(); };
+  box.querySelector('#epLook').onclick = () => { done(); openBannerFitting(wallet.banner || 'meadow'); };
   box.onclick = e => { if (e.target === box) done(); };
 }
 function renderHistory(el) {
@@ -457,12 +463,12 @@ function onProgressClick(e) {
     Object.assign(it, {id: next, n: 0, got: false}); PROG.qre = PROG.day;
     saveWallet(); renderProgress(); toastAny('Задание заменено'); return;
   }
-  if (q) { const it = PROG.q.find(x => x.id === q.dataset.claimq), Q = QUESTS.find(x => x.id === it.id); if (it.got || it.n < Q.n) return; it.got = true; wallet.gold += Q.g; }
-  else if (a) { const A = ACH.find(x => x.id === a.dataset.claima); if (PROG.ach[A.id] === 'got' || !A.ok(PROG.st, PROG.lvl)) return; PROG.ach[A.id] = 'got'; COINS.give(wallet, A.g, A.coin === 'star' ? 'star' : 'tile'); }
-  else if (wq) { const it = (PROG.wq || []).find(x => x.id === wq.dataset.claimwq), WQ = WEEKLY_ALL.find(x => x.id === it.id); if (!it || !WQ || it.got || it.n < WQ.n) return; it.got = true; wallet.gold += WQ.g; }
+  if (q) { const it = PROG.q.find(x => x.id === q.dataset.claimq), Q = QUESTS.find(x => x.id === it.id); if (it.got || it.n < Q.n) return; it.got = true; wallet.gold += Q.g; toastAny(`Задание выполнено! +${Q.g} тайлов`); }
+  else if (a) { const A = ACH.find(x => x.id === a.dataset.claima); if (PROG.ach[A.id] === 'got' || !A.ok(PROG.st, PROG.lvl)) return; PROG.ach[A.id] = 'got'; COINS.give(wallet, A.g, A.coin === 'star' ? 'star' : 'tile'); toastAny(`Достижение «${A.t}»! +${A.g} ${A.coin === 'star' ? '⭐' : 'тайлов'}`); }
+  else if (wq) { const it = (PROG.wq || []).find(x => x.id === wq.dataset.claimwq), WQ = WEEKLY_ALL.find(x => x.id === it.id); if (!it || !WQ || it.got || it.n < WQ.n) return; it.got = true; wallet.gold += WQ.g; toastAny(`Цель недели выполнена! +${WQ.g} тайлов`); }
   else if (wch) { if (PROG.wchest || !PROG.wq || !PROG.wq.length || !PROG.wq.every(x => x.got)) return; PROG.wchest = true; wallet.gold += WEEKLY_CHEST_GOLD || 100; toastAny('Большой сундук недели открыт! +100 тайлов 🎉'); }
   else return;
-  beep('coin'); saveWallet(); progressDot(); renderProgress(); if (typeof renderAchievements === 'function' && !$('#scr-achievements').hidden) renderAchievements(); renderMenuProfile();
+  beep('coin'); saveWallet(); progressDot(); renderProgress(); if (typeof renderAchievements === 'function' && !$('#scr-achievements').hidden) renderAchievements(); renderMenuProfile(); renderMenuQuestBanner();
 }
 $('#ptab').addEventListener('click', onProgressClick);
 if ($('#roadQuestsSheetBody')) $('#roadQuestsSheetBody').addEventListener('click', onProgressClick);

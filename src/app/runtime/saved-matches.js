@@ -11,7 +11,13 @@ function markGameFinished(key) {
 }
 function historySave(reason, final) {
   const id = gameKey(); if (!id) return;
-  const row = {id,at:Date.now(),reason:reason || 'deck',final:!!final,players:players.map(p => ({name:p.name,score:p.score,col:p.col,me:isMe(p),uid:p.uid || null,bot:!p.human,resigned:!!p.resigned}))};
+  const row = {
+    id, at: Date.now(), reason: reason || 'deck', final: !!final,
+    players: players.map(p => ({
+      name: p.name, score: p.score, col: p.col, me: isMe(p), uid: p.uid || null, bot: !p.human,
+      resigned: !!p.resigned, stats: p.stats && {c: p.stats.c, r: p.stats.r, f: p.stats.f},
+    })),
+  };
   if (typeof PG !== 'undefined' && PG.state && PG.state.save) {
     PG.state.save.saveHistoryEntry(localStorage, row);
   } else {

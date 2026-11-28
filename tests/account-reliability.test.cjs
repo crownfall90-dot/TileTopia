@@ -86,13 +86,13 @@ function googleEnv(idp, {registered = false, profile = null} = {}) {
     toastAny: (t) => log.toasts.push(t), profileName: () => 'Player',
     wallet: {name: 'Гость'}, saveWallet: () => {}, renderAccount: () => {}, renderSetup: () => {}, renderShop: () => {},
     progressDot: () => {}, show: () => {}, presenceMark: () => {}, syncRating: () => {}, socialReset: () => {},
-    finishSignup: (n) => log.signup.push(n), accountDialog: (m, mail) => log.login.push([m, mail]),
+    finishSignup: (n) => log.signup.push(n), accountDialog: (m, mail, credential) => log.login.push([m, mail, credential]),
     $: () => ({hidden: true}), document: {querySelectorAll: () => []}, setTimeout: () => {}, Date,
   };
   vm.runInNewContext(
-    'let googleBusy = false; let lastGoogleToken = ""; let lastGoogleTokenTime = 0; let pendingGoogle = null;\n' +
+    'let googleBusy = false; let lastGoogleToken = ""; let lastGoogleTokenTime = 0;\n' +
     "const gErr = (e, re) => !!(e && e.error && re.test(String(e.error.message || '')));\n" +
-    fn('finishGoogle') + '\nthis.pending = () => pendingGoogle;', env);
+    fn('finishGoogle'), env);
   return {env, log};
 }
 const fail = m => { throw {error: {message: m}}; };
@@ -141,8 +141,8 @@ test('finishGoogle: a 200 answer without a session is never taken for a sign-in'
   const failures = [];
   await env.finishGoogle('tok', false, c => failures.push(c));
   assert.equal(log.keep.length, 0, 'no empty session may be saved');
-  assert.deepEqual(log.login, [['login', 'player@gmail.com']], 'the player is sent to the password sign-in');
-  assert.equal(env.pending().token, 'tok', 'Google waits to be attached after that sign-in');
+  assert.deepEqual(log.login[0].slice(0, 2), ['login', 'player@gmail.com']);
+  assert.equal(log.login[0][2].token, 'tok', 'only the confirmation dialog owns the pending Google token');
   assert.equal(failures.length, 1);
 });
 

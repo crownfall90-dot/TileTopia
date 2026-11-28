@@ -53,6 +53,7 @@ export function createSound({sfxOn, musicLevel}) {
     turn: t => { tone(t, NOTE(81), .45, 'sine', .12); tone(t + .1, NOTE(86), .55, 'sine', .09); },
     coin: t => { tone(t, 1319, .06, 'square', .04); tone(t + .06, 1760, .16, 'square', .04); },
     tap: t => noise(t, .02, 3200, .06),
+    chat: t => { tone(t, 660, .07, 'sine', .09, sfxOut, 880); },
     win: t => { [[72, 0], [76, .14], [79, .28], [84, .42], [79, .62], [84, .76]].forEach(([n, d]) => pluck(t + d, NOTE(n), .7, .18)); tone(t + .76, NOTE(60), 1.4, 'triangle', .1); },
     lose: t => [[76, 0], [74, .22], [72, .44], [71, .7]].forEach(([n, d]) => pluck(t + d, NOTE(n), .8, .13)),
   };

@@ -798,6 +798,9 @@ html.app .saybtn:not([hidden])+.deck{margin-left:0}
 
 .lead i{font:800 13px var(--f-display);width:26px;text-align:center;font-style:normal;color:var(--muted)}
 
+#menuQuestBanner.ready{border-color:rgba(242,184,75,.75)!important;box-shadow:0 0 18px rgba(242,184,75,.32)!important}
+#menuQuestBanner.ready #mqSub{color:#ffd875;font-weight:700}
+
 .lead span{flex:1;min-width:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.lead b{font:800 14px var(--f-display);font-variant-numeric:tabular-nums}
 
 .topbtn.hasdot::after{content:"";position:absolute;top:-3px;right:-3px;width:10px;height:10px;border-radius:50%;background:#ef5350;border:2px solid #141b33}

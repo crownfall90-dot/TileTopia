@@ -13,7 +13,8 @@ function newGame() {
   const seats = setup.seats.slice(0, numSeats).map((s, i) => {
     const fig = s.human ? (firstHuman ? wallet.fig : 'classic') : randomFig();
     if (s.human) firstHuman = false;
-    return {name: i ? s.name : profileName(), st: i ? '' : myStatus(), human: s.human, fig, col: s.col};
+    const persona = s.human ? null : (s.persona || (PL0[i] && PL0[i].persona) || 'balanced');
+    return {name: i ? s.name : profileName(), st: i ? '' : myStatus(), human: s.human, fig, col: s.col, persona};
   });
   // An "extra figure" gift gives you one more figure in a game against bots.
   let bonus = -1;
@@ -25,6 +26,7 @@ function newGame() {
 }
 // Everything random about a game is in cfg, so every phone in an online room builds the same game.
 function startGame(cfg, replay = []) {
+  stopTimelapse?.();
   clearRematchTimer(); if (net) net.rematchVotes = null;
   if (!cfg.online) cfg = {...cfg, localId: cfg.localId || (window.crypto && crypto.randomUUID ? crypto.randomUUID() : Date.now().toString(36) + '-' + Math.random().toString(36).slice(2))};
   ending = false; $('.tray').classList.remove('ended');
@@ -34,10 +36,13 @@ function startGame(cfg, replay = []) {
   }
   if (!replay.length && !cfg.tut && !cfg.noIntro) {
     const mode = cfg.online ? (net && net.quick ? 'online' : 'friends') : cfg.seats.filter(s => s.human).length > 1 ? 'local' : 'bots';
+    const hasBots = cfg.seats.some(s => !s.human || s.ghost);
     useCount('match:start');
     useCount(`match:mode_${mode}`);
-    track('game_start', {mode, players: cfg.seats.length, rules: (cfg.rules && cfg.rules.mode) || 'classic'});
+    if (mode === 'online') useCount(hasBots ? 'match:mode_online_bots' : 'match:mode_online_live');
+    track('game_start', {mode, players: cfg.seats.length, rules: (cfg.rules && cfg.rules.mode) || 'classic', bots: hasBots ? 1 : 0});
   }
+  onlineMoveTracked = false;
   tut = null; tutShow();
   const locId = (cfg && cfg.loc) || wallet.loc || 'village';
   const gameScr = $('#scr-game');
@@ -49,10 +54,12 @@ function startGame(cfg, replay = []) {
   gameLog = {cfg, moves: replay.slice()};
   if (meepleResolve) { meepleResolve = null; mrow.hidden = true; prow.hidden = false; }
   buildMini(); useGeo(cfg.rules && cfg.rules.mode === 'hex');
+  ownershipDialog.close();
+  ownershipMarkers.clear();
   world.innerHTML = '';
-  ghost = null; slotEls = []; meeples = []; doneFeats = []; turn = 0; phase = 'idle';
+  ghost = null; slotEls = []; meeples = []; doneFeats = []; if (typeof seenFeatureProg !== 'undefined') seenFeatureProg.clear(); turn = 0; phase = 'idle';
   const rules = gameRules = cfg.rules;
-  players = cfg.seats.map((s, i) => { const name = clean(s.name) || 'Игрок ' + (i + 1); return {name, init: name[0].toUpperCase(), col: validCol(s.col) ? s.col : PL0[i].col, human: s.human, ghost: !!s.ghost, st: PG.state.status.shownStatus(s.st), owner: s.owner, uid: s.uid || null, fig: FIGS[s.fig] ? s.fig : 'classic', botlvl: s.botlvl || (s.human ? null : (wallet.botlvl || 'normal')), score: 0, stats: {c: 0, r: 0, f: 0, t: 0, m: 0}, meeples: rules.meeples, missed: 0}; });
+  players = cfg.seats.map((s, i) => { const name = clean(s.name) || 'Игрок ' + (i + 1); const persona = s.human ? null : (s.persona || (PL0[i] && PL0[i].persona) || 'balanced'); return {name, init: name[0].toUpperCase(), col: validCol(s.col) ? s.col : PL0[i].col, human: s.human, ghost: !!s.ghost, st: PG.state.status.shownStatus(s.st), owner: s.owner, uid: s.uid || null, fig: FIGS[s.fig] ? s.fig : 'classic', botlvl: s.botlvl || (s.human ? null : (wallet.botlvl || 'normal')), persona, score: 0, stats: {c: 0, r: 0, f: 0, t: 0, m: 0}, meeples: rules.meeples, missed: 0}; });
   if (cfg.bonus >= 0 && players[cfg.bonus]) players[cfg.bonus].meeples++;
   paintFigures();
   if (!net) saveGame();

@@ -74,7 +74,7 @@ let net = null;
 let queue = [], applied = 0, gameLog = null, ending = false;
 // catchUp: moves taken from the history (coming back to a game) are applied at once, without animation, sound or
 // messages; only the last tile is shown (see focusLast).
-let catchUp = false, lastPlaced = null;
+let catchUp = false, lastPlaced = null, onlineMoveTracked = false;
 const fast = () => queue.length > 1 || catchUp;
 // A paused offline game (game menu open) holds bots and animations until it resumes.
 let paused = false;

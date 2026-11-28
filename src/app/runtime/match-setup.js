@@ -219,8 +219,8 @@ function toastAny(t, kind, title) {
   d.className = 'tile-toast ' + k;
   d.setAttribute('role', k === 'bad' ? 'alert' : 'status');
 
-  const icon = k === 'bad' ? '!' : k === 'ok' ? '✓' : (k === 'relic' ? '🎁' : 'ℹ');
-  const heading = title || (k === 'bad' ? 'Внимание' : k === 'ok' ? 'Успешно' : (k === 'relic' ? 'Находка' : ''));
+  const icon = k === 'bad' ? '!' : k === 'ok' ? '✓' : 'ℹ';
+  const heading = title || (k === 'bad' ? 'Внимание' : k === 'ok' ? 'Успешно' : '');
 
   d.innerHTML = `
     <div class="tt-icon">${icon}</div>

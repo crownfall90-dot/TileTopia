@@ -6,6 +6,48 @@ const prow = $('#prow'), mrow = $('#mrow'), tface = $('#tface'), ct = $('#ct'), 
 // Contested objects alternate the colours of everyone who has figures on them.
 let ownDirty = true;
 const markOwn = () => { ownDirty = true; };
+const ownershipDialog = $('#ownershipDialog');
+const ownershipMarkers = new Map();
+function showOwnership({kind, holders, scored}) {
+  if (ownershipDialog.open) return;
+  ownershipDialog.querySelector('h3').textContent = KIND[kind];
+  ownershipDialog.querySelector('p').textContent = `${scored ? 'Очки получили' : 'Фишки на объекте'}: ${holders.map(i => players[i].name).join(', ')}`;
+  ownershipDialog.showModal();
+}
+
+function updateOwnershipMarkers(features) {
+  const used = new Set();
+  for (const feature of features) {
+    const {t, g, kind, holders, scored} = feature;
+    const id = `${scored ? 'scored' : 'active'}:${gid(t, g)}`;
+    const label = `${KIND[kind]} · ${holders.map(i => players[i].name).join(', ')}`;
+    const state = JSON.stringify([label, holders, scored]);
+    used.add(id);
+    const previous = ownershipMarkers.get(id);
+    if (previous?.state === state) continue;
+    const [x, y] = groupPos(t, g);
+    const marker = document.createElement('button');
+    marker.type = 'button'; marker.className = 'bb ownership-marker';
+    marker.style.left = `${(HEX ? HW / 2 : T / 2) + x * T}px`;
+    marker.style.top = `${(.5 + y) * T + 13}px`;
+    marker.setAttribute('aria-label', label);
+    marker.setAttribute('aria-haspopup', 'dialog');
+    marker.addEventListener('click', () => showOwnership(feature));
+    for (const i of holders) {
+      const chip = document.createElement('span');
+      chip.textContent = `${players[i].init}${i + 1}`;
+      chip.style.setProperty('--owner', players[i].col);
+      marker.append(chip);
+    }
+    previous?.marker.remove();
+    t.el.append(marker);
+    ownershipMarkers.set(id, {marker, state});
+  }
+  for (const [id, {marker}] of ownershipMarkers) {
+    if (used.has(id)) continue;
+    marker.remove(); ownershipMarkers.delete(id);
+  }
+}
 function cityD(E, S) {
   if (PG.ui && PG.ui.hud) return PG.ui.hud.cityD(E, S);
   const city = [0,1,2,3].filter(d => E[d] === 'c'), k = city.length, C = S / 2;
@@ -103,8 +145,11 @@ function flagSprite(col) {
   }
   return k;
 }
-function markDone(c, cols) {
-  doneFeats.push({ids: c.ids, cols}); markOwn();
+function markDone(c, holders) {
+  const cols = holders.map(i => players[i].col);
+  const {t, g} = c.meeples.find(m => holders.includes(m.p));
+  doneFeats = doneFeats.filter(f => !f.ids.has(gid(t, g)));
+  doneFeats.push({ids: c.ids, cols, t, g, kind: c.kind, holders, scored: true}); markOwn();
   let spots = [];
   if (c.kind === 'f') {
     const center = c.tiles.find(t => c.ids.has(key(t.x, t.y) + '|f'));
@@ -127,12 +172,14 @@ function updateOwnership() {
   if (!ownDirty) return;
   ownDirty = false;
   for (const t of tiles.values()) if (t.own) { t.el.querySelector('.face').style.backgroundImage = ''; t.own = false; }
-  if (!wallet.zones || !players.length) return;
-  const perTile = new Map(), done = new Set();
+  if (!wallet.zones || !players.length) { updateOwnershipMarkers([]); return; }
+  const perTile = new Map(), done = new Set(), features = [...doneFeats];
   for (const m of meeples) {
     if (done.has(m.gid)) continue;
     const c = component(m.t, m.g); c.ids.forEach(i => done.add(i));
-    const cols = [...new Set(c.meeples.map(x => x.p))].map(p => players[p].col);
+    const holders = [...new Set(c.meeples.map(x => x.p))].sort((a, b) => a - b);
+    const cols = holders.map(p => players[p].col);
+    features.push({t: m.t, g: m.g, kind: c.kind, holders, scored: false});
     for (const id of c.ids) {
       const [k, rest] = id.split('|'), t = tiles.get(k);
       if (!t) continue;
@@ -150,6 +197,7 @@ function updateOwnership() {
     t.el.querySelector('.face').style.backgroundImage = `url("${ownSvg(t, list)}"), url(${TILE_URL[t.type]})` + (DRAWN[t.type] ? `, url(${DRAWN[t.type]})` : '');
     t.own = true;
   }
+  updateOwnershipMarkers(features);
 }
 // Out of the game after a skipped turn: a bot plays for you until you come back.
 function checkKicked() {
@@ -281,13 +329,15 @@ function rotate() {
   setRot(rots[(rots.indexOf(current.r) + 1) % rots.length]);
 }
 rotBtn.onclick = rotate;
-board.addEventListener('keydown', e => {
-  if (e.target !== board || !gameVisible || phase !== 'place' || paused || e.altKey || e.ctrlKey || e.metaKey) return;
+document.addEventListener('keydown', e => {
+  if (!gameVisible || phase !== 'place' || paused || e.altKey || e.ctrlKey || e.metaKey) return;
+  if (ownershipDialog.open || e.target?.closest?.('input,textarea,select,[contenteditable="true"],dialog[open]')) return;
   if (document.querySelector('.over:not(#over):not([hidden])')) return;
   if (e.code === 'KeyR') {
     rotate();
   } else if (e.key === 'Enter') {
-    if (!e.repeat) okBtn.click();
+    if (e.target?.closest?.('button,a,summary,[role="button"]')) return;
+    if (!e.repeat && sel && !okBtn.disabled) okBtn.click();
   } else if ((e.key === 'ArrowLeft' || e.key === 'ArrowRight') && slotEls.length) {
     const step = e.key === 'ArrowRight' ? 1 : -1;
     let index = slotEls.findIndex(s => s.classList.contains('sel'));
@@ -360,7 +410,14 @@ okBtn.onclick = async () => {
   // the turn the coach asks for, and in the right rotation (the next step builds on it)
   if (tut && (tutStep().wait !== 'placed' || (tutStep().r != null && current.r !== tutStep().r))) { const h = $('#rot'); h.classList.remove('tutpulse'); void h.offsetWidth; h.classList.add('tutpulse'); return; }
   phase = 'busy'; okBtn.disabled = rotBtn.disabled = true; clearSlots(); showTip();
-  if (!autoMove) useCount('turn:placed');
+  if (!autoMove) {
+    useCount('turn:placed');
+    if (net && !onlineMoveTracked) {
+      onlineMoveTracked = true;
+      useCount('match:first_online_move');
+      track('first_online_move', {live: players.some(p => !p.human || p.ghost) ? 0 : 1});
+    }
+  }
   tutEvent('placed');
   const t = {x: sel.x, y: sel.y, type: current.type, r: current.r, seed: (Math.random() * 1e9) | 0};
   if (meCounted() && isMe(players[turn]) && !tut) progress({tiles: 1});
@@ -369,6 +426,7 @@ okBtn.onclick = async () => {
 function tap(x, y) {
   const el = document.elementFromPoint(x, y); if (!el) return;
   const gm = el.closest('.gm'); if (gm && meepleResolve) { meepleActed = true; meepleResolve(meepleOpts[+gm.dataset.i]); return; }
+  const owner = el.closest('.ownership-marker'); if (owner) { owner.focus({preventScroll: true}); owner.click(); return; }
   if (phase !== 'place') return;
   if (el.closest('.tile.ghost')) return rotate();
   const s = el.closest('.slot');
@@ -385,9 +443,10 @@ async function dropAt(t) {
     await preview.animate([{transform: 'translateZ(8px)'}, {transform: 'translateZ(0)'}], {duration: 140, easing: 'ease-in'}).finished.catch(() => {});
   }
   if (token !== match) return;
+  if (lastPlaced && lastPlaced.el) lastPlaced.el.classList.remove('last-move');
   preview.remove(); ghost = null; lastPlaced = t;
   $('#lastMoveBtn').hidden = false;
-  t.el = tileEl(t); world.append(t.el); tiles.set(key(t.x, t.y), t); resizeTable(); wallsAround(t); markOwn();
+  t.el = tileEl(t); t.el.classList.add('last-move'); world.append(t.el); tiles.set(key(t.x, t.y), t); resizeTable(); wallsAround(t); markOwn();
   if (!fast()) beep('place');
   if (!fast()) { const pf = document.createElement('i'); pf.className = 'puff'; t.el.append(pf); setTimeout(() => pf.remove(), 600); }
   if (!fast()) { t.el.classList.add('puzzle-lock'); setTimeout(() => { if (t.el) t.el.classList.remove('puzzle-lock'); }, 350); }

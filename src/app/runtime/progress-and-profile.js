@@ -74,8 +74,12 @@ function claimRoadMilestone(id) {
   if (m.reward.frame && !(wallet.frames || []).includes(m.reward.frame)) {
     wallet.frames = [...(wallet.frames || []), m.reward.frame];
   }
-  if (m.reward.fig && !(wallet.owned || []).includes(m.reward.fig)) {
-    wallet.owned = [...(wallet.owned || []), m.reward.fig];
+  if (m.reward.fig) {
+    if (!(wallet.owned || []).includes(m.reward.fig)) {
+      wallet.owned = [...(wallet.owned || []), m.reward.fig];
+    } else {
+      wallet.gold += 100;
+    }
   }
   // emoji / phrase rewards: collected, and straight into the deck while it has room
   for (const kind of ['emote', 'phrase']) {
@@ -210,7 +214,7 @@ function renderProfile() {
       </div>
 
       <div class="pchips">
-        <div class="pchip-item cups-item">
+        <button type="button" class="pchip-item cups-item" data-go="rating" title="Открыть рейтинг">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg cup-svg">
             <path d="M6 9H4a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h2"/><path d="M18 9h2a2 2 0 0 0 2-2V5a2 2 0 0 0-2-2h-2"/><path d="M6 3h12v7a6 6 0 0 1-12 0V3z"/><path d="M12 16v4"/><path d="M8 20h8"/>
           </svg>
@@ -218,8 +222,8 @@ function renderProfile() {
             <b>${PROG.cups || 0}</b>
             <small>Кубков</small>
           </div>
-        </div>
-        <div class="pchip-item ach-item">
+        </button>
+        <button type="button" class="pchip-item ach-item" data-go="achievements" title="Открыть достижения">
           <svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" class="pc-svg ach-svg">
             <circle cx="12" cy="14" r="6"/><path d="M8.5 8.5L7 3l5 3 5-3-1.5 5.5"/>
           </svg>
@@ -227,7 +231,7 @@ function renderProfile() {
             <b>${achGot} <span class="tot">/ ${ACH.length}</span></b>
             <small>Наград</small>
           </div>
-        </div>
+        </button>
       </div>
 
       <div class="pcoins" data-go="shop" title="Открыть Витрину">
@@ -246,6 +250,11 @@ function renderProfile() {
           </div>
         </div>
       </div>
+
+      <button type="button" class="prof-items-btn" data-go="items">
+        <span>🎒 Мои предметы, рамки и фигурки</span>
+        <i>›</i>
+      </button>
 
       ${FB ? `<div class="pacts">${isGuest
         ? '<button class="pact-btn guest-btn" data-hacct="in"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2"><path d="M19 21v-2a4 4 0 0 0-4-4H9a4 4 0 0 0-4 4v2"/><circle cx="12" cy="7" r="4"/></svg><span>Войти или создать профиль</span><i class="pact-arr">›</i></button>'

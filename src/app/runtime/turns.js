@@ -108,17 +108,64 @@ function featureConfetti(tile, color) {
   }
   tile.el.append(cf); setTimeout(() => cf.remove(), 800);
 }
+let lastBotReactAt = 0;
+function botReact(win, each, kind, helped, placer) {
+  if (fast() || tut || net || typeof showSay !== 'function' || Date.now() - lastBotReactAt < 10000) return;
+  const bots = players.map((pl, idx) => (!pl.human && !pl.resigned) ? idx : -1).filter(idx => idx >= 0);
+  if (!bots.length || Math.random() > 0.35) return;
+  let speaker = -1, pool = [];
+  if (helped && !players[placer].human) {
+    speaker = placer;
+    pool = ['🤝', '😅', 'Вот это поворот!'];
+  } else if (win.some(i => !players[i].human) && each >= 6) {
+    speaker = win.find(i => !players[i].human);
+    pool = kind === 'c' ? ['Мой замок!', '👑', '🔥'] : kind === 'f' ? ['Дзен превыше всего 🍵', '🏆'] : ['Тут моя дорога 🛤️', '😎'];
+  } else if (win.some(i => isMe(players[i])) && each >= 8) {
+    speaker = bots[(Math.random() * bots.length) | 0];
+    pool = ['Отличный ход!', '👏', 'Ну ты гроссмейстер! 👑', 'Красиво строишь!'];
+  }
+  if (speaker < 0 || !pool.length || typeof SAYS === 'undefined') return;
+  const pick = pool[(Math.random() * pool.length) | 0];
+  const idx = SAYS.indexOf(pick);
+  if (idx < 0) return;
+  lastBotReactAt = Date.now();
+  const match = token;
+  setTimeout(() => { if (match === token && phase !== 'end' && gameVisible) showSay(speaker, idx); }, 450);
+}
+let seenFeatureProg = new Set();
 async function resolveFeature(c, final, placer) {
   const {win, each, helped} = SC.settle(tiles, c, final, players.length, gameRules.tie, placer, rules2());
   c.tiles.forEach(x => x.el.classList.add('glow'));
   setTimeout(() => c.tiles.forEach(x => x.el.classList.remove('glow')), 1100);
   if (!win.length) { toast(`${KIND[c.kind]} ${{c: 'достроен', r: 'достроена', f: 'окружена'}[c.kind]} · фишек нет, очков нет`); await wait(600); return; }
-  win.forEach(i => { const m = c.meeples.find(x => x.p === i); floatText(m.t, groupPos(m.t, m.g), '+' + each, players[i].col); });
+  win.forEach(i => { const m = c.meeples.find(x => x.p === i); floatText(m.t, groupPos(m.t, m.g), '+' + each, players[i].col, each >= 8); });
   win.forEach(i => { players[i].score += each; players[i].stats[c.kind] += each; const b = players[i].best; if (!b || each > b.pts) players[i].best = {pts: each, kind: c.kind, n: c.tiles.length}; });
-  if (!final) markDone(c, win.map(i => players[i].col));
+  if (!final) markDone(c, win);
+  if (!fast() && meCounted()) {
+    const meIdx = players.findIndex(isMe);
+    const featureKey = `${final ? 'final' : 'mid'}:${[...c.ids].sort().join(',')}`;
+    const d = (PG.state.progress && PG.state.progress.featureProgressDelta)
+      ? PG.state.progress.featureProgressDelta({kind: c.kind, tilesCount: c.tiles.length, each, final, win, helped, placer, meIdx, isFast: false, counted: true, seenIds: seenFeatureProg, featureKey})
+      : (() => {
+          if (seenFeatureProg.has(featureKey)) return null;
+          seenFeatureProg.add(featureKey);
+          const out = {};
+          let pts = 0;
+          if (win.includes(meIdx)) {
+            pts += each;
+            if (!final) {
+              out[c.kind] = 1;
+              if (c.kind === 'c') { out.cityTiles = c.tiles.length; if (c.tiles.length >= 5) out.bigc = 1; }
+              else if (c.kind === 'r') { out.roadTiles = c.tiles.length; if (c.tiles.length >= 4) out.longr = 1; }
+            }
+          }
+          if (helped && placer === meIdx) pts += 1;
+          if (pts > 0) out.pts = pts;
+          return Object.keys(out).length ? out : null;
+        })();
+    if (d) progress(d);
+  }
   if (!final && !fast()) {
-    const n = c.tiles.length;
-    win.forEach(i => { if (meCounted() && isMe(players[i])) progress({[c.kind]: 1, pts: each, cityTiles: c.kind === 'c' ? n : 0, roadTiles: c.kind === 'r' ? n : 0, bigc: c.kind === 'c' && n >= 5 ? 1 : 0, longr: c.kind === 'r' && n >= 4 ? 1 : 0}); });
     if (win.length && c.tiles && c.tiles[0]) featureConfetti(c.tiles[0], players[win[0]].col);
     if (gameRules && gameRules.mode === 'epic' && (c.tiles.length >= 5 || c.tiles.some(x => TY(x.type) && TY(x.type).rare))) {
       setTimeout(() => toastAny(`🌟 Событие в Большой игре: ${KIND[c.kind]} завершён! (${c.tiles.length} карт)`), 500);
@@ -137,6 +184,7 @@ async function resolveFeature(c, final, placer) {
   toast(`${KIND[c.kind]} ${final ? 'не достроен' : done}${help} · ${win.map(i => players[i].name).join(' и ')} +${each}${share}`);
   [...c.meeples].forEach(removeMeeple);
   renderPlayers(helped ? [...win, placer] : win);
+  if (!final) botReact(win, each, c.kind, helped, placer);
   await wait(final ? 700 : 950);
 }
 // The history is in: show where the game stands (the last card put down), not how it got there.
@@ -325,13 +373,85 @@ async function endGame(reason) {
   // Offer guests to secure their progress with an account
   const needsSave = FB && !fbAuth && !registered();
   const saveCard = needsSave && (PROG.st.games >= 1) && !wallet.saveDismissed ? `<button class="ghostbtn savecard" id="saveProg"><b>🏰 Сохранить прогресс</b><small>Войдите через Google в 1 клик, чтобы не потерять фигурки, ${wallet.gold} 💰 тайлов и кубки</small></button>` : '';
-  over.innerHTML = `<div class="ocard fin">${confetti}<div class="medal">${medal}</div><h3>${title}</h3><p>${sub}</p><ol class="standings">${rows}</ol>${rewardChips(gold)}${xpLine()}${saveCard}<button class="cta wide" id="again2">${net ? 'Реванш' : 'Ещё партию'}</button><button class="ghostbtn" data-go="results">Подробные итоги</button></div>`;
+  const hasMoves = gameLog && Array.isArray(gameLog.moves) && gameLog.moves.length > 0;
+  over.innerHTML = `<div class="ocard fin">${confetti}<div class="medal">${medal}</div><h3>${title}</h3><p>${sub}</p><ol class="standings">${rows}</ol>${rewardChips(gold)}${xpLine()}${saveCard}<button class="cta wide" id="again2">${net ? 'Реванш' : 'Ещё партию'}</button>${hasMoves ? '<button class="ghostbtn" id="timelapseBtn">🎬 Хроника партии</button>' : ''}<button class="ghostbtn" data-go="results">Подробные итоги</button></div>`;
   over.hidden = false;
   historySave(reason, true);
   $('#again2').onclick = () => rematchClick();
+  const tlBtn = $('#timelapseBtn');
+  if (tlBtn) tlBtn.onclick = () => playTimelapse(over);
   const sp = $('#saveProg'); if (sp) sp.onclick = () => { wallet.saveAsked = true; saveWallet(); over.hidden = true; track('save_prompt_tap'); wallet.name ? accountDialog('link') : askProfile(); };
   if (saveCard) { wallet.saveAsked = true; saveWallet(); }
   setStatus('Партия окончена'); $('.tray').classList.add('ended');
+}
+let stopTimelapse = null;
+async function playTimelapse(over) {
+  const moves = gameLog?.moves?.slice();
+  if (stopTimelapse || !moves?.length) return;
+  const origin = at(0, 0);
+  if (!origin) return;
+  const replay = new Map();
+  const add = tile => {
+    const t = {...tile, el: tileEl(tile)};
+    t.el.classList.add('replay-tile');
+    replay.set(key(t.x, t.y), t);
+    world.append(t.el);
+    const hasTile = (x, y) => replay.has(key(x, y));
+    walls(t, hasTile);
+    for (let side = 0; side < NDIR(); side++) {
+      const neighbor = replay.get(key(...nbXY(t.x, t.y, side)));
+      if (neighbor) walls(neighbor, hasTile);
+    }
+    return t;
+  };
+  const match = token, previousCam = {...cam}, trigger = $('#timelapseBtn');
+  over.hidden = true;
+  const hud = document.createElement('div');
+  hud.className = 'timelapse-hud';
+  hud.innerHTML = `<span>Хроника партии · <b id="tlStep">0</b> / ${moves.length}</span><button type="button" class="chip" id="tlSkip">Закрыть</button>`;
+  board.append(hud);
+  world.classList.add('replaying');
+  const close = hud.querySelector('#tlSkip');
+  const onKey = e => { if (e.key === 'Escape') { e.preventDefault(); stop(); } };
+  const stop = () => {
+    if (stopTimelapse !== stop) return;
+    stopTimelapse = null;
+    document.removeEventListener('keydown', onKey);
+    hud.remove();
+    for (const t of replay.values()) t.el.remove();
+    world.classList.remove('replaying');
+    if (token === match) {
+      camAnim++; inertia++;
+      Object.assign(cam, previousCam); applyCam();
+      over.hidden = false;
+      if (gameVisible) trigger?.focus({preventScroll: true});
+    }
+  };
+  stopTimelapse = stop;
+  close.onclick = stop;
+  document.addEventListener('keydown', onKey);
+  close.focus({preventScroll: true});
+  const step = hud.querySelector('#tlStep');
+  camAnim++; inertia++;
+  Object.assign(cam, {px: 0, py: 0}); applyCam();
+  try {
+    let last = add(origin);
+    for (const [i, move] of moves.entries()) {
+      if (stopTimelapse !== stop || token !== match || !gameVisible) return;
+      const source = at(move.x, move.y);
+      if (source && source !== origin && !replay.has(key(source.x, source.y))) {
+        last.el.classList.remove('last-move');
+        last = add(source);
+        last.el.classList.add('last-move');
+        if (!RM) ensureVisible(last.x, last.y);
+      }
+      step.textContent = String(i + 1);
+      await wait(RM ? 120 : 95);
+    }
+    await wait(650);
+  } finally {
+    stop();
+  }
 }
 const winTitle = (p, final) => isMe(p) ? (final ? 'Вы победили!' : 'Вы лидируете') : `${final ? 'Побеждает' : 'Лидирует'} ${p.name}`;
 const ranked = () => players.map((p, i) => ({...p, i})).sort((a, b) => {

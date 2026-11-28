@@ -106,7 +106,10 @@ function gameDone(place, score) {
   PROG.st.streak = win ? (PROG.st.streak || 0) + 1 : 0;
   PROG.st.bestStreak = Math.max(PROG.st.bestStreak || 0, PROG.st.streak);
   const hard = !net && win && typeof botLevel === 'function' && botLevel() === 'hard';
-  progress({games: 1, win: win ? 1 : 0, wins: win ? 1 : 0, s30: score >= ((deckMax <= 30) ? 20 : 30) ? 1 : 0, s40: score >= 40 ? 1 : 0, online: net ? 1 : 0, ogames: net ? 1 : 0, owins: net && win ? 1 : 0, hardwin: hard ? 1 : 0});
+  const sq = (PG.state.progress && PG.state.progress.matchScoreQuests)
+    ? PG.state.progress.matchScoreQuests(score, deckMax)
+    : {s30: score >= (deckMax <= 30 ? 20 : 30) ? 1 : 0, s40: score >= (deckMax <= 30 ? 25 : 40) ? 1 : 0};
+  progress({games: 1, win: win ? 1 : 0, wins: win ? 1 : 0, s30: sq.s30, s40: sq.s40, online: net ? 1 : 0, ogames: net ? 1 : 0, owins: net && win ? 1 : 0, hardwin: hard ? 1 : 0});
   // Experience: a share for taking part, more for the place and for the points, half again online. A game where this
   // player laid fewer than 6 cards gives nothing (quitting early is not farming).
   const me = players.find(isMe), laid = me && me.stats ? me.stats.t || 0 : 6;
@@ -166,7 +169,7 @@ const PROGRESS_ROAD_MILESTONES = [
   { id: 'm15', lvl: 15, cups: 750, title: 'Зодчий', desc: '+120 тайлов и эмодзи 🏰', reward: { gold: 120, emote: '🏰' }, ic: '🏰' },
   { id: 'm20', lvl: 20, cups: 1000, title: 'Изумруд', desc: 'Рамка «Изумруд» и +150 тайлов', reward: { frame: 'emerald', gold: 150 }, ic: '💎' },
   { id: 'm25', lvl: 25, cups: 1250, title: 'Мастер', desc: '+200 тайлов и фраза «Красиво строишь!»', reward: { gold: 200, phrase: 'Красиво строишь!' }, ic: '⭐' },
-  { id: 'm30', lvl: 30, cups: 1500, title: 'Магистр', desc: 'Фигурка, +250 тайлов и +1 звезда', reward: { fig: 'classic', gold: 250, stars: 1 }, ic: '🧙‍♂️' },
+  { id: 'm30', lvl: 30, cups: 1500, title: 'Магистр', desc: 'Фигурка «Архимаг», +250 тайлов и +1 звезда', reward: { fig: 'wizard', gold: 250, stars: 1 }, ic: '🧙‍♂️' },
   { id: 'm35', lvl: 35, cups: 1750, title: 'Золотой сундук', desc: '+350 тайлов', reward: { gold: 350 }, ic: '🎁' },
   { id: 'm40', lvl: 40, cups: 2000, title: 'Гроссмейстер', desc: 'Статус «Гроссмейстер», +300 тайлов, фраза и +2 звезды', reward: { status: 'Гроссмейстер', gold: 300, stars: 2, phrase: 'Ну ты гроссмейстер! 👑' }, ic: '👑' },
   { id: 'm45', lvl: 45, cups: 2250, title: 'Легенда', desc: '+400 тайлов, статус «Легенда» и +2 звезды', reward: { status: 'Легенда', gold: 400, stars: 2 }, ic: '⚔️' },

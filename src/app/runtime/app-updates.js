@@ -9,13 +9,14 @@ function bootHide() {
   boot.gone = true;
   const el = $('#boot');
   if (el) {
-    if (RM) el.remove();
+    if (RM || window.AndroidApp?.holdsLaunchCover?.()) el.remove();
     else {
       el.classList.add('gone');
       el.setAttribute('aria-hidden', 'true');
       setTimeout(() => el.remove(), 260);
     }
   }
+  window.__finishNativeLaunch?.();
   bootDone();
 }
 
@@ -47,6 +48,7 @@ window.onUpdateAvailable = (info, manual) => {
   updateSettingsUpdateBtn(info);
   releaseUpdates.offer(info, manual);
   updBox = releaseUpdates.box;
+  if (boot.update && updBox) window.__finishNativeLaunch?.();
 };
 window.onUpdateProgress = percent => releaseUpdates.progress(percent);
 window.onUpdateError = message => releaseUpdates.error(message);

@@ -4,7 +4,12 @@
           <div class="podium" id="podium"></div>
           <div class="goldres" id="goldres" hidden></div>
           <div id="rres" hidden></div>
-          <table class="bd"><thead><tr><th>Игрок</th><th>Города</th><th>Дороги</th><th>Монастыри</th><th>Ходов</th><th>Всего</th></tr></thead><tbody id="bd"></tbody></table>
+          <div>
+            <div class="score-table-scroll" role="region" aria-label="Очки по категориям" tabindex="0">
+              <table class="bd"><thead><tr><th scope="col">Игрок</th><th scope="col">Города</th><th scope="col">Дороги</th><th scope="col">Монастыри</th><th scope="col">Помощь</th><th scope="col">Ходов</th><th scope="col">Всего</th></tr></thead><tbody id="bd"></tbody></table>
+            </div>
+            <p class="score-help">За завершение чужого объекта начисляется 1 очко помощи.</p>
+          </div>
           <div id="bestmove" hidden></div>
           <div class="sumline" id="sumline"></div>
           <div class="ract"><button class="cta wide" id="again">Ещё партию</button><button class="ghostbtn" data-go="menu">В меню</button></div>

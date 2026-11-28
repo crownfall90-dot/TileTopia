@@ -49,7 +49,6 @@ html body .ltop .iconbtn,html body .gtop .iconbtn{background:var(--m-surface);bo
 html body #scr-game{background-image:none;background-color:#0f1626}
 html body .board{background:radial-gradient(75% 60% at 50% 46%,#1c2944 0%,#121b2f 62%,#0e1524 100%)}
 html body .village-backdrop{display:none}
-html body .relic-name{display:none}
 html body .fabs{gap:2px;padding:3px;border-radius:15px;background:#141e30;border:1px solid var(--m-line)}
 html body .fabs .fab{background:transparent;border:0;box-shadow:none;color:var(--muted);border-radius:13px}
 @media (hover: hover){
@@ -152,8 +151,7 @@ html body #scr-profile .tutcard.historyentry b,html body #scr-profile .tutcard.h
 html body #scr-profile .tutcard.historyentry small{color:var(--muted)}
 html body #scr-profile .pstats{background:var(--m-surface);border:1px solid var(--m-line);box-shadow:none}
 
-/* no relics, bonuses or scout on the map */
-html body .fog-relic,html body .scout-radar-wave{display:none!important}
+html body .scout-radar-wave{display:none!important}
 
 /* ===== main screen header: plate (who, level, experience), trophies and gold under it, the menu pops out under its button ===== */
 html body .mtop{align-items:flex-start;gap:10px}

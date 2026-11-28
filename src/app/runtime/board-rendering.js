@@ -73,9 +73,9 @@ function removeMeeple(m) {
   const a = m.el.animate([{opacity: 1, translate: '0 0'}, {opacity: 0, translate: '0 -30px'}], {duration: RM ? 1 : 600, easing: 'ease-in'});
   a.onfinish = () => m.el.remove();
 }
-function floatText(t, [x, y], txt, col) {
+function floatText(t, [x, y], txt, col, big = false) {
   if (fast()) return;
-  const f = document.createElement('i'); f.className = 'fl'; f.textContent = txt;
+  const f = document.createElement('i'); f.className = 'fl' + (big ? ' big' : ''); f.textContent = txt;
   f.style.cssText = `left:${(HEX ? HW / 2 : T / 2) + x * T}px;top:${(0.5 + y) * T - 20}px;--c:${col}`;
   t.el.append(f); setTimeout(() => f.remove(), 1600);
 }

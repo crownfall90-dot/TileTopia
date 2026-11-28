@@ -41,7 +41,11 @@ public class MainActivity extends Activity {
     private final Handler handler = new Handler(Looper.getMainLooper());
     private final Runnable recheck = () -> checkSoon();
     private FrameLayout root;
-    private LaunchCover launchCover;
+    private volatile LaunchCover launchCover;
+    // Allow the page's 20-second recovery screen to paint before the last-resort handoff.
+    private static final long COVER_TIMEOUT_MS = 22_000;
+    private Runnable coverTimeout;
+    private long revealingNavigation = -1;
     private WebView web;
     private long webNavigation;
     private Updater updater;
@@ -100,8 +104,9 @@ public class MainActivity extends Activity {
         hideSystemBars();
         grabLink(getIntent());
         registerBack();
-        // Allow Android to draw the cover before constructing the WebView on the UI thread.
-        root.postOnAnimation(() -> root.postOnAnimation(() -> {
+        // WebView construction can block Android's UI thread on a cold launch.
+        // Keep that work outside the visible tile assembly on slower devices.
+        launchCover.whenSettled(() -> root.postOnAnimation(() -> {
             if (!isDestroyed() && !isFinishing()) createWebView();
         }));
     }
@@ -246,22 +251,25 @@ public class MainActivity extends Activity {
         web.setWebViewClient(new WebViewClient() {
             @Override
             public void onPageStarted(WebView view, String url, android.graphics.Bitmap favicon) {
+                if (view != web) return;
                 webNavigation++;
+                pageReady = false;
+                resetCoverHandoff();
+                if (launchCover != null) {
+                    long navigation = webNavigation;
+                    coverTimeout = () -> revealWebView(view, navigation);
+                    handler.postDelayed(coverTimeout, COVER_TIMEOUT_MS);
+                }
             }
 
             @Override
             public void onPageFinished(WebView view, String url) {
+                if (view != web) return;
                 pageReady = true;
                 if (!insetsJs.isEmpty()) view.evaluateJavascript(insetsJs, null);
                 deliverLink();
                 checkSoon();
-                // Older downloaded pages lack the early handoff hook.
-                if (launchCover != null) {
-                    long navigation = webNavigation;
-                    view.evaluateJavascript("typeof window.__showWebLaunch === 'function'", value -> {
-                        if ("false".equals(value) && navigation == webNavigation) revealWebView(view);
-                    });
-                }
+                checkLaunchDocument(view, true);
             }
 
             @Override
@@ -283,7 +291,10 @@ public class MainActivity extends Activity {
                 report(new IllegalStateException("WebView renderer gone"));
                 root.removeView(view);
                 view.destroy();
-                if (web == view) createWebView();
+                if (web == view) {
+                    resetCoverHandoff();
+                    createWebView();
+                }
                 return true;
             }
         });
@@ -303,18 +314,42 @@ public class MainActivity extends Activity {
         } else web.loadUrl(ContentUpdater.BUNDLED);
     }
 
-    private void revealWebView(WebView view) {
+    private void checkLaunchDocument(WebView view, boolean pageFinished) {
         if (launchCover == null || web != view || isDestroyed()) return;
         long navigation = webNavigation;
+        // Check the active document even for bridge calls queued by the previous navigation.
+        String ready = "typeof window.__finishNativeLaunch === 'function' ? "
+                + "window.__nativeLaunchFinished === true : " + (pageFinished && pageReady);
+        view.evaluateJavascript(ready, value -> {
+            if ("true".equals(value)) revealWebView(view, navigation);
+        });
+    }
+
+    private void revealWebView(WebView view, long navigation) {
+        if (launchCover == null || web != view || isDestroyed() || webNavigation != navigation
+                || revealingNavigation == navigation) return;
+        revealingNavigation = navigation;
         view.postVisualStateCallback(navigation, new WebView.VisualStateCallback() {
             @Override public void onComplete(long requestId) {
-                if (web == view && requestId == webNavigation) removeLaunchCover();
+                LaunchCover cover = launchCover;
+                if (cover == null || web != view || requestId != webNavigation || isDestroyed()) return;
+                cover.whenSettled(() -> cover.fadeOut(() -> {
+                    if (launchCover == cover && web == view && requestId == webNavigation) removeLaunchCover();
+                }));
             }
         });
     }
 
+    private void resetCoverHandoff() {
+        if (coverTimeout != null) handler.removeCallbacks(coverTimeout);
+        coverTimeout = null;
+        revealingNavigation = -1;
+        if (launchCover != null) launchCover.resetHandoff();
+    }
+
     private void removeLaunchCover() {
         if (launchCover == null) return;
+        resetCoverHandoff();
         root.removeView(launchCover);
         launchCover = null;
     }
@@ -339,6 +374,8 @@ public class MainActivity extends Activity {
 
     @Override
     protected void onDestroy() {
+        removeLaunchCover();
+        handler.removeCallbacks(otaWatch);
         handler.removeCallbacks(recheck);
         if (web != null) web.destroy();
         super.onDestroy();
@@ -415,8 +452,13 @@ public class MainActivity extends Activity {
         Bridge(WebView source) { this.source = source; }
 
         @JavascriptInterface
+        public boolean holdsLaunchCover() {
+            return launchCover != null;
+        }
+
+        @JavascriptInterface
         public void launchArtReady() {
-            runOnUiThread(() -> revealWebView(source));
+            runOnUiThread(() -> checkLaunchDocument(source, false));
         }
 
         /** The game has started (end of its start-up): a page downloaded over the air is good. */
@@ -424,7 +466,6 @@ public class MainActivity extends Activity {
         public void contentReady() {
             runOnUiThread(() -> {
                 if (web != source) return;
-                revealWebView(source);
                 contentStarted = true;
                 handler.removeCallbacks(otaWatch);
                 if (ota != null) ota.ready();
