@@ -169,7 +169,7 @@ const PROGRESS_ROAD_MILESTONES = [
   { id: 'm15', lvl: 15, cups: 750, title: 'Зодчий', desc: '+120 тайлов и эмодзи 🏰', reward: { gold: 120, emote: '🏰' }, ic: '🏰' },
   { id: 'm20', lvl: 20, cups: 1000, title: 'Изумруд', desc: 'Рамка «Изумруд» и +150 тайлов', reward: { frame: 'emerald', gold: 150 }, ic: '💎' },
   { id: 'm25', lvl: 25, cups: 1250, title: 'Мастер', desc: '+200 тайлов и фраза «Красиво строишь!»', reward: { gold: 200, phrase: 'Красиво строишь!' }, ic: '⭐' },
-  { id: 'm30', lvl: 30, cups: 1500, title: 'Магистр', desc: 'Фигурка, +250 тайлов и +1 звезда', reward: { fig: 'classic', gold: 250, stars: 1 }, ic: '🧙‍♂️' },
+  { id: 'm30', lvl: 30, cups: 1500, title: 'Магистр', desc: 'Фигурка «Архимаг», +250 тайлов и +1 звезда', reward: { fig: 'wizard', gold: 250, stars: 1 }, ic: '🧙‍♂️' },
   { id: 'm35', lvl: 35, cups: 1750, title: 'Золотой сундук', desc: '+350 тайлов', reward: { gold: 350 }, ic: '🎁' },
   { id: 'm40', lvl: 40, cups: 2000, title: 'Гроссмейстер', desc: 'Статус «Гроссмейстер», +300 тайлов, фраза и +2 звезды', reward: { status: 'Гроссмейстер', gold: 300, stars: 2, phrase: 'Ну ты гроссмейстер! 👑' }, ic: '👑' },
   { id: 'm45', lvl: 45, cups: 2250, title: 'Легенда', desc: '+400 тайлов, статус «Легенда» и +2 звезды', reward: { status: 'Легенда', gold: 400, stars: 2 }, ic: '⚔️' },

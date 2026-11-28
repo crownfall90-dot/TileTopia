@@ -282,10 +282,27 @@ $('#itemsBody').addEventListener('click', e => {
     toastAny(d && d.where ? ('Рамка «' + frName + '» надета. Где увидят: ' + d.where) : ('Рамка «' + frName + '» надета'));
     return;
   }
+  const fb = t.closest('[data-figbuy]'); if (fb) {
+    const k = fb.dataset.figbuy, fObj = FIGS[k];
+    if (!fObj || wallet.owned.includes(k)) return;
+    if (!COINS.canPay(wallet, fObj.price)) return toastAny(COINS.lackText(wallet, fObj.price));
+    confirmBox(`Купить фигурку «${fObj.name}» за ${COINS.priceText(fObj.price)}?`, 'Купить и выбрать', () => {
+      if (wallet.owned.includes(k) || !COINS.pay(wallet, fObj.price)) return;
+      wallet.owned = [...wallet.owned, k];
+      wallet.fig = k;
+      beep('coin');
+      track('spend_virtual_currency', {item_name: 'fig_' + k, virtual_currency_name: 'gold', value: fObj.price});
+      saveWallet(); renderItems(); renderShop(); renderMenuProfile(); renderProgressRoad();
+      toastAny(`Фигурка «${fObj.name}» куплена и выбрана!`);
+    });
+    return;
+  }
   const g = t.closest('[data-ifig]'); if (g) {
     wallet.fig = g.dataset.ifig;
     saveWallet();
     renderItems();
+    renderMenuProfile();
+    renderProgressRoad();
     const d = (typeof PG !== 'undefined' && PG.ui && PG.ui.shop && PG.ui.shop.getItemDescription) ? PG.ui.shop.getItemDescription('fig', g.dataset.ifig) : null;
     if (d && d.where) toastAny('Где увидят: ' + d.where);
     return;

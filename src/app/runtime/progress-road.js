@@ -14,6 +14,7 @@ function renderMenuQuestBanner() {
   const remGold = qList.filter(q => !q.got).reduce((sum, q) => sum + ((QUESTS || []).find(x => x.id === q.id) || {g: 0}).g, 0);
 
   const tEl = $('#mqTitle'), sEl = $('#mqSub');
+  b.classList.toggle('ready', readyGold > 0);
   if (tEl) tEl.textContent = `${doneCount}/${qList.length}`;
   if (sEl) {
     if (readyGold > 0) sEl.textContent = `+${readyGold} 🪙`;

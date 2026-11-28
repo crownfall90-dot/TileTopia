@@ -120,6 +120,7 @@ export function renderAchievementsHtml({
       ? `<button class="chip pri ach-claim-btn" data-claima="${a.id}">Забрать +${a.g} <i class="coin c-${a.coin || 'tile'}"></i></button>`
       : '<span class="pill lock">В процессе</span>';
 
+    const starWord = n => n === 1 ? 'звезда' : (n >= 2 && n <= 4) ? 'звезды' : 'звёзд';
     return `
       <div class="quest ach-card${got ? ' got' : ok ? ' done ready-glow' : ' lock'}${a.tier ? ' tier-' + a.tier : ''}">
         <span class="qi ach-qi">${a.ic}</span>
@@ -129,7 +130,7 @@ export function renderAchievementsHtml({
             ${tierTag}
           </div>
           <small class="ach-desc">${a.d}</small>
-          <div class="ach-reward-val"><i class="coin c-${a.coin || 'tile'}"></i> +${a.g} ${a.coin === 'star' ? 'звёзд' : 'тайлов'}</div>
+          <div class="ach-reward-val"><i class="coin c-${a.coin || 'tile'}"></i> +${a.g} ${a.coin === 'star' ? starWord(a.g) : 'тайлов'}</div>
         </span>
         <div class="ach-action-wrap">
           ${statusPill}
@@ -137,13 +138,15 @@ export function renderAchievementsHtml({
       </div>`;
   }).join('');
 
+  const pct = totalCount ? Math.round(100 * gotCount / totalCount) : 0;
   const summaryHeader = `
     <div class="ach-header-card">
-      <div class="ach-header-left">
+      <div class="ach-header-left" style="width:100%">
         <span class="ach-trophy-icon">🎖️</span>
-        <div>
+        <div style="flex:1;min-width:0">
           <h3>Достижения</h3>
           <p>Собрано <b>${gotCount}</b> из <b>${totalCount}</b> достижений${readyCount ? ` · <b class="ach-ready-notice">${readyCount} готово к получению!</b>` : ''}</p>
+          <div class="xpbar" style="margin-top:8px"><i style="width:${pct}%"></i></div>
         </div>
       </div>
     </div>`;

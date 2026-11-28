@@ -175,7 +175,7 @@ export function renderItemsFigsHtml({figs = {}, ownedFigs = [], selectedFig = 'c
   const lock = Object.keys(figs).filter(k => !ownedFigs.includes(k));
 
   return `<div class="icount">Собрано <b>${ownF.length}</b> из ${Object.keys(figs).length}</div><div class="figgrid">${ownF.map(k => `<button class="fig${selectedFig === k ? ' sel' : ''}" data-ifig="${k}"><img src="${figPreviewFn(k)}" alt=""><b>${figs[k].name}</b><small>${selectedFig === k ? 'Выбрана' : 'Выбрать'}</small></button>`).join('')}</div>`
-    + (lock.length ? `<div class="h3 sec">Ещё не куплены</div><div class="figgrid">${lock.map(k => `<div class="fig poor lockd"><img src="${figPreviewFn(k)}" alt="" style="filter:grayscale(1) brightness(.6)"><b>${figs[k].name}</b><small>${priceTag(figs[k].price)}</small></div>`).join('')}</div>` : '')
+    + (lock.length ? `<div class="h3 sec">Ещё не куплены</div><div class="figgrid">${lock.map(k => `<button type="button" class="fig poor lockd" data-figbuy="${k}"><img src="${figPreviewFn(k)}" alt="" style="filter:grayscale(1) brightness(.6)"><b>${figs[k].name}</b><small>${priceTag(figs[k].price)}</small></button>`).join('')}</div>` : '')
     + '<button class="ghostbtn wide" data-ishop>В магазин</button>';
 }
 
