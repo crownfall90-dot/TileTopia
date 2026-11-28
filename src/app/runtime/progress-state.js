@@ -106,7 +106,10 @@ function gameDone(place, score) {
   PROG.st.streak = win ? (PROG.st.streak || 0) + 1 : 0;
   PROG.st.bestStreak = Math.max(PROG.st.bestStreak || 0, PROG.st.streak);
   const hard = !net && win && typeof botLevel === 'function' && botLevel() === 'hard';
-  progress({games: 1, win: win ? 1 : 0, wins: win ? 1 : 0, s30: score >= ((deckMax <= 30) ? 20 : 30) ? 1 : 0, s40: score >= 40 ? 1 : 0, online: net ? 1 : 0, ogames: net ? 1 : 0, owins: net && win ? 1 : 0, hardwin: hard ? 1 : 0});
+  const sq = (PG.state.progress && PG.state.progress.matchScoreQuests)
+    ? PG.state.progress.matchScoreQuests(score, deckMax)
+    : {s30: score >= (deckMax <= 30 ? 20 : 30) ? 1 : 0, s40: score >= (deckMax <= 30 ? 25 : 40) ? 1 : 0};
+  progress({games: 1, win: win ? 1 : 0, wins: win ? 1 : 0, s30: sq.s30, s40: sq.s40, online: net ? 1 : 0, ogames: net ? 1 : 0, owins: net && win ? 1 : 0, hardwin: hard ? 1 : 0});
   // Experience: a share for taking part, more for the place and for the points, half again online. A game where this
   // player laid fewer than 6 cards gives nothing (quitting early is not farming).
   const me = players.find(isMe), laid = me && me.stats ? me.stats.t || 0 : 6;

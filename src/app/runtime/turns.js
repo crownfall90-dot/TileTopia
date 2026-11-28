@@ -132,6 +132,7 @@ function botReact(win, each, kind, helped, placer) {
   const match = token;
   setTimeout(() => { if (match === token && phase !== 'end' && gameVisible) showSay(speaker, idx); }, 450);
 }
+let seenFeatureProg = new Set();
 async function resolveFeature(c, final, placer) {
   const {win, each, helped} = SC.settle(tiles, c, final, players.length, gameRules.tie, placer, rules2());
   c.tiles.forEach(x => x.el.classList.add('glow'));
@@ -140,9 +141,31 @@ async function resolveFeature(c, final, placer) {
   win.forEach(i => { const m = c.meeples.find(x => x.p === i); floatText(m.t, groupPos(m.t, m.g), '+' + each, players[i].col, each >= 8); });
   win.forEach(i => { players[i].score += each; players[i].stats[c.kind] += each; const b = players[i].best; if (!b || each > b.pts) players[i].best = {pts: each, kind: c.kind, n: c.tiles.length}; });
   if (!final) markDone(c, win);
+  if (!fast() && meCounted()) {
+    const meIdx = players.findIndex(isMe);
+    const featureKey = `${final ? 'final' : 'mid'}:${[...c.ids].sort().join(',')}`;
+    const d = (PG.state.progress && PG.state.progress.featureProgressDelta)
+      ? PG.state.progress.featureProgressDelta({kind: c.kind, tilesCount: c.tiles.length, each, final, win, helped, placer, meIdx, isFast: false, counted: true, seenIds: seenFeatureProg, featureKey})
+      : (() => {
+          if (seenFeatureProg.has(featureKey)) return null;
+          seenFeatureProg.add(featureKey);
+          const out = {};
+          let pts = 0;
+          if (win.includes(meIdx)) {
+            pts += each;
+            if (!final) {
+              out[c.kind] = 1;
+              if (c.kind === 'c') { out.cityTiles = c.tiles.length; if (c.tiles.length >= 5) out.bigc = 1; }
+              else if (c.kind === 'r') { out.roadTiles = c.tiles.length; if (c.tiles.length >= 4) out.longr = 1; }
+            }
+          }
+          if (helped && placer === meIdx) pts += 1;
+          if (pts > 0) out.pts = pts;
+          return Object.keys(out).length ? out : null;
+        })();
+    if (d) progress(d);
+  }
   if (!final && !fast()) {
-    const n = c.tiles.length;
-    win.forEach(i => { if (meCounted() && isMe(players[i])) progress({[c.kind]: 1, pts: each, cityTiles: c.kind === 'c' ? n : 0, roadTiles: c.kind === 'r' ? n : 0, bigc: c.kind === 'c' && n >= 5 ? 1 : 0, longr: c.kind === 'r' && n >= 4 ? 1 : 0}); });
     if (win.length && c.tiles && c.tiles[0]) featureConfetti(c.tiles[0], players[win[0]].col);
     if (gameRules && gameRules.mode === 'epic' && (c.tiles.length >= 5 || c.tiles.some(x => TY(x.type) && TY(x.type).rare))) {
       setTimeout(() => toastAny(`🌟 Событие в Большой игре: ${KIND[c.kind]} завершён! (${c.tiles.length} карт)`), 500);

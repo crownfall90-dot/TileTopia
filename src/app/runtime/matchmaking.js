@@ -52,7 +52,7 @@ async function quickMatch(create) {
   show('match'); matchRender();
   if (FB && registered()) loadFriends().then(renderLobbyFriends).catch(() => {});
 }
-function matchFail(me) { if (mm !== me) return; toastAny('Нет связи с сервером — проверьте интернет'); stopMatch(); show('menu'); }
+function matchFail(me) { if (mm !== me) return; useCount('match:search_fail'); me.failed = true; toastAny('Нет связи с сервером — проверьте интернет'); stopMatch(); show('menu'); }
 const matchSay = (msg) => FIRE.send(MATCH_ROOM, msg).catch(() => {});
 // Open rooms others wait in, the closest to starting first: one free seat, then two, and so on (any mode and size).
 function matchOpen(me) {
@@ -104,6 +104,7 @@ function matchTick(me) {
     // seats added by the module above carry no human-like name yet
     nextSeats.forEach(x => { if (x.bot && !x.owner && !x.ghost) { x.ghost = 1; x.name = ghostName(nextSeats.filter(y => y !== x)); } });
     publishLobby(nextSeats);
+    useCount('match:search_bots');
     me.startAt = Date.now() + 1500;
     matchSay({t: 'close', code: net.code});
   }
@@ -151,6 +152,7 @@ function matchRender() {
 // keepRoom: the game is starting, so stay in the room; otherwise leave it (and close it if ours).
 function stopMatch(keepRoom) {
   const me = mm; if (!me) return;
+  if (!keepRoom && !me.failed && !(net && net.gameId)) useCount('match:search_cancel');
   mm = null;
   me.timers.forEach(clearInterval);
   if (me.es) me.es.close();
@@ -165,6 +167,7 @@ $('#mOther').onclick = () => {
   connect(b.dataset.code, false, true); matchRender();
 };
 $('#mBots').onclick = () => {
+  useCount('match:search_bots');
   const seats = net && net.quick && net.lobby ? net.lobby.seats.slice() : [];
   if (!net || !net.host || seats.length < 2) return openSetup('bots');
   while (seats.length < mm.want) seats.push({owner: null, name: BOT_NAMES.find(n => !seats.some(x => x.name === n)) || 'Бот', fig: randomFig(), col: null});

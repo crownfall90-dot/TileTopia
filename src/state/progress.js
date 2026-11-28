@@ -1,6 +1,41 @@
 // Progress rules: levels, daily quests and achievements. The game keeps the numbers in wallet.prog (PROG).
 // Quest and achievement ids are stored in players' profiles: never rename or reuse one.
 
+export function matchScoreQuests(score, deckSize) {
+  const fast30 = Number(deckSize) > 0 && Number(deckSize) <= 30;
+  return {
+    s30: score >= (fast30 ? 20 : 30) ? 1 : 0,
+    s40: score >= (fast30 ? 25 : 40) ? 1 : 0,
+  };
+}
+
+/** Progress delta for one resolved feature (mid-game or final). Dedupes via seenIds and counts final pts + +1 respect once. */
+export function featureProgressDelta({kind, tilesCount = 0, each = 0, final = false, win = [], helped = false, placer = -1, meIdx = -1, isFast = false, counted = true, seenIds = null, featureKey = ''}) {
+  if (!counted || isFast || meIdx < 0) return null;
+  if (seenIds && featureKey) {
+    if (seenIds.has(featureKey)) return null;
+    seenIds.add(featureKey);
+  }
+  const delta = {};
+  let pts = 0;
+  if (win.includes(meIdx)) {
+    pts += each;
+    if (!final) {
+      delta[kind] = 1;
+      if (kind === 'c') {
+        delta.cityTiles = tilesCount;
+        if (tilesCount >= 5) delta.bigc = 1;
+      } else if (kind === 'r') {
+        delta.roadTiles = tilesCount;
+        if (tilesCount >= 4) delta.longr = 1;
+      }
+    }
+  }
+  if (helped && placer === meIdx) pts += 1;
+  if (pts > 0) delta.pts = pts;
+  return Object.keys(delta).length ? delta : null;
+}
+
 /** Experience needed to go from level l to l + 1. */
 export const xpNeed = l => 50 + 50 * l;
 export const QUESTS = [
@@ -17,7 +52,7 @@ export const QUESTS = [
   {id: 'bc5', ic: '🏯', t: 'Достройте город из 5 плиток и больше', k: 'bigc', n: 1, g: 20},
   {id: 'lr4', ic: '🛣️', t: 'Достройте дорогу из 4 плиток и больше', k: 'longr', n: 1, g: 15},
   {id: 'hw1', ic: '🔥', t: 'Победите сложных ботов', k: 'hardwin', n: 1, g: 30},
-  {id: 's40', ic: '🌟', t: 'Наберите 40 очков за партию', k: 's40', n: 1, g: 25},
+  {id: 's40', ic: '🌟', t: 'Наберите 40 очков за партию (25 в быстрой)', k: 's40', n: 1, g: 25},
   {id: 'say3', ic: '💬', t: 'Отправьте 3 реакции в партиях', k: 'say', n: 3, g: 10},
   {id: 'f2', ic: '⛪', t: 'Окружите 2 монастыря', k: 'f', n: 2, g: 25},
   {id: 'c5', ic: '🏰', t: 'Достройте 5 городов', k: 'c', n: 5, g: 25},

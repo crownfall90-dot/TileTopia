@@ -36,10 +36,13 @@ function startGame(cfg, replay = []) {
   }
   if (!replay.length && !cfg.tut && !cfg.noIntro) {
     const mode = cfg.online ? (net && net.quick ? 'online' : 'friends') : cfg.seats.filter(s => s.human).length > 1 ? 'local' : 'bots';
+    const hasBots = cfg.seats.some(s => !s.human || s.ghost);
     useCount('match:start');
     useCount(`match:mode_${mode}`);
-    track('game_start', {mode, players: cfg.seats.length, rules: (cfg.rules && cfg.rules.mode) || 'classic'});
+    if (mode === 'online') useCount(hasBots ? 'match:mode_online_bots' : 'match:mode_online_live');
+    track('game_start', {mode, players: cfg.seats.length, rules: (cfg.rules && cfg.rules.mode) || 'classic', bots: hasBots ? 1 : 0});
   }
+  onlineMoveTracked = false;
   tut = null; tutShow();
   const locId = (cfg && cfg.loc) || wallet.loc || 'village';
   const gameScr = $('#scr-game');
@@ -54,7 +57,7 @@ function startGame(cfg, replay = []) {
   ownershipDialog.close();
   ownershipMarkers.clear();
   world.innerHTML = '';
-  ghost = null; slotEls = []; meeples = []; doneFeats = []; turn = 0; phase = 'idle';
+  ghost = null; slotEls = []; meeples = []; doneFeats = []; if (typeof seenFeatureProg !== 'undefined') seenFeatureProg.clear(); turn = 0; phase = 'idle';
   const rules = gameRules = cfg.rules;
   players = cfg.seats.map((s, i) => { const name = clean(s.name) || 'Игрок ' + (i + 1); const persona = s.human ? null : (s.persona || (PL0[i] && PL0[i].persona) || 'balanced'); return {name, init: name[0].toUpperCase(), col: validCol(s.col) ? s.col : PL0[i].col, human: s.human, ghost: !!s.ghost, st: PG.state.status.shownStatus(s.st), owner: s.owner, uid: s.uid || null, fig: FIGS[s.fig] ? s.fig : 'classic', botlvl: s.botlvl || (s.human ? null : (wallet.botlvl || 'normal')), persona, score: 0, stats: {c: 0, r: 0, f: 0, t: 0, m: 0}, meeples: rules.meeples, missed: 0}; });
   if (cfg.bonus >= 0 && players[cfg.bonus]) players[cfg.bonus].meeples++;

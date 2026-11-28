@@ -410,7 +410,14 @@ okBtn.onclick = async () => {
   // the turn the coach asks for, and in the right rotation (the next step builds on it)
   if (tut && (tutStep().wait !== 'placed' || (tutStep().r != null && current.r !== tutStep().r))) { const h = $('#rot'); h.classList.remove('tutpulse'); void h.offsetWidth; h.classList.add('tutpulse'); return; }
   phase = 'busy'; okBtn.disabled = rotBtn.disabled = true; clearSlots(); showTip();
-  if (!autoMove) useCount('turn:placed');
+  if (!autoMove) {
+    useCount('turn:placed');
+    if (net && !onlineMoveTracked) {
+      onlineMoveTracked = true;
+      useCount('match:first_online_move');
+      track('first_online_move', {live: players.some(p => !p.human || p.ghost) ? 0 : 1});
+    }
+  }
   tutEvent('placed');
   const t = {x: sel.x, y: sel.y, type: current.type, r: current.r, seed: (Math.random() * 1e9) | 0};
   if (meCounted() && isMe(players[turn]) && !tut) progress({tiles: 1});

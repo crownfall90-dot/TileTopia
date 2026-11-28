@@ -179,7 +179,7 @@ function netRetry(me) {
   if (net !== me) return;
   if (me.close) me.close();
   me.down = null; netDown(me);
-  me.close = TRANSPORT.listen(me.code, {open: () => net === me && netUp(me), error: () => {}, msg: d => { if (net === me) onNet(d); }});
+  me.close = TRANSPORT.listen(me.code, {open: () => net === me && netUp(me), error: () => { if (net === me) netDown(me); }, msg: d => { if (net === me) onNet(d); }});
 }
 addEventListener('offline', () => { if (net && net.gameId) netDown(net); });
 // Before going online: one request to the game server with a time limit (Wi-Fi alone proves nothing).
